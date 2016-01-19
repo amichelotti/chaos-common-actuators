@@ -1,10 +1,17 @@
 
+///#include <common/debug/core/debug.h>
+namespace common{
+    
+    namespace actuators{
+        namespace technosoft{
+    
+
 class TechnoSoftLowDriver {
    
  public:
   int init(char*);
 
-  int initializeAxis(bool,int)// parametri del costruttore: (bool host, int ID_axis)
+  int initializeAxis(bool,int);// parametri del costruttore: (bool host, int ID_axis)
     int setHost(bool);// TRUE se Host
   int initComunication();// puo’ instaurarla solo l’host
   int moveRelativeSteps(int, int, int);// (0 -> OK)  (≠0 -> error)
@@ -34,3 +41,4 @@ class TechnoSoftLowDriver {
   int error_register; 
   int fd;
 };
+        }}}

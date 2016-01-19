@@ -25,8 +25,8 @@ ELSE()
   ADD_LIBRARY(${PROJECT_NAME} SHARED ${src})
 ENDIF()
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug )
-ADD_EXECUTABLE(test_technosoft test/technosoft.cpp)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug TML_lib )
+ADD_EXECUTABLE(test_technosoft test/main.cpp)
 TARGET_LINK_LIBRARIES(test_technosoft  ${PROJECT_NAME} common_debug ${chaoslib})
 
 
