@@ -6,7 +6,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
-
+#include <string>
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
@@ -54,29 +54,31 @@ int getch();
 #define SETUP_FILE_01 "/u2/dcs/prefs/MOV/setups/1setup001.t.zip"
 #define SETUP_FILE_02 "/u2/dcs/prefs/MOV/setups/1setup001.t.zip"
 #endif
+            
+#define CONST_MULT_TECHNOFT 256
+
 
 ///#include <common/debug/core/debug.h>
 namespace common{
     
     namespace actuators{
         namespace technosoft{
-            
-            #define CONST_MULT_TECHNOFT 256
-    
-            //Channel class
+
+	    //Channel class
             class SerialCommChannelTechnosoft{
                 
                 private:
-                    char pszDevName[50];
+                    char pszDevName[100];
                     BYTE btType;
                     DWORD baudrate;
                     int fd;
-                
                 public:
-                    SerialCommChannelTechnosoft();
-                    void initCommChannel(char*,const BYTE&,const DWORD&);
-                    BOOL openCommChannel(int hostID);
-                    void deinitCommChannel();
+                    SerialCommChannelTechnosoft(){};
+		    ~SerialCommChannelTechnosoft(){}
+		    // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
+                    void init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                    BOOL open(int hostID);
+                    void deinit();
             };
         
             //TechnoSoftLowDriver class
@@ -84,23 +86,24 @@ namespace common{
                 
             public:
                 // Costruttore
-                TechnoSoftLowDriver(const int&,const char*);
-                
+                TechnoSoftLowDriver(const std::string&);
+                // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
+		~TechnoSoftLowDriver(){}
                 // Inizializzazione singolo drive/motor
-                int init(const int&, const long&, const double&, const double&, const BOOL&, const short&, const short&);
+                int init(const int&, const double&, const double&, const BOOL&, const short&, const short&);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
-                BOOL moveRelativeSteps();// (0 -> OK)  (≠0 -> error)
+                BOOL moveRelativeSteps(long);// (0 -> OK)  (≠0 -> error)
                 // get methods for variables
-                int getCounter(long&);
-                int getEncoder(long&);
+                BOOL getCounter(long&);
+                BOOL getEncoder(long&);
                 // resetting methos
-                int resetCounter();// reset TPOS_register();
-                int resetEncoder();// reset APOS_register();
-                int getPower(BOOL&); //***************** Questo metodo dovrà essere sostituito da:
+                BOOL resetCounter();// reset TPOS_register();
+                BOOL resetEncoder();// reset APOS_register();
+                BOOL getPower(BOOL&); //***************** Questo metodo dovrà essere sostituito da:
                 //int getRegister()**********************;
                 BOOL stopMotion();
                 int deinit();
@@ -124,7 +127,7 @@ namespace common{
                 //long jerkTime;
                 //short decelerationType;
                 
-                char setup_file[100];
+                char setupFilePath[200];
                 
                 // ************** cosa rappresentano queste tre variabili? ***************
                 int absoluteSteps;// contatore software

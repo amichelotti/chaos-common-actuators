@@ -3,12 +3,13 @@
 /* Function: Main function in the application                                      */
 /*=================================================================================*/
 
-#include <common/actuators/models/TechnosoftLowDriver.h>
+#include <common/actuators/models/technosoft/TechnoSoftLowDriver.h>
 #include <stdlib.h>
 
 int main(int argc, char** argv)
 {
-    TechnosoftLowDriver tc;
+  std::string path=".";
+  common::actuators::technosoft::TechnoSoftLowDriver tc(path);
     
 	return 0;
 }

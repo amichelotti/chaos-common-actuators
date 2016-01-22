@@ -3,6 +3,8 @@ project(common_actuators)
 IF (DEFINED ENV{CHAOS_BUNDLE} )
 include($ENV{CHAOS_BUNDLE}/tools/project_template/CMakeChaos.txt)
 add_definitions(-DCHAOS)
+ELSE()
+
 ENDIF()
 # FILE(GLOB core_src core/*.cpp)    
 

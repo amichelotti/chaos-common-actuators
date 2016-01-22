@@ -4,14 +4,14 @@
 using namespace common::actuators::technosoft;
 
 //--------------------------------------------
-void SerialCommChannelTechnosoft::initCommChannel(char* pszDevName,const BYTE& btType,const DWORD& baudrate){
+void SerialCommChannelTechnosoft::init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
     
-    strcpy(this->pszDevName,pszDevName);
+    strcpy(this->pszDevName,pszDevName.c_str());
     this->btType=btType;
     this->baudrate = baudrate;
 }
 
-BOOL SerialCommChannelTechnosoft::openCommChannel(int hostID){
+BOOL SerialCommChannelTechnosoft::open(int hostID){
     
     int resp;
     /*	Open the comunication channel: COM1, RS232, 1, 115200 */
@@ -23,22 +23,22 @@ BOOL SerialCommChannelTechnosoft::openCommChannel(int hostID){
     return TRUE;
 }
 
-void SerialCommChannelTechnosoft::deinitCommChannel(){
+void SerialCommChannelTechnosoft::deinit(){
     
     TS_CloseChannel(fd);
 }
     
 //--------------------------------------------
-TechnoSoftLowDriver::TechnoSoftLowDriver(const int& axisID,const char* pathSetupFile)
+TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& setupFilePath)
 {
-    strcpy(this->setup_file,pathSetupFile);
+    strcpy(this->setupFilePath,setupFilePath.c_str());
 }
 
-int TechnoSoftLowDriver::init(const int& axisID, const long& relPosition, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;
-    axisRef = TS_LoadSetup(this->setup_file);
+    axisRef = TS_LoadSetup(this->setupFilePath);
     if(axisRef < 0){
         return -1;
     }
@@ -61,7 +61,7 @@ int TechnoSoftLowDriver::init(const int& axisID, const long& relPosition, const 
     this->axisID=axisID;
     this->axisRef=axisRef;
     // Nota: in realtà l'axisID e l'axisRef potrebbero anche non essere definiti tra gli attributi privati perché non sono parametri dei successivi comandi per la movimentazione o lettura dei parametri
-    this->relPosition=relPosition;
+    //this->relPosition=relPosition;
     this->speed=speed;
     this->acceleration=acceleration;
     this->isAdditive=isAdditive;
@@ -71,9 +71,9 @@ int TechnoSoftLowDriver::init(const int& axisID, const long& relPosition, const 
     return 0;
 }
 
-BOOL TechnoSoftLowDriver::moveRelativeSteps(){
+BOOL TechnoSoftLowDriver::moveRelativeSteps( long deltaPosition){
     
-    long deltaPosition=this->relPosition*CONST_MULT_TECHNOFT;
+    deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
     if(!TS_MoveRelative(deltaPosition, this->speed, this->acceleration, this->isAdditive,this->movement,this->referenceBase)){
         return FALSE;
@@ -117,59 +117,61 @@ int TechnoSoftLowDriver::stopPower(){
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
     
-    if(!TS_Power(POWER_OFF)){
-        return -1;
-    }
+    //if(!TS_Power(POWER_OFF)){
+        //return -1;
+    //}
     return 0;
 }
 
-int TechnoSoftLowDriver::getCounter(long& tposition){
+BOOL TechnoSoftLowDriver::getCounter(long& tposition){
 
     if(!TS_GetLongVariable("TPOS", tposition)){
-        return -1;
+        return FALSE;
     }
-    return 0;
+    return TRUE;
 }
 
-int TechnoSoftLowDriver::getEncoder(long& aposition){
+BOOL TechnoSoftLowDriver::getEncoder(long& aposition){
    
     if(!TS_GetLongVariable("APOS", aposition)){
-        return -1;
+        return FALSE;
     }
-    return 0;
+    return TRUE;
 }
 
-int TechnoSoftLowDriver::resetCounter(){
+BOOL TechnoSoftLowDriver::resetCounter(){
     
     if(!TS_Execute("SAP 0")){
-        return -1;
+        return FALSE;
     }
-    return 0;
+    return TRUE;
 }
 
-int TechnoSoftLowDriver::resetEncoder(){
+BOOL TechnoSoftLowDriver::resetEncoder(){
     
     if(!TS_Execute("APOS=0")){
-        return -1;
+        return FALSE;
     }
-    return 0;
+    return TRUE;
 }
 
-int TechnoSoftLowDriver::getPower(BOOL& powered){
+BOOL TechnoSoftLowDriver::getPower(BOOL& powered){
     
     powered = FALSE;
     WORD power;
     if(!TS_ReadStatus(REG_SRL,power)){
-        return -1;
+        return FALSE;
     }
     power = ((power & 1<<15)==0 ? 1 : 0); //La forma generale dell'istruzione di SHIFT A SINISTRA è del tipo:
     //variabile_intera << numero_posizioni
     if (power==1) {
         powered = FALSE;
-        return 0;
+        return TRUE;
     }
     else{
         powered = TRUE;
-        return 0;
+        return TRUE;
     }
 }
+
+
