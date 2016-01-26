@@ -1,7 +1,8 @@
-#include "TML_lib.h"
+//#include "TML_lib.h"
 #include "TechnoSoftLowDriver.h"
 
 using namespace common::actuators::technosoft;
+using namespace common::actuators;
 
 //--------------------------------------------
 void SerialCommChannelTechnosoft::init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
@@ -34,7 +35,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& setupFilePath)
     strcpy(this->setupFilePath,setupFilePath.c_str());
 }
 
-int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+int TechnoSoftLowDriver::initTechnoSoftLowDriver(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;
@@ -71,9 +72,9 @@ int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const doub
     return 0;
 }
 
-BOOL TechnoSoftLowDriver::moveRelativeSteps( long deltaPosition){
+BOOL TechnoSoftLowDriver::moveRelativeSteps( long& deltaPosition){
     
-    deltaPosition*=CONST_MULT_TECHNOFT;
+    //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
     if(!TS_MoveRelative(deltaPosition, this->speed, this->acceleration, this->isAdditive,this->movement,this->referenceBase)){
         return FALSE;
@@ -174,4 +175,44 @@ BOOL TechnoSoftLowDriver::getPower(BOOL& powered){
     }
 }
 
+void Actuator::initActuator(const double& range,const double& mechanicalReduceFactor,const double& movementUnit_mm,const int& encoderLines,const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+
+	initTechnoSoftLowDriver(axisID,speed,acceleration,isAdditive,moveMoment,referenceBase);
+	this->range = range;
+	this->mechanicalReduceFactor=mechanicalReduceFactor;
+	this->movementUnit_mm = movementUnit_mm;
+	this->encoderLines = encoderLines;
+}
+
+int Actuator::moveRelativeMillimeters(double deltaMillimeters){
+
+	// Calcolo argomento funzione moveRelativeSteps
+	double deltaMicroSteps = round((N_ROUNDS*STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS);
+	if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
+		return -1;
+     
+	long deltaMicroStepsL = deltaMicroSteps;	
+	if(!moveRelativeSteps(deltaMicroStepsL))
+		return -2;			
+		
+	return 0;
+ }
+
+int Actuator::getPosition(BOOL readingType, long& deltaPosition_mm){
+
+	if(readingType==TRUE){ // Lettura posizione per mezzo del counter (TPOS register)
+		long tposition;
+		if(!TechnoSoftLowDriver::getCounter(tposition))
+        		return -1;
+		deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
+	}
+	else{               // Lettura posizione per mezzo dell'encoder (Apos register)
+		long aposition;
+		if(!TechnoSoftLowDriver::getEncoder(aposition))
+        		return -2;
+		deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(N_ENCODER_LINES*N_ROUNDS);
+	}
+	
+	return 0;
+ }
 
