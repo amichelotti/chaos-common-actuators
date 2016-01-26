@@ -1,6 +1,6 @@
 //#include "TML_lib.h"
 #include "TechnoSoftLowDriver.h"
-#include <iostream> //solo per il test
+
 
 using namespace common::actuators::technosoft;
 using namespace common::actuators;
