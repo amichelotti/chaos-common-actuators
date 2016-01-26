@@ -1,4 +1,4 @@
-#include "iostream"
+#include <iostream>
 #include "TechnoSoftLowDriver.h"
 
 int main(int argc,const char* argv[]){
@@ -11,8 +11,10 @@ int main(int argc,const char* argv[]){
 	serial1.init(channelName,btType,baudrate);
 
 	// Apertura canale
-	if(!serial1.open(HOST_ID))
+	if(!serial1.open(HOST_ID)){
+		std::cout<<"Errore apertura canale di comunicazione"<<std::endl;
 		return -1;
+	}
 
 	// Costruzione oggetto Actuator
 	//common::actuators::technosoft::TechnoSoftLowDriver techSoftDriveMotor1(SETUP_FILE_01);
@@ -34,29 +36,34 @@ int main(int argc,const char* argv[]){
 	ActuatorTechSoft.initActuator(range,mechanicalReduceFactor,movementUnit_mm,encoderLines,axisID, speed, acceleration, isAdditive, moveMoment, referenceBase);
 
 	// Reset encoder di Actuator
-	if(!ActuatorTechSoft.resetEncoder())
+	if(!ActuatorTechSoft.resetEncoder()){
+		std::cout<<"Errore reset encoder"<<std::endl;
 		return -1;
+	}
 
 	// Reset counter di Actuator
-	if(!ActuatorTechSoft.resetCounter())
+	if(!ActuatorTechSoft.resetCounter()){
+		std::cout<<"Errore reset counter"<<std::endl;
 		return -2;
+	}
 
-	
 	// Lettura encoder di Actuator (PRIMA della movimentazione)
-	long apositionFirst;
-	if(!ActuatorTechSoft.getPosition(FALSE,apositionFirst)){
+	double apositionFirst;
+	if(ActuatorTechSoft.getPosition(FALSE,apositionFirst)!=0){
+		std::cout<<"Errore get position from encoder"<<std::endl;
 		return -3;
 	}
 	else
-		std::cout<<"The value of encoder is "<< apositionFirst<<std::endl;
+		std::cout<<"Shift in millimeters (read from encoder): "<< apositionFirst<<std::endl;
 
 	// Lettura counter di Actuator (PRIMA della movimentazione)
-	long tpositionFirst;
-	if(!ActuatorTechSoft.getPosition(TRUE,tpositionFirst)){
+	double tpositionFirst;
+	if(ActuatorTechSoft.getPosition(TRUE,tpositionFirst)!=0){
+		std::cout<<"Errore get position from counter"<<std::endl;
 		return -4;
 	}
 	else
-		std::cout<<"The value of counter is "<<tpositionFirst<<std::endl;
+		std::cout<<"Shift in millimeters (read from counter): "<<tpositionFirst<<std::endl;
 
 	
 	// Alimentazione Actuator
@@ -66,34 +73,38 @@ int main(int argc,const char* argv[]){
 
 	
 	// Movimentazione Actuator	
-	long relPosition;
-	std::cout<<"Enter number of steps for motion: " << std::endl;
+	double relPosition;
+	std::cout<<"Enter number of millimeters for motion: " << std::endl;
 	std::cin>>relPosition;
-	if(!ActuatorTechSoft.moveRelativeMillimeters(relPosition))
+	if(ActuatorTechSoft.moveRelativeMillimeters(relPosition)!=0){
+		std::cout<<"Errore movimentazione relativa in millimetri: " << std::endl;
 		return -6;
-	
+	}
+
+
 	sleep(10);
 
 	// Stop movimentazione Actuator
-	if(!ActuatorTechSoft.stopMotion())
+	if(!ActuatorTechSoft.stopMotion()){
+		std::cout<<"Errore stop movimentazione: " << std::endl;
 		return -7;
+	}
 
 	// Lettura encoder di Actuator (DOPO la movimentazione)
-	long apositionAfter;
-	if(!ActuatorTechSoft.getPosition(FALSE,apositionAfter)){
+	double apositionAfter;
+	if(ActuatorTechSoft.getPosition(FALSE,apositionAfter)!=0){
 		return -8;
 	}
 	else
-		std::cout<<"The value of encoder is "<< apositionAfter<<std::endl;
+		std::cout<<"Shift in millimeters (read from encoder): "<< apositionAfter<<std::endl;
 
 	// Lettura counter di Actuator (DOPO la movimentazione)
-	long tpositionAfter;
-	if(!ActuatorTechSoft.getPosition(TRUE,tpositionAfter)){
+	double tpositionAfter;
+	if(ActuatorTechSoft.getPosition(TRUE,tpositionAfter)!=0){
 		return -9;
 	}
 	else
-		std::cout<<"The value of counter is "<<tpositionAfter<<std::endl;
-
+		std::cout<<"Shift in millimeters (read from counter): "<<tpositionAfter<<std::endl;
 
 	// Check alimentazione Actuator
 	BOOL poweredFirst;
@@ -106,7 +117,6 @@ int main(int argc,const char* argv[]){
 	// Interruzione alimentazione Actuator
 	ActuatorTechSoft.stopPower();
 
-
 	// Check alimentazione dopo aver tagliato l'alimentazione a Actuator
 	BOOL poweredAfter;
 	if(!ActuatorTechSoft.getPower(poweredAfter))
@@ -115,7 +125,7 @@ int main(int argc,const char* argv[]){
 		std::cout<<"Now, the power state is: "<< poweredAfter << std::endl;
 
 	// deinizializzazione Actuator: di nuovo interruzione alimentazione techSoftDriveMotor1	
-	ActuatorTechSoft.deinit(); // non fa niente...
+	ActuatorTechSoft.deinit(); // non fa niente in questo momento in pratica...
 	
 	// Deinizializzazione canale: chiusura canale di comunicazione
 	serial1.deinit();

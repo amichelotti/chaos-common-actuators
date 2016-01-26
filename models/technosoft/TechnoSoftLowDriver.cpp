@@ -1,5 +1,6 @@
 //#include "TML_lib.h"
 #include "TechnoSoftLowDriver.h"
+#include <iostream> //solo per il test
 
 using namespace common::actuators::technosoft;
 using namespace common::actuators;
@@ -198,18 +199,21 @@ int Actuator::moveRelativeMillimeters(double deltaMillimeters){
 	return 0;
  }
 
-int Actuator::getPosition(BOOL readingType, long& deltaPosition_mm){
+int Actuator::getPosition(BOOL readingType, double& deltaPosition_mm){
 
 	if(readingType==TRUE){ // Lettura posizione per mezzo del counter (TPOS register)
 		long tposition;
 		if(!TechnoSoftLowDriver::getCounter(tposition))
         		return -1;
+		//std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
 		deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
 	}
 	else{               // Lettura posizione per mezzo dell'encoder (Apos register)
 		long aposition;
+		
 		if(!TechnoSoftLowDriver::getEncoder(aposition))
         		return -2;
+		//std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
 		deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(N_ENCODER_LINES*N_ROUNDS);
 	}
 	

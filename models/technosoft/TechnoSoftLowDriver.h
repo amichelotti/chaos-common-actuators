@@ -58,10 +58,10 @@ int getch();
             
 #define CONST_MULT_TECHNOFT 256.0 // numero micro steps per step (MDS)
 #define STEPS_PER_ROUNDS 200.0     // numero steps per giro
-#define N_ROUNDS 20 
+#define N_ROUNDS 20.0 
 #define LINEAR_MOVEMENT_PER_N_ROUNDS 1.5 //[mm]
-#define N_ENCODER_LINES 800 //[mm]
-#define RANGE 20  
+#define N_ENCODER_LINES 800.0 //[mm]
+#define RANGE 20.0  
 
 
 
@@ -160,7 +160,7 @@ namespace common{
 			~Actuator(){}
 			void initActuator(const double&,const double&,const double&,const int&,const int&, const double&, const double&, const BOOL&, const short&, const short&);// all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
 			int moveRelativeMillimeters(double);
-			int getPosition(BOOL, long&);
+			int getPosition(BOOL, double&);
 			//BOOL stopMotion(); questa funzione verra ereditata direttamente dalla classe base, quindi non occorre dichiararla
 			//int homing();
 			//int getStatus();
