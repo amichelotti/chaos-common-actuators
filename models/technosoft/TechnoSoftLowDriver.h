@@ -147,6 +147,7 @@ namespace common{
 	class Actuator: public common::actuators::technosoft::TechnoSoftLowDriver{
 	
 		private:
+			common::actuators::technosoft::TechnoSoftLowDriver *driver;
 			char actuator_name[20]; //(passato da MDS) es. SLTTB001 left
 			double range; //mechanical range of the slit (passato da MDS)
 			double mechanicalReduceFactor; // (passato da MDS), 1/x, x giri : 1 un_mov_mm
