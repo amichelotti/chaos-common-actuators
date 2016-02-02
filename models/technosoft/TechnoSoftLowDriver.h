@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/timeb.h>
 #include <string>
+#include <cmath>
+#include <limits.h>
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
@@ -41,8 +43,7 @@ int getch();
 #define BAUDRATE	115200
 #define SPEED 400.0 // 30.0
 #define ACCELERATION 0.1 // 0.6
-#define CONST_MULT 256
-#define MAX_NAMEAXIS_LENGTH 256
+
 
 #define MAX_LENGTH_STRING_FROM_SHELL 50
 #define MAX_COMMAND_LENGTH 10
@@ -55,7 +56,13 @@ int getch();
 #define SETUP_FILE_02 "/u2/dcs/prefs/MOV/setups/1setup001.t.zip"
 #endif
             
-#define CONST_MULT_TECHNOFT 256
+#define CONST_MULT_TECHNOFT 256.0 // numero micro steps per step (MDS)
+#define STEPS_PER_ROUNDS 200.0     // numero steps per giro
+#define N_ROUNDS 20.0 
+#define LINEAR_MOVEMENT_PER_N_ROUNDS 1.5 //[mm]
+#define N_ENCODER_LINES 800.0 //[mm]
+#define RANGE 20.0  
+
 
 
 ///#include <common/debug/core/debug.h>
@@ -73,46 +80,17 @@ namespace common{
                     DWORD baudrate;
                     int fd;
                 public:
-                    SerialCommChannelTechnosoft(){};
-		    ~SerialCommChannelTechnosoft(){}
-		    // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
-                    void init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                    ~SerialCommChannelTechnosoft(){}
+		    // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE********************
                     BOOL open(int hostID);
-                    void deinit();
+                    void close();
             };
         
             //TechnoSoftLowDriver class
             class TechnoSoftLowDriver {
-                
-            public:
-                // Costruttore
-                TechnoSoftLowDriver(const std::string&);
-                // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
-		~TechnoSoftLowDriver(){}
-                // Inizializzazione singolo drive/motor
-                int init(const int&, const double&, const double&, const BOOL&, const short&, const short&);
-                
-                //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
-                //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
-                int providePower();
-                int stopPower();
-                BOOL moveRelativeSteps(long);// (0 -> OK)  (≠0 -> error)
-                // get methods for variables
-                BOOL getCounter(long&);
-                BOOL getEncoder(long&);
-                // resetting methos
-                BOOL resetCounter();// reset TPOS_register();
-                BOOL resetEncoder();// reset APOS_register();
-                BOOL getPower(BOOL&); //***************** Questo metodo dovrà essere sostituito da:
-                //int getRegister()**********************;
-                BOOL stopMotion();
-                int deinit();
-                
-                int getMERregister();// REG_MER_register();
-                int getSRLregister();// REG_SRL_register();
-                //******************* da aggiungere la lettura dell'altro registro rimanente ******************
-                
-            private:
+
+	    private:
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
                 
@@ -133,5 +111,35 @@ namespace common{
                 int absoluteSteps;// contatore software
                 int status_register;// Reg_MER
                 int error_register; 
-            };
-}}}
+                
+            public:
+                // Costruttore
+                TechnoSoftLowDriver(const std::string&);
+                // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
+                ~TechnoSoftLowDriver(){}
+                // Inizializzazione singolo drive/motor
+                int initTechnoSoftLowDriver(const int&, const double&, const double&, const BOOL&, const short&, const short&);
+                
+                //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
+                //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
+                int providePower();
+                int stopPower();
+                BOOL moveRelativeSteps(long&);// (0 -> OK)  (≠0 -> error)
+                // get methods for variables
+                BOOL getCounter(long&);
+                BOOL getEncoder(long&);
+                // resetting methos
+                BOOL resetCounter();// reset TPOS_register();
+                BOOL resetEncoder();// reset APOS_register();
+                BOOL getPower(BOOL&); //***************** Questo metodo dovrà essere sostituito da:
+                //int getRegister()**********************;
+                BOOL stopMotion();
+                int deinit();
+                
+                int getMERregister();// REG_MER_register();
+                int getSRLregister();// REG_SRL_register();
+                //******************* da aggiungere la lettura dell'altro registro rimanente ******************
+           };
+	}// chiude namespace technosoft
+
+}}

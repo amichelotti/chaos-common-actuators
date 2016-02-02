@@ -1,31 +1,39 @@
-#include "TML_lib.h"
+//#include "TML_lib.h"
 #include "TechnoSoftLowDriver.h"
 
+
 using namespace common::actuators::technosoft;
+using namespace common::actuators;
 
 //--------------------------------------------
-void SerialCommChannelTechnosoft::init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
-    
+// Costruttore classe SerialCommChannelTechnosoft
+SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
     strcpy(this->pszDevName,pszDevName.c_str());
     this->btType=btType;
     this->baudrate = baudrate;
+    this->fd = -1;
+}
+
+SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
+    this->close();
 }
 
 BOOL SerialCommChannelTechnosoft::open(int hostID){
     
     int resp;
     /*	Open the comunication channel: COM1, RS232, 1, 115200 */
-    if((resp=TS_OpenChannel(this->pszDevName, this->btType, hostID, this->baudrate)) < 0)
-    {
+    if((resp=TS_OpenChannel(this->pszDevName, this->btType, hostID, this->baudrate)) < 0){
         return FALSE;
     }
     this->fd = resp;
     return TRUE;
 }
 
-void SerialCommChannelTechnosoft::deinit(){
+void SerialCommChannelTechnosoft::close(){
     
-    TS_CloseChannel(fd);
+    if (this->fd!=-1) {
+        TS_CloseChannel(fd);
+    }
 }
     
 //--------------------------------------------
@@ -34,7 +42,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& setupFilePath)
     strcpy(this->setupFilePath,setupFilePath.c_str());
 }
 
-int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+int TechnoSoftLowDriver::initTechnoSoftLowDriver(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;
@@ -71,9 +79,9 @@ int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const doub
     return 0;
 }
 
-BOOL TechnoSoftLowDriver::moveRelativeSteps( long deltaPosition){
+BOOL TechnoSoftLowDriver::moveRelativeSteps( long& deltaPosition){
     
-    deltaPosition*=CONST_MULT_TECHNOFT;
+    //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
     if(!TS_MoveRelative(deltaPosition, this->speed, this->acceleration, this->isAdditive,this->movement,this->referenceBase)){
         return FALSE;
@@ -173,5 +181,3 @@ BOOL TechnoSoftLowDriver::getPower(BOOL& powered){
         return TRUE;
     }
 }
-
-
