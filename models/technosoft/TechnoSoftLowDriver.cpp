@@ -3,7 +3,6 @@
 
 
 using namespace common::actuators::technosoft;
-using namespace common::actuators;
 
 //--------------------------------------------
 // Costruttore classe SerialCommChannelTechnosoft
@@ -42,7 +41,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& setupFilePath)
     strcpy(this->setupFilePath,setupFilePath.c_str());
 }
 
-int TechnoSoftLowDriver::initTechnoSoftLowDriver(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;

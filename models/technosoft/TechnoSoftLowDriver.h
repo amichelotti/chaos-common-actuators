@@ -26,7 +26,7 @@
 #	include <errno.h>
 #	include <fcntl.h>
 #	include "TML_lib.h"
-int getch();
+//int getch();
 #endif
 
 #if defined(WINDOWS) || defined(WIN32)
@@ -64,8 +64,6 @@ int getch();
 #define RANGE 20.0  
 
 
-
-///#include <common/debug/core/debug.h>
 namespace common{
     
     namespace actuators{
@@ -81,8 +79,7 @@ namespace common{
                     int fd;
                 public:
                     SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
-                    ~SerialCommChannelTechnosoft(){}
-		    // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE********************
+                    ~SerialCommChannelTechnosoft();
                     BOOL open(int hostID);
                     void close();
             };
@@ -118,13 +115,13 @@ namespace common{
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver(){}
                 // Inizializzazione singolo drive/motor
-                int initTechnoSoftLowDriver(const int&, const double&, const double&, const BOOL&, const short&, const short&);
+                int init(const int&, const double&, const double&, const BOOL&, const short&, const short&);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
-                BOOL moveRelativeSteps(long&);// (0 -> OK)  (≠0 -> error)
+                BOOL moveRelativeSteps(long& deltaPosition);// (0 -> OK)  (≠0 -> error)
                 // get methods for variables
                 BOOL getCounter(long&);
                 BOOL getEncoder(long&);
@@ -141,5 +138,5 @@ namespace common{
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
            };
 	}// chiude namespace technosoft
-
-}}
+    }
+}

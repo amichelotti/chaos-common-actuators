@@ -47,7 +47,7 @@ int Actuator::moveRelativeMillimeters(double deltaMillimeters){
         return -1;
     
     long deltaMicroStepsL = deltaMicroSteps;
-    if(!moveRelativeSteps(deltaMicroStepsL))
+    if(!this->driver->moveRelativeSteps(deltaMicroStepsL))
         return -2;
     
     return 0;
@@ -57,7 +57,7 @@ int Actuator::getPosition(readingTypes readingType, double& deltaPosition_mm){
     
     if(readingType==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
         long tposition;
-        if(!TechnoSoftLowDriver::getCounter(tposition))
+        if(!this->driver->getCounter(tposition))
             return -1;
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
         deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
@@ -65,7 +65,7 @@ int Actuator::getPosition(readingTypes readingType, double& deltaPosition_mm){
     else if(readingType==READ_ENCODER){               // Lettura posizione per mezzo dell'encoder (Apos register)
         long aposition;
         
-        if(!TechnoSoftLowDriver::getEncoder(aposition))
+        if(!this->driver->getEncoder(aposition))
             return -2;
         //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
         deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(N_ENCODER_LINES*N_ROUNDS);
