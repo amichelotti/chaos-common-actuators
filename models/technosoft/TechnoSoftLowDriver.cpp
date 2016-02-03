@@ -1,11 +1,10 @@
-//#include "TML_lib.h"
+
 #include "TechnoSoftLowDriver.h"
 
 
 using namespace common::actuators::technosoft;
 
 //--------------------------------------------
-// Costruttore classe SerialCommChannelTechnosoft
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
     strcpy(this->pszDevName,pszDevName.c_str());
     this->btType=btType;
@@ -13,12 +12,19 @@ SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszD
     this->fd = -1;
 }
 
+
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
     this->close();
 }
 
+void SerialCommChannelTechnosoft::close(){
+
+	if(this->fd!=-1){
+		TS_CloseChannel(this->fd);
+	}
+}
+
 BOOL SerialCommChannelTechnosoft::open(int hostID){
-    
     int resp;
     /*	Open the comunication channel: COM1, RS232, 1, 115200 */
     if((resp=TS_OpenChannel(this->pszDevName, this->btType, hostID, this->baudrate)) < 0){
@@ -28,13 +34,6 @@ BOOL SerialCommChannelTechnosoft::open(int hostID){
     return TRUE;
 }
 
-void SerialCommChannelTechnosoft::close(){
-    
-    if (this->fd!=-1) {
-        TS_CloseChannel(fd);
-    }
-}
-    
 //--------------------------------------------
 TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& setupFilePath)
 {
@@ -78,7 +77,8 @@ int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const doub
     return 0;
 }
 
-BOOL TechnoSoftLowDriver::moveRelativeSteps( long& deltaPosition){
+
+BOOL TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     
     //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
@@ -89,7 +89,7 @@ BOOL TechnoSoftLowDriver::moveRelativeSteps( long& deltaPosition){
 }
 
 BOOL TechnoSoftLowDriver::stopMotion(){
-      
+
       if(!TS_Stop()){
           return FALSE;
       }
@@ -169,7 +169,7 @@ BOOL TechnoSoftLowDriver::getPower(BOOL& powered){
     if(!TS_ReadStatus(REG_SRL,power)){
         return FALSE;
     }
-    power = ((power & 1<<15)==0 ? 1 : 0); //La forma generale dell'istruzione di SHIFT A SINISTRA è del tipo:
+    power = ((power & 1<<15)==0 ? 1 : 0); //La forma generale dell'istruzione di SHIFT A SINISTRA e' del tipo:
     //variabile_intera << numero_posizioni
     if (power==1) {
         powered = FALSE;

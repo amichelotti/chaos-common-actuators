@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <math.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
 #include <string>
 #include <cmath>
 #include <limits.h>
+#include <string.h>
+
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
@@ -67,7 +67,7 @@
 namespace common{
     
     namespace actuators{
-        namespace technosoft{
+       namespace technosoft{
 
 	    //Channel class
             class SerialCommChannelTechnosoft{
@@ -78,7 +78,7 @@ namespace common{
                     DWORD baudrate;
                     int fd;
                 public:
-                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
                     ~SerialCommChannelTechnosoft();
                     BOOL open(int hostID);
                     void close();
@@ -121,7 +121,7 @@ namespace common{
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
-                BOOL moveRelativeSteps(long& deltaPosition);// (0 -> OK)  (≠0 -> error)
+                BOOL moveRelativeSteps(const long&);// (0 -> OK)  (different 0 -> error)
                 // get methods for variables
                 BOOL getCounter(long&);
                 BOOL getEncoder(long&);
