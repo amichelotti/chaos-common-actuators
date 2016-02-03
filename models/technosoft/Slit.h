@@ -32,7 +32,7 @@
 
 
 namespace common {
-
+    namespace actuators {
         typedef enum
         {	READ_ENCODER,
             READ_COUNTER
@@ -94,4 +94,5 @@ namespace common {
         virtual int homing()=0; // ***Da implementare***
         virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
     };
+}
 }

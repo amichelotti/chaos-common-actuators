@@ -18,7 +18,7 @@ namespace common{
 
 	namespace technosoft{
 
-            class Actuator: public common::Slit{
+            class Actuator: public common::actuators::Slit{
     
                 private:
                     common::actuators::technosoft::TechnoSoftLowDriver *driver=NULL;

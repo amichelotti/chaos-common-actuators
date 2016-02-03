@@ -79,7 +79,10 @@ namespace common{
                     DWORD baudrate;
                     int fd;
                 public:
+                SerialCommChannelTechnosoft(){}
                 SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                
                     ~SerialCommChannelTechnosoft();
                     BOOL open(int hostID);
                     void close();
@@ -116,7 +119,7 @@ namespace common{
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver(){}
                 // Inizializzazione singolo drive/motor
-                int initTechnoSoftLowDriver(const int&, const double&, const double&, const BOOL&, const short&, const short&);
+                int init(const int&, const double&, const double&, const BOOL&, const short&, const short&);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);

@@ -7,12 +7,14 @@ using namespace common::actuators;
 
 //--------------------------------------------
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
+    init(pszDevName,btType,baudrate);
+}
+int SerialCommChannelTechnosoft::init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
     strcpy(this->pszDevName,pszDevName.c_str());
     this->btType=btType;
     this->baudrate = baudrate;
     this->fd = -1;
 }
-
 
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
     this->close();
@@ -41,7 +43,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& setupFilePath)
     strcpy(this->setupFilePath,setupFilePath.c_str());
 }
 
-int TechnoSoftLowDriver::initTechnoSoftLowDriver(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;

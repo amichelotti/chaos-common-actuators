@@ -25,8 +25,8 @@ ELSE()
 ENDIF()
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug TML_lib )
-ADD_EXECUTABLE(test_technosoft test/main.cpp)
-TARGET_LINK_LIBRARIES(test_technosoft  ${PROJECT_NAME} common_debug ${chaoslib})
+# ADD_EXECUTABLE(test_technosoft test/main.cpp)
+# TARGET_LINK_LIBRARIES(test_technosoft  ${PROJECT_NAME} common_debug ${chaoslib})
 
 
 FILE(GLOB model_src *.h)    
@@ -34,5 +34,5 @@ FILE(GLOB model_src *.h)
 
 INSTALL(FILES ${model_src} DESTINATION include/common/actuators/models/technosoft ) 
 INSTALL_TARGETS(/lib ${PROJECT_NAME})
-INSTALL_TARGETS(/bin test_technosoft)
+# INSTALL_TARGETS(/bin test_technosoft)
 
