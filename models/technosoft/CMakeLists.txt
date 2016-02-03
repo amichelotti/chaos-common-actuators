@@ -25,8 +25,8 @@ ELSE()
 ENDIF()
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug TML_lib )
-# ADD_EXECUTABLE(test_technosoft test/main.cpp)
-# TARGET_LINK_LIBRARIES(test_technosoft  ${PROJECT_NAME} common_debug ${chaoslib})
+ADD_EXECUTABLE(test_technosoft test/test_main.cpp)
+TARGET_LINK_LIBRARIES(test_technosoft  ${PROJECT_NAME} common_debug ${chaoslib})
 
 
 FILE(GLOB model_src *.h)    

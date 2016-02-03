@@ -20,6 +20,8 @@ int Actuator::init(const double& range,const double& _mechanicalReduceFactor,con
     if (driver==NULL) {
         return -1;
     }
+    
+    
     // Inizializzazione parametri TechnoSoftLowDriver
     driver->init(axisID,speed,acceleration,isAdditive,moveMoment,referenceBase);
     
@@ -28,7 +30,6 @@ int Actuator::init(const double& range,const double& _mechanicalReduceFactor,con
     mechanicalReduceFactor=_mechanicalReduceFactor;
     movementUnit_mm = _movementUnit_mm;
     encoderLines = _encoderLines;
-    
     return 0;
 }
 

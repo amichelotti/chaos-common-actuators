@@ -6,6 +6,7 @@
         <df name="technosoft">
           <df name="test">
             <in>Ex04_MainFile.c</in>
+            <in>test_main.cpp</in>
           </df>
           <in>ActuatorTechnoSoft.cpp</in>
           <in>TechnoSoftLowDriver.cpp</in>
@@ -50,9 +51,6 @@
               <pElem>../..</pElem>
               <pElem>..</pElem>
             </incDir>
-            <preprocessorList>
-              <Elem>common_actuators_technosoft_EXPORTS</Elem>
-            </preprocessorList>
           </ccTool>
         </makeTool>
         <preBuild>
@@ -65,6 +63,9 @@
             tool="1"
             flavor2="4">
         <ccTool flags="0">
+          <preprocessorList>
+            <Elem>common_actuators_technosoft_EXPORTS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="models/technosoft/TechnoSoftLowDriver.cpp"
@@ -72,16 +73,27 @@
             tool="1"
             flavor2="4">
         <ccTool flags="0">
+          <preprocessorList>
+            <Elem>common_actuators_technosoft_EXPORTS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="models/technosoft/main.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
+          <preprocessorList>
+            <Elem>common_actuators_technosoft_EXPORTS</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="models/technosoft/test/Ex04_MainFile.c"
             ex="false"
             tool="0"
             flavor2="2">
+      </item>
+      <item path="models/technosoft/test/test_main.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
     </conf>
   </confs>

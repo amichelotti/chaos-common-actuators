@@ -6,7 +6,7 @@
 //  Copyright © 2016 MacBookProINFN. All rights reserved.
 //
 
-#include "Slit.h"
+#include <common/actuators/core/Slit.h>
 #include "TechnoSoftLowDriver.h"
 
 #ifndef ActuatorTechnosoft_h
