@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <math.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
 #include <string>
 #include <cmath>
 #include <limits.h>
+
+#include <string.h>
+
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
@@ -26,7 +27,7 @@
 #	include <errno.h>
 #	include <fcntl.h>
 #	include "TML_lib.h"
-int getch();
+//int getch();
 #endif
 
 #if defined(WINDOWS) || defined(WIN32)
@@ -64,12 +65,10 @@ int getch();
 #define RANGE 20.0  
 
 
-
-///#include <common/debug/core/debug.h>
 namespace common{
     
     namespace actuators{
-        namespace technosoft{
+       namespace technosoft{
 
 	    //Channel class
             class SerialCommChannelTechnosoft{
@@ -80,12 +79,10 @@ namespace common{
                     DWORD baudrate;
                     int fd;
                 public:
-                    SerialCommChannelTechnosoft(){};
-		    ~SerialCommChannelTechnosoft(){}
-		    // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
-                    void init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                    ~SerialCommChannelTechnosoft();
                     BOOL open(int hostID);
-                    void deinit();
+                    void close();
             };
         
             //TechnoSoftLowDriver class
@@ -117,7 +114,7 @@ namespace common{
                 // Costruttore
                 TechnoSoftLowDriver(const std::string&);
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
-		~TechnoSoftLowDriver(){}
+                ~TechnoSoftLowDriver(){}
                 // Inizializzazione singolo drive/motor
                 int initTechnoSoftLowDriver(const int&, const double&, const double&, const BOOL&, const short&, const short&);
                 
@@ -125,7 +122,8 @@ namespace common{
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
-                BOOL moveRelativeSteps(long&);// (0 -> OK)  (≠0 -> error)
+                BOOL moveRelativeSteps(const long&);// (0 -> OK)  (different 0 -> error)
+
                 // get methods for variables
                 BOOL getCounter(long&);
                 BOOL getEncoder(long&);
@@ -142,30 +140,7 @@ namespace common{
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
            };
 	}// chiude namespace technosoft
-	
 
-	class Actuator: public common::actuators::technosoft::TechnoSoftLowDriver{
-	
-		private:
-			common::actuators::technosoft::TechnoSoftLowDriver *driver;
-			char actuator_name[20]; //(passato da MDS) es. SLTTB001 left
-			double range; //mechanical range of the slit (passato da MDS)
-			double mechanicalReduceFactor; // (passato da MDS), 1/x, x giri : 1 un_mov_mm
-			double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
-			int encoderLines; // (passato da MDS)
-		public:
-			// costruttore
-			Actuator(const std::string& actuator_name,const std::string& filePath):TechnoSoftLowDriver(filePath){
-				strcpy(this->actuator_name,actuator_name.c_str());
-			}
-			~Actuator(){}
-			void initActuator(const double&,const double&,const double&,const int&,const int&, const double&, const double&, const BOOL&, const short&, const short&);// all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
-			int moveRelativeMillimeters(double);
-			int getPosition(BOOL, double&);
-			//BOOL stopMotion(); questa funzione verra ereditata direttamente dalla classe base, quindi non occorre dichiararla
-			//int homing();
-			//int getStatus();
+    }
+}
 
-	 };
-
-}}
