@@ -33,15 +33,17 @@
 
 namespace common {
     namespace actuators {
+        
         typedef enum
         {	READ_ENCODER,
             READ_COUNTER
         } readingTypes;
     
-    class Slit {
+    class AbstractSlit {
 
         protected:
             double range_mm; //mechanical range of the slit (passato da MDS), [mm]
+            uint64_t timeo_ms;
         public:
         Slit() {};
         virtual ~Slit() {};
@@ -59,11 +61,36 @@ namespace common {
         @brief Move the actuator X millimeters away from current position
         @return 0 if success or an error code
         */
-            virtual int moveRelativeMillimeters(double millimeters)=0;      //***OK***
+            virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
+            
+        /**
+        @brief set the actuator speed in mm/s
+        @return 0 if success or an error code
+        */
+            virtual int setSpeed(double speed_mm_per_sec)=0;
+            
+        /**
+        @brief get the actuator speed in mm/s
+        @return 0 if success or an error code
+        */    
+           virtual double getSpeed()=0;
+            
+        /**
+        @brief set the actuator acceleration in mm/s^2
+        @return 0 if success or an error code
+        */
+            virtual int setAcceleration(double acceleration_mm_per_sec2)=0;
+            
+        /**
+        @brief get the actuator acceleration in mm/s^2
+        @return 0 if success or an error code
+        */    
+           virtual double getAcceleration()=0;
+            
         /**
         @brief get the actuator position using the readingType mode chosen for reading
         @return 0 if success or an error code
-        */
+        */    
             virtual int getPosition(readingTypes readingType,double& deltaPosition_mm)=0;                                        //***OK***
         /**
         @brief initialize and poweron the motor
@@ -81,18 +108,18 @@ namespace common {
            @param version returning string
            @return 0 if success or an error code
         */
-       virtual int getSWVersion(std::string& version)=0;          // ****Da implementare***
+            virtual int getSWVersion(std::string& version)=0;          // ****Da implementare***
 
         /**
         @brief returns the HW version of the actuator 
         @param version returning string
         @return 0 if success or an error code
         */
-        virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
+            virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
 
-        virtual int stopMotion()=0;
-        virtual int homing()=0; // ***Da implementare***
-        virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
+            virtual int stopMotion()=0;
+            virtual int homing()=0; // ***Da implementare***
+            virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
     };
 }
 }

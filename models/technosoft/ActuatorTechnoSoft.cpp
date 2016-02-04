@@ -8,10 +8,30 @@
 
 #include <stdio.h>
 #include "ActuatorTechnosoft.h"
-
+#include <boost/regex.hpp>
 using namespace common::actuators::technosoft;
+//([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
+                int axisRef;// handler
+                
+                // Trapezoidal profile parameters
+                long relPosition;
+                double speed;
+                double acceleration;
+                bool isAdditive;
+                short movement;
+                short referenceBase;
+// initialisation format <device>,<device name>,<configuration path>,<axisid>,
+static const boost::regex driver_match("([\\w\\/]+),(\\w+),([\\w\\/]+),(\\d+)");
 
-int Actuator::init(const double& range,const double& _mechanicalReduceFactor,const double& _movementUnit_mm,const int& _encoderLines,const std::string& filePath, const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+int Actuator::init(void*initialization_string){
+    std::string params;
+    params.assign(initialization_string);
+    
+    technoinfo_t* info=(technoinfo_t*)myinfo;
+    init();
+}
+
+int Actuator::init(const double& range,const double& _mechanicalReduceFactor,const double& _movementUnit_mm,const int& encoderLines,const std::string& filePath, const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
     
     if (driver!=NULL) {
         delete driver;
@@ -23,13 +43,12 @@ int Actuator::init(const double& range,const double& _mechanicalReduceFactor,con
     
     
     // Inizializzazione parametri TechnoSoftLowDriver
-    driver->init(axisID,speed,acceleration,isAdditive,moveMoment,referenceBase);
+    driver->init(axisID,speed,acceleration,isAdditive,moveMoment,referenceBase,encoderLines);
     
     // Inizializzazione parametri Actuator
     range_mm = range;
     mechanicalReduceFactor=_mechanicalReduceFactor;
     movementUnit_mm = _movementUnit_mm;
-    encoderLines = _encoderLines;
     return 0;
 }
 

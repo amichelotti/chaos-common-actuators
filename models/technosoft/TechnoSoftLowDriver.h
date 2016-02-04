@@ -63,7 +63,8 @@
 #define LINEAR_MOVEMENT_PER_N_ROUNDS 1.5 //[mm]
 #define N_ENCODER_LINES 800.0 //[mm]
 #define RANGE 20.0  
-
+#include <map>
+#include <boost/shared_ptr.hpp>
 
 namespace common{
     
@@ -79,12 +80,12 @@ namespace common{
                     DWORD baudrate;
                     int fd;
                 public:
-                SerialCommChannelTechnosoft(){}
-                SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
-                int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                    SerialCommChannelTechnosoft(){}
+                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=1,const DWORD baudrate=BAUDRATE);
+                    int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
                 
                     ~SerialCommChannelTechnosoft();
-                    BOOL open(int hostID);
+                    BOOL open(int hostID=HOST_ID);
                     void close();
             };
         
@@ -113,27 +114,35 @@ namespace common{
                 int status_register;// Reg_MER
                 int error_register; 
                 
+                //Encoder parameter
+                int encoderLines; // (passato da MDS)
+                typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh; 
+                channel_psh my_channel;
+                typedef std::map<std::string,channel_psh> channel_map_t;
+                static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
+                                              // percio e dichiarata di tipo static
+                
             public:
-                // Costruttore
-                TechnoSoftLowDriver(const std::string&);
+                // Costruttore device channel and device name
+                TechnoSoftLowDriver(const std::string devName,const std::string name);
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
-                ~TechnoSoftLowDriver(){}
+                ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
-                int init(const int&, const double&, const double&, const BOOL&, const short&, const short&);
+                int init(const std::string& setupFilePath,const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase, const int& encoderLines);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
-                BOOL moveRelativeSteps(const long&);// (0 -> OK)  (different 0 -> error)
+                BOOL moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
 
                 // get methods for variables
-                BOOL getCounter(long&);
-                BOOL getEncoder(long&);
+                BOOL getCounter(long& tposition);
+                BOOL getEncoder(long& aposition);
                 // resetting methos
                 BOOL resetCounter();// reset TPOS_register();
                 BOOL resetEncoder();// reset APOS_register();
-                BOOL getPower(BOOL&); //***************** Questo metodo dovrà essere sostituito da:
+                BOOL getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
                 //int getRegister()**********************;
                 BOOL stopMotion();
                 int deinit();

@@ -33,7 +33,7 @@ namespace common {
 	{	READ_ENCODER=0,
 		READ_COUNTER=1
 	};
-
+      
 
 	class AbstractActuator {
 

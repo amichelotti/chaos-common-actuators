@@ -37,17 +37,30 @@ BOOL SerialCommChannelTechnosoft::open(int hostID){
     return TRUE;
 }
 
+TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels;
+
+
 //--------------------------------------------
-TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& setupFilePath)
-{
-    strcpy(this->setupFilePath,setupFilePath.c_str());
+
+TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::string name){
+    channel_map_t::iterator i=channels.find(devName);
+    if(i!=channels.end()){
+        my_channel = i->second;
+    } else {
+        my_channel = channel_psh(new SerialCommChannelTechnosoft(devName));
+        my_channel->open();
+    }
 }
 
-int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
+TechnoSoftLowDriver::TechnoSoftLowDriver(){
+    deinit();
+}
+
+int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase, const int& encoderLines){
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;
-    axisRef = TS_LoadSetup(this->setupFilePath);
+    axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         return -1;
     }
@@ -77,12 +90,17 @@ int TechnoSoftLowDriver::init(const int& axisID, const double& speed, const doub
     this->movement=moveMoment;
     this->referenceBase=referenceBase;
     
+    this->encoderLines= encoderLines;
+    
     return 0;
 }
 
 
 BOOL TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
-    
+      if(!TS_SelectAxis(axisID)){
+        return -3;
+    }
+
     //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
     if(!TS_MoveRelative(deltaPosition, this->speed, this->acceleration, this->isAdditive,this->movement,this->referenceBase)){
@@ -92,6 +110,9 @@ BOOL TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 }
 
 BOOL TechnoSoftLowDriver::stopMotion(){
+  if(!TS_SelectAxis(axisID)){
+        return -3;
+    }
 
       if(!TS_Stop()){
           return FALSE;
@@ -100,7 +121,10 @@ BOOL TechnoSoftLowDriver::stopMotion(){
 }
 
 int TechnoSoftLowDriver::providePower(){
-    
+      if(!TS_SelectAxis(axisID)){
+        return -3;
+    }
+
     if(!TS_Power(POWER_ON)){
         return -1;
     }
@@ -118,7 +142,10 @@ int TechnoSoftLowDriver::providePower(){
 }
 
 int TechnoSoftLowDriver::stopPower(){
-    
+      if(!TS_SelectAxis(axisID)){
+        return -3;
+    }
+
     if(!TS_Power(POWER_OFF)){
         return -1;
     }
@@ -130,10 +157,14 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     //if(!TS_Power(POWER_OFF)){
         //return -1;
     //}
+    my_channel.reset();
     return 0;
 }
 
 BOOL TechnoSoftLowDriver::getCounter(long& tposition){
+  if(!TS_SelectAxis(axisID)){
+        return -3;
+    }
 
     if(!TS_GetLongVariable("TPOS", tposition)){
         return FALSE;

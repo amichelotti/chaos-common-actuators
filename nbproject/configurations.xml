@@ -10,7 +10,6 @@
           </df>
           <in>ActuatorTechnoSoft.cpp</in>
           <in>TechnoSoftLowDriver.cpp</in>
-          <in>main.cpp</in>
         </df>
       </df>
     </df>
@@ -72,13 +71,6 @@
             ex="false"
             tool="1"
             flavor2="4">
-        <ccTool flags="0">
-          <preprocessorList>
-            <Elem>common_actuators_technosoft_EXPORTS</Elem>
-          </preprocessorList>
-        </ccTool>
-      </item>
-      <item path="models/technosoft/main.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <preprocessorList>
             <Elem>common_actuators_technosoft_EXPORTS</Elem>
