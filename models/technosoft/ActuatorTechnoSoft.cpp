@@ -7,60 +7,54 @@
 //
 
 #include <stdio.h>
-#include "ActuatorTechnosoft.h"
+#include "ActuatorTechnoSoft.h"
 #include <boost/regex.hpp>
-using namespace common::actuators::technosoft;
+
+#include <common/debug/core/debug.h>
+using namespace common::actuators::models;
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
-                int axisRef;// handler
-                
-                // Trapezoidal profile parameters
-                long relPosition;
-                double speed;
-                double acceleration;
-                bool isAdditive;
-                short movement;
-                short referenceBase;
+      
+
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,
 static const boost::regex driver_match("([\\w\\/]+),(\\w+),([\\w\\/]+),(\\d+)");
 
-int Actuator::init(void*initialization_string){
+ActuatorTechnoSoft::ActuatorTechnoSoft(){
+    driver=NULL;
+}
+
+int ActuatorTechnoSoft::init(void*initialization_string){
     std::string params;
-    params.assign(initialization_string);
-    
-    technoinfo_t* info=(technoinfo_t*)myinfo;
-    init();
+    params.assign((const char*)initialization_string);
+    boost::smatch match;
+
+    if(regex_match(params, match, driver_match, boost::match_extra)){
+        std::string dev=match[1];
+        std::string dev_name=match[2];
+        std::string conf_path=match[3];
+        std::string axid=match[4];
+        driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
+        if((this->driver)==NULL){
+            DERR("## cannot create driver");
+            return -1;
+        }
+        return (this->driver)->init(conf_path,atoi(axid.c_str()));
+    }
+
+   DERR("## error parsing initialisation string:\"%s"\"",params.c_str());
+   return -3;
 }
 
-int Actuator::init(const double& range,const double& _mechanicalReduceFactor,const double& _movementUnit_mm,const int& encoderLines,const std::string& filePath, const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase){
-    
-    if (driver!=NULL) {
-        delete driver;
-    }
-    driver = new (std::nothrow) TechnoSoftLowDriver(filePath);
-    if (driver==NULL) {
-        return -1;
-    }
-    
-    
-    // Inizializzazione parametri TechnoSoftLowDriver
-    driver->init(axisID,speed,acceleration,isAdditive,moveMoment,referenceBase,encoderLines);
-    
-    // Inizializzazione parametri Actuator
-    range_mm = range;
-    mechanicalReduceFactor=_mechanicalReduceFactor;
-    movementUnit_mm = _movementUnit_mm;
-    return 0;
-}
 
-void Actuator::deinit(){
-    
+void ActuatorTechnoSoft::deinit(){
+    DPRINT("deinitializing");
     if (driver!=NULL) {
         delete driver;
     }
 }
 
-int Actuator::moveRelativeMillimeters(double deltaMillimeters){
-    
+int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
+        DPRINT("moving relative %f mm",deltaMillimeters);
+
     // Calcolo argomento funzione moveRelativeSteps
     double deltaMicroSteps = round((N_ROUNDS*STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS);
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
@@ -73,8 +67,9 @@ int Actuator::moveRelativeMillimeters(double deltaMillimeters){
     return 0;
 }
 
-int Actuator::getPosition(readingTypes readingType, double& deltaPosition_mm){
-    
+int ActuatorTechnoSoft::getPosition(readingTypes readingType, double& deltaPosition_mm){
+    DPRINT("getPosition");
+
     if(readingType==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
         long tposition;
         if(!driver->getCounter(tposition))

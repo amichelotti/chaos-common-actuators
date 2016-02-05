@@ -1,28 +1,51 @@
 #include "iostream"
-#include <common/actuators/core/AbstractSlit.h>
-#include "TechnoSoftLowDriver.h"
+#include <common/debug/core/debug.h>
+#include <common/actuators/core/AbstractActuator.h>
+#include "ActuatorTechnoSoft.h"
+
+
+using namespace common::actuators::models;
+#define USAGE \
+printf("Usage is:%s <axis> <move mosition in mm>\n",argv[0]);
 
 int main(int argc,const char* argv[]){
-	
-    common::actuators::core::AbstractSlit*mySlit[3];
+    int axis;
+    float pos;
+    double rpos=0,rpos1=0;
+    if(argc!=3){
+        USAGE;
+        return -1;
+    }
+    axis=atoi(argv[1]);
+    pos=atof(argv[2]);
+    PRINT("* using axis %d, moving of %f mm",axis,pos);
+    common::actuators::AbstractActuator*mySlit;
     
-    common::actuators::core::ActuatorTechnosoft::technoinfo_t info;
     
     
    
-    mySlit[0] = new ActuatorTechnosoft("/dev/tty","X");
-    mySlit[1] = new ActuatorTechnosoft("/dev/tty","Y");
+    mySlit = new ActuatorTechnoSoft();
+    //mySlit[1] = new ActuatorTechnosoft();
     
-    mySlit[0]->init();
-    mySlit[1]->init();
-
-    
-    while(1){
-        mySlit[0]->move
-        mySlit[0]->move
+    if(mySlit->init((void*)"/dev/ttyr00,myslit,/u2/dcs/prefs/MOV/setups/1setup001.t.zip,14")!=0){
+        DERR("## cannot init");
+        delete mySlit;
     }
-    mySlit->init((void*)&info);
     
+    
+    mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,rpos);
+    mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,rpos1);
+    
+    DPRINT("current position encoder %f, counter %f",rpos,rpos1);
+    DPRINT("moving...");
+    
+    mySlit->moveRelativeMillimeters(pos);
+    mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,rpos);
+    mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,rpos1);
+    
+    DPRINT("current after position encoder %f, counter %f",rpos,rpos1);
+
+    delete mySlit;
 	
     return 0;
 }

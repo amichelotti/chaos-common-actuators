@@ -2,11 +2,10 @@
 #include "TechnoSoftLowDriver.h"
 
 
-using namespace common::actuators::technosoft;
-using namespace common::actuators;
+using namespace common::actuators::models;
 
 //--------------------------------------------
-SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
+SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType,const DWORD baudrate){
     init(pszDevName,btType,baudrate);
 }
 int SerialCommChannelTechnosoft::init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
@@ -52,11 +51,11 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::st
     }
 }
 
-TechnoSoftLowDriver::TechnoSoftLowDriver(){
+TechnoSoftLowDriver::~TechnoSoftLowDriver(){
     deinit();
 }
 
-int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase, const int& encoderLines){
+int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID, const double speed, const double acceleration, const BOOL isAdditive, const short moveMoment, const short referenceBase, const int encoderLines){
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;

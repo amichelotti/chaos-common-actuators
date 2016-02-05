@@ -69,16 +69,16 @@
 namespace common{
     
     namespace actuators{
-       namespace technosoft{
+       namespace models {
 
 	    //Channel class
             class SerialCommChannelTechnosoft{
                 
                 private:
-                    char pszDevName[100];
-                    BYTE btType;
-                    DWORD baudrate;
-                    int fd;
+                    char pszDevName[100]; // The communication channel to be opened
+                    BYTE btType; // the type of the communication channel and the CAN-bus communication protocol
+                    DWORD baudrate; // communication baud rate
+                    int fd; // file descriptor of the channel
                 public:
                     SerialCommChannelTechnosoft(){}
                     SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=1,const DWORD baudrate=BAUDRATE);
@@ -96,16 +96,19 @@ namespace common{
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
                 
+                std::string dev;
+                std::string devName;
+                
                 // Trapezoidal profile parameters
-                long relPosition;
+                //long relPosition;
                 double speed;
                 double acceleration;
                 bool isAdditive;
                 short movement;
                 short referenceBase;
                 // Additional parameters for s-curve profile
-                //long jerkTime;
-                //short decelerationType;
+                long jerkTime;
+                short decelerationType;
                 
                 char setupFilePath[200];
                 
@@ -124,11 +127,11 @@ namespace common{
                 
             public:
                 // Costruttore device channel and device name
-                TechnoSoftLowDriver(const std::string devName,const std::string name);
+                TechnoSoftLowDriver(const std::string dev, const std::string devName);
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
-                int init(const std::string& setupFilePath,const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase, const int& encoderLines);
+                int init(const std::string& setupFilePath,const int& axisID, const double speed=SPEED, const double acceleration=ACCELERATION, const BOOL isAdditive=0, const short moveMoment =0, const short referenceBase=0, const int encoderLines=N_ENCODER_LINES);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
