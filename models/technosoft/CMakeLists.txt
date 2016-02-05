@@ -26,7 +26,7 @@ ENDIF()
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug TML_lib )
 ADD_EXECUTABLE(test_technosoft_slit test/test_slit.cpp)
-TARGET_LINK_LIBRARIES(test_technosoft_slit ${PROJECT_NAME} common_actuators common_debug ${chaoslib})
+TARGET_LINK_LIBRARIES(test_technosoft_slit ${PROJECT_NAME} common_actuators common_debug ${chaoslib} boost_regex )
 
 
 FILE(GLOB model_src *.h)    
