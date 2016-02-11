@@ -6,18 +6,21 @@
 
 using namespace common::actuators::models;
 #define USAGE \
-printf("Usage is:%s <axis> <move mosition in mm>\n",argv[0]);
+  printf("Usage is:%s <dev/tty> <axis> <move mosition in mm>\n",argv[0]);
 
 int main(int argc,const char* argv[]){
     int axis;
     float pos;
     double rpos=0,rpos1=0;
-    if(argc!=3){
+    const char *dev;
+    char sinit[256];
+    if(argc!=4){
         USAGE;
         return -1;
     }
-    axis=atoi(argv[1]);
-    pos=atof(argv[2]);
+    dev=argv[1];
+    axis=atoi(argv[2]);
+    pos=atof(argv[3]);
     PRINT("* using axis %d, moving of %f mm",axis,pos);
     common::actuators::AbstractActuator*mySlit;
     
@@ -26,8 +29,8 @@ int main(int argc,const char* argv[]){
    
     mySlit = new ActuatorTechnoSoft();
     //mySlit[1] = new ActuatorTechnosoft();
-    
-    if(mySlit->init((void*)"/dev/ttyr00,myslit,/u2/dcs/prefs/MOV/setups/1setup001.t.zip,14")!=0){
+    sprintf(sinit,"%s,myslit,/u2/dcs/prefs/MOV/setups/1setup001.t.zip,14",dev);
+    if(mySlit->init((void*)sinit)!=0){
         DERR("## cannot init");
         delete mySlit;
     }

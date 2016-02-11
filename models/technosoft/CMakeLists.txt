@@ -38,5 +38,5 @@ INSTALL(FILES ${model_src} DESTINATION include/common/actuators/models/technosof
 FILE(GLOB model_lib lib/*)    
 INSTALL(FILES ${model_lib} DESTINATION lib/)
 INSTALL_TARGETS(/lib ${PROJECT_NAME})
-# INSTALL_TARGETS(/bin test_technosoft)
+INSTALL_TARGETS(/bin test_technosoft_slit)
 
