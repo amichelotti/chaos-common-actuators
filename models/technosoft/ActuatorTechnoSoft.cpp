@@ -37,6 +37,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
             DERR("## cannot create driver");
             return -1;
         }
+        DPRINT("initializing %s dev:%s conf path:")
         return (this->driver)->init(conf_path,atoi(axid.c_str()));
     }
 
