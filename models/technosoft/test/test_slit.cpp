@@ -46,16 +46,16 @@ int main(int argc,const char* argv[]){
     do{
         mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,rpos);
         mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,rpos1);
-        printf("back ->%f",rpos1);
-    } while ((rpos1-.1) < 0 );
+        printf("back ->%.5f\r",rpos1);
+    } while ((rpos1-.1) > 0 );
     
-    DPRINT("moving...");
+    printf("\n moving to %f...\n",pos);
     
     mySlit->moveRelativeMillimeters(pos);
     do{
         mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,rpos);
         mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,rpos1);
-        printf("->%f",rpos1);
+        printf("up ->%.5f\r",rpos1);
     } while ((rpos1+.1) < pos);
     
     DPRINT("current after position encoder %f, counter %f",rpos,rpos1);
