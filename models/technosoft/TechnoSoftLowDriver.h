@@ -49,13 +49,6 @@
 #define MAX_LENGTH_STRING_FROM_SHELL 50
 #define MAX_COMMAND_LENGTH 10
 
-#if defined(WINDOWS) || defined(WIN32)
-#define SETUP_FILE_01 "Exx_setup_file_ID1.t.zip"
-#else
-//#define SETUP_FILE_01 "../../TML_LIB_User/Exx_setup_file_ID1.t.zip"
-#define SETUP_FILE_01 "/u2/dcs/prefs/MOV/setups/1setup001.t.zip"
-#define SETUP_FILE_02 "/u2/dcs/prefs/MOV/setups/1setup001.t.zip"
-#endif
             
 #define CONST_MULT_TECHNOFT 256.0 // numero micro steps per step (MDS)
 #define STEPS_PER_ROUNDS 200.0     // numero steps per giro
@@ -75,13 +68,13 @@ namespace common{
             class SerialCommChannelTechnosoft{
                 
                 private:
-                    char pszDevName[100]; // The communication channel to be opened
+                    std::string pszDevName; // The communication channel to be opened
                     BYTE btType; // the type of the communication channel and the CAN-bus communication protocol
                     DWORD baudrate; // communication baud rate
                     int fd; // file descriptor of the channel
                 public:
                     SerialCommChannelTechnosoft(){}
-                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=1,const DWORD baudrate=BAUDRATE);
+                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=CHANNEL_RS232,const DWORD baudrate=BAUDRATE);
                     int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
                 
                     ~SerialCommChannelTechnosoft();
@@ -131,7 +124,7 @@ namespace common{
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
-                int init(const std::string& setupFilePath,const int& axisID, const double speed=SPEED, const double acceleration=ACCELERATION, const BOOL isAdditive=0, const short moveMoment =0, const short referenceBase=0, const int encoderLines=N_ENCODER_LINES);
+                int init(const std::string& setupFilePath,const int& axisID, const double speed=SPEED, const double acceleration=ACCELERATION, const BOOL isAdditive=0, const short moveMoment =UPDATE_IMMEDIATE, const short referenceBase=FROM_REFERENCE, const int encoderLines=N_ENCODER_LINES);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);

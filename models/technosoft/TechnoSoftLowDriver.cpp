@@ -1,6 +1,6 @@
 
 #include "TechnoSoftLowDriver.h"
-
+#include <common/debug/core/debug.h>
 
 using namespace common::actuators::models;
 
@@ -8,8 +8,9 @@ using namespace common::actuators::models;
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType,const DWORD baudrate){
     init(pszDevName,btType,baudrate);
 }
-int SerialCommChannelTechnosoft::init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate){
-    strcpy(this->pszDevName,pszDevName.c_str());
+int SerialCommChannelTechnosoft::init(const std::string& _pszDevName,const BYTE& btType,const DWORD& baudrate){
+    DPRINT("initializing dev %s type %d baud %d",_pszDevName.c_str(),btType,baudrate);
+    pszDevName=_pszDevName;
     this->btType=btType;
     this->baudrate = baudrate;
     this->fd = -1;
@@ -29,10 +30,14 @@ void SerialCommChannelTechnosoft::close(){
 BOOL SerialCommChannelTechnosoft::open(int hostID){
     int resp;
     /*	Open the comunication channel: COM1, RS232, 1, 115200 */
-    if((resp=TS_OpenChannel(this->pszDevName, this->btType, hostID, this->baudrate)) < 0){
+   DPRINT("opening dev %s type %d baud %d, hostid:%d",pszDevName.c_str(),btType,baudrate,hostID);
+   resp=TS_OpenChannel(pszDevName.c_str(), btType, hostID, baudrate);
+    if(resp < 0){
+        DERR("failed opening channel");
         return FALSE;
     }
     this->fd = resp;
+    DPRINT("Openchannel resp=%d",resp);
     return TRUE;
 }
 
@@ -47,7 +52,8 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::st
         my_channel = i->second;
     } else {
         my_channel = channel_psh(new SerialCommChannelTechnosoft(devName));
-        my_channel->open();
+        
+        
     }
 }
 
@@ -59,22 +65,32 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;
+    if((my_channel==NULL) || (my_channel->open()==FALSE)){
+        DERR("error opening channel");
+        return -10;
+    }
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
+        DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
         return -1;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(axisID, axisRef)){
+        DERR("failed to setup axis %d",axisID);
         return -2;
     }
     
     if(!TS_SelectAxis(axisID)){
+      DERR("failed to select axis %d",axisID);
+
         return -3;
     }
 
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
+        DERR("Low driver initialisation");
+
         return -4;
     }
 
@@ -90,26 +106,30 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     this->referenceBase=referenceBase;
     
     this->encoderLines= encoderLines;
+    return providePower();
     
-    return 0;
 }
 
 
 BOOL TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
       if(!TS_SelectAxis(axisID)){
+          DERR("error selecting axis");
         return -3;
     }
 
     //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
+      DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, this->speed, this->acceleration, this->isAdditive,this->movement,this->referenceBase)){
+        DERR("error moving");
         return FALSE;
     }
     return TRUE;
 }
 
 BOOL TechnoSoftLowDriver::stopMotion(){
-  if(!TS_SelectAxis(axisID)){
+  DPRINT("stop axis:%d",axisID);
+    if(!TS_SelectAxis(axisID)){
         return -3;
     }
 
@@ -120,6 +140,7 @@ BOOL TechnoSoftLowDriver::stopMotion(){
 }
 
 int TechnoSoftLowDriver::providePower(){
+    DPRINT("provide power to axis:%d",axisID);
       if(!TS_SelectAxis(axisID)){
         return -3;
     }
@@ -141,6 +162,8 @@ int TechnoSoftLowDriver::providePower(){
 }
 
 int TechnoSoftLowDriver::stopPower(){
+      DPRINT("stop power to axis:%d",axisID);
+
       if(!TS_SelectAxis(axisID)){
         return -3;
     }
@@ -152,15 +175,19 @@ int TechnoSoftLowDriver::stopPower(){
 }
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
-    
+    DPRINT("deinitializing");
     //if(!TS_Power(POWER_OFF)){
         //return -1;
     //}
-    my_channel.reset();
+    stopPower();
+    if(my_channel!=NULL){
+        my_channel.reset();
+    }
     return 0;
 }
 
 BOOL TechnoSoftLowDriver::getCounter(long& tposition){
+   // DPRINT("getting counter");
   if(!TS_SelectAxis(axisID)){
         return -3;
     }

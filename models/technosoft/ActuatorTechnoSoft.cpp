@@ -16,7 +16,7 @@ using namespace common::actuators::models;
       
 
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,
-static const boost::regex driver_match("([\\w\\/]+),(\\w+),([\\w\\/]+),(\\d+)");
+static const boost::regex driver_match("([\\w\\/]+),(\\w+),([\\w\\/\\.]+),(\\d+)");
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     driver=NULL;
@@ -33,15 +33,15 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string conf_path=match[3];
         std::string axid=match[4];
         driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
-        if((this->driver)==NULL){
+        if((driver)==NULL){
             DERR("## cannot create driver");
             return -1;
         }
-        DPRINT("initializing %s dev:%s conf path:")
-        return (this->driver)->init(conf_path,atoi(axid.c_str()));
+        DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
+        return driver->init(conf_path,atoi(axid.c_str()));
     }
 
-   DERR("## error parsing initialisation string:\"%s"\"",params.c_str());
+   DERR("error parsing initialisation string:\"%s\"",params.c_str());
    return -3;
 }
 
@@ -69,12 +69,12 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
 }
 
 int ActuatorTechnoSoft::getPosition(readingTypes readingType, double& deltaPosition_mm){
-    DPRINT("getPosition");
-
     if(readingType==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
         long tposition;
-        if(!driver->getCounter(tposition))
+        if(!driver->getCounter(tposition)){
+            DERR("getting counter");
             return -1;
+        }
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
         deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
     }

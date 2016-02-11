@@ -17,7 +17,7 @@ set (chaoslib boost_regex boost_log boost_thread boost_system pthread)
 ENDIF()
 
 LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/lib)
-ADD_DEFINITIONS(-DDEBUG)
+ADD_DEFINITIONS(-DDEBUG -g3 -O0 -fpic)
 
 FILE(GLOB src *.cpp)    
 IF(BUILD_FORCE_STATIC)
