@@ -28,8 +28,8 @@ int ActuatorTechnoSoft::init(void*initialization_string){
     boost::smatch match;
 
     if(regex_match(params, match, driver_match, boost::match_extra)){
-        std::string dev=match[1];
-        std::string dev_name=match[2];
+        std::string dev=match[1];      
+        std::string dev_name=match[2]; 
         std::string conf_path=match[3];
         std::string axid=match[4];
         driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
