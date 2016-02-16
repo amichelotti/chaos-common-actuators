@@ -25,8 +25,8 @@
 #define __common_AbstractActuator_h__
 
 
-#ifndef ACTUATORS_DEFAULT_TIMEOUT
-#define ACTUATORS_DEFAULT_TIMEOUT 1000
+#ifndef ACTUATOR_DEFAULT_TIMEOUT
+#define ACTUATOR_DEFAULT_TIMEOUT 1000
 #endif
 
 
@@ -118,7 +118,7 @@ namespace common {
            @return 0 if success
           */
 
-            virtual void deinit()=0;                                    // ****Da implementare***
+            virtual int  deinit()=0;                                    // ****Da implementare***
         /**
            @brief returns the SW/FW version of the driver/FW
            @param version returning string
@@ -136,6 +136,8 @@ namespace common {
             virtual int stopMotion()=0;
             virtual int homing()=0; // ***Da implementare***
             virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
+            virtual int getAlarms(uint64_t*alrm)=0;
+            virtual int resetAlarms(uint64_t alrm);
     };
 }
 }
