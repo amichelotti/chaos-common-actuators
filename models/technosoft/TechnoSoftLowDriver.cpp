@@ -240,3 +240,48 @@ BOOL TechnoSoftLowDriver::getPower(BOOL& powered){
         return TRUE;
     }
 }
+
+BOOL TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
+//The function converts the value to type fixed and writes it in the TML data
+//pszName on the active axis
+    if(!TS_SetFixedVariable(pszName, value)) 
+        return FALSE;
+    return TRUE;
+}
+
+BOOL TechnoSoftLowDriver::abortNativeOperation(){
+    //The function aborts the execution of a TML function launched with a 
+    //cancelable call
+    if(!TS_ABORT()) 
+        return FALSE;
+    return TRUE;
+}
+
+BOOL TechnoSoftLowDriver::executeTMLfunction(LPCSTR pszFunctionName){
+    // The function commands the active axis to execute the TML function stored
+    //at pszFunctionName
+    if(!TS_CancelableCALL_Label(pszFunctionName)) 
+        return FALSE;
+    return TRUE;
+}
+
+BOOL TechnoSoftLowDriver::setDecelerationParam(double deceleration){
+    // 
+    if(!TS_QuickStopDecelerationRate(deceleration))
+        return FALSE;
+    return TRUE;
+}
+
+BOOL TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
+    if(!TS_SetLongVariable(pszName, value)) 
+		return FALSE;
+    return TRUE;
+}
+
+BOOL TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
+    
+    if(!TS_ReadStatus(selIndex, &status)) 
+        return FALSE;
+    status=((status & 1<<8) == 0 ? 1 : 0);
+    return TRUE;
+}

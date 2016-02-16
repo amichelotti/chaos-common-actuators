@@ -142,6 +142,12 @@ namespace common{
                 //int getRegister()**********************;
                 BOOL stopMotion();
                 int deinit();
+                BOOL setDecelerationParam(double deceleration);
+                BOOL setFixedVariable(LPCSTR pszName, double value);
+                BOOL abortNativeOperation();
+                BOOL executeTMLfunction(std::string&);
+                BOOL setVariable(LPCSTR pszName, long value);
+                BOOL readHomingCallReg(short selIndex, WORD& status);
                 
                 int getMERregister();// REG_MER_register();
                 int getSRLregister();// REG_SRL_register();
