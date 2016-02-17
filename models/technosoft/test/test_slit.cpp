@@ -6,7 +6,7 @@
 
 using namespace common::actuators::models;
 #define USAGE \
-  printf("Usage is:%s <dev/tty> <technosoft configuration> <axis> <move mosition in mm>\n",argv[0]);
+  printf("Usage is:%s <dev/tty> <technosoft configuration> <axis> <move position in mm>\n",argv[0]);
 
 int main(int argc,const char* argv[]){
     int axis;
@@ -19,17 +19,14 @@ int main(int argc,const char* argv[]){
         USAGE;
         return -1;
     }
-    dev=argv[1];
-    conf=argv[2];
-    axis=atoi(argv[3]);
-    pos=atof(argv[4]);
+    dev=argv[1];        // [string], <dev/tty>
+    conf=argv[2];       // [string], <technosoft configuration>
+    axis=atoi(argv[3]); // [int], <axis>
+    pos=atof(argv[4]);  // [float], <move position in mm>
     PRINT("* using axis %d, moving of %f mm",axis,pos);
     common::actuators::AbstractActuator*mySlit;
     
-    
-    
-   
-    mySlit = new ActuatorTechnoSoft();
+    mySlit = new ActuatorTechnoSoft(); 
     //mySlit[1] = new ActuatorTechnosoft();
     sprintf(sinit,"%s,myslit,%s,%d",dev,conf,axis);
     if((ret=mySlit->init((void*)sinit))!=0){

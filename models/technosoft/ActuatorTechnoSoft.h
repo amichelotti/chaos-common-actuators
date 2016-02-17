@@ -51,7 +51,7 @@ namespace common{
                     int moveRelativeMillimeters(double deltaMillimeters);
                     int getPosition(readingTypes readingType, double& deltaPosition_mm);
                     int stopMotion(){return 0;};
-                    int homing(){return 0;}; // ***Da implementare***
+                    BOOL homing(int minutes, std::string& mode);
                     int getState(int* state, std::string& desc ){return 0;}   // **
                    
             
