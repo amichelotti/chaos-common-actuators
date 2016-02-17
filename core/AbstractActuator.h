@@ -134,7 +134,7 @@ namespace common {
             virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
 
             virtual int stopMotion()=0;
-            virtual BOOL homing(int minutes, std::string& mode)=0; //
+            virtual bool homing(int minutes, std::string& mode)=0; //
             virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
             virtual int getAlarms(uint64_t*alrm)=0;
             virtual int resetAlarms(uint64_t alrm);
