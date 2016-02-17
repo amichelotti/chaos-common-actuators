@@ -59,12 +59,12 @@ namespace common {
         @brief get timeout in ms for the completion of the operation 
         @return 0 if success or an error code
         */
-          int getTimeout(uint64_t* timeo_ms);               // ****Da implementare***
+        int getTimeout(uint64_t* timeo_ms);               // ****Da implementare***
         /**
         @brief Move the actuator X millimeters away from current position
         @return 0 if success or an error code
         */
-            virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
+        virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
             
         /**
         @brief set the actuator speed in mm/s
@@ -106,7 +106,7 @@ namespace common {
             READ_COUNTER
         } readingTypes;
         
-        virtual int getPosition(readingTypes readingType,double& deltaPosition_mm)=0;   //***OK***
+        virtual int getPosition(readingTypes mode,double& deltaPosition_mm)=0;   //***OK***
            
         /**
         @brief initialize and poweron the motor
@@ -134,7 +134,14 @@ namespace common {
             virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
 
             virtual int stopMotion()=0;
-            virtual BOOL homing(int minutes, std::string& mode)=0; //
+            
+            typedef enum{   
+                defaultHoming,
+                homing2,   
+                nativeHoming15    
+            } homingType;
+        
+            virtual int homing(homingType mode)=0;
             virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
     };
 }
