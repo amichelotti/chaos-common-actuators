@@ -89,7 +89,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes readingType, double& deltaPosit
     
     return 0;
 }
-
+#if 0
 BOOL ActuatorTechnoSoft::homing(int minutes,std::string& mode){
     
     if(mode.compare("mode_1")==0){
@@ -125,9 +125,9 @@ BOOL ActuatorTechnoSoft::homing(int minutes,std::string& mode){
 /*	--------------------------------------------------------------------*/
 
 /*	Call the homing procedure stored in the non-volatile memory of the drive */
-	if(!driver->executeTMLfunction("Homing15")) 
+	/*if(!driver->executeTMLfunction("Homing15"))
 		return -6;
-
+*/
 /*	Wait until the homing process is ended */
 	time( &long_time );
 	ini_time = localtime( &long_time );
@@ -135,8 +135,10 @@ BOOL ActuatorTechnoSoft::homing(int minutes,std::string& mode){
 	
 /*	Wait for homing procedure to end */	
 	while(homing_done == 0){
-/*	Check the SRL.8 bit - Homing active flag*/
-		if(!TS_ReadStatus(REG_SRL, &homing_done)){ 
+/*
+ * Check the SRL.8 bit - Homing active flag*/
+
+		if(!TS_ReadStatus(REG_SRL, &homing_done)){
                     /*	Cancel the homing procedure   */
                     if(!driver->abortNativeOperation()) 
                         return -7;
@@ -145,6 +147,7 @@ BOOL ActuatorTechnoSoft::homing(int minutes,std::string& mode){
 			return -8;
                     return -9;
                 }
+
 		homing_done=((homing_done & 1<<8) == 0 ? 1 : 0);
 
 /*	If the homing procedure doesn't ends in MINUTES time then abort it */
@@ -228,3 +231,4 @@ BOOL ActuatorTechnoSoft::homing(int minutes,std::string& mode){
 	return TRUE;
     }
 }
+#endif
