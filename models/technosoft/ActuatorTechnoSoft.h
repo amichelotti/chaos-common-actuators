@@ -8,6 +8,7 @@
 
 #include <common/actuators/core/AbstractActuator.h>
 #include "TechnoSoftLowDriver.h"
+#include <sys/time.h>
 
 #ifndef ActuatorTechnoSoft_h
 #define ActuatorTechnoSoft_h
@@ -49,11 +50,12 @@ namespace common{
 			// all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
                     void deinit();
                     int moveRelativeMillimeters(double deltaMillimeters);
-                    int getPosition(readingTypes readingType, double& deltaPosition_mm);
+                    int moveAbsoluteMillimeters(double mm);
+                    int getPosition(readingTypes mode, double& deltaPosition_mm);
                     int stopMotion(){return 0;};
-                    BOOL homing(int minutes, std::string& mode);
+                    BOOL homing(homingType mode); 
                     int getState(int* state, std::string& desc ){return 0;}   // **
-                   
+                    
             
             
      
@@ -67,7 +69,7 @@ namespace common{
            @param version returning string
            @return 0 if success or an error code
         */
-        int getSWVersion(std::string& version){return 0;}
+        int getSWVersion(std::string& version);
 
         /**
         @brief returns the HW version of the actuator 

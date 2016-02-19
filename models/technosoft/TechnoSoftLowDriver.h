@@ -7,7 +7,6 @@
 #include <string>
 #include <cmath>
 #include <limits.h>
-
 #include <string.h>
 
 
@@ -131,7 +130,8 @@ namespace common{
                 int providePower();
                 int stopPower();
                 BOOL moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
-
+                BOOL moveAbsoluteSteps(const long& position);
+                
                 // get methods for variables
                 BOOL getCounter(long& tposition);
                 BOOL getEncoder(long& aposition);
@@ -148,10 +148,18 @@ namespace common{
                 BOOL executeTMLfunction(std::string&);
                 BOOL setVariable(LPCSTR pszName, long value);
                 BOOL readHomingCallReg(short selIndex, WORD& status);
+                BOOL setEventOnLimitSwitch(short lswType , short transitionType, BOOL waitEvent, BOOL enableStop);
+                BOOL setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop);
+                BOOL setPosition(const long& posValue);
                 
+                BOOL getLVariable(const std::string& nameVar,long* var) const;
+                
+                BOOL checkEvent(BOOL& event);
+
                 int getMERregister();// REG_MER_register();
                 int getSRLregister();// REG_SRL_register();
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
+                
            };
 	}// chiude namespace technosoft
 

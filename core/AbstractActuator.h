@@ -65,6 +65,7 @@ namespace common {
         @return 0 if success or an error code
         */
         virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
+        virtual int moveAbsoluteMillimeters(double mm)=0;      //***OK**
             
         /**
         @brief set the actuator speed in mm/s
@@ -118,7 +119,7 @@ namespace common {
            @return 0 if success
           */
 
-            virtual int deinit()=0;                                    // ****Da implementare***
+            virtual void deinit()=0;                                    // ****Da implementare***
         /**
            @brief returns the SW/FW version of the driver/FW
            @param version returning string
@@ -133,12 +134,6 @@ namespace common {
         */
             virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
 
-         /**
-        @brief stop the motion of the actuator 
-        @return 0 if success or an error code
-        */
-            
-            
             virtual int stopMotion()=0;
             
             typedef enum{   
@@ -149,8 +144,6 @@ namespace common {
         
             virtual int homing(homingType mode)=0;
             virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
-            virtual int getAlarms(uint64_t*alrm)=0;
-            virtual int resetAlarms(uint64_t alrm)=0;
     };
 }
 }

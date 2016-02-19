@@ -114,14 +114,30 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
 BOOL TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
       if(!TS_SelectAxis(axisID)){
           DERR("error selecting axis");
-        return -3;
+        return FALSE;
     }
 
     //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
       DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
-    if(!TS_MoveRelative(deltaPosition, this->speed, this->acceleration, this->isAdditive,this->movement,this->referenceBase)){
-        DERR("error moving");
+    if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
+        DERR("error relative moving");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
+    
+    if(!TS_SelectAxis(axisID)){
+        DERR("error selecting axis");
+        return FALSE;
+    }
+    //deltaPosition*=CONST_MULT_TECHNOFT;
+    //printf("%ld",deltaPosition);
+    //DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    if(!TS_MoveAbsolute(absPosition, this->speed, this->acceleration, movement, referenceBase)){
+        DERR("error absolute moving");
         return FALSE;
     }
     return TRUE;
@@ -206,6 +222,13 @@ BOOL TechnoSoftLowDriver::getEncoder(long& aposition){
     return TRUE;
 }
 
+BOOL getLVariable(std::string& nameVar, long* var){
+    if(!TS_GetLongVariable(nameVar.c_str(), var)){
+        return FALSE;
+    }
+    return TRUE;
+}
+
 BOOL TechnoSoftLowDriver::resetCounter(){
     
     if(!TS_Execute("SAP 0")){
@@ -257,10 +280,10 @@ BOOL TechnoSoftLowDriver::abortNativeOperation(){
     return TRUE;
 }
 
-BOOL TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
+BOOL TechnoSoftLowDriver::executeTMLfunction(LPCSTR pszFunctionName){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
-    if(!TS_CancelableCALL_Label(pszFunctionName.c_str()))
+    if(!TS_CancelableCALL_Label(pszFunctionName)) 
         return FALSE;
     return TRUE;
 }
@@ -274,14 +297,42 @@ BOOL TechnoSoftLowDriver::setDecelerationParam(double deceleration){
 
 BOOL TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
     if(!TS_SetLongVariable(pszName, value)) 
-		return FALSE;
+	return FALSE;
     return TRUE;
 }
 
 BOOL TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
     
-    if(!TS_ReadStatus(selIndex, status))
+    if(!TS_ReadStatus(selIndex, &status)) 
         return FALSE;
     status=((status & 1<<8) == 0 ? 1 : 0);
+    return TRUE;
+}
+
+BOOL setEventOnLimitSwitch(short lswType = LSW_NEGATIVE , short transitionType = TRANSITION_HIGH_TO_LOW , BOOL waitEvent = 1, BOOL enableStop = 0){
+    
+    if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)) 
+	return FALSE;
+    return TRUE;
+}
+
+BOOL setEventOnMotionComplete(BOOL waitEvent=1, BOOL enableStop=0){
+    
+    if(!TS_SetEventOnMotionComplete(waitEvent,enableStop)) 
+	return FALSE;
+    return TRUE;
+}
+
+BOOL checkEvent(BOOL& event){
+    
+    if(!TS_CheckEvent(&event)) 
+        return FALSE;
+    return TRUE;
+}
+
+BOOL setPosition(const long& posValue){
+    
+    if(!TS_SetPosition(posValue)) 
+        return FALSE;
     return TRUE;
 }
