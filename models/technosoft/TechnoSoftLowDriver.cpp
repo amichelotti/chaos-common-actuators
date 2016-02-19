@@ -257,10 +257,10 @@ BOOL TechnoSoftLowDriver::abortNativeOperation(){
     return TRUE;
 }
 
-BOOL TechnoSoftLowDriver::executeTMLfunction(LPCSTR pszFunctionName){
+BOOL TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
-    if(!TS_CancelableCALL_Label(pszFunctionName)) 
+    if(!TS_CancelableCALL_Label(pszFunctionName.c_str()))
         return FALSE;
     return TRUE;
 }
@@ -280,7 +280,7 @@ BOOL TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
 
 BOOL TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
     
-    if(!TS_ReadStatus(selIndex, &status)) 
+    if(!TS_ReadStatus(selIndex, status))
         return FALSE;
     status=((status & 1<<8) == 0 ? 1 : 0);
     return TRUE;
