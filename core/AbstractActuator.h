@@ -106,7 +106,7 @@ namespace common {
             READ_COUNTER
         } readingTypes;
         
-        virtual int getPosition(readingTypes mode,double& deltaPosition_mm)=0;   //***OK***
+        virtual int getPosition(readingTypes mode,float *deltaPosition_mm)=0;   //***OK***
            
         /**
         @brief initialize and poweron the motor
