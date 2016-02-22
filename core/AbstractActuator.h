@@ -151,8 +151,9 @@ namespace common {
             virtual int getState(int* state, std::string& desc )=0;   // ****Da implementare***
             virtual int getAlarms(uint64_t*alrm)=0;
             virtual int resetAlarms(uint64_t alrm)=0;
-            virtual int poweron()=0;
+            virtual int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT)=0;
             virtual uint64_t getFeatures()=0;
+            virtual int moveAbsoluteMillimeters(double mm)=0;
     };
 }
 }
