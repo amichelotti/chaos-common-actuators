@@ -14,6 +14,7 @@ int SerialCommChannelTechnosoft::init(const std::string& _pszDevName,const BYTE&
     this->btType=btType;
     this->baudrate = baudrate;
     this->fd = -1;
+    return 0;
 }
 
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
@@ -22,23 +23,23 @@ SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
 
 void SerialCommChannelTechnosoft::close(){
 
-	if(this->fd!=-1){
-		TS_CloseChannel(this->fd);
-	}
+    if(this->fd!=-1){
+	TS_CloseChannel(this->fd);
+    }
 }
 
-BOOL SerialCommChannelTechnosoft::open(int hostID){
+int SerialCommChannelTechnosoft::open(int hostID){
     int resp;
     /*	Open the comunication channel: COM1, RS232, 1, 115200 */
    DPRINT("opening dev %s type %d baud %d, hostid:%d",pszDevName.c_str(),btType,baudrate,hostID);
    resp=TS_OpenChannel(pszDevName.c_str(), btType, hostID, baudrate);
     if(resp < 0){
         DERR("failed opening channel");
-        return FALSE;
+        return -1;
     }
     this->fd = resp;
     DPRINT("Openchannel resp=%d",resp);
-    return TRUE;
+    return 0;
 }
 
 TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels;
@@ -67,33 +68,32 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     int axisRef;
     if((my_channel==NULL) || (my_channel->open()==FALSE)){
         DERR("error opening channel");
-        return -10;
+        return -1;
     }
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
-        return -1;
+        return -2;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(axisID, axisRef)){
         DERR("failed to setup axis %d",axisID);
-        return -2;
+        return -3;
     }
     
     if(!TS_SelectAxis(axisID)){
       DERR("failed to select axis %d",axisID);
 
-        return -3;
+        return -4;
     }
 
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("Low driver initialisation");
-
-        return -4;
+        return -5;
     }
-
+    
     // Inizializziamo l'asse ID del motore
     this->axisID=axisID;
     this->axisRef=axisRef;
@@ -110,43 +110,58 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     
 }
 
-
-BOOL TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
+int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
       if(!TS_SelectAxis(axisID)){
           DERR("error selecting axis");
-        return -3;
+        return -1;
     }
 
     //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
-      DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
-    if(!TS_MoveRelative(deltaPosition, this->speed, this->acceleration, this->isAdditive,this->movement,this->referenceBase)){
-        DERR("error moving");
-        return FALSE;
+    DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
+        DERR("error relative moving");
+        return -2;
     }
-    return TRUE;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::stopMotion(){
-  DPRINT("stop axis:%d",axisID);
+int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
+    
     if(!TS_SelectAxis(axisID)){
-        return -3;
+        DERR("error selecting axis");
+        return -1;
+    }
+    //deltaPosition*=CONST_MULT_TECHNOFT;
+    //printf("%ld",deltaPosition);
+    //DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    if(!TS_MoveAbsolute(absPosition, this->speed, this->acceleration, movement, referenceBase)){
+        DERR("error absolute moving");
+        return -2;
+    }
+    return 0;
+}
+
+int TechnoSoftLowDriver::stopMotion(){
+    DPRINT("stop axis:%d",axisID);
+    if(!TS_SelectAxis(axisID)){
+        return -1;
     }
 
-      if(!TS_Stop()){
-          return FALSE;
-      }
-      return TRUE;
+    if(!TS_Stop()){
+        return -2;
+    }
+    return 0;
 }
 
 int TechnoSoftLowDriver::providePower(){
     DPRINT("provide power to axis:%d",axisID);
       if(!TS_SelectAxis(axisID)){
-        return -3;
+        return -1;
     }
 
     if(!TS_Power(POWER_ON)){
-        return -1;
+        return -2;
     }
 				
     /*	Wait for power stage to be enabled */
@@ -154,7 +169,7 @@ int TechnoSoftLowDriver::providePower(){
     while(sAxiOn_flag == 0){
         /* Check the status of the power stage */
         if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
-            return -2;
+            return -3;
         }
         sAxiOn_flag=((sAxiOn_flag & 1<<15) != 0 ? 1 : 0);
     }
@@ -162,14 +177,14 @@ int TechnoSoftLowDriver::providePower(){
 }
 
 int TechnoSoftLowDriver::stopPower(){
-      DPRINT("stop power to axis:%d",axisID);
+    DPRINT("stop power to axis:%d",axisID);
 
-      if(!TS_SelectAxis(axisID)){
-        return -3;
+    if(!TS_SelectAxis(axisID)){
+        return -1;
     }
 
     if(!TS_Power(POWER_OFF)){
-        return -1;
+        return -2;
     }
     return 0;
 }
@@ -186,102 +201,150 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     return 0;
 }
 
-BOOL TechnoSoftLowDriver::getCounter(long& tposition){
+int TechnoSoftLowDriver::getCounter(long& tposition){
    // DPRINT("getting counter");
-  if(!TS_SelectAxis(axisID)){
-        return -3;
+    if(!TS_SelectAxis(axisID)){
+        return -1;
     }
 
     if(!TS_GetLongVariable("TPOS", tposition)){
-        return FALSE;
+        return -2;
     }
-    return TRUE;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::getEncoder(long& aposition){
+int TechnoSoftLowDriver::getEncoder(long& aposition){
    
     if(!TS_GetLongVariable("APOS", aposition)){
-        return FALSE;
+        return -1;
     }
-    return TRUE;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::resetCounter(){
+int getLVariable(std::string& nameVar, long& var){
+    if(!TS_GetLongVariable(nameVar.c_str(), var)){
+        return -1;
+    }
+    return 0;
+}
+
+int TechnoSoftLowDriver::resetCounter(){
     
     if(!TS_Execute("SAP 0")){
-        return FALSE;
+        return -1;
     }
-    return TRUE;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::resetEncoder(){
+int TechnoSoftLowDriver::resetEncoder(){
     
     if(!TS_Execute("APOS=0")){
-        return FALSE;
+        return -1;
     }
-    return TRUE;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::getPower(BOOL& powered){
+int TechnoSoftLowDriver::getPower(BOOL& powered){
     
     powered = FALSE;
     WORD power;
     if(!TS_ReadStatus(REG_SRL,power)){
-        return FALSE;
+        return -1;
     }
     power = ((power & 1<<15)==0 ? 1 : 0); //La forma generale dell'istruzione di SHIFT A SINISTRA e' del tipo:
     //variabile_intera << numero_posizioni
     if (power==1) {
         powered = FALSE;
-        return TRUE;
+        return -2;
     }
     else{
         powered = TRUE;
-        return TRUE;
+        return -3;
     }
 }
 
-BOOL TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
+int TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
 //The function converts the value to type fixed and writes it in the TML data
 //pszName on the active axis
     if(!TS_SetFixedVariable(pszName, value)) 
-        return FALSE;
-    return TRUE;
+        return -1;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::abortNativeOperation(){
+int TechnoSoftLowDriver::abortNativeOperation(){
     //The function aborts the execution of a TML function launched with a 
     //cancelable call
     if(!TS_ABORT()) 
-        return FALSE;
-    return TRUE;
+        return -1;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::executeTMLfunction(LPCSTR pszFunctionName){
+int TechnoSoftLowDriver::executeTMLfunction(LPCSTR pszFunctionName){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
     if(!TS_CancelableCALL_Label(pszFunctionName)) 
-        return FALSE;
-    return TRUE;
+        return -1;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::setDecelerationParam(double deceleration){
+int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
     // 
     if(!TS_QuickStopDecelerationRate(deceleration))
-        return FALSE;
-    return TRUE;
+        return -1;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
+int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
     if(!TS_SetLongVariable(pszName, value)) 
-		return FALSE;
-    return TRUE;
+	return -1;
+    return 0;
 }
 
-BOOL TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
+int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
     
-    if(!TS_ReadStatus(selIndex, &status)) 
-        return FALSE;
+    if(!TS_ReadStatus(selIndex, status)) 
+        return -1;
     status=((status & 1<<8) == 0 ? 1 : 0);
-    return TRUE;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType = LSW_NEGATIVE , short transitionType = TRANSITION_HIGH_TO_LOW , BOOL waitEvent = 1, BOOL enableStop = 0){
+    
+    if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)) 
+	return -1;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent=1, BOOL enableStop=0){
+    
+    if(!TS_SetEventOnMotionComplete(waitEvent,enableStop)) 
+	return -1;
+    return 0;
+}
+
+int TechnoSoftLowDriver::checkEvent(BOOL& event){
+    
+    if(!TS_CheckEvent(event)) 
+        return -1;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setPosition(const long& posValue){
+    
+    if(!TS_SetPosition(posValue)) 
+        return -1;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegister, std::string& descrErr){
+    
+    DPRINT("Reading status");
+    descrErr.assign("");
+    if(!TS_ReadStatus(regIndex,contentRegister)){
+	
+        DERR("Error at the register reading: %s",TS_GetLastErrorText());
+        descrErr.assign(TS_GetLastErrorText());
+        return -1;
+    }
+    return 0;
 }

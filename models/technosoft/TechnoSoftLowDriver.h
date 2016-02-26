@@ -7,7 +7,6 @@
 #include <string>
 #include <cmath>
 #include <limits.h>
-
 #include <string.h>
 
 
@@ -78,7 +77,7 @@ namespace common{
                     int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
                 
                     ~SerialCommChannelTechnosoft();
-                    BOOL open(int hostID=HOST_ID);
+                    int open(int hostID=HOST_ID);
                     void close();
             };
         
@@ -100,7 +99,7 @@ namespace common{
                 short movement;
                 short referenceBase;
                 // Additional parameters for s-curve profile
-                long jerkTime;
+                //long jerkTime;
                 short decelerationType;
                 
                 char setupFilePath[200];
@@ -130,27 +129,38 @@ namespace common{
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
-                BOOL moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
-
-                // get methods for variables
-                BOOL getCounter(long& tposition);
-                BOOL getEncoder(long& aposition);
-                // resetting methos
-                BOOL resetCounter();// reset TPOS_register();
-                BOOL resetEncoder();// reset APOS_register();
-                BOOL getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
-                //int getRegister()**********************;
-                BOOL stopMotion();
-                int deinit();
-                BOOL setDecelerationParam(double deceleration);
-                BOOL setFixedVariable(LPCSTR pszName, double value);
-                BOOL abortNativeOperation();
-                BOOL executeTMLfunction(std::string&);
-                BOOL setVariable(LPCSTR pszName, long value);
-                BOOL readHomingCallReg(short selIndex, WORD& status);
+                int moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
+                int moveAbsoluteSteps(const long& position);
                 
-                int getMERregister();// REG_MER_register();
-                int getSRLregister();// REG_SRL_register();
+                // get methods for variables
+                int getCounter(long& tposition);
+                int getEncoder(long& aposition);
+                // resetting methos
+                int resetCounter();// reset TPOS_register();
+                int resetEncoder();// reset APOS_register();
+                int getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
+                //int getRegister()**********************;
+                int stopMotion();
+                int deinit();
+                int setDecelerationParam(double deceleration);
+                int setFixedVariable(LPCSTR pszName, double value);
+                int abortNativeOperation();
+                int executeTMLfunction(LPCSTR pszFunctionName);
+                int setVariable(LPCSTR pszName, long value);
+                int readHomingCallReg(short selIndex, WORD& status);
+                int setEventOnLimitSwitch(short lswType , short transitionType, BOOL waitEvent, BOOL enableStop);
+                int setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop);
+                int setPosition(const long& posValue);
+                
+                int getLVariable(const std::string& nameVar,long& var) const;
+                
+                int checkEvent(BOOL& event);
+                
+                int getStatusOrErrorReg(short& regIndex, WORD& contentRegister, std::string& descrErr);
+
+                int getMERregister();// read content of the error register
+                int getSRLregister();// read content of the low part of the status register
+                int getSRHregister();// read content of the high part of the status register
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
            };
 	}// chiude namespace technosoft

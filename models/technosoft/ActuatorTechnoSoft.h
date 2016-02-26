@@ -8,9 +8,12 @@
 
 #include <common/actuators/core/AbstractActuator.h>
 #include "TechnoSoftLowDriver.h"
+#include <sys/time.h>
 
 #ifndef ActuatorTechnoSoft_h
 #define ActuatorTechnoSoft_h
+
+using namespace common::actuators;
 
 namespace common{
     
@@ -26,6 +29,7 @@ namespace common{
                     std::string name; // ActuatorTechnoSoft name
                     double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
 		    double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
+                    bool readyState;
                     
                 public:
                     typedef struct __technoinfo {
@@ -39,23 +43,28 @@ namespace common{
                         const DWORD baudrate;
                     } technoinfo_t;
                     
-                    // costruttore
-                    ActuatorTechnoSoft();
-                    ~ActuatorTechnoSoft(){
-                        deinit();
-                    } 
-                     int init(void*initialization_string);
-                    // OK
-			// all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
-                    void deinit();
-                    int moveRelativeMillimeters(double deltaMillimeters);
-                    int getPosition(readingTypes readingType, double& deltaPosition_mm);
-                    int stopMotion(){return 0;};
-                    BOOL homing(int minutes, std::string& mode);
-                    int getState(int* state, std::string& desc ){return 0;}   // **
-                   
-            
-            
+                // costruttore
+                ActuatorTechnoSoft();
+                ~ActuatorTechnoSoft(){
+                    deinit();
+                } 
+               
+                int init(void*initialization_string);
+                // OK
+                // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
+                int deinit();
+                int moveRelativeMillimeters(double deltaMillimeters);
+                int moveAbsoluteMillimeters(double mm);
+                int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT){return 0;}
+                int resetAlarms(uint64_t alrm){return 0;}
+                
+                //int getPosition(readingTypes mode, double& deltaPosition_mm);
+                int stopMotion(){return 0;}
+                int getPosition(readingTypes mode, double& deltaPosition_mm);
+                int homing(homingType mode){return 0;}
+                int getState(int* state, std::string& desc );   // **
+                int getAlarms(uint64_t*alrm);
+                uint64_t getFeatures(){return 0;}
      
         /**
         @brief get the actuator position using the readingType mode chosen for reading
@@ -74,7 +83,7 @@ namespace common{
         @param version returning string
         @return 0 if success or an error code
         */
-            int getHWVersion(std::string& version){return 0;};         // ****Da implementare***
+        int getHWVersion(std::string& version){return 0;}         // ****Da implementare***
 
             
             };

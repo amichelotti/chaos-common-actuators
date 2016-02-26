@@ -39,7 +39,7 @@
       </toolsSet>
       <flagsDictionary>
         <element flagsID="0" commonFlags="-O2 -O2"/>
-        <element flagsID="1" commonFlags="-mtune=generic -march=i686 -O3 -O2 -O2 -fPIC"/>
+        <element flagsID="1" commonFlags="-mtune=generic -march=i686 -O3 -O2 -O2 -fpic"/>
         <element flagsID="2" commonFlags="-mtune=generic -march=i686 -O3 -O2 -fPIC"/>
       </flagsDictionary>
       <codeAssistance>
@@ -76,39 +76,56 @@
           </incDir>
         </ccTool>
       </folder>
+      <folder path="0/models">
+        <ccTool>
+          <preprocessorList>
+            <Elem>CHAOS=1</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/models/technosoft/test">
+        <ccTool>
+          <preprocessorList>
+            <Elem>CHAOS</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
       <item path="models/technosoft/ActuatorTechnoSoft.cpp"
             ex="false"
             tool="1"
             flavor2="4">
         <ccTool flags="1">
           <incDir>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/bits</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2</pElem>
+            <pElem>core</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/exception</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr</pElem>
             <pElem>models/technosoft</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/core</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/attributes</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/sources</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/regex/v4</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/bits</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/gregorian</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility/type_dispatch</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/system</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/ext</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/detail</pElem>
-            <pElem>core</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/core</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter/aux_</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/regex</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/i686-nptl-linux-gnu/bits</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/gregorian</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/posix_time</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/attributes</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/core</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/sources</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/system</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/regex/v4</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/ext</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility/type_dispatch</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/lib/gcc/i686-nptl-linux-gnu/4.8.2/include</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/bits</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/i686-nptl-linux-gnu/bits</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/debug</pElem>
             <pElem>../debug/core</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config</pElem>
@@ -119,13 +136,11 @@
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/preprocessed/gcc</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/regex/pending</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/regex</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/functional/hash/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format/detail</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/type_traits</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/optional</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/posix_time</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/iterator/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range/detail</pElem>
@@ -139,15 +154,150 @@
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/container</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/expressions</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/keywords</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common/exception</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common/log</pElem>
-            <pElem>../..</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/sys</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/gnu</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/backward</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/lib/gcc/i686-nptl-linux-gnu/4.8.2/include-fixed</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/linux</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/asm</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/asm-generic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/compiler</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/no_tr1</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/stdlib</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/platform</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/language</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/architecture</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/architecture/x86</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/compiler</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library/c</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library/std</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/os</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/os/bsd</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/other</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/platform</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/regex/config</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/config</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/config</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/preprocessor</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/punctuation</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/control</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/logical</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/facilities</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/repetition</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/debug</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/tuple</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/arithmetic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/limits</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/list</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/list/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/control/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/variadic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/array</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/functional</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/functional/hash</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/utility</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/repetition/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/utility/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/slot</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/slot/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration/detail/iter</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration/detail/bounds</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/io</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/iterator</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/concept</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/seq</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/arithmetic/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/comparison</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range/algorithm</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/numeric/conversion/detail/preprocessed</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/math/special_functions</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/math/special_functions/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list/aux_/preprocessed/plain</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector/aux_/preprocessed/typeof_based</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/filesystem</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include</pElem>
+            <pElem>../..</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/i686-nptl-linux-gnu</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>BOOST_ASIO_DISABLE_EVENTFD=1</Elem>
+            <Elem>DEBUG=1</Elem>
+            <Elem>NDEBUG=1</Elem>
+            <Elem>__FLT_EVAL_METHOD__=2</Elem>
+            <Elem>__INT64_C(c)=c ## LL</Elem>
+            <Elem>__INT64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT64_TYPE__=long long int</Elem>
+            <Elem>__INTMAX_C(c)=c ## LL</Elem>
+            <Elem>__INTMAX_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INTMAX_TYPE__=long long int</Elem>
+            <Elem>__INTPTR_MAX__=2147483647</Elem>
+            <Elem>__INTPTR_TYPE__=int</Elem>
+            <Elem>__INT_FAST16_MAX__=2147483647</Elem>
+            <Elem>__INT_FAST16_TYPE__=int</Elem>
+            <Elem>__INT_FAST32_MAX__=2147483647</Elem>
+            <Elem>__INT_FAST32_TYPE__=int</Elem>
+            <Elem>__INT_FAST64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT_FAST64_TYPE__=long long int</Elem>
+            <Elem>__INT_LEAST64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT_LEAST64_TYPE__=long long int</Elem>
+            <Elem>__LONG_MAX__=2147483647L</Elem>
+            <Elem>__PIC__=1</Elem>
+            <Elem>__PTRDIFF_MAX__=2147483647</Elem>
+            <Elem>__PTRDIFF_TYPE__=int</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__SIZEOF_LONG_DOUBLE__=12</Elem>
+            <Elem>__SIZEOF_LONG__=4</Elem>
+            <Elem>__SIZEOF_POINTER__=4</Elem>
+            <Elem>__SIZEOF_PTRDIFF_T__=4</Elem>
+            <Elem>__SIZEOF_SIZE_T__=4</Elem>
+            <Elem>__SIZE_MAX__=4294967295U</Elem>
+            <Elem>__SIZE_TYPE__=unsigned int</Elem>
+            <Elem>__UINT64_C(c)=c ## ULL</Elem>
+            <Elem>__UINT64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT64_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINTMAX_C(c)=c ## ULL</Elem>
+            <Elem>__UINTMAX_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINTMAX_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINTPTR_MAX__=4294967295U</Elem>
+            <Elem>__UINTPTR_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST16_MAX__=4294967295U</Elem>
+            <Elem>__UINT_FAST16_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST32_MAX__=4294967295U</Elem>
+            <Elem>__UINT_FAST32_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT_FAST64_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINT_LEAST64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT_LEAST64_TYPE__=long long unsigned int</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__WCHAR_MAX__=2147483647L</Elem>
+            <Elem>__WCHAR_TYPE__=long int</Elem>
+            <Elem>__code_model_32__=1</Elem>
+            <Elem>__i386=1</Elem>
+            <Elem>__i386__=1</Elem>
+            <Elem>__i686=1</Elem>
+            <Elem>__i686__=1</Elem>
+            <Elem>__pentiumpro=1</Elem>
+            <Elem>__pentiumpro__=1</Elem>
+            <Elem>__pic__=1</Elem>
+            <Elem>common_actuators_technosoft_EXPORTS=1</Elem>
+            <Elem>i386=1</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="models/technosoft/TechnoSoftLowDriver.cpp"
@@ -156,25 +306,30 @@
             flavor2="4">
         <ccTool flags="1">
           <incDir>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/exception</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr/detail</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/core</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/attributes</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/sources</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/gregorian</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility/type_dispatch</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/system</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/bits</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/ext</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/detail</pElem>
-            <pElem>models/technosoft</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/core</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/exception</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/core</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/gregorian</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/posix_time</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/attributes</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/core</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/sources</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/system</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common</pElem>
+            <pElem>models/technosoft</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move/detail</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/ext</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility/type_dispatch</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/lib/gcc/i686-nptl-linux-gnu/4.8.2/include</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/bits</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include</pElem>
@@ -185,14 +340,11 @@
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/type_traits/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format/detail</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/preprocessed/gcc</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/type_traits</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/optional</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/posix_time</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/iterator/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range/detail</pElem>
@@ -206,17 +358,149 @@
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/container</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/expressions</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/keywords</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter/aux_</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread</pElem>
             <pElem>../debug/core</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common/exception</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common/log</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/gnu</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/backward</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/lib/gcc/i686-nptl-linux-gnu/4.8.2/include-fixed</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/linux</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/asm</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/asm-generic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/compiler</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/no_tr1</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/stdlib</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/platform</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/language</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/architecture</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/architecture/x86</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/compiler</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library/c</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library/std</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/os</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/os/bsd</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/other</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/platform</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/config</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/config</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/preprocessor</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/punctuation</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/control</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/logical</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/facilities</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/repetition</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/debug</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/tuple</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/arithmetic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/limits</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/list</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/list/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/control/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/variadic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/repetition/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/utility</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/utility/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/array</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/slot</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/slot/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration/detail/iter</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration/detail/bounds</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/io</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/iterator</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/concept</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/seq</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/arithmetic/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/comparison</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range/algorithm</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/functional</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/functional/hash</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/numeric/conversion/detail/preprocessed</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/math/special_functions</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/math/special_functions/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list/aux_/preprocessed/plain</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector/aux_/preprocessed/typeof_based</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/filesystem</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread</pElem>
             <pElem>../..</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/i686-nptl-linux-gnu</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>BOOST_ASIO_DISABLE_EVENTFD=1</Elem>
+            <Elem>DEBUG=1</Elem>
+            <Elem>NDEBUG=1</Elem>
+            <Elem>__FLT_EVAL_METHOD__=2</Elem>
+            <Elem>__INT64_C(c)=c ## LL</Elem>
+            <Elem>__INT64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT64_TYPE__=long long int</Elem>
+            <Elem>__INTMAX_C(c)=c ## LL</Elem>
+            <Elem>__INTMAX_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INTMAX_TYPE__=long long int</Elem>
+            <Elem>__INTPTR_MAX__=2147483647</Elem>
+            <Elem>__INTPTR_TYPE__=int</Elem>
+            <Elem>__INT_FAST16_MAX__=2147483647</Elem>
+            <Elem>__INT_FAST16_TYPE__=int</Elem>
+            <Elem>__INT_FAST32_MAX__=2147483647</Elem>
+            <Elem>__INT_FAST32_TYPE__=int</Elem>
+            <Elem>__INT_FAST64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT_FAST64_TYPE__=long long int</Elem>
+            <Elem>__INT_LEAST64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT_LEAST64_TYPE__=long long int</Elem>
+            <Elem>__LONG_MAX__=2147483647L</Elem>
+            <Elem>__PIC__=1</Elem>
+            <Elem>__PTRDIFF_MAX__=2147483647</Elem>
+            <Elem>__PTRDIFF_TYPE__=int</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__SIZEOF_LONG_DOUBLE__=12</Elem>
+            <Elem>__SIZEOF_LONG__=4</Elem>
+            <Elem>__SIZEOF_POINTER__=4</Elem>
+            <Elem>__SIZEOF_PTRDIFF_T__=4</Elem>
+            <Elem>__SIZEOF_SIZE_T__=4</Elem>
+            <Elem>__SIZE_MAX__=4294967295U</Elem>
+            <Elem>__SIZE_TYPE__=unsigned int</Elem>
+            <Elem>__UINT64_C(c)=c ## ULL</Elem>
+            <Elem>__UINT64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT64_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINTMAX_C(c)=c ## ULL</Elem>
+            <Elem>__UINTMAX_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINTMAX_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINTPTR_MAX__=4294967295U</Elem>
+            <Elem>__UINTPTR_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST16_MAX__=4294967295U</Elem>
+            <Elem>__UINT_FAST16_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST32_MAX__=4294967295U</Elem>
+            <Elem>__UINT_FAST32_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT_FAST64_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINT_LEAST64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT_LEAST64_TYPE__=long long unsigned int</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__WCHAR_MAX__=2147483647L</Elem>
+            <Elem>__WCHAR_TYPE__=long int</Elem>
+            <Elem>__code_model_32__=1</Elem>
+            <Elem>__i386=1</Elem>
+            <Elem>__i386__=1</Elem>
+            <Elem>__i686=1</Elem>
+            <Elem>__i686__=1</Elem>
+            <Elem>__pentiumpro=1</Elem>
+            <Elem>__pentiumpro__=1</Elem>
+            <Elem>__pic__=1</Elem>
+            <Elem>common_actuators_technosoft_EXPORTS=1</Elem>
+            <Elem>i386=1</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="models/technosoft/test/Ex04_MainFile.c"
@@ -237,9 +521,6 @@
             <pElem>models/technosoft</pElem>
             <pElem>models</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>CHAOS</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="models/technosoft/test/test_slit.cpp"
@@ -248,43 +529,44 @@
             flavor2="4">
         <ccTool flags="1">
           <incDir>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/bits</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/core</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/exception</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr/detail</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/attributes</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/sources</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/gregorian</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility/type_dispatch</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/system</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/bits</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/ext</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/detail</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/core</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/smart_ptr</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time</pElem>
-            <pElem>models/technosoft/test</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include</pElem>
-            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/bits</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/gregorian</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/posix_time</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/attributes</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/core</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/sources</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/system</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common</pElem>
+            <pElem>models/technosoft/test</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/utility/type_dispatch</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/lib/gcc/i686-nptl-linux-gnu/4.8.2/include</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/i686-nptl-linux-gnu/bits</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/ext</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/debug</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/bits</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format/detail</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/type_traits/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/preprocessed/gcc</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/type_traits</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/optional</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/date_time/posix_time</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/iterator/detail</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range/detail</pElem>
@@ -298,18 +580,152 @@
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/container</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/expressions</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log/keywords</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/move</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/parameter</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common/exception</pElem>
             <pElem>../../chaos-i686-linux26-dynamic-release/include/chaos/common/log</pElem>
             <pElem>../debug/core</pElem>
             <pElem>core</pElem>
             <pElem>models/technosoft</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/sys</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/gnu</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/backward</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/compiler</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/no_tr1</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/stdlib</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/config/platform</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/format</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/config</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/config</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/aux_/preprocessor</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/punctuation</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/control</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/logical</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/facilities</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/repetition</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/debug</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/tuple</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/arithmetic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/limits</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/list</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/list/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/control/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/variadic</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/repetition/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/utility</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/utility/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/array</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/slot</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/slot/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration/detail/iter</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/iteration/detail/bounds</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/language</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/architecture</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/architecture/x86</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/compiler</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library/c</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/library/std</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/os</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/os/bsd</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/other</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/predef/platform</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/io</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/iterator</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/concept</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/seq</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/arithmetic/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/preprocessor/comparison</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/range/algorithm</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/lib/gcc/i686-nptl-linux-gnu/4.8.2/include-fixed</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/linux</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/functional</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/functional/hash</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/numeric/conversion/detail/preprocessed</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/math/special_functions</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/math/special_functions/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/list/aux_/preprocessed/plain</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector/aux_</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/mpl/vector/aux_/preprocessed/typeof_based</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/log</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/filesystem</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread/detail</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include/boost/thread</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/asm</pElem>
+            <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sysroot/usr/include/asm-generic</pElem>
             <pElem>../..</pElem>
-            <pElem>../../chaos-i686-linux26-dynamic-release/include</pElem>
             <pElem>/usr/local/chaos/i686-nptl-linux-gnu/i686-nptl-linux-gnu/include/c++/4.8.2/i686-nptl-linux-gnu</pElem>
+            <pElem>../../chaos-i686-linux26-dynamic-release/include</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>BOOST_ASIO_DISABLE_EVENTFD=1</Elem>
+            <Elem>CHAOS=1</Elem>
+            <Elem>DEBUG=1</Elem>
+            <Elem>NDEBUG=1</Elem>
+            <Elem>__FLT_EVAL_METHOD__=2</Elem>
+            <Elem>__INT64_C(c)=c ## LL</Elem>
+            <Elem>__INT64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT64_TYPE__=long long int</Elem>
+            <Elem>__INTMAX_C(c)=c ## LL</Elem>
+            <Elem>__INTMAX_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INTMAX_TYPE__=long long int</Elem>
+            <Elem>__INTPTR_MAX__=2147483647</Elem>
+            <Elem>__INTPTR_TYPE__=int</Elem>
+            <Elem>__INT_FAST16_MAX__=2147483647</Elem>
+            <Elem>__INT_FAST16_TYPE__=int</Elem>
+            <Elem>__INT_FAST32_MAX__=2147483647</Elem>
+            <Elem>__INT_FAST32_TYPE__=int</Elem>
+            <Elem>__INT_FAST64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT_FAST64_TYPE__=long long int</Elem>
+            <Elem>__INT_LEAST64_MAX__=9223372036854775807LL</Elem>
+            <Elem>__INT_LEAST64_TYPE__=long long int</Elem>
+            <Elem>__LONG_MAX__=2147483647L</Elem>
+            <Elem>__PIC__=1</Elem>
+            <Elem>__PTRDIFF_MAX__=2147483647</Elem>
+            <Elem>__PTRDIFF_TYPE__=int</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__SIZEOF_LONG_DOUBLE__=12</Elem>
+            <Elem>__SIZEOF_LONG__=4</Elem>
+            <Elem>__SIZEOF_POINTER__=4</Elem>
+            <Elem>__SIZEOF_PTRDIFF_T__=4</Elem>
+            <Elem>__SIZEOF_SIZE_T__=4</Elem>
+            <Elem>__SIZE_MAX__=4294967295U</Elem>
+            <Elem>__SIZE_TYPE__=unsigned int</Elem>
+            <Elem>__UINT64_C(c)=c ## ULL</Elem>
+            <Elem>__UINT64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT64_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINTMAX_C(c)=c ## ULL</Elem>
+            <Elem>__UINTMAX_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINTMAX_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINTPTR_MAX__=4294967295U</Elem>
+            <Elem>__UINTPTR_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST16_MAX__=4294967295U</Elem>
+            <Elem>__UINT_FAST16_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST32_MAX__=4294967295U</Elem>
+            <Elem>__UINT_FAST32_TYPE__=unsigned int</Elem>
+            <Elem>__UINT_FAST64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT_FAST64_TYPE__=long long unsigned int</Elem>
+            <Elem>__UINT_LEAST64_MAX__=18446744073709551615ULL</Elem>
+            <Elem>__UINT_LEAST64_TYPE__=long long unsigned int</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__WCHAR_MAX__=2147483647L</Elem>
+            <Elem>__WCHAR_TYPE__=long int</Elem>
+            <Elem>__code_model_32__=1</Elem>
+            <Elem>__i386=1</Elem>
+            <Elem>__i386__=1</Elem>
+            <Elem>__i686=1</Elem>
+            <Elem>__i686__=1</Elem>
+            <Elem>__pentiumpro=1</Elem>
+            <Elem>__pentiumpro__=1</Elem>
+            <Elem>__pic__=1</Elem>
+            <Elem>i386=1</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
     </conf>
