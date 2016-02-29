@@ -34,8 +34,7 @@ int main(int argc,const char* argv[]){
         delete mySlit;
         return -1;
     }
-    
-    
+   
     mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,rpos);
     mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,rpos1);
     DPRINT("current position encoder %f, counter %f, moving back...",rpos,rpos1);
