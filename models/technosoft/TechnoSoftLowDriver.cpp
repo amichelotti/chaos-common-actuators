@@ -53,8 +53,6 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::st
         my_channel = i->second;
     } else {
         my_channel = channel_psh(new SerialCommChannelTechnosoft(devName));
-        
-        
     }
 }
 
@@ -66,10 +64,13 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;
+    
     if((my_channel==NULL) || (my_channel->open()==FALSE)){
+      
         DERR("error opening channel");
         return -1;
     }
+    
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
@@ -106,8 +107,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     this->referenceBase=referenceBase;
     
     this->encoderLines= encoderLines;
+    printf("esito providePower: %d\n",providePower());
     return providePower();
-    
 }
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){

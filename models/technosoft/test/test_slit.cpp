@@ -9,6 +9,7 @@ using namespace common::actuators::models;
   printf("Usage is:%s <dev/tty> <technosoft configuration> <axis> <move position in mm>\n",argv[0]);
 
 int main(int argc,const char* argv[]){
+    
     int axis;
     float pos;
     double rpos=0,rpos1=0;

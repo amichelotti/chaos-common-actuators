@@ -29,7 +29,7 @@ namespace common{
                     std::string name; // ActuatorTechnoSoft name
                     double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
 		    double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
-                    bool readyState;
+                    bool readyState=false;
                     
                 public:
                     typedef struct __technoinfo {
