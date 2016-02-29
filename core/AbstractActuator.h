@@ -31,6 +31,7 @@
 
 namespace common {
     namespace actuators {
+
         
     typedef enum {   
         // High part of the status
@@ -39,6 +40,7 @@ namespace common {
         //AGGIUNGERE STATO DI MOTORE PRONTO ALL'UTILIZZO:
         ACTUATOR_READY = 0x1,
         
+
         ACTUATOR_OVER_POSITION_TRIGGER = 0x2, // Position trigger
         ACTUATOR_AUTORUN_ENABLED = 0x4, // Auto run mode status
         ACTUATOR_LSP_EVENT_INTERRUPUT = 0x8, // Limit switch positive event/interrupt
@@ -59,6 +61,7 @@ namespace common {
         ACTUATOR_UNKNOWN_STATUS // Unknown state of the actuator
     } actuatorStatus;
     
+
     typedef enum {
         ACTUATOR_CANBUS_ERROR=0x1, // CAN bus status
         ACTUATOR_SHORT_CIRCUIT=0x2, // Short-circuit protection status
@@ -66,6 +69,7 @@ namespace common {
         ACTUATOR_CONTROL_ERROR=0x8, // Control error
         ACTUATOR_SERIAL_COMM_ERROR=0x10, // Communication error
         ACTUATOR_HALL_SENSOR_MISSING=0x20, // Hall sensor missing / Resolver error / BiSS error / Position wrap around error 
+
         ACTUATOR_LSP_LIMIT_ACTIVE=0x40, // Positive limit switch status
         ACTUATOR_LSN_LIMIT_ACTIVE=0x80, // Negative limit switch status
         ACTUATOR_OVER_CURRENT=0x100, // Over-current error
@@ -79,20 +83,20 @@ namespace common {
         ACTUATOR_I2T_WARNING_MOTOR = 0x8000, // Motor I2T protection warning
         ACTUATOR_I2T_WARNING_DRIVE = 0x10000, // Drive I2T protection warning
     } actuatorAlarms;
-    
+
     class AbstractActuator {
 
         protected:
             double range_mm; //mechanical range of the slit (passato da MDS), [mm]
             uint64_t timeo_ms;
-            
+
             // Trapezoidal profile parameters
             double speed;
             double acceleration;
             bool isAdditive;
             int32_t movement;
             int32_t referenceBase;
-            
+
         public:
         AbstractActuator() {timeo_ms=0;};
         virtual ~AbstractActuator() {};
@@ -102,7 +106,7 @@ namespace common {
         */
         int setTimeout(uint64_t timeo_ms);                // ****Da implementare***
         /**
-        @brief get timeout in ms for the completion of the operation 
+        @brief get timeout in ms for the completion of the operation
         @return 0 if success or an error code
         */
         int getTimeout(uint64_t* timeo_ms);               // ****Da implementare***
@@ -111,49 +115,49 @@ namespace common {
         @return 0 if success or an error code
         */
         virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
-            
+
         /**
         @brief set the actuator speed in mm/s
         @return 0 if success or an error code
         */
          virtual int setSpeed(double speed_mm_per_sec);
-            
+
         /**
         @brief set the actuator acceleration in mm/s^2
         @return 0 if success or an error code
         */
             virtual int setAcceleration(double acceleration_mm_per_sec2);
-            
+
         /**
         @brief specify how is computed the position to reach
-        */    
+        */
             virtual void setAdditive(bool isAdditive);
-            
+
         /**
         @brief define the moment when the motion is started
         @return 0 if success or an error code
-        */    
+        */
             virtual int setMovement(int32_t movement);  //********** per ora ritorna un valore ***********
-            
+
         /**
-        @brief specify how the motion reference is computed is computed: from 
+        @brief specify how the motion reference is computed is computed: from
          * actual values of position and speed reference or from actual values
          * of load/motor position and speed
         @return 0 if success or an error code
-        */     
+        */
             virtual int setReferenceBase(int32_t referenceBase); //********** per ora ritorna un valore ***********
-            
+
         /**
         @brief get the actuator position using the readingType mode chosen for reading
         @return 0 if success or an error code
-        */    
+        */
         typedef enum
         {   READ_ENCODER,
             READ_COUNTER
         } readingTypes;
-        
-        virtual int getPosition(readingTypes mode,double& deltaPosition_mm)=0;   //***OK***
-           
+
+        virtual int getPosition(readingTypes mode,float *deltaPosition_mm)=0;   //***OK***
+
         /**
         @brief initialize and poweron the motor
         @return 0 if success
@@ -173,24 +177,26 @@ namespace common {
             virtual int getSWVersion(std::string& version)=0;          // ****Da implementare***
 
         /**
-        @brief returns the HW version of the actuator 
+        @brief returns the HW version of the actuator
         @param version returning string
         @return 0 if success or an error code
         */
             virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
 
          /**
+
         @brief stop the motion of the actuator 
+
         @return 0 if success or an error code
         */
             virtual int stopMotion()=0;
-            
-            typedef enum{   
+
+            typedef enum{
                 defaultHoming,
-                homing2,   
-                nativeHoming15    
+                homing2,
+                nativeHoming15
             } homingType;
-        
+
             virtual int homing(homingType mode)=0;
             virtual int getState(int* state, std::string& desc)=0;   // ****Da implementare***
             virtual int getAlarms(uint64_t*alrm)=0;

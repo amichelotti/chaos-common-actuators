@@ -279,12 +279,14 @@ int TechnoSoftLowDriver::abortNativeOperation(){
     return 0;
 }
 
-int TechnoSoftLowDriver::executeTMLfunction(LPCSTR pszFunctionName){
+
+BOOL TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
-    if(!TS_CancelableCALL_Label(pszFunctionName)) 
-        return -1;
-    return 0;
+    if(!TS_CancelableCALL_Label(pszFunctionName.c_str()))
+        return FALSE;
+    return TRUE;
+
 }
 
 int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
@@ -302,8 +304,9 @@ int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
 
 int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
     
-    if(!TS_ReadStatus(selIndex, status)) 
-        return -1;
+    if(!TS_ReadStatus(selIndex, status))
+        return FALSE;
+
     status=((status & 1<<8) == 0 ? 1 : 0);
     return 0;
 }
