@@ -10,6 +10,8 @@ using namespace common::actuators::models;
 
 int main(int argc,const char* argv[]){
     
+    printf("CIAO CORE \n");
+    
     int axis;
     float pos;
     double rpos=0,rpos1=0;
@@ -31,7 +33,7 @@ int main(int argc,const char* argv[]){
     //mySlit[1] = new ActuatorTechnosoft();
     sprintf(sinit,"%s,myslit,%s,%d",dev,conf,axis);
     if((ret=mySlit->init((void*)sinit))!=0){
-        DERR("cannot init ret=%d",ret);
+        DERR("cannot init reeeeeeeeeeeeeeeeeet=%d",ret);
         delete mySlit;
         return -1;
     }
