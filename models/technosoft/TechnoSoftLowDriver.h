@@ -145,7 +145,7 @@ namespace common{
                 int setDecelerationParam(double deceleration);
                 int setFixedVariable(LPCSTR pszName, double value);
                 int abortNativeOperation();
-                int executeTMLfunction(LPCSTR pszFunctionName);
+                int executeTMLfunction(std::string& pszFunctionName);
                 int setVariable(LPCSTR pszName, long value);
                 int readHomingCallReg(short selIndex, WORD& status);
                 int setEventOnLimitSwitch(short lswType , short transitionType, BOOL waitEvent, BOOL enableStop);

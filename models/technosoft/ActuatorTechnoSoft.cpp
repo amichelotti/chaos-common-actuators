@@ -84,7 +84,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
     return 0;
 }
 
-int ActuatorTechnoSoft::getPosition(readingTypes mode, double& deltaPosition_mm){
+int ActuatorTechnoSoft::getPosition(readingTypes mode, float* deltaPosition_mm){
     if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
         long tposition;
         if(driver->getCounter(tposition)<0){
@@ -92,7 +92,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double& deltaPosition_mm)
             return -1;
         }
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
-        deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
+        *deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
     }
     else if(mode==READ_ENCODER){               // Lettura posizione per mezzo dell'encoder (Apos register)
         long aposition;
@@ -100,7 +100,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double& deltaPosition_mm)
         if(driver->getEncoder(aposition)<0)
             return -2;
         //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
-        deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(N_ENCODER_LINES*N_ROUNDS);
+        *deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(N_ENCODER_LINES*N_ROUNDS);
     }
     return 0;
 }
@@ -643,4 +643,4 @@ int ActuatorTechnoSoft::getAlarms(uint64_t*alrm){
 
 
 
-#endif
+//#endif

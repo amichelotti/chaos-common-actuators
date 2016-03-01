@@ -281,7 +281,7 @@ int TechnoSoftLowDriver::abortNativeOperation(){
 }
 
 
-BOOL TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
+int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
     if(!TS_CancelableCALL_Label(pszFunctionName.c_str()))
