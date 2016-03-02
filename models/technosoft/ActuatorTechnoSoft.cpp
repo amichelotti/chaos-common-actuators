@@ -12,8 +12,8 @@
 
 
 #include <common/debug/core/debug.h>
-using namespace common::actuators::models;
-using namespace common::actuators;
+using namespace ::common::actuators::models;
+
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
       
 
@@ -22,6 +22,7 @@ static const boost::regex driver_match("([\\w\\/]+),(\\w+),([\\w\\/\\.]+),(\\d+)
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     driver=NULL;
+    readyState=false;
 }
 
 int ActuatorTechnoSoft::init(void*initialization_string){

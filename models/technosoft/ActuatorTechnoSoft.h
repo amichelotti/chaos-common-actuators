@@ -13,23 +13,21 @@
 #ifndef ActuatorTechnoSoft_h
 #define ActuatorTechnoSoft_h
 
-using namespace common::actuators;
-
 namespace common{
     
     namespace actuators{
 
 	namespace models{
 
-          class ActuatorTechnoSoft: public common::actuators::AbstractActuator{
+          class ActuatorTechnoSoft: public ::common::actuators::AbstractActuator{
     
                 private:
-                    TechnoSoftLowDriver *driver=NULL;
+                    TechnoSoftLowDriver *driver;
                     std::string dev; // Serial channel name
                     std::string name; // ActuatorTechnoSoft name
                     double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
 		    double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
-                    bool readyState=false;
+                    bool readyState;
                     
                 public:
                     typedef struct __technoinfo {
