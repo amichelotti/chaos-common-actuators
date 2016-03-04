@@ -34,8 +34,8 @@ int SerialCommChannelTechnosoft::open(int hostID){
    DPRINT("opening dev %s type %d baud %d, hostid:%d",pszDevName.c_str(),btType,baudrate,hostID);
    resp=TS_OpenChannel(pszDevName.c_str(), btType, hostID, baudrate);
     if(resp < 0){
-        DERR("failed opening channel");
-        return -1;
+      ERR("failed opening channel dev:%s type:%d host:%d baudrate: %d",pszDevName.c_str(), btType, hostID, baudrate);
+      return -1;
     }
     this->fd = resp;
     DPRINT("Openchannel resp=%d",resp);
@@ -54,6 +54,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::st
     } else {
         my_channel = channel_psh(new SerialCommChannelTechnosoft(devName));
     }
+    DPRINT("created channel  dev %s name %s", devName.c_str(),name.c_str());
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
@@ -65,7 +66,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     int axisRef;
     
-    if((my_channel==NULL) || (my_channel->open()==FALSE)){
+    if((my_channel==NULL) || (my_channel->open()<0)){
       
         DERR("error opening channel");
         return -1;
@@ -334,19 +335,27 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
 }
 
 int TechnoSoftLowDriver::setPosition(const long& posValue){
-    
+  if(!TS_SelectAxis(axisID)){
+        return -1;
+  }
+  
     if(!TS_SetPosition(posValue)) 
         return -1;
     return 0;
 }
 
 int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegister, std::string& descrErr){
-    
+
+  if(!TS_SelectAxis(axisID)){
+    ERR("cannot select axis %d",axisID);
+    return -1;
+  }
+
     DPRINT("Reading status");
     descrErr.assign("");
     if(!TS_ReadStatus(regIndex,contentRegister)){
 	
-        DERR("Error at the register reading: %s",TS_GetLastErrorText());
+        ERR("Error at the register reading: %s",TS_GetLastErrorText());
         descrErr.assign(TS_GetLastErrorText());
         return -1;
     }

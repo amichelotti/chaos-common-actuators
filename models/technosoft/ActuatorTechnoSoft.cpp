@@ -18,7 +18,7 @@ using namespace ::common::actuators::models;
       
 
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,
-static const boost::regex driver_match("([\\w\\/]+),(\\w+),([\\w\\/\\.]+),(\\d+)");
+static const boost::regex driver_match("([\\w\\/]+),(\\w+),(.+),(\\d+)");
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     driver=NULL;
@@ -27,6 +27,10 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 
 int ActuatorTechnoSoft::init(void*initialization_string){
     std::string params;
+    if(readyState==true){
+      DPRINT("already initialized");
+      return 0;
+    }
     params.assign((const char*)initialization_string);
     boost::smatch match;
 
@@ -38,18 +42,19 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
         readyState = true;
         if((driver)==NULL){
-            DERR("## cannot create driver");
+            ERR("## cannot create driver");
             return -1;                     
         }
         DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
         return driver->init(conf_path,atoi(axid.c_str()));
     }
-   DERR("error parsing initialization string:\"%s\"",params.c_str());
+   ERR("error parsing initialization string:\"%s\"",params.c_str());
    return -10;
 }
 
 int ActuatorTechnoSoft::deinit(){
     DPRINT("deinitializing");
+    readyState=false;
     if (driver!=NULL) {
         delete driver;
     }
@@ -316,7 +321,7 @@ int ActuatorTechnoSoft::getState(int* state, std::string& desc){
     short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
     
     if((driver->getStatusOrErrorReg(indexRegSRH, contentRegSRH, desc))<0){
-        DERR("Reading state error: %s",desc.c_str());
+        ERR("Reading state error: %s",desc.c_str());
         return -1;
     }
     
@@ -335,42 +340,42 @@ int ActuatorTechnoSoft::getState(int* state, std::string& desc){
     if(overPositionState)
         desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
                                          // con il contenuto corrente **************
-    if(contentRegSRH & base2^5){
+    if(contentRegSRH & (1<<5)){
         stCode |= ACTUATOR_AUTORUN_ENABLED;
         desc+="Auto run mode. ";
     }
-    if(contentRegSRH & base2^6){
+    if(contentRegSRH & (1<<6)){
         stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
         desc+="Limit switch positive event/interrupt. ";
     }
-    if(contentRegSRH & base2^7){
+    if(contentRegSRH & (1<<7)){
         stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
         desc+="Limit switch negative event/interrupt. ";
     }
-    if(contentRegSRH & base2^12){
+    if(contentRegSRH & (1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         desc+="Gear ratio in electronic gearing mode. ";
     }
-    if(contentRegSRH & base2^14){
+    if(contentRegSRH & (1<<14)){
         stCode |= ACTUATOR_IN_CAM;
         desc+="Reference position in absolute electronic camming mode. ";
     }
-    if(contentRegSRH & base2^15){
+    if(contentRegSRH & (1<<15)){
         stCode |= ACTUATOR_FAULT;
         desc+="Fault status. ";
     }
     
     short indexRegSRL = 3; // see constant REG_SRH in TML_lib.h
     if((driver->getStatusOrErrorReg(indexRegSRL, contentRegSRL, desc))<0){
-        DERR("Reading state error: %s",desc.c_str());
+        ERR("Reading state error: %s",desc.c_str());
         return -2;
     }
     //  Analysis of the register content SRL
-    if(contentRegSRL & base2^10){
+    if(contentRegSRL & (1<<10)){
         stCode |= ACTUATOR_MOTION_COMPLETED;
         desc+="Actuator motion completed. ";
     }
-    if(contentRegSRL & base2^15){
+    if(contentRegSRL & (1<<15)){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         desc += "Electrical power supplied.";
     }
