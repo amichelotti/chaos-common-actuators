@@ -74,14 +74,14 @@ namespace common{
            @param version returning string
            @return 0 if success or an error code
         */
-        int getSWVersion(std::string& version){return 0;}
+		int getSWVersion(std::string& version){version="technosoft-0.0.1";return 0;}
 
         /**
         @brief returns the HW version of the actuator 
         @param version returning string
         @return 0 if success or an error code
         */
-        int getHWVersion(std::string& version){return 0;}         // ****Da implementare***
+        int getHWVersion(std::string& version){version="technosofthw-0.0";return 0;}
 
             
             };
