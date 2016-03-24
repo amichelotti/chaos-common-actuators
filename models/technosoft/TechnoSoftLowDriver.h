@@ -75,7 +75,11 @@ namespace common{
                     SerialCommChannelTechnosoft(){}
                     SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=CHANNEL_RS232,const DWORD baudrate=BAUDRATE);
                     int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
-                
+                    int getFD(); 
+		    std::string  getDevName();
+		    int getbtType();
+		    int getbaudrate();
+		    void PrintChannel();
                     ~SerialCommChannelTechnosoft();
                     int open(int hostID=HOST_ID);
                     void close();
@@ -117,6 +121,9 @@ namespace common{
                 static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
                                               // percio e dichiarata di tipo static
                 
+                bool alreadyopenedChannel; 
+                bool poweron;
+                
             public:
                 // Costruttore device channel and device name
                 TechnoSoftLowDriver(const std::string dev, const std::string devName);
@@ -133,6 +140,7 @@ namespace common{
                 int moveAbsoluteSteps(const long& position);
                 
                 // get methods for variables
+                channel_psh getMyChannel();
                 int getCounter(long& tposition);
                 int getEncoder(long& aposition);
                 // resetting methos

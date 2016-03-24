@@ -39,14 +39,68 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string dev_name=match[2]; 
         std::string conf_path=match[3];
         std::string axid=match[4];
-        driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
-        readyState = true;
+        try{
+            driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
+            // ATTENZIONE: IL COSTRUTTORE TechnoSoftLowDriver DOVRÀ IN SEGUITO 
+            // GENERARE UNA ECCEZIONE nel caso l'oggetto SerialCommChannelTechnosoft 
+            // non venga allocato.
+            // L'istruzione precedente dovrà essere invocata facendo uso di un blocco 
+            // try/catch. Nel caso l'eccezione venga catturata dovrà essere restituito
+            // un numero negativo
+        }
+        catch(std::bad_alloc& e){ // Eccezione derivante dal fatto che l'oggetto canale di comunicazione
+                                    // non è stato possibile allocarlo.
+                                  
+            ERR("## cannot create channel");
+            delete driver; 
+            //readyState = false; //non è necessari questa assegnazione
+            return -1;
+        }
         if((driver)==NULL){
             ERR("## cannot create driver");
-            return -1;                     
+            // readyState = false; // non è necessaria questa assegnazione
+            return -2;                     
         }
+        
         DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
-        return driver->init(conf_path,atoi(axid.c_str()));
+        //int rt= driver->init(conf_path,atoi(axid.c_str()));
+        
+        // INIZIALIZZAZIONE CANALE + DRIVE/MOTOR
+        if(driver->init(conf_path,atoi(axid.c_str()))<0){
+            // Deallocazione oggetto canale ()
+            try{
+                delete driver; // Nota importante: l'indirizzo del canale 
+                           // non è stato memorizzato nella mappa. Essendo l'oggetto
+                           // canale puntato da un solo oggetto TechnoSOftLowDriver,
+                           // anche l'oggetto canale sarà deallocato (funzionamento smartpointer).
+                           // Se il canale di comunicazione è stato aperto (abbiamo quindi avuto
+                           // un errore nella inizializzazione del drive/motor), il canale di 
+                           // comunicazione verrà anche chiuso nella fase di deallocazione dell'oggetto
+                           // SerialCommChannel
+            // readyState = false; // non è necessaria questa istruzione 
+                
+            }
+            catch(){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
+                     // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
+                     // DEL MOTORE.
+                     //.....
+                     //.....
+                     //.....
+                retun -3;
+            }
+            return -4;
+        }
+        
+        // A questo punto siamo certi che l'apertura del canale è andata a buon fine
+        // ed i parametri del drive/motor sono stati inizializzati correttamente
+        
+        readyState = true;
+	int state;
+	std::string desc;
+	this->getState(&state,desc);
+	DPRINT("ALEDEBUG state is %d (%s)",state,desc.c_str());
+        
+	return rt;
     }
    ERR("error parsing initialization string:\"%s\"",params.c_str());
    return -10;
@@ -311,6 +365,9 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, float* deltaPosition_mm){
 int ActuatorTechnoSoft::getState(int* state, std::string& desc){
     
     *state = ACTUATOR_UNKNOWN_STATUS;
+    // *state = ACTUATOR_READY;
+    //return 0;
+    desc.assign("Unknown state");
     int stCode=0;
     
     DPRINT("Getting state of the actuator");
@@ -329,10 +386,9 @@ int ActuatorTechnoSoft::getState(int* state, std::string& desc){
         stCode|=ACTUATOR_READY;
     
     // Analysis of the register content SRH
-    WORD base2 = 2;
     bool overPositionState = false;
     for(WORD i=1; i<=4; i++){
-        if(contentRegSRH & base2^i){ 
+        if(contentRegSRH & 1 << i){ 
             stCode |= ACTUATOR_OVER_POSITION_TRIGGER;
             overPositionState = true;
         }

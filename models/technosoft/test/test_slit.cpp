@@ -10,12 +10,13 @@ using namespace common::actuators::models;
 
 int main(int argc,const char* argv[]){
     
-    printf("CIAO CORE \n");
     
     int axis;
     float pos;
     float rpos=0,rpos1=0;
     int ret;
+    int status;
+    std::string desc;
     const char *dev,*conf;
     char sinit[256];
     if(argc!=5){
@@ -37,26 +38,28 @@ int main(int argc,const char* argv[]){
         delete mySlit;
         return -1;
     }
-   
+    mySlit->getState(&status,desc);
+    printf("status %d, %s\n",status ,desc.c_str());
+    
     mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
     mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
     DPRINT("current position encoder %f, counter %f, moving back...",rpos,rpos1);
     mySlit->moveRelativeMillimeters(-rpos1);
-    do{
+    /*do{
         mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
         mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
         printf("back ->%.5f\r",rpos1);
     } while ((rpos1-.1) > 0 );
     
     printf("\n moving to %f...\n",pos);
-    
-    mySlit->moveRelativeMillimeters(pos);
+   */ 
+    /* mySlit->moveRelativeMillimeters(pos);
     do{
         mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
         mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
         printf("up ->%.5f\r",rpos1);
     } while ((rpos1+.1) < pos);
-    
+    */ 
     DPRINT("current after position encoder %f, counter %f",rpos,rpos1);
     delete mySlit;
 	
