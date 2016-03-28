@@ -1,10 +1,18 @@
 
 #include "TechnoSoftLowDriver.h"
 #include <common/debug/core/debug.h>
+#include <iostream>
 
 using namespace common::actuators::models;
 
 //--------------------------------------------
+
+void ElectricPowerException::badElectricPowerInfo(){
+    
+    std::cerr<< "The electrical power has not been turned off." << std::endl; 
+}
+
+
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType,const DWORD baudrate){
     init(pszDevName,btType,baudrate);
 }
@@ -54,7 +62,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::st
     poweron = false;
     channel_map_t::iterator i=channels.find(devName);
     if(i!=channels.end()){
-        my_channel = i->second; 
+        my_channel = i->second;
         // In questo caso non dovrò più provare ad aprire il canale di comunicazione
         // nella sucessiva procedura di inizializzazione  del canale + drive/motor
         // Settiamo dunque a true questo stato
@@ -136,7 +144,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     }
     
     if(resp==0 && !alreadyopenedChannel){
-        channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON GENERA MAI ECCEZIONE
+        channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); 
+        // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON può GENERAre MAI ECCEZIONE
     }
     return resp;
 }
@@ -249,12 +258,21 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
             // ..................
             // ..................
             // ..................
+            throw ElectricPowerException();
         }
     // COSI COME BISOGNA TOGLIERE IL PRIMA POSSIBILE L'ISTRUZIONE providePower
     // in INIT
     }
     
     if(my_channel!=NULL){
+        if(my_channel.use_count()==2){
+            // In questo caso bisogna eliminare anche la riga relativa all'oggetto canale utilizzato 
+            // ,unicamente utilizzato dall'oggetto this, nella mappa statica.
+            // Questo garantisce che una volta distrutto l'oggetto this, anche l'oggetto canale
+            // sarà automaticamente deallocato (e quindi chiuso anche il canale di comunicazione)
+            channels.erase(devName);
+        }
+            
         my_channel.reset(); // Setto a NULL lo smart pointer (shared),
                             // cosicché se era l'unico a puntare all'oggetto canale,
                             // l'oggetto canale sarà anche esso deallocato (ed in quel caso

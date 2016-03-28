@@ -80,12 +80,13 @@ int ActuatorTechnoSoft::init(void*initialization_string){
             // readyState = false; // non è necessaria questa istruzione 
                 
             }
-            catch(){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
+            catch(ElectricPowerException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
                      // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
                      // DEL MOTORE.
                      //.....
                      //.....
                      //.....
+                e.badElectricPowerInfo();
                 retun -3;
             }
             return -4;

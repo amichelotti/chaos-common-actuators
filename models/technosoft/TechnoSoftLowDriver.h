@@ -62,6 +62,12 @@ namespace common{
     
     namespace actuators{
        namespace models {
+           
+           class ElectricPowerException{
+                public:
+                    ElectricPowerException(){}
+                    void badElectricPowerInfo();
+           };
 
 	    //Channel class
             class SerialCommChannelTechnosoft{
@@ -115,9 +121,10 @@ namespace common{
                 
                 //Encoder parameter
                 int encoderLines; // (passato da MDS)
-                typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh; 
+                typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh;
                 channel_psh my_channel;
                 typedef std::map<std::string,channel_psh> channel_map_t;
+                
                 static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
                                               // percio e dichiarata di tipo static
                 
