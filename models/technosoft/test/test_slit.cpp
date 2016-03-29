@@ -1,4 +1,5 @@
 #include "iostream"
+#include "stdio.h"
 #include <common/debug/core/debug.h>
 #include <common/actuators/core/AbstractActuator.h>
 #include "ActuatorTechnoSoft.h"
@@ -6,14 +7,13 @@
 
 using namespace common::actuators::models;
 #define USAGE \
-  printf("Usage is:%s <dev/tty> <technosoft configuration> <axis> <move position in mm>\n",argv[0]);
+  printf("**************Usage is:%s <dev/tty> <technosoft configuration> <axis> <move position in mm>*************\n",argv[0]);
 
 int main(int argc,const char* argv[]){
     
-    
     int axis;
     float pos;
-    float rpos=0,rpos1=0;
+    float rpos=-1000,rpos1=-1000;
     int ret;
     int status;
     std::string desc;
@@ -27,24 +27,42 @@ int main(int argc,const char* argv[]){
     conf=argv[2];       // [string], <technosoft configuration>
     axis=atoi(argv[3]); // [int], <axis>
     pos=atof(argv[4]);  // [float], <move position in mm>
-    PRINT("* using axis %d, moving of %f mm",axis,pos);
+    PRINT("************ using axis %d, moving of %f mm**************",axis,pos);
     common::actuators::AbstractActuator*mySlit;
     
     mySlit = new ActuatorTechnoSoft(); 
-    //mySlit[1] = new ActuatorTechnosoft();
     sprintf(sinit,"%s,myslit,%s,%d",dev,conf,axis);
+
+    // Inizializzazione
     if((ret=mySlit->init((void*)sinit))!=0){
-        DERR("cannot init reeeeeeeeeeeeeeeeeet=%d",ret);
+        DERR("*************Cannot init. In fact the value returned is %d ****************",ret);
         delete mySlit;
         return -1;
     }
-    mySlit->getState(&status,desc);
-    printf("status %d, %s\n",status ,desc.c_str());
+    else{
+	DPRINT("************Operazione di inizializzazione andata a buon fine!***************");
+    }
+
+    // Lettura stato
+    if(mySlit->getState(&status,desc)<0)
+	fprintf(stderr,"**************Error at first reading status**************\n");
+    else
+    	fprintf(stderr,"**************First reading status %d, %s **************\n",status ,desc.c_str());
     
-    mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
-    mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
-    DPRINT("current position encoder %f, counter %f, moving back...",rpos,rpos1);
-    mySlit->moveRelativeMillimeters(-rpos1);
+    // Lettura posizione tramite encoder e counter
+    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0)
+	fprintf(stderr,"**************Error at first position reading by encoder **************\n");
+    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0)
+    	fprintf(stderr,"**************Error at first position reading by counter **************\n");
+    
+    DPRINT("************** Current position encoder %f, counter %f, before movement **************",rpos,rpos1);
+
+    // Spostamento della slitta 
+    if(mySlit->moveRelativeMillimeters(pos)<0)
+	fprintf(stderr,"************** Error returned by movement operation **************\n");
+	 
+    sleep(30); // // Attesa completamento movimentazione, in seconds
+
     /*do{
         mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
         mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
@@ -60,7 +78,12 @@ int main(int argc,const char* argv[]){
         printf("up ->%.5f\r",rpos1);
     } while ((rpos1+.1) < pos);
     */ 
-    DPRINT("current after position encoder %f, counter %f",rpos,rpos1);
+
+    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0)
+	fprintf(stderr,"************** Error at second position reading by encoder **************\n");
+    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0)
+    	fprintf(stderr,"************** Error at second position reading by counter **************\n");
+    DPRINT("************** current position encoder: %f, and counter %f after movement **************",rpos,rpos1);
     delete mySlit;
 	
     return 0;

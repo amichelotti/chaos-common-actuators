@@ -87,7 +87,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
                      //.....
                      //.....
                 e.badElectricPowerInfo();
-                retun -3;
+                return -3;
             }
             return -4;
         }
@@ -95,13 +95,13 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         // A questo punto siamo certi che l'apertura del canale è andata a buon fine
         // ed i parametri del drive/motor sono stati inizializzati correttamente
         
-        readyState = true;
-	int state;
-	std::string desc;
-	this->getState(&state,desc);
-	DPRINT("ALEDEBUG state is %d (%s)",state,desc.c_str());
+        //readyState = true;
+	//int state;
+	//std::string desc;
+	//this->getState(&state,desc);
+	//DPRINT("ALEDEBUG state is %d (%s)",state,desc.c_str());
         
-	return rt;
+	return 0;
     }
    ERR("error parsing initialization string:\"%s\"",params.c_str());
    return -10;
@@ -146,6 +146,9 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
 }
 
 int ActuatorTechnoSoft::getPosition(readingTypes mode, float* deltaPosition_mm){
+     
+    DPRINT("Position reading");
+
     if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
         long tposition;
         if(driver->getCounter(tposition)<0){
@@ -155,7 +158,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, float* deltaPosition_mm){
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
         *deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
     }
-    else if(mode==READ_ENCODER){               // Lettura posizione per mezzo dell'encoder (Apos register)
+    else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
         long aposition;
         
         if(driver->getEncoder(aposition)<0)

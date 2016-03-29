@@ -150,7 +150,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     return resp;
 }
 
-channel_psh getMyChannel(){
+TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
     
     return my_channel;
 }
@@ -158,12 +158,12 @@ channel_psh getMyChannel(){
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
       if(!TS_SelectAxis(axisID)){
           DERR("error selecting axis");
-        return -1;
+      return -1;
     }
 
     //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
-    DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
         return -2;
@@ -432,7 +432,9 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegis
 
   if (my_channel==NULL)
   {
-	DPRINT("mychannel == null");
+	DERR("mychannel == null");
+	return -1;
+
   }
   else
   {
@@ -443,7 +445,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegis
 	//DPRINT("ALEDEBUG after second init ");
 	//TS_SelectChannel(my_channel->getFD());
   }
-  int count=10;
+  /*int count=10;
   while ( (count >0) && (!TS_SelectAxis(axisID)))
   {
     ERR("%d cannot select axis %d (%s)",count,axisID,TS_GetLastErrorText());
@@ -464,15 +466,16 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegis
 	ERR("ALEDEBUG failed to select axis");
 	return -1;
   }
+  */
  
 
     DPRINT("Reading status at %d",regIndex);
     descrErr.assign("");
     if(!TS_ReadStatus(regIndex,contentRegister)){
 	
-        ERR("Error at the register reading: %s",TS_GetLastErrorText());
+        DERR("Error at the register reading: %s",TS_GetLastErrorText());
         descrErr.assign(TS_GetLastErrorText());
-        return -1;
+        return -2;
     }
     return 0;
 }
