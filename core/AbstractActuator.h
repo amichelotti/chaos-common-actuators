@@ -40,7 +40,6 @@ namespace common {
         //AGGIUNGERE STATO DI MOTORE PRONTO ALL'UTILIZZO:
         ACTUATOR_READY = 0x1,
         
-
         ACTUATOR_OVER_POSITION_TRIGGER = 0x2, // Position trigger
         ACTUATOR_AUTORUN_ENABLED = 0x4, // Auto run mode status
         ACTUATOR_LSP_EVENT_INTERRUPUT = 0x8, // Limit switch positive event/interrupt
@@ -89,13 +88,14 @@ namespace common {
         protected:
             double range_mm; //mechanical range of the slit (passato da MDS), [mm]
             uint64_t timeo_ms;
+            uint64_t timeo_homing_ms;
 
             // Trapezoidal profile parameters
-            double speed;
-            double acceleration;
-            bool isAdditive;
-            int32_t movement;
-            int32_t referenceBase;
+            //double speed;
+            //double acceleration;
+            //bool isAdditive;
+            //int32_t movement;
+            //int32_t referenceBase;
 
         public:
         AbstractActuator() {timeo_ms=0;};
@@ -104,17 +104,24 @@ namespace common {
         @brief set timeout in ms for the completion of the operation (0 wait undefinitively)
         @return 0 if success or an error code
         */
-        int setTimeout(uint64_t timeo_ms);                // ****Da implementare***
+        int setTimeout(uint64_t timeo_ms);
         /**
         @brief get timeout in ms for the completion of the operation
         @return 0 if success or an error code
         */
-        int getTimeout(uint64_t* timeo_ms);               // ****Da implementare***
+        int getTimeout(uint64_t* timeo_ms);
+        
+        // Set homing procedure time out
+        int setHomingTimeout(uint64_t timeo_ms);
+        
+        // Get homing procedure time out
+        int getHomingTimeout(uint64_t* timeo_ms);
+        
         /**
         @brief Move the actuator X millimeters away from current position
         @return 0 if success or an error code
         */
-        virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
+        virtual int moveRelativeMillimeters(double mm)=0;
 
         /**
         @brief set the actuator speed in mm/s

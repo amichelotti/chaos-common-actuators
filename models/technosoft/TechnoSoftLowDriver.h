@@ -155,13 +155,13 @@ namespace common{
                 int resetEncoder();// reset APOS_register();
                 int getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
                 //int getRegister()**********************;
-                int stopMotion();
+                int stopMotion(std::string& descrErr);
                 int deinit();
-                int setDecelerationParam(double deceleration);
-                int setFixedVariable(LPCSTR pszName, double value);
-                int abortNativeOperation();
-                int executeTMLfunction(std::string& pszFunctionName);
-                int setVariable(LPCSTR pszName, long value);
+                int setDecelerationParam(double deceleration,std::string& descrErr);
+                int setFixedVariable(LPCSTR pszName, double value, std::string& descrErr);
+                int abortNativeOperation(std::string& descrErr);
+                int executeTMLfunction(std::string& pszFunctionName, std::string& descrErr);
+                int setVariable(LPCSTR pszName, long value, std::string& descrErr);
                 int readHomingCallReg(short selIndex, WORD& status);
                 int setEventOnLimitSwitch(short lswType , short transitionType, BOOL waitEvent, BOOL enableStop);
                 int setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop);

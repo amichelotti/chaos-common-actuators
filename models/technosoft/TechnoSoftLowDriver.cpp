@@ -187,14 +187,11 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
     return 0;
 }
 
-int TechnoSoftLowDriver::stopMotion(){
-    DPRINT("stop axis:%d",axisID);
-    if(!TS_SelectAxis(axisID)){
-        return -1;
-    }
+int TechnoSoftLowDriver::stopMotion(std::string& descrErr){
 
     if(!TS_Stop()){
-        return -2;
+        descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        return -1;
     }
     return 0;
 }
@@ -349,46 +346,54 @@ int TechnoSoftLowDriver::getPower(BOOL& powered){
     }
 }
 
-int TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
+int TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value, std::string& descrErr){
 //The function converts the value to type fixed and writes it in the TML data
 //pszName on the active axis
-    if(!TS_SetFixedVariable(pszName, value)) 
+    if(!TS_SetFixedVariable(pszName, value)){
+        descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         return -1;
+    }
     return 0;
 }
 
-int TechnoSoftLowDriver::abortNativeOperation(){
+int TechnoSoftLowDriver::abortNativeOperation(std::string& descrErr){
     //The function aborts the execution of a TML function launched with a 
     //cancelable call
-    if(!TS_ABORT()) 
+    if(!TS_ABORT()){
+        descrErr=descrErr+". "+TS_GetLastErrorText();
         return -1;
+    }
     return 0;
 }
 
-
-int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
+int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName, std::string& descrErr){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
-    if(!TS_CancelableCALL_Label(pszFunctionName.c_str()))
-        return FALSE;
-    return TRUE;
-
-}
-
-int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
-    // 
-    if(!TS_QuickStopDecelerationRate(deceleration))
+    if(!TS_CancelableCALL_Label(pszFunctionName.c_str())){
+        descrErr=descrErr+". "+TS_GetLastErrorText();
         return -1;
+    }
     return 0;
 }
 
-int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
-    if(!TS_SetLongVariable(pszName, value)) 
-	return -1;
+int TechnoSoftLowDriver::setDecelerationParam(double deceleration, std::string& descrErr){
+
+    if(!TS_QuickStopDecelerationRate(deceleration)){
+        descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        return -1;
+    }
     return 0;
 }
 
-int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
+int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value, std::string& descrErr){
+    if(!TS_SetLongVariable(pszName, value)){
+        descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        return -1;
+    }
+    return 0;
+}
+
+int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status, std::string& descrErr){
     
     if(!TS_ReadStatus(selIndex, status))
         return FALSE;
@@ -430,21 +435,15 @@ int TechnoSoftLowDriver::setPosition(const long& posValue){
 
 int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegister, std::string& descrErr){
 
-  if (my_channel==NULL)
-  {
-	DERR("mychannel == null");
-	return -1;
-
-  }
-  else
-  {
-	//DPRINT("my_channel not null ");
-	my_channel->PrintChannel();
-	//int a=my_channel->close();
-	//my_channel->init(my_channel->getDevName(),my_channel->getbtType(),my_channel->getbaudrate());
-	//DPRINT("ALEDEBUG after second init ");
-	//TS_SelectChannel(my_channel->getFD());
-  }
+//  else
+//  {
+//	//DPRINT("my_channel not null ");
+//	my_channel->PrintChannel();
+//	//int a=my_channel->close();
+//	//my_channel->init(my_channel->getDevName(),my_channel->getbtType(),my_channel->getbaudrate());
+//	//DPRINT("ALEDEBUG after second init ");
+//	//TS_SelectChannel(my_channel->getFD());
+//  }
   /*int count=10;
   while ( (count >0) && (!TS_SelectAxis(axisID)))
   {
@@ -467,18 +466,20 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegis
 	return -1;
   }
   */
- 
-
-    DPRINT("Reading status at %d",regIndex);
-    descrErr.assign("");
+    
+    //DPRINT("Reading status at %d",regIndex);
+    //descrErr.assign("");
+    
     if(!TS_ReadStatus(regIndex,contentRegister)){
 	
-        DERR("Error at the register reading: %s",TS_GetLastErrorText());
-        descrErr.assign(TS_GetLastErrorText());
-        return -2;
+        //DERR("Error at the register reading: %s",TS_GetLastErrorText());
+        //descrErr.assign(TS_GetLastErrorText());
+        descrErr=descrErr+". "+TS_GetLastErrorText();
+        return -1;
     }
     return 0;
 }
+
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
