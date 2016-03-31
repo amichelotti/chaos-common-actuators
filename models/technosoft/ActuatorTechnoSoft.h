@@ -51,7 +51,7 @@ namespace common{
                 // OK
                 // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
                 int deinit();
-                int moveRelativeMillimeters(double deltaMillimeters);
+              int moveRelativeMillimeters(double deltaMillimeters, std::string& descrErr);
                 int moveAbsoluteMillimeters(double mm);
                 int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT){return 0;}
                 int resetAlarms(uint64_t alrm){return 0;}

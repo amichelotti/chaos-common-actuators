@@ -155,10 +155,11 @@ TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
     return my_channel;
 }
 
-int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
-      if(!TS_SelectAxis(axisID)){
-          DERR("error selecting axis");
-      return -1;
+int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition, std::string& descrErr){
+    if(!TS_SelectAxis(axisID)){
+        DERR("error selecting axis");
+        descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        return -1;
     }
 
     //deltaPosition*=CONST_MULT_TECHNOFT;
@@ -166,6 +167,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
+        descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         return -2;
     }
     return 0;
@@ -402,10 +404,12 @@ int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status, std::st
     return 0;
 }
 
-int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType = LSW_NEGATIVE , short transitionType = TRANSITION_HIGH_TO_LOW , BOOL waitEvent = 1, BOOL enableStop = 0){
+int TechnoSoftLowDriver::setEventOnLimitSwitch(std::string& descrErr, short lswType = LSW_NEGATIVE , short transitionType = TRANSITION_HIGH_TO_LOW , BOOL waitEvent = 1, BOOL enableStop = 0){
     
-    if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)) 
-	return -1;
+    if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)){
+        descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        return -1;
+    }
     return 0;
 }
 

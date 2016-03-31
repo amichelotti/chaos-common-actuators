@@ -41,8 +41,14 @@
 #define HOST_ID		0
 #define AXIS_ID_01		14
 #define BAUDRATE	115200
-#define SPEED 400.0 // 30.0
-#define ACCELERATION 0.1 // 0.6
+
+// Constants concerning trapezoidal profile parameters
+#define SPEED 400.0 // Value assigned to TechnoSoftLowDriver::speed (30.0)
+#define ACCELERATION 0.1 // Value assigned to TechnoSoftLowDriver::acceleration       (0.6)
+#define NO_ADDITIVE 0       // value assigned to TechnoSoftLowDriver::isAdditive
+//UPDATE_IMMEDIATE    // value assigned to TechnoSoftLowDriver::moveMoment
+//FROM_REFERENCE      // value assigned to TechnoSoftLowDriver::referenceBase
+// Nota: UPDATE_IMMEDIATE, FROM_REFERENCE sono costanti definite all'interno di TML_lib.h
 
 
 #define MAX_LENGTH_STRING_FROM_SHELL 50
@@ -137,13 +143,13 @@ namespace common{
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
-                int init(const std::string& setupFilePath,const int& axisID, const double speed=SPEED, const double acceleration=ACCELERATION, const BOOL isAdditive=0, const short moveMoment =UPDATE_IMMEDIATE, const short referenceBase=FROM_REFERENCE, const int encoderLines=N_ENCODER_LINES);
+                int init(const std::string& setupFilePath,const int& axisID, const double speed=SPEED, const double acceleration=ACCELERATION, const BOOL isAdditive=NO_ADDITIVE, const short moveMoment =UPDATE_IMMEDIATE, const short referenceBase=FROM_REFERENCE, const int encoderLines=N_ENCODER_LINES);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
-                int moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
+                int moveRelativeSteps(const long& deltaPosition, std::string& descrErr);// (0 -> OK)  (different 0 -> error)
                 int moveAbsoluteSteps(const long& position);
                 
                 // get methods for variables
@@ -163,7 +169,7 @@ namespace common{
                 int executeTMLfunction(std::string& pszFunctionName, std::string& descrErr);
                 int setVariable(LPCSTR pszName, long value, std::string& descrErr);
                 int readHomingCallReg(short selIndex, WORD& status);
-                int setEventOnLimitSwitch(short lswType , short transitionType, BOOL waitEvent, BOOL enableStop);
+                int setEventOnLimitSwitch(std::string& descrErr, short lswType , short transitionType, BOOL waitEvent, BOOL enableStop);
                 int setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop);
                 int setPosition(const long& posValue);
                 
