@@ -42,28 +42,28 @@ int AbstractActuator::getHomingTimeout(uint64_t* _timeo_homing_ms){
     return 0;
 }
 
-int AbstractActuator::setSpeed(double speed_mm_per_sec){
-     speed=speed_mm_per_sec;
-     return 0;
-}
+//int AbstractActuator::setSpeed(double speed_mm_per_sec){
+//     speed=speed_mm_per_sec;
+//     return 0;
+//}
  
-int AbstractActuator::setAcceleration(double acceleration_mm_per_sec2){
-    acceleration=acceleration_mm_per_sec2;
-    return 0;
-}
+//int AbstractActuator::setAcceleration(double acceleration_mm_per_sec2){
+//    acceleration=acceleration_mm_per_sec2;
+//    return 0;
+//}
 
-void AbstractActuator::setAdditive(bool _isAdditive){
-    isAdditive=_isAdditive;
-    
-}
+//void AbstractActuator::setAdditive(bool _isAdditive){
+//    isAdditive=_isAdditive;
+//    
+//}
 
-int AbstractActuator::setMovement(int32_t _movement){
-    movement=_movement;
-    return 0;
-}
+//int AbstractActuator::setMovement(int32_t _movement){
+//    movement=_movement;
+//    return 0;
+//}
       
-int AbstractActuator::setReferenceBase(int32_t _referenceBase){
-    referenceBase=_referenceBase;
-    return 0;
-}
+//int AbstractActuator::setReferenceBase(int32_t _referenceBase){
+//    referenceBase=_referenceBase;
+//    return 0;
+//}
 

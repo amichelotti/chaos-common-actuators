@@ -123,36 +123,36 @@ namespace common {
         */
         virtual int moveRelativeMillimeters(double mm)=0;
 
-        /**
-        @brief set the actuator speed in mm/s
-        @return 0 if success or an error code
-        */
-         virtual int setSpeed(double speed_mm_per_sec);
+//        /**
+//        @brief set the actuator speed in mm/s
+//        @return 0 if success or an error code
+//        */
+//         virtual int setSpeed(double speed_mm_per_sec);
 
-        /**
-        @brief set the actuator acceleration in mm/s^2
-        @return 0 if success or an error code
-        */
-            virtual int setAcceleration(double acceleration_mm_per_sec2);
+//        /**
+//        @brief set the actuator acceleration in mm/s^2
+//        @return 0 if success or an error code
+//        */
+//            virtual int setAcceleration(double acceleration_mm_per_sec2);
 
-        /**
-        @brief specify how is computed the position to reach
-        */
-            virtual void setAdditive(bool isAdditive);
+//        /**
+//        @brief specify how is computed the position to reach
+//        */
+//            virtual void setAdditive(bool isAdditive);
 
-        /**
-        @brief define the moment when the motion is started
-        @return 0 if success or an error code
-        */
-            virtual int setMovement(int32_t movement);  //********** per ora ritorna un valore ***********
+//        /**
+//        @brief define the moment when the motion is started
+//        @return 0 if success or an error code
+//        */
+//            virtual int setMovement(int32_t movement);  //********** per ora ritorna un valore ***********
 
-        /**
-        @brief specify how the motion reference is computed is computed: from
-         * actual values of position and speed reference or from actual values
-         * of load/motor position and speed
-        @return 0 if success or an error code
-        */
-            virtual int setReferenceBase(int32_t referenceBase); //********** per ora ritorna un valore ***********
+//        /**
+//        @brief specify how the motion reference is computed is computed: from
+//         * actual values of position and speed reference or from actual values
+//         * of load/motor position and speed
+//        @return 0 if success or an error code
+//        */
+//            virtual int setReferenceBase(int32_t referenceBase); //********** per ora ritorna un valore ***********
 
         /**
         @brief get the actuator position using the readingType mode chosen for reading

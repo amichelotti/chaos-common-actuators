@@ -84,6 +84,11 @@ int main(int argc,const char* argv[]){
     if(mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0)
     	fprintf(stderr,"************** Error at second position reading by counter **************\n");
     DPRINT("************** current position encoder: %f, and counter %f after movement **************",rpos,rpos1);
+    
+    // test procedura di homing
+    //AbstractActuator::homingType homeType = AbstractActuator::nativeHoming15; 
+    //mySlit->homing(homeType);
+    
     delete mySlit;
 	
     return 0;
