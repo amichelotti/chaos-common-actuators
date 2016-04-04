@@ -296,9 +296,10 @@ int TechnoSoftLowDriver::getCounter(long& tposition){
 
 int TechnoSoftLowDriver::getEncoder(long& aposition){
     DPRINT("Reading ENCODER position");
-    if(!TS_SelectAxis(axisID)){
-        return -1;
-    }
+    //if(!TS_SelectAxis(axisID)){
+	
+        //return -1;
+    //}
 
    
     if(!TS_GetLongVariable("APOS", aposition)){
