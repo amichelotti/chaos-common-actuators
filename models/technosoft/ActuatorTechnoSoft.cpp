@@ -366,78 +366,80 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, float* deltaPosition_mm){
 //    return -50; // Indica che non ho indicato alcuna modalità corretta
 //}
 
-int ActuatorTechnoSoft::getState(int* state, std::string& desc){
-    
-    *state = ACTUATOR_UNKNOWN_STATUS;
-    // *state = ACTUATOR_READY;
-    //return 0;
-    desc.assign("Unknown state");
+int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
+
+    DPRINT("Getting state of the actuator. ");
+
+    *state  = ACTUATOR_UNKNOWN_STATUS;
+    descStr.assign("");
+
     int stCode=0;
-    
-    DPRINT("Getting state of the actuator");
-    
-    WORD contentRegSRH; // remember typedef uint16_t WORD; 
-    WORD contentRegSRL;
-  
-    short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
-    
-    if((driver->getStatusOrErrorReg(indexRegSRH, contentRegSRH, desc))<0){
-        ERR("Reading state error: %s",desc.c_str());
+
+    uint16_t contentRegSRH; // remember typedef uint16_t WORD;
+    uint16_t contentRegSRL;
+
+    short indexReg = 4; // see constant REG_SRH in TML_lib.h
+    if((driver->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
+        ERR("Reading state error: %s",descStr.c_str());
         return -1;
     }
-    
-    if(readyState)
-        stCode|=ACTUATOR_READY;
-    
-    // Analysis of the register content SRH
-    bool overPositionState = false;
-    for(WORD i=1; i<=4; i++){
-        if(contentRegSRH & 1 << i){ 
-            stCode |= ACTUATOR_OVER_POSITION_TRIGGER;
-            overPositionState = true;
-        }
-    }
-    if(overPositionState)
-        desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
-                                         // con il contenuto corrente **************
-    if(contentRegSRH & (1<<5)){
-        stCode |= ACTUATOR_AUTORUN_ENABLED;
-        desc+="Auto run mode. ";
-    }
-    if(contentRegSRH & (1<<6)){
-        stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
-        desc+="Limit switch positive event/interrupt. ";
-    }
-    if(contentRegSRH & (1<<7)){
-        stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
-        desc+="Limit switch negative event/interrupt. ";
-    }
-    if(contentRegSRH & (1<<12)){
-        stCode |= ACTUATOR_IN_GEAR;
-        desc+="Gear ratio in electronic gearing mode. ";
-    }
-    if(contentRegSRH & (1<<14)){
-        stCode |= ACTUATOR_IN_CAM;
-        desc+="Reference position in absolute electronic camming mode. ";
-    }
-    if(contentRegSRH & (1<<15)){
-        stCode |= ACTUATOR_FAULT;
-        desc+="Fault status. ";
-    }
-    
-    short indexRegSRL = 3; // see constant REG_SRH in TML_lib.h
-    if((driver->getStatusOrErrorReg(indexRegSRL, contentRegSRL, desc))<0){
-        ERR("Reading state error: %s",desc.c_str());
+    indexReg = 3; // see constant REG_SRL in TML_lib.h
+    if((driver->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
+        ERR("Reading state error: %s",descStr.c_str());
         return -2;
     }
-    //  Analysis of the register content SRL
-    if(contentRegSRL & (1<<10)){
-        stCode |= ACTUATOR_MOTION_COMPLETED;
-        desc+="Actuator motion completed. ";
+
+    if(readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
+        stCode|=ACTUATOR_READY;
     }
-    if(contentRegSRL & (1<<15)){
+
+    // Analysis of the register content SRH (bit 1,2,3,4)
+    bool overPositionTrigger = false;
+    for(int i=1; i<=4; i++){
+        if(contentRegSRH & ((uint16_t)1 << i)){
+            stCode |= ACTUATOR_OVER_POSITION_TRIGGER; // accendo il secondo bit
+            overPositionTrigger = true;
+        }
+    }
+
+    if(overPositionTrigger){
+        //desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
+        descStr=descStr+"Position trigger. ";
+    }
+    // con il contenuto corrente **************
+    if(contentRegSRH & ((uint16_t)1<<5)){
+        stCode |= ACTUATOR_AUTORUN_ENABLED;
+        descStr+="Auto run mode. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<6)){
+        stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
+        descStr+="Limit switch positive event/interrupt. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<7)){
+        stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
+        descStr+="Limit switch negative event/interrupt. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<12)){
+        stCode |= ACTUATOR_IN_GEAR;
+        descStr+="Gear ratio in electronic gearing mode. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<14)){
+        stCode |= ACTUATOR_IN_CAM;
+        descStr+="Reference position in absolute electronic camming mode. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<15)){
+        stCode |= ACTUATOR_FAULT;
+        descStr+="Fault status. ";
+    }
+
+    //  Analysis of the register content SRL
+    if(contentRegSRL & ((uint16_t)1<<10)){
+        stCode |= ACTUATOR_MOTION_COMPLETED;
+        descStr+="Actuator motion completed. ";
+    }
+    if(contentRegSRL & ((uint16_t)1<<15)){
         stCode |= ACTUATOR_POWER_SUPPLIED;
-        desc += "Electrical power supplied.";
+        descStr += "Electrical power supplied.";
     }
     *state = stCode;
     return 0;
