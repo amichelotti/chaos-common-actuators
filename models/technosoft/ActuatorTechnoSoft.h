@@ -58,10 +58,10 @@ namespace common{
                 
                 //int getPosition(readingTypes mode, double& deltaPosition_mm);
                 int stopMotion(){return 0;}
-                int getPosition(readingTypes mode, float* deltaPosition_mm);
+                int getPosition(readingTypes mode, double* deltaPosition_mm);
                 int homing(homingType mode){return 0;}
                 int getState(int* state, std::string& desc );   // **
-                int getAlarms(uint64_t*alrm);
+                int getAlarms(uint64_t*alrm, std::string& descStr);
                 uint64_t getFeatures(){return 0;}
      
         /**

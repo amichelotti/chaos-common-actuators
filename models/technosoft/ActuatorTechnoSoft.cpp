@@ -145,7 +145,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
     return 0;
 }
 
-int ActuatorTechnoSoft::getPosition(readingTypes mode, float* deltaPosition_mm){
+int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm){
      
     DPRINT("Position reading");
 
@@ -445,110 +445,116 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
     return 0;
 }
 
-int ActuatorTechnoSoft::getAlarms(uint64_t*alrm){
-    
-    uint64_t stCode=0;
-    
+int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
+
+    * alrm = ACTUATOR_NO_ALARMS_DETECTED;
+    descStr.assign("");
+
+    int stCode=0;
+
     DPRINT("Getting alarms of the actuator");
-    
-    WORD contentRegMER; // remember typedef uint16_t WORD;
-    WORD contentRegSRH;
-    std::string desc; // *************IMPORTANTE: QUESTA STRINGA DOVRÀ ESSERE POI ARGOMENTO 
-                       // DELLA FUNZIONE getAlarms. Bisognerà quindi cambiare in seguito il prototipo.
-    
+
+    uint16_t contentRegMER; // remember typedef uint16_t WORD;
+    uint16_t contentRegSRH;
+
     short indexRegMER = 5; // see constant REG_MER in TML_lib.h
-    if(driver->getStatusOrErrorReg(indexRegMER, contentRegMER, desc)<0){
-        DERR("Reading alarms error: %s",desc.c_str());
+    if(driver->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
+        DERR("Reading alarms error: %s",descStr.c_str());
         return -1;
     }
-    
+
     short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
-    if(driver->getStatusOrErrorReg(indexRegSRH, contentRegSRH, desc)<0){
-        DERR("Reading alarms error: %s",desc.c_str());
+    if(driver->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
+        DERR("Reading alarms error: %s",descStr.c_str());
         return -2;
     }
-    
-    WORD base2 = 2;
+
+    // ***********************RIPRENDERE DA QUI*********************
+    //WORD base2 = 2;
     // Analysis of the register content REG_MER
-    for(WORD i=0; i<sizeof(WORD)*8; i++){
-        if(contentRegMER & ((WORD)(base2^i))){ 
+    // (WORD)(base2^i)
+    for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
+        if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
             if(i==0){
                 stCode|=ACTUATOR_CANBUS_ERROR; // IMPORTANTE: ACTUATOR_CANBUS_ERROR è di tipo int (32 bit)
-                                               // Nell'operazione di OR logico, automaticamente il contenuto
-                                               // a destra dell'uguale viene prima memorizzato in una locazione
-                                               // a 64 bit di tipo unsigned cosicché si possa fare l'OR logico 
-                                               // bit a bit con la variabile a primo membro
-                                               // In corrispondenza di questo errore accendo il bit 0 di *alarm
-                desc.assign("CAN bus error. ");
+                // Nell'operazione di OR logico, automaticamente il contenuto
+                // a destra dell'uguale viene prima memorizzato in una locazione
+                // a 64 bit di tipo unsigned cosicché si possa fare l'OR logico
+                // bit a bit con la variabile a primo membro
+                // In corrispondenza di questo errore accendo il bit 0 di *alarm
+                //desc.assign("CAN bus error. ");
+                descStr+="CAN bus error. ";
             }
             else if(i==1){
                 stCode|=ACTUATOR_SHORT_CIRCUIT; // In corrispondenza di questo errore accendo il bit 1 di *alarm
-                desc+="Short circuit. ";
+                descStr+="Short circuit. ";
             }
             else if(i==2){
                 stCode|=ACTUATOR_INVALID_SETUP_DATA;
-                desc+= "Invalid setup data. ";
+                descStr+= "Invalid setup data. ";
             }
             else if(i==3){
                 stCode|=ACTUATOR_CONTROL_ERROR;
-                desc+= "Control error. ";
+                descStr+= "Control error. ";
             }
             else if(i==4){
                 stCode|=ACTUATOR_SERIAL_COMM_ERROR;
-                desc+= "Communication error. ";
+                descStr+= "Communication error. ";
             }
             else if(i==5){
                 stCode|=ACTUATOR_HALL_SENSOR_MISSING;
-                desc+= "Hall sensor missing / Resolver error / BiSS error / Position wrap around error. ";
+                descStr+= "Hall sensor missing / Resolver error / BiSS error / Position wrap around error. ";
             }
             else if(i==6){
                 stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
-                desc+="Positive limit switch active. ";
+                descStr+="Positive limit switch active. ";
             }
             else if(i==7){
                 stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
-                desc+="Negative limit switch active. ";
+                descStr+="Negative limit switch active. ";
             }
             else if(i==8){
                 stCode|=ACTUATOR_OVER_CURRENT;
-                desc+="Over current error. ";
+                descStr+="Over current error. ";
             }
             else if(i==9){
                 stCode|=ACTUATOR_I2T;
-                desc+="I2T protection error. ";
+                descStr+="I2T protection error. ";
             }
             else if(i==10){
                 stCode|=ACTUATOR_OVERTEMP_MOTOR;
-                desc+="Motor over temperature error. ";
+                descStr+="Motor over temperature error. ";
             }
             else if(i==11){
                 stCode|=ACTUATOR_OVERTEMP_DRIVE;
-                desc+="Drive over temperature error. ";
+                descStr+="Drive over temperature error. ";
             }
             else if(i==12){
                 stCode|=ACTUATOR_OVERVOLTAGE;
-                desc+="Over voltage error. ";
+                descStr+="Over voltage error. ";
             }
             else if(i==13){
                 stCode|=ACTUATOR_UNDERVOLTAGE;
-                desc+="Under voltage error. ";
+                descStr+="Under voltage error. ";
             }
             else if(i==14){
                 stCode|=ACTUATOR_COMMANDERROR;
-                desc+="Command error. ";
+                descStr+="Command error. ";
             }
-        }
-    }
+        }// chiudo if(contentRegMER & ((WORD)(base2^i)))
+    } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
+
     // Analysis of the register content REG_SRH
-    if(contentRegSRH & ((WORD)(base2^10))){
-        stCode|=(uint64_t)ACTUATOR_I2T_WARNING_MOTOR;
-        desc+="Motor I2T protection warning. ";
+    if(contentRegSRH & ((uint16_t)1<<10)){
+        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
+        descStr+="Motor I2T protection warning. ";
     }
-    if(contentRegSRH & ((WORD)(base2^11))){
-        stCode|=(uint64_t)ACTUATOR_I2T_WARNING_DRIVE;
-        desc+="Drive I2T protection warning";
+    if(contentRegSRH & ((uint16_t)1<<11)){
+        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
+        descStr
+                +="Drive I2T protection warning";
     }
-    
+
     *alrm = stCode;
     return 0;
 }

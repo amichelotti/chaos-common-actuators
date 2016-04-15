@@ -171,7 +171,7 @@ namespace common{
                 
                 int checkEvent(BOOL& event);
                 
-                int getStatusOrErrorReg(short& regIndex, WORD& contentRegister, std::string& descrErr);
+                int getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr);
 
                 int getMERregister();// read content of the error register
                 int getSRLregister();// read content of the low part of the status register

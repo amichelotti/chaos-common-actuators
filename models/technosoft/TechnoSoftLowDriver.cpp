@@ -110,12 +110,18 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
         DERR("failed to setup axis %d",axisID);
         resp = -3;
     }
-    
+   
+
     if(!TS_SelectAxis(axisID)){
         DERR("failed to select axis %d",axisID);
         resp = -4;
     }
 
+     // Settare il registro per la lettura dell'encoder
+    if(!TS_Execute("SCR=0x4338")){
+        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        return -6;
+    }
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
@@ -135,7 +141,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     this->encoderLines= encoderLines;
     //printf("esito providePower: %d\n",providePower());
     
-    DPRINT("ALEDEBUG Caschera!!! Exiting init");
+    
     
     // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
     if(providePower()<0){
@@ -429,58 +435,17 @@ int TechnoSoftLowDriver::setPosition(const long& posValue){
     return 0;
 }
 
-int TechnoSoftLowDriver::getStatusOrErrorReg(short& regIndex, WORD& contentRegister, std::string& descrErr){
+int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr){
 
-  if (my_channel==NULL)
-  {
-	DERR("mychannel == null");
-	return -1;
-
-  }
-  else
-  {
-	//DPRINT("my_channel not null ");
-	my_channel->PrintChannel();
-	//int a=my_channel->close();
-	//my_channel->init(my_channel->getDevName(),my_channel->getbtType(),my_channel->getbaudrate());
-	//DPRINT("ALEDEBUG after second init ");
-	//TS_SelectChannel(my_channel->getFD());
-  }
-  /*int count=10;
-  while ( (count >0) && (!TS_SelectAxis(axisID)))
-  {
-    ERR("%d cannot select axis %d (%s)",count,axisID,TS_GetLastErrorText());
-    count--;
-    my_channel->close();
-	if (!TS_OpenChannel(my_channel->getDevName().c_str(),(BYTE)my_channel->getbtType(),HOST_ID, my_channel->getbaudrate())) {
-	  DPRINT("ALEDEBUG failed open channel");
-         }
-	 else
-	 {
-	   DPRINT("ALEDEBUG opened channel");
-	   my_channel->PrintChannel();
-	   TS_SelectChannel(my_channel->getFD());
-	 }
-  }
-  if (count == 0)
-  {
-	ERR("ALEDEBUG failed to select axis");
-	return -1;
-  }
-  */
- 
-
-    DPRINT("Reading status at %d",regIndex);
-    descrErr.assign("");
     if(!TS_ReadStatus(regIndex,contentRegister)){
-	
-        DERR("Error at the register reading: %s",TS_GetLastErrorText());
-        descrErr.assign(TS_GetLastErrorText());
-        return -2;
+
+        //DERR("Error at the register reading: %s",TS_GetLastErrorText());
+        //descrErr.assign(TS_GetLastErrorText());
+        descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
+        return -1;
     }
     return 0;
 }
-/*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
  void SerialCommChannelTechnosoft::PrintChannel()
