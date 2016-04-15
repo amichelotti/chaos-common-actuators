@@ -95,7 +95,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         // A questo punto siamo certi che l'apertura del canale è andata a buon fine
         // ed i parametri del drive/motor sono stati inizializzati correttamente
         
-        //readyState = true;
+        readyState = true;
 	//int state;
 	//std::string desc;
 	//this->getState(&state,desc);
@@ -391,6 +391,7 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
 
     if(readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
+        descStr=descStr+"Ready. ";
     }
 
     // Analysis of the register content SRH (bit 1,2,3,4)
@@ -404,7 +405,7 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
 
     if(overPositionTrigger){
         //desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
-        descStr=descStr+"Position trigger. ";
+        descStr=descStr+"Over position trigger. ";
     }
     // con il contenuto corrente **************
     if(contentRegSRH & ((uint16_t)1<<5)){
