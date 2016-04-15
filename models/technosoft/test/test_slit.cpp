@@ -12,8 +12,8 @@ using namespace common::actuators::models;
 int main(int argc,const char* argv[]){
     
     int axis;
-    float pos;
-    float rpos=-1000,rpos1=-1000;
+    double pos;
+    double rpos=-1000,rpos1=-1000;
     int ret;
     int status;
     std::string desc;
