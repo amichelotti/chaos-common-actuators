@@ -197,6 +197,34 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     return 0;
 }
 
+// Set trapezoidal speed parameters
+int TechnoSoftLowDriver::setSpeed(const double& _speed){
+    speed = _speed;
+    return 0;
+}
+int TechnoSoftLowDriver::setAcceleration(const double& _acceleration){
+    acceleration = _acceleration;
+    return 0;
+}
+int TechnoSoftLowDriver::setIsAdditive(const BOOL& _isAdditive){
+    isAdditive = _isAdditive;
+    return 0;
+}
+int TechnoSoftLowDriver::setMovement(const short& _movement){
+    movement = _movement;   
+    return 0;
+}
+int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
+    referenceBase=_referenceBase; 
+    return 0;
+}
+                
+// Set encoder lines
+int TechnoSoftLowDriver::setEncoderLines(int& _encoderLines){
+    encoderLines=_encoderLines;   
+    return 0;
+}
+
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
     
     if(!TS_SelectAxis(axisID)){

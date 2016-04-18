@@ -106,7 +106,6 @@ namespace common{
                 std::string devName;
                 
                 // Trapezoidal profile parameters
-                //long relPosition;
                 double speed;
                 double acceleration;
                 BOOL isAdditive;
@@ -148,7 +147,17 @@ namespace common{
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
                 int providePower();
                 int stopPower();
+                
                 int moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
+                int setSpeed(const double& speed);
+                int setAcceleration(const double& acceleration);
+                int setIsAdditive(const BOOL& isAdditive);
+                int setMovement(const short& movement);
+                int setReferenceBase(const short& referenceBase);
+                
+                //Encoder lines
+                int setEncoderLines(int& _encoderLines);
+                
                 int moveAbsoluteSteps(const long& position);
                 
                 // get methods for variables

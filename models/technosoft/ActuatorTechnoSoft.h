@@ -30,16 +30,16 @@ namespace common{
                     bool readyState;
                     
                 public:
-                    typedef struct __technoinfo {
-                        //const double range;
-                        const double mechanicalReduceFactor;
-                        const double movementUnit_mm;
-                        const int encoderLines;
-                        // SerialCommChannelTechnosoft parameters:
-                        const std::string pszDevName;
-                        const BYTE btType;
-                        const DWORD baudrate;
-                    } technoinfo_t;
+//                    typedef struct __technoinfo {
+//                        //const double range;
+//                        const double mechanicalReduceFactor;
+//                        const double movementUnit_mm;
+//                        const int encoderLines;
+//                        // SerialCommChannelTechnosoft parameters:
+//                        const std::string pszDevName;
+//                        const BYTE btType;
+//                        const DWORD baudrate;
+//                    } technoinfo_t;
                     
                 // costruttore
                 ActuatorTechnoSoft();
@@ -52,6 +52,7 @@ namespace common{
                 // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
                 int deinit();
                 int moveRelativeMillimeters(double deltaMillimeters);
+                int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase);
                 int moveAbsoluteMillimeters(double mm);
                 int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT){return 0;}
                 int resetAlarms(uint64_t alrm){return 0;}

@@ -114,6 +114,8 @@ typedef enum {
         @return 0 if success or an error code
         */
         virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
+        
+        virtual int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase)=0;
 
         /**
         @brief set the actuator speed in mm/s

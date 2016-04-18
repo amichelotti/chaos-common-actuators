@@ -131,6 +131,17 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
     return 0;
 }
 
+int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase){
+    
+    driver->setSpeed(speed);
+    driver->setAcceleration(acceleration);
+    driver->setIsAdditive(isAdditive);
+    driver->setMovement(movement);
+    driver->setReferenceBase(referenceBase);
+    
+    return 0;
+}
+
 int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){ 
     
     // Calcolo argomento funzione moveAbsoluteSteps
