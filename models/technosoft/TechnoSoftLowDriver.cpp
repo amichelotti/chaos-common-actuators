@@ -80,7 +80,7 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
     deinit();
 }
 
-int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID, const double speed, const double acceleration, const BOOL isAdditive, const short moveMoment, const short referenceBase, const int encoderLines)
+int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase, const int& encoderLine)
 {
     int resp=0;
     
@@ -162,17 +162,37 @@ TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
 }
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
-      if(!TS_SelectAxis(axisID)){
-          DERR("error selecting axis");
-      return -1;
-    }
+    
+//    if(!TS_SelectAxis(axisID)){
+//          DERR("error selecting axis");
+//      return -1;
+//    }
 
-    //deltaPosition*=CONST_MULT_TECHNOFT;
-    //printf("%ld",deltaPosition);
+    if(speed<0 || speed>MAX_SPEED){
+        return -1;
+    }
+    if(acceleration<0 || acceleration>MAX_ACCELERATION){
+        return -2;
+    }
+    // nota: MAX_SPEED, MAX_ACCELERATION in TechnoSoftLowDriver.h 
+    
+    if(isAdditive!=TRUE || isAdditive!=FALSE){
+        return -3;
+    }    
+    if((movement!=UPDATE_NONE) || (movement!=UPDATE_IMMEDIATE) || (movement!=UPDATE_ON_EVENT)){
+        return -4;
+    }
+    // nota: UPDATE_NONE, UPDATE_IMMEDIATE, UPDATE_ON_EVENT costanti definite in TML_LIB.h 
+    
+    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
+        return -5;
+    }
+    // nota: FROM_MEASURE, FROM_REFERENCE costanti definite in TML_LIB.h
+    
     DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
-        return -2;
+        return -6;
     }
     return 0;
 }

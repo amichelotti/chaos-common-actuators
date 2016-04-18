@@ -41,8 +41,12 @@
 #define HOST_ID		0
 #define AXIS_ID_01		14
 #define BAUDRATE	115200
+
+// Features of trapezoidal speed profile
 #define SPEED 400.0 // 30.0
 #define ACCELERATION 0.1 // 0.6
+#define MAX_SPEED 500.0
+#define MAX_ACCELERATION 2.0
 
 
 #define MAX_LENGTH_STRING_FROM_SHELL 50
@@ -105,9 +109,10 @@ namespace common{
                 //long relPosition;
                 double speed;
                 double acceleration;
-                bool isAdditive;
+                BOOL isAdditive;
                 short movement;
                 short referenceBase;
+                
                 // Additional parameters for s-curve profile
                 //long jerkTime;
                 short decelerationType;
@@ -137,7 +142,7 @@ namespace common{
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
-                int init(const std::string& setupFilePath,const int& axisID, const double speed=SPEED, const double acceleration=ACCELERATION, const BOOL isAdditive=0, const short moveMoment =UPDATE_IMMEDIATE, const short referenceBase=FROM_REFERENCE, const int encoderLines=N_ENCODER_LINES);
+                int init(const std::string& setupFilePath,const int& axisID, const double& speed=SPEED, const double& acceleration=ACCELERATION, const BOOL& isAdditive=FALSE, const short& moveMoment =UPDATE_IMMEDIATE, const short& referenceBase=FROM_REFERENCE, const int& encoderLines=N_ENCODER_LINES);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);

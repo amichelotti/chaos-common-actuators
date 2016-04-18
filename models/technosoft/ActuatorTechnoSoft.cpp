@@ -124,8 +124,8 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
         return -1;
     
-    long deltaMicroStepsL = deltaMicroSteps;
-    if(driver->moveRelativeSteps(deltaMicroStepsL)<0)
+    //long deltaMicroStepsL = deltaMicroSteps;
+    if(driver->moveRelativeSteps((long)deltaMicroSteps)<0)
         return -2;
     
     return 0;
