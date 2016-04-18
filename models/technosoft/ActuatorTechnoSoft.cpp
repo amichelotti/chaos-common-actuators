@@ -133,12 +133,21 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
 
 int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase){
     
-    driver->setSpeed(speed);
-    driver->setAcceleration(acceleration);
-    driver->setIsAdditive(isAdditive);
-    driver->setMovement(movement);
-    driver->setReferenceBase(referenceBase);
-    
+    if(driver->setSpeed(speed)<0){
+        return -1;
+    }
+    if(driver->setAcceleration(acceleration)<0){
+        return -2;
+    }
+    if(driver->setIsAdditive(isAdditive)<0){
+        return -3;
+    }
+    if(driver->setMovement(movement)<0){
+        return -4;
+    }
+    if(driver->setReferenceBase(referenceBase)<0){
+        return -5;
+    }
     return 0;
 }
 
@@ -149,8 +158,8 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
         return -1;
     
-    long nMicroStepsL = nMicroSteps;
-    if(driver->moveAbsoluteSteps(nMicroStepsL)<0)    
+    //long nMicroStepsL = nMicroSteps;
+    if(driver->moveAbsoluteSteps((long)nMicroSteps)<0)    
         return -2;
     
     return 0;

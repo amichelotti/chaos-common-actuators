@@ -168,26 +168,26 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 //      return -1;
 //    }
 
-    if(speed<0 || speed>MAX_SPEED){
-        return -1;
-    }
-    if(acceleration<0 || acceleration>MAX_ACCELERATION){
-        return -2;
-    }
-    // nota: MAX_SPEED, MAX_ACCELERATION in TechnoSoftLowDriver.h 
-    
-    if(isAdditive!=TRUE || isAdditive!=FALSE){
-        return -3;
-    }    
-    if((movement!=UPDATE_NONE) || (movement!=UPDATE_IMMEDIATE) || (movement!=UPDATE_ON_EVENT)){
-        return -4;
-    }
-    // nota: UPDATE_NONE, UPDATE_IMMEDIATE, UPDATE_ON_EVENT costanti definite in TML_LIB.h 
-    
-    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
-        return -5;
-    }
-    // nota: FROM_MEASURE, FROM_REFERENCE costanti definite in TML_LIB.h
+//    if(speed<0 || speed>MAX_SPEED){
+//        return -1;
+//    }
+//    if(acceleration<0 || acceleration>MAX_ACCELERATION){
+//        return -2;
+//    }
+//    // nota: MAX_SPEED, MAX_ACCELERATION in TechnoSoftLowDriver.h 
+//    
+//    if(isAdditive!=TRUE || isAdditive!=FALSE){
+//        return -3;
+//    }    
+//    if((movement!=UPDATE_NONE) || (movement!=UPDATE_IMMEDIATE) || (movement!=UPDATE_ON_EVENT)){
+//        return -4;
+//    }
+//    // nota: UPDATE_NONE, UPDATE_IMMEDIATE, UPDATE_ON_EVENT costanti definite in TML_LIB.h 
+//    
+//    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
+//        return -5;
+//    }
+//    // nota: FROM_MEASURE, FROM_REFERENCE costanti definite in TML_LIB.h
     
     DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
@@ -199,22 +199,38 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 
 // Set trapezoidal speed parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed){
+    if(_speed<0 || _speed>MAX_SPEED){
+        return -1;
+    }
     speed = _speed;
     return 0;
 }
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration){
+    if(_acceleration<0 || _acceleration>MAX_ACCELERATION){
+        return -1;
+    }
     acceleration = _acceleration;
     return 0;
 }
 int TechnoSoftLowDriver::setIsAdditive(const BOOL& _isAdditive){
+    
+    if(_isAdditive!=TRUE || _isAdditive!=FALSE){
+        return -1;
+    }   
     isAdditive = _isAdditive;
     return 0;
 }
 int TechnoSoftLowDriver::setMovement(const short& _movement){
+    if((_movement!=UPDATE_NONE) || (_movement!=UPDATE_IMMEDIATE) || (_movement!=UPDATE_ON_EVENT)){
+        return -1;
+    }
     movement = _movement;   
     return 0;
 }
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
+    if((_referenceBase!=FROM_MEASURE) || _referenceBase!=FROM_REFERENCE){
+        return -1;
+    }
     referenceBase=_referenceBase; 
     return 0;
 }
@@ -225,18 +241,34 @@ int TechnoSoftLowDriver::setEncoderLines(int& _encoderLines){
     return 0;
 }
 
-int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
+int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
     
-    if(!TS_SelectAxis(axisID)){
-        DERR("error selecting axis");
-        return -1;
-    }
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("error selecting axis");
+//        return -1;
+//    }
     //deltaPosition*=CONST_MULT_TECHNOFT;
     //printf("%ld",deltaPosition);
     //DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
-    if(!TS_MoveAbsolute(absPosition, this->speed, this->acceleration, movement, referenceBase)){
+//    if(speed<0 || speed>MAX_SPEED){
+//        return -1;
+//    }
+//    if(acceleration<0 || acceleration>MAX_ACCELERATION){
+//        return -2;
+//    }
+//    // nota: MAX_SPEED, MAX_ACCELERATION in TechnoSoftLowDriver.h 
+//        
+//    if((movement!=UPDATE_NONE) || (movement!=UPDATE_IMMEDIATE) || (movement!=UPDATE_ON_EVENT)){
+//        return -3;
+//    }
+//    // nota: UPDATE_NONE, UPDATE_IMMEDIATE, UPDATE_ON_EVENT costanti definite in TML_LIB.h 
+//    
+//    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
+//        return -4;
+//    }
+    if(!TS_MoveAbsolute(absPosition, speed, acceleration, movement, referenceBase)){
         DERR("error absolute moving");
-        return -2;
+        return -1;
     }
     return 0;
 }

@@ -158,7 +158,7 @@ namespace common{
                 //Encoder lines
                 int setEncoderLines(int& _encoderLines);
                 
-                int moveAbsoluteSteps(const long& position);
+                int moveAbsoluteSteps(const long& position) const;
                 
                 // get methods for variables
                 channel_psh getMyChannel();
