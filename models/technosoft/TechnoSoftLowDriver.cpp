@@ -90,7 +90,42 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const short& _moveMoment,
                         const short& _referenceBase, 
                         const double& _encoderLines){
-    int resp=0;
+    
+    // Set trapezoidal parameters
+    if(_speed<0 || _speed>_maxSpeed){
+        return -1;
+    }
+    speed = _speed;
+    
+    if(_acceleration<0 || _acceleration>_maxAcceleration){
+        return -2;
+    }
+    acceleration=_acceleration;
+    
+     if(_isAdditive!=TRUE || _isAdditive!=FALSE){
+        return -3;
+    }  
+    isAdditive=_isAdditive;
+    
+    if((_moveMoment!=UPDATE_NONE) || (_moveMoment!=UPDATE_IMMEDIATE) || (_moveMoment!=UPDATE_ON_EVENT)){
+        return -4;
+    }
+    movement=_moveMoment;
+    
+    if((_referenceBase!=FROM_MEASURE) || _referenceBase!=FROM_REFERENCE){
+        return -5;
+    }
+    referenceBase=_referenceBase;
+    
+     if(_encoderLines<=0){
+        return -6;
+    }   
+    encoderLines= _encoderLines;
+    
+    // Inizializziamo l'asse ID del motore
+    axisID=_axisID;
+    
+    //int resp=0;
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
     //int axisRef;
@@ -99,7 +134,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(!alreadyopenedChannel){
         if((my_channel->open()<0)){
             DERR("error opening channel");
-            resp = -1;
+            return -7;
         }
     }
     DPRINT("channel opened");
@@ -110,57 +145,51 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
-        resp = -2;
+        return -8;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d",axisID);
-        resp = -3;
+        return -9;
     }
    
     if(!TS_SelectAxis(_axisID)){
         DERR("failed to select axis %d",_axisID);
-        resp = -4;
+        return -10;
     }
 
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
-        return -6;
+        return -11;
     }
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
-        resp = -5;
+        return -12;
     }
     
-    // Inizializziamo l'asse ID del motore
-    axisID=_axisID;
     //axisRef=_axisRef;
-    // Nota: in realtà l'axisID e l'axisRef potrebbero anche non essere definiti tra gli attributi privati perché non sono parametri dei successivi comandi per la movimentazione o lettura dei parametri
-    //this->relPosition=relPosition;
-    speed=_speed;
-    acceleration=_acceleration;
-    isAdditive=_isAdditive;
-    movement=_moveMoment;
-    referenceBase=_referenceBase;
-    encoderLines= _encoderLines;
+    // Nota: in realtà l'axisID e l'axisRef potrebbero anche non essere definiti tra gli attributi privati perché
+    //non sono parametri dei successivi comandi per la movimentazione o lettura dei parametri
+  
+    
     //printf("esito providePower: %d\n",providePower());
     
     // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
     if(providePower()<0){
         DERR("failed power providing");
-        resp = -6;
+        return -13;
     }
     
     poweron=true;
     
-    if(resp==0 && !alreadyopenedChannel){
+    if(!alreadyopenedChannel){
         channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); 
         // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON può GENERAre MAI ECCEZIONE
     }
-    return resp;
+    return 0;
 }
 
 TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
@@ -174,27 +203,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 //          DERR("error selecting axis");
 //      return -1;
 //    }
-
-//    if(speed<0 || speed>MAX_SPEED){
-//        return -1;
-//    }
-//    if(acceleration<0 || acceleration>MAX_ACCELERATION){
-//        return -2;
-//    }
-//    // nota: MAX_SPEED, MAX_ACCELERATION in TechnoSoftLowDriver.h 
-//    
-//    if(isAdditive!=TRUE || isAdditive!=FALSE){
-//        return -3;
-//    }    
-//    if((movement!=UPDATE_NONE) || (movement!=UPDATE_IMMEDIATE) || (movement!=UPDATE_ON_EVENT)){
-//        return -4;
-//    }
-//    // nota: UPDATE_NONE, UPDATE_IMMEDIATE, UPDATE_ON_EVENT costanti definite in TML_LIB.h 
-//    
-//    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
-//        return -5;
-//    }
-//    // nota: FROM_MEASURE, FROM_REFERENCE costanti definite in TML_LIB.h
+    
     
     DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
@@ -204,16 +213,16 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     return 0;
 }
 
-// Set trapezoidal speed parameters
+// Set trapezoidal parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed){
-    if(_speed<0 || _speed>MAX_SPEED_DEFAULT){
+    if(_speed<0 || _speed>maxSpeed){
         return -1;
     }
     speed = _speed;
     return 0;
 }
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration){
-    if(_acceleration<0 || _acceleration>MAX_ACCELERATION_DEFAULT){
+    if(_acceleration<0 || _acceleration>maxAcceleration){
         return -1;
     }
     acceleration = _acceleration;
@@ -244,7 +253,10 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
                 
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(int& _encoderLines){
-    encoderLines=_encoderLines;   
+    if(_encoderLines<=0){
+        return -1;
+    }   
+    encoderLines=_encoderLines;
     return 0;
 }
 
