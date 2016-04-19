@@ -80,12 +80,20 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
     deinit();
 }
 
-int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID, const double& speed, const double& acceleration, const BOOL& isAdditive, const short& moveMoment, const short& referenceBase, const int& encoderLine)
-{
+int TechnoSoftLowDriver::init(const std::string& setupFilePath,
+                        const int& _axisID,
+                        const double& _speed,
+                        const double& _maxSpeed, 
+                        const double& _acceleration,
+                        const double& _maxAcceleration,
+                        const BOOL& _isAdditive, 
+                        const short& _moveMoment,
+                        const short& _referenceBase, 
+                        const double& _encoderLines){
     int resp=0;
     
     /*	Load the *.t.zip with setup data generated with EasyMotion Studio or EasySetUp, for axisID*/
-    int axisRef;
+    //int axisRef;
     DPRINT("during low driver init"); 
     
     if(!alreadyopenedChannel){
@@ -106,14 +114,13 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
-    if(!TS_SetupAxis(axisID, axisRef)){
+    if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d",axisID);
         resp = -3;
     }
    
-
-    if(!TS_SelectAxis(axisID)){
-        DERR("failed to select axis %d",axisID);
+    if(!TS_SelectAxis(_axisID)){
+        DERR("failed to select axis %d",_axisID);
         resp = -4;
     }
 
@@ -129,25 +136,25 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,const int& axisID
     }
     
     // Inizializziamo l'asse ID del motore
-    this->axisID=axisID;
-    this->axisRef=axisRef;
+    axisID=_axisID;
+    //axisRef=_axisRef;
     // Nota: in realtà l'axisID e l'axisRef potrebbero anche non essere definiti tra gli attributi privati perché non sono parametri dei successivi comandi per la movimentazione o lettura dei parametri
     //this->relPosition=relPosition;
-    this->speed=speed;
-    this->acceleration=acceleration;
-    this->isAdditive=isAdditive;
-    this->movement=moveMoment;
-    this->referenceBase=referenceBase;
-    this->encoderLines= encoderLines;
+    speed=_speed;
+    acceleration=_acceleration;
+    isAdditive=_isAdditive;
+    movement=_moveMoment;
+    referenceBase=_referenceBase;
+    encoderLines= _encoderLines;
     //printf("esito providePower: %d\n",providePower());
-    
-    
     
     // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
     if(providePower()<0){
         DERR("failed power providing");
         resp = -6;
     }
+    
+    poweron=true;
     
     if(resp==0 && !alreadyopenedChannel){
         channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); 
@@ -192,21 +199,21 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
-        return -6;
+        return -1;
     }
     return 0;
 }
 
 // Set trapezoidal speed parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed){
-    if(_speed<0 || _speed>MAX_SPEED){
+    if(_speed<0 || _speed>MAX_SPEED_DEFAULT){
         return -1;
     }
     speed = _speed;
     return 0;
 }
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration){
-    if(_acceleration<0 || _acceleration>MAX_ACCELERATION){
+    if(_acceleration<0 || _acceleration>MAX_ACCELERATION_DEFAULT){
         return -1;
     }
     acceleration = _acceleration;

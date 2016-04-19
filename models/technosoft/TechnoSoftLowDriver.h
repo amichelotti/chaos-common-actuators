@@ -43,22 +43,22 @@
 #define BAUDRATE	115200
 
 // Features of trapezoidal speed profile
-#define SPEED 400.0 // 30.0
-#define ACCELERATION 0.1 // 0.6
-#define MAX_SPEED 500.0
-#define MAX_ACCELERATION 2.0
+#define SPEED_DEFAULT 400.0 // 30.0               inizializzabile
+#define ACCELERATION_DEFAULT 0.1 // 0.6           inizializzabile
+#define MAX_SPEED_DEFAULT 500.0                   //inizializzabile
+#define MAX_ACCELERATION_DEFAULT 2.0              //inizializzabile
 
 
-#define MAX_LENGTH_STRING_FROM_SHELL 50
-#define MAX_COMMAND_LENGTH 10
+//#define MAX_LENGTH_STRING_FROM_SHELL 50
+//#define MAX_COMMAND_LENGTH 10
 
             
-#define CONST_MULT_TECHNOFT 256.0 // numero micro steps per step (MDS)
-#define STEPS_PER_ROUNDS 200.0     // numero steps per giro
-#define N_ROUNDS 20.0 
-#define LINEAR_MOVEMENT_PER_N_ROUNDS 1.5 //[mm]
-#define N_ENCODER_LINES 800.0 //[mm]
-#define RANGE 20.0  
+#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step (MDS)
+#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro
+#define N_ROUNDS_DEFAULT 20.0 
+#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
+#define N_ENCODER_LINES_DEFAULT 800.0 //[mm]
+#define RANGE_DEFAULT 20.0  
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -107,11 +107,13 @@ namespace common{
                 
                 // Trapezoidal profile parameters
                 double speed;
+                double maxSpeed;
                 double acceleration;
+                double maxAcceleration;
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
-                
+                 
                 // Additional parameters for s-curve profile
                 //long jerkTime;
                 short decelerationType;
@@ -141,7 +143,16 @@ namespace common{
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
-                int init(const std::string& setupFilePath,const int& axisID, const double& speed=SPEED, const double& acceleration=ACCELERATION, const BOOL& isAdditive=FALSE, const short& moveMoment =UPDATE_IMMEDIATE, const short& referenceBase=FROM_REFERENCE, const int& encoderLines=N_ENCODER_LINES);
+                int init(const std::string& setupFilePath,
+                        const int& axisID,
+                        const double& speed=SPEED_DEFAULT,
+                        const double& maxSpeed=MAX_SPEED_DEFAULT, 
+                        const double& acceleration=ACCELERATION_DEFAULT,
+                        const double& maxAcceleration = MAX_ACCELERATION_DEFAULT,
+                        const BOOL& isAdditive=FALSE, 
+                        const short& moveMoment =UPDATE_IMMEDIATE,
+                        const short& referenceBase=FROM_REFERENCE, 
+                        const double& encoderLines=N_ENCODER_LINES_DEFAULT);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);

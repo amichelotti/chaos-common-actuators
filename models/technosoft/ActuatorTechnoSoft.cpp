@@ -120,7 +120,7 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
     DPRINT("moving relative %f mm",deltaMillimeters);
     
     // Calcolo argomento funzione moveRelativeSteps
-    double deltaMicroSteps = round((N_ROUNDS*STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS);
+    double deltaMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
         return -1;
     
@@ -154,7 +154,7 @@ int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration,
 int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){ 
     
     // Calcolo argomento funzione moveAbsoluteSteps
-    double nMicroSteps = round((N_ROUNDS*STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS);
+    double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
         return -1;
     
@@ -176,7 +176,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
             return -1;
         }
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
-        *deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(STEPS_PER_ROUNDS*CONST_MULT_TECHNOFT*N_ROUNDS);
+        *deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
     }
     else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
         long aposition;
@@ -184,7 +184,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
         if(driver->getEncoder(aposition)<0)
             return -2;
         //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
-        *deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS)/(N_ENCODER_LINES*N_ROUNDS);
+        *deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
     }
     return 0;
 }
