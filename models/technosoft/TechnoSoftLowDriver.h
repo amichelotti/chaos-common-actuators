@@ -105,7 +105,7 @@ namespace common{
                 std::string dev;
                 std::string devName;
                 
-                // Trapezoidal profile parameters
+                // Trapezoidal profile parameters for move relative and move absolute
                 double speed;
                 double maxSpeed;
                 double acceleration;
@@ -113,6 +113,10 @@ namespace common{
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
+                
+                // Speed parameters regarding homing procedure
+                
+                
                  
                 // Additional parameters for s-curve profile
                 //long jerkTime;
