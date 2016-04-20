@@ -47,10 +47,10 @@ namespace common{
                     deinit();
                 } 
                
-                int init(void*initialization_string);
-                // OK
-                // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
-                int deinit();
+        int init(void*initialization_string);
+        // OK
+        // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
+        int deinit();
                 int moveRelativeMillimeters(double deltaMillimeters);
                 int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase);
                 int moveAbsoluteMillimeters(double mm);
@@ -60,7 +60,7 @@ namespace common{
                 //int getPosition(readingTypes mode, double& deltaPosition_mm);
                 int stopMotion(){return 0;}
                 int getPosition(readingTypes mode, double* deltaPosition_mm);
-                int homing(homingType mode){return 0;}
+                int homing(homingType mode);
                 int getState(int* state, std::string& desc );   // **
                 int getAlarms(uint64_t*alrm, std::string& descStr);
                 uint64_t getFeatures(){return 0;}
@@ -75,7 +75,7 @@ namespace common{
            @param version returning string
            @return 0 if success or an error code
         */
-		int getSWVersion(std::string& version){version="technosoft-0.0.1";return 0;}
+	int getSWVersion(std::string& version){version="technosoft-0.0.1";return 0;}
 
         /**
         @brief returns the HW version of the actuator 
