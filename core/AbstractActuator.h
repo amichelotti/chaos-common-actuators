@@ -119,7 +119,7 @@ typedef enum {
         int getTimeoutHoming(uint64_t* timeo_ms);
         
         
-        virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
+        virtual int moveRelativeMillimeters(double mm)=0;
         
         virtual int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase)=0;
 

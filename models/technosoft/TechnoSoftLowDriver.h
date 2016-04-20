@@ -149,14 +149,14 @@ namespace common{
                 // Inizializzazione singolo drive/motor
                 int init(const std::string& setupFilePath,
                         const int& axisID,
-                        const double& speed=SPEED_DEFAULT,
-                        const double& maxSpeed=MAX_SPEED_DEFAULT, 
-                        const double& acceleration=ACCELERATION_DEFAULT,
-                        const double& maxAcceleration = MAX_ACCELERATION_DEFAULT,
-                        const BOOL& isAdditive=FALSE, 
-                        const short& moveMoment =UPDATE_IMMEDIATE,
-                        const short& referenceBase=FROM_REFERENCE, 
-                        const double& encoderLines=N_ENCODER_LINES_DEFAULT);
+                        const double speed=SPEED_DEFAULT,
+                        const double maxSpeed=MAX_SPEED_DEFAULT, 
+                        const double acceleration=ACCELERATION_DEFAULT,
+                        const double maxAcceleration = MAX_ACCELERATION_DEFAULT,
+                        const BOOL isAdditive=FALSE, 
+                        const short moveMoment =UPDATE_IMMEDIATE,
+                        const short referenceBase=FROM_REFERENCE, 
+                        const double encoderLines=N_ENCODER_LINES_DEFAULT);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);

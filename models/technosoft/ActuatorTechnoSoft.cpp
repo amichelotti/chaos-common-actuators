@@ -66,7 +66,9 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         //int rt= driver->init(conf_path,atoi(axid.c_str()));
         
         // INIZIALIZZAZIONE CANALE + DRIVE/MOTOR
-        if(driver->init(conf_path,atoi(axid.c_str()))<0){
+        int val;
+        if((val=driver->init(conf_path,atoi(axid.c_str())))<0){
+            printf("Iipologia di errore in fase di inizializzazione %d \n",val);
             // Deallocazione oggetto canale ()
             try{
                 delete driver; // Nota importante: l'indirizzo del canale 

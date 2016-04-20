@@ -82,14 +82,14 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const int& _axisID,
-                        const double& _speed,
-                        const double& _maxSpeed, 
-                        const double& _acceleration,
-                        const double& _maxAcceleration,
-                        const BOOL& _isAdditive, 
-                        const short& _moveMoment,
-                        const short& _referenceBase, 
-                        const double& _encoderLines){
+                        const double _speed,
+                        const double _maxSpeed, 
+                        const double _acceleration,
+                        const double _maxAcceleration,
+                        const BOOL _isAdditive, 
+                        const short _moveMoment,
+                        const short _referenceBase, 
+                        const double _encoderLines){
     
     // Set trapezoidal parameters
     if(_speed<0 || _speed>_maxSpeed){
@@ -97,22 +97,32 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
     speed = _speed;
     
-    if(_acceleration<0 || _acceleration>_maxAcceleration){
+    if(_maxSpeed<=0){
         return -2;
+    }
+    maxSpeed=_maxSpeed;    
+        
+    if(_acceleration<0 || _acceleration>_maxAcceleration){
+        return -3;
     }
     acceleration=_acceleration;
     
-     if(_isAdditive!=TRUE || _isAdditive!=FALSE){
+    if(_maxAcceleration<0){
+        return -4;
+    }
+    maxAcceleration=_maxAcceleration;
+   
+    if(_isAdditive!=TRUE && _isAdditive!=FALSE){
         return -3;
     }  
     isAdditive=_isAdditive;
     
-    if((_moveMoment!=UPDATE_NONE) || (_moveMoment!=UPDATE_IMMEDIATE) || (_moveMoment!=UPDATE_ON_EVENT)){
+    if((_moveMoment!=UPDATE_NONE) && (_moveMoment!=UPDATE_IMMEDIATE) && (_moveMoment!=UPDATE_ON_EVENT)){
         return -4;
     }
     movement=_moveMoment;
     
-    if((_referenceBase!=FROM_MEASURE) || _referenceBase!=FROM_REFERENCE){
+    if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
         return -5;
     }
     referenceBase=_referenceBase;
@@ -215,6 +225,8 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 
 // Set trapezoidal parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed){
+    printf("speed = %f, max speed = %f", _speed,maxSpeed);
+    
     if(_speed<0 || _speed>maxSpeed){
         return -1;
     }
@@ -222,6 +234,7 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed){
     return 0;
 }
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration){
+    printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
     if(_acceleration<0 || _acceleration>maxAcceleration){
         return -1;
     }
@@ -230,21 +243,21 @@ int TechnoSoftLowDriver::setAcceleration(const double& _acceleration){
 }
 int TechnoSoftLowDriver::setIsAdditive(const BOOL& _isAdditive){
     
-    if(_isAdditive!=TRUE || _isAdditive!=FALSE){
+    if(_isAdditive!=TRUE && _isAdditive!=FALSE){
         return -1;
     }   
     isAdditive = _isAdditive;
     return 0;
 }
 int TechnoSoftLowDriver::setMovement(const short& _movement){
-    if((_movement!=UPDATE_NONE) || (_movement!=UPDATE_IMMEDIATE) || (_movement!=UPDATE_ON_EVENT)){
+    if((_movement!=UPDATE_NONE) && (_movement!=UPDATE_IMMEDIATE) && (_movement!=UPDATE_ON_EVENT)){
         return -1;
     }
     movement = _movement;   
     return 0;
 }
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
-    if((_referenceBase!=FROM_MEASURE) || _referenceBase!=FROM_REFERENCE){
+    if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
         return -1;
     }
     referenceBase=_referenceBase; 
@@ -478,10 +491,10 @@ int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
     if(!TS_CancelableCALL_Label(pszFunctionName.c_str())){
+        printf("executeTMLfunction: %s\n",TS_GetLastErrorText());
         return -1;
     }
     return 0;
-
 }
 
 int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
