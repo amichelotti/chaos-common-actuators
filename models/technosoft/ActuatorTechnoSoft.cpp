@@ -189,82 +189,91 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
     return 0;
 }
 
-//int ActuatorTechnoSoft::homing(homingType mode){
-//    
-//    struct timeval structTimeEval;
-//    if(mode==nativeHoming15){
-//    /*	Settings of homing parameters for this example */
-//	double high_speed = 10;		/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling] */
-//	double low_speed = 1.;		/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
-//	double acceleration = 0.3;	/* the acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
-//	double deceleration = 1.5;	/* the decceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
-//	long home_position = 1000;	/* the homing position [drive internal position units, encoder counts]  */
-//	WORD homing_done = 0;
-//        long currentTime_ms;
-//        
-///*	Set the homing parameters */
-///*	--------------------------------------------------------------------*/
-///*	Set the acceleration rate for homing */
-//	if(driver->setFixedVariable("CACC", acceleration)<0) 
-//		return -1;		
-///*	Set the deceleration rate for homing */
-//	if(driver->setDecelerationParam(deceleration)<0) 
-//		return -2;	
-///*	Set the high speed for homing */
-//	if(driver->setFixedVariable("CSPD", high_speed)<0) 
-//		return -3;		
-///*	Set the low speed for homing */
-//	if(driver->setFixedVariable("HOMESPD", low_speed)<0) 
-//		return -4;	
-///*	Setup the home position at the end of the homing procedure */
-//	if(driver->setVariable("HOMEPOS", home_position)<0) 
-//		return -5;	
-///*	--------------------------------------------------------------------*/
-//
-///*	Call the homing procedure stored in the non-volatile memory of the drive */
-//	if(driver->executeTMLfunction("Homing15")<0) 
-//		return -6;
-//
-///*	Wait until the homing process is ended */
-//        gettimeofday(&structTimeEval, NULL);
-//        long iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
-//	
-///*	Wait for homing procedure to end */	
-//	while(homing_done == 0){
-///*	Check the SRL.8 bit - Homing active flag*/
-//		if(driver->    TS_ReadStatus(REG_SRL, &homing_done)){ 
-//                    /*	Cancel the homing procedure   */
-//                    if(driver->abortNativeOperation()<0) 
-//                        return -7; // HARD ERROR
-//                    /*	Stop the motor */
-//                    if(driver->stopMotion()<0) 
-//			return -8; // HARD ERROR
-//                    return -9;
-//                }
-//		homing_done=((homing_done & 1<<8) == 0 ? 1 : 0);
-//
-///*	If the homing procedure doesn't ends in MINUTES time then abort it */
-//                gettimeofday(&structTimeEval, NULL);
-//                currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 100;
-//		if(currentTime_ms - iniTime_ms >= timeo_ms){
-//			break;
-//		}
-//                usleep(1000); // Check each millisecond
-//	}//chiude while(homing_done == 0)
-//        
-//        if(homing_done == 0){
-//        /*	Cancel the homing procedure	*/
-//		if(driver->abortNativeOperation()<0) 
-//			return -10;
-//
-//        /*	Stop the motor */
-//		if(driver->stopMotion()<0) 
-//			return -11;
-//                
-//                return -12;
-//	}	
-//	return 0;
-//    }
+int ActuatorTechnoSoft::homing(homingType mode){
+    
+    struct timeval structTimeEval;
+    if(mode==nativeHoming15){
+    /*	Settings of homing parameters for this example */
+	double high_speed = 10;		/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling] */
+	double low_speed = 1.;		/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
+	double acceleration = 0.3;	/* the acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
+	double deceleration = 1.5;	/* the decceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
+	long home_position = 1000;	/* the homing position [drive internal position units, encoder counts]  */
+        
+/*	Set the homing parameters */
+/*	--------------------------------------------------------------------*/
+/*	Set the acceleration rate for homing */
+	if(driver->setFixedVariable("CACC", acceleration)<0) 
+		return -1;		
+/*	Set the deceleration rate for homing */
+	if(driver->setDecelerationParam(deceleration)<0) 
+		return -2;	
+/*	Set the high speed for homing */
+	if(driver->setFixedVariable("CSPD", high_speed)<0) 
+		return -3;		
+/*	Set the low speed for homing */
+	if(driver->setFixedVariable("HOMESPD", low_speed)<0) 
+		return -4;	
+/*	Setup the home position at the end of the homing procedure */
+	if(driver->setVariable("HOMEPOS", home_position)<0) 
+		return -5;	
+/*	--------------------------------------------------------------------*/
+
+        std::string str="Homing15";
+/*	Call the homing procedure stored in the non-volatile memory of the drive */
+	if(driver->executeTMLfunction(str)<0) 
+		return -6;
+
+/*	Wait until the homing process is ended */
+        long currentTime_ms;
+        uint16_t homing_done;
+        str.assign("");
+        
+        gettimeofday(&structTimeEval, NULL);
+        long iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+        /*	Wait for homing procedure to end */	
+	while(homing_done == 0){
+/*	Check the SRL.8 bit - Homing active flag*/
+		if(driver->getStatusOrErrorReg(3, homing_done,str)<0){ 
+                    /*	Cancel the homing procedure   */
+                    if(driver->abortNativeOperation()<0) 
+                        return -7; // HARD ERROR
+                    /*	Stop the motor */
+                    if(driver->stopMotion()<0) 
+			return -8; // HARD ERROR
+                    return -9;
+                }
+		homing_done=((homing_done & 1<<8) == 0 ? 1 : 0);
+
+/*	If the homing procedure doesn't ends in MINUTES time then abort it */
+                gettimeofday(&structTimeEval, NULL);
+                currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+		if(currentTime_ms - iniTime_ms >= timeo_homing_ms){
+			break;
+		}
+                usleep(1000); // Check each millisecond
+	}//chiude while(homing_done == 0)
+        
+        if(homing_done == 0){ // Time out scaduto
+        /*	Cancel the homing procedure	*/
+		if(driver->abortNativeOperation()<0) 
+			return -10;
+
+        /*	Stop the motor */
+		if(driver->stopMotion()<0) 
+			return -11;
+                
+                return -12;
+	}
+      
+        // Reset encoder e counter
+        if(driver->resetEncoder()<0)
+            return -13;
+        if(driver->resetCounter()<0)
+            return -14;
+        
+	return 0;
+    }
 //    else if(mode==homing2){
 //        /*	Movement parameters	*/
 //	long position_mm = -100000000;		/* position command [drive internal position units, encoder counts] */
@@ -383,8 +392,8 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
 //        
 //        
 //    }
-//    return -50; // Indica che non ho indicato alcuna modalità corretta
-//}
+    return -50; // Indica che non ho indicato alcuna modalità corretta
+}
 
 int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
 

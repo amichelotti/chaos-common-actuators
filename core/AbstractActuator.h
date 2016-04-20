@@ -88,6 +88,7 @@ typedef enum {
         protected:
             double range_mm; //mechanical range of the slit (passato da MDS), [mm]
             uint64_t timeo_ms;
+            uint64_t timeo_homing_ms;            
 
 //            // Trapezoidal profile parameters
 //            double speed;
@@ -113,6 +114,11 @@ typedef enum {
         @brief Move the actuator X millimeters away from current position
         @return 0 if success or an error code
         */
+        
+        int setTimeoutHoming(uint64_t timeo_ms);
+        int getTimeoutHoming(uint64_t* timeo_ms);
+        
+        
         virtual int moveRelativeMillimeters(double mm)=0;      //***OK**
         
         virtual int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase)=0;

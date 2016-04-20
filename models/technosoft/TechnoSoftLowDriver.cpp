@@ -294,12 +294,12 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 
 int TechnoSoftLowDriver::stopMotion(){
     DPRINT("stop axis:%d",axisID);
-    if(!TS_SelectAxis(axisID)){
-        return -1;
-    }
+//    if(!TS_SelectAxis(axisID)){
+//        return -1;
+//    }
 
     if(!TS_Stop()){
-        return -2;
+        return -1;
     }
     return 0;
 }
@@ -458,16 +458,18 @@ int TechnoSoftLowDriver::getPower(BOOL& powered){
 int TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
 //The function converts the value to type fixed and writes it in the TML data
 //pszName on the active axis
-    if(!TS_SetFixedVariable(pszName, value)) 
+    if(!TS_SetFixedVariable(pszName, value)){
         return -1;
+    }
     return 0;
 }
 
 int TechnoSoftLowDriver::abortNativeOperation(){
     //The function aborts the execution of a TML function launched with a 
     //cancelable call
-    if(!TS_ABORT()) 
+    if(!TS_ABORT()){
         return -1;
+    }
     return 0;
 }
 
@@ -475,22 +477,25 @@ int TechnoSoftLowDriver::abortNativeOperation(){
 int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
     // The function commands the active axis to execute the TML function stored
     //at pszFunctionName
-    if(!TS_CancelableCALL_Label(pszFunctionName.c_str()))
-        return FALSE;
-    return TRUE;
+    if(!TS_CancelableCALL_Label(pszFunctionName.c_str())){
+        return -1;
+    }
+    return 0;
 
 }
 
 int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
     // 
-    if(!TS_QuickStopDecelerationRate(deceleration))
+    if(!TS_QuickStopDecelerationRate(deceleration)){
         return -1;
+    }
     return 0;
 }
 
 int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
-    if(!TS_SetLongVariable(pszName, value)) 
+    if(!TS_SetLongVariable(pszName, value)){
 	return -1;
+    }
     return 0;
 }
 
