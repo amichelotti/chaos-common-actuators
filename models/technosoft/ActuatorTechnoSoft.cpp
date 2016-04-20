@@ -157,6 +157,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
     
     // Calcolo argomento funzione moveAbsoluteSteps
     double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+    printf("nMicroSteps=%f\n",nMicroSteps);
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
         return -1;
     
