@@ -349,12 +349,12 @@ int TechnoSoftLowDriver::providePower(){
 int TechnoSoftLowDriver::stopPower(){
     DPRINT("stop power to axis:%d",axisID);
 
-    if(!TS_SelectAxis(axisID)){
-        return -1;
-    }
+//    if(!TS_SelectAxis(axisID)){
+//        return -1;
+//    }
 
     if(!TS_Power(POWER_OFF)){
-        return -2;
+        return -1;
     }
     return 0;
 }
@@ -365,6 +365,8 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
         //return -1;
     //}
     
+    if(stopMotion()<0)
+        return -1;
     // DA TOGLIERE IL PRIMA POSSIBILE QUESTA ISTRUZIONE
     if(poweron){
         if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
@@ -381,7 +383,7 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     // COSI COME BISOGNA TOGLIERE IL PRIMA POSSIBILE L'ISTRUZIONE providePower
     // in INIT
     }
-    
+ 
     if(my_channel!=NULL){
         if(my_channel.use_count()==2){
             // In questo caso bisogna eliminare anche la riga relativa all'oggetto canale utilizzato 
@@ -402,9 +404,9 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
 int TechnoSoftLowDriver::getCounter(long& tposition){
    // DPRINT("getting counter");
     DPRINT("Reading COUNTER position");
-    if(!TS_SelectAxis(axisID)){
-        return -1;
-    }
+//    if(!TS_SelectAxis(axisID)){
+//        return -1;
+//    }
 
     if(!TS_GetLongVariable("TPOS", tposition)){
         return -2;
@@ -543,9 +545,9 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
 }
 
 int TechnoSoftLowDriver::setPosition(const long& posValue){
-  if(!TS_SelectAxis(axisID)){
-        return -1;
-  }
+//  if(!TS_SelectAxis(axisID)){
+//        return -1;
+//  }
   
     if(!TS_SetPosition(posValue)) 
         return -1;
