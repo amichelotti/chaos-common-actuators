@@ -428,7 +428,7 @@ int TechnoSoftLowDriver::getEncoder(long& aposition){
     return 0;
 }
 
-int getLVariable(std::string& nameVar, long& var){
+int TechnoSoftLowDriver::getLVariable(std::string& nameVar, long& var) {
     if(!TS_GetLongVariable(nameVar.c_str(), var)){
         return -1;
     }

@@ -62,73 +62,74 @@ int main(int argc,const char* argv[]){
     }
     DPRINT("************** Current position counter %f, before movement **************",rpos1);
 
-    // Spostamento della slitta 
-    if(mySlit->moveRelativeMillimeters(pos)<0){
-	fprintf(stderr,"************** Error returned by movement operation **************\n");
-        return -5;
-    }
-	 
-    sleep(30); // // Attesa completamento movimentazione, in seconds
-    
-    printf("Fine pausa imposta per la movimentazione\n");
-    
-    if(mySlit->setTimeoutHoming(100000)<0){ //Settiamo il timeout = 100000
-        return -6;
-    }
-
-//    int respHoming;
-//    if((respHoming=mySlit->homing(common::actuators::AbstractActuator::nativeHoming15))<0){
-//        fprintf(stderr,"************** Error returned by movement operation with code %d**************\n",respHoming);
+//    // Spostamento della slitta 
+//    if(mySlit->moveRelativeMillimeters(pos)<0){
+//	fprintf(stderr,"************** Error returned by movement operation **************\n");
+//        return -5;
+//    }
+//	 
+//    sleep(30); // // Attesa completamento movimentazione, in seconds
+//    
+//    printf("Fine pausa imposta per la movimentazione\n");
+//    
+//    if(mySlit->setTimeoutHoming(100000)<0){ //Settiamo il timeout = 100000
+//        return -6;
+//    }
+//
+////    int respHoming;
+////    if((respHoming=mySlit->homing(common::actuators::AbstractActuator::nativeHoming15))<0){
+////        fprintf(stderr,"************** Error returned by movement operation with code %d**************\n",respHoming);
+////        return -7;
+////    }
+//    printf("Operazione di homing partita\n");
+//    
+//    int resp;
+//    if((resp=mySlit->setTrapezoidalProfile(50, 0.2, 0, 1, 1))<0){
+//        fprintf(stderr,"************** Error returned by setting Trapezoidal profile %d **************\n", resp);
 //        return -7;
 //    }
-    printf("Operazione di homing partita\n");
-    
-    int resp;
-    if((resp=mySlit->setTrapezoidalProfile(50, 0.2, 0, 1, 1))<0){
-        fprintf(stderr,"************** Error returned by setting Trapezoidal profile %d **************\n", resp);
-        return -7;
-    }
-    
-    if(mySlit->moveRelativeMillimeters(pos)<0){
-	fprintf(stderr,"************** Error returned by second movement operation **************\n");
-        return -8;
-    }
-    sleep(50); // // Attesa completamento movimentazione, in seconds
-    
-    printf("Movement absolute\n");
-    int resp2;
-    if((resp2=mySlit->moveAbsoluteMillimeters(15))<0){
-	fprintf(stderr,"************** Error returned by movement absolute operation with code %d **************\n", resp2);
-        return -9;
-    }
-    sleep(50); // Attesa completamento movimentazione, in seconds
-    
-    /*do{
-        mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
-        mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
-        printf("back ->%.5f\r",rpos1);
-    } while ((rpos1-.1) > 0 );
-    
-    printf("\n moving to %f...\n",pos);
-   */ 
-    /* mySlit->moveRelativeMillimeters(pos);
-    do{
-        mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
-        mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
-        printf("up ->%.5f\r",rpos1);
-    } while ((rpos1+.1) < pos);
-    */ 
-
-    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-	fprintf(stderr,"************** Error at second position after homing by encoder **************\n");
-        return -10;
-    }
-    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
-    	fprintf(stderr,"************** Error at second position after homing reading by counter **************\n");
-        return -11;
-    }
-    DPRINT("************** current position encoder: %f, and counter %f after movement **************",rpos,rpos1);
-    delete mySlit;
+//    
+//    if(mySlit->moveRelativeMillimeters(pos)<0){
+//	fprintf(stderr,"************** Error returned by second movement operation **************\n");
+//        return -8;
+//    }
+//    sleep(50); // // Attesa completamento movimentazione, in seconds
+//    
+//    printf("Movement absolute\n");
+//    int resp2;
+//    if((resp2=mySlit->moveAbsoluteMillimeters(15))<0){
+//	fprintf(stderr,"************** Error returned by movement absolute operation with code %d **************\n", resp2);
+//        return -9;
+//    }
+//    sleep(50); // Attesa completamento movimentazione, in seconds
+//    
+//    /*do{
+//        mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
+//        mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
+//        printf("back ->%.5f\r",rpos1);
+//    } while ((rpos1-.1) > 0 );
+//    
+//    printf("\n moving to %f...\n",pos);
+//   */ 
+//    /* mySlit->moveRelativeMillimeters(pos);
+//    do{
+//        mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos);
+//        mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1);
+//        printf("up ->%.5f\r",rpos1);
+//    } while ((rpos1+.1) < pos);
+//    */ 
+//
+//    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+//	fprintf(stderr,"************** Error at second position after homing by encoder **************\n");
+//        return -10;
+//    }
+//    if(mySlit->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+//    	fprintf(stderr,"************** Error at second position after homing reading by counter **************\n");
+//        return -11;
+//    }
+//    DPRINT("************** current position encoder: %f, and counter %f after movement **************",rpos,rpos1);
+//    delete mySlit;
 	
+    sleep(5);
     return 0;
 }

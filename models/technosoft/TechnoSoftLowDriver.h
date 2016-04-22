@@ -196,7 +196,7 @@ namespace common{
                 int setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop);
                 int setPosition(const long& posValue);
                 
-                int getLVariable(const std::string& nameVar,long& var) const;
+                int getLVariable(std::string& nameVar, long& var);
                 
                 int checkEvent(BOOL& event);
                 

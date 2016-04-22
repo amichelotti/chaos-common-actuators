@@ -322,8 +322,9 @@ int ActuatorTechnoSoft::homing(homingType mode){
         // member movement = UPDATE_IMMEDIATE;
         // member referenceBase = FROM_REFERENCE;
         
-        if(moveRelativeMillimeters(position_mm)<0)
+        if(moveRelativeMillimeters(position_mm)<0){
             return -1;
+        }
 	
         /*	Wait for the HIGH-LOW transition on negative limit switch */
 	if(driver->setEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, wait_event, no_stop)<0){
@@ -337,7 +338,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
         currentTime_ms = iniTime_ms+tol_ms;
        
-        while(!switchTransited && ((currentTime_ms - iniTime_ms) < timeo_homing_ms*perc1))
+        while(!switchTransited && ((currentTime_ms - iniTime_ms) < timeo_homing_ms*perc1)){
             if(driver->checkEvent(switchTransited)<0){
                 if(driver->stopMotion()<0){
                     return -4;
@@ -379,7 +380,8 @@ int ActuatorTechnoSoft::homing(homingType mode){
         
         if(motionCompleted){ // In questo caso il motore è fermo
             /*	Read the captured position on limit switch transition */
-            if(driver->getLVariable("CAPPOS", &cap_position)<0){ 
+            std::string cappos = "CAPPOS";
+            if(driver->getLVariable(cappos, cap_position)<0){ 
 //                if(driver->stopMotion()<0){
 //                    return -13;
 //                }
@@ -396,8 +398,9 @@ int ActuatorTechnoSoft::homing(homingType mode){
         }
 
         /*	Command an absolute positioning on the captured position */
-	if(moveAbsoluteMillimeters(cap_position)<0); 
+	if(moveAbsoluteMillimeters(cap_position)<0){
             return -17;
+        }
 
         /*	Wait for positioning to end */
         
@@ -431,15 +434,16 @@ int ActuatorTechnoSoft::homing(homingType mode){
         else{
             return -50; // valore che scegliamo per denotare la scadenza del timeout
         }
-        //printf(" The motor position is set to %ld [position internal units]!\n\n", home_position);
-	//printf(" Homing procedure done!\n");
+//        //printf(" The motor position is set to %ld [position internal units]!\n\n", home_position);
+//	//printf(" Homing procedure done!\n");
 	return 0;
     }
-//    else if(mode==defaultHoming){
-//        
-//        
-//    }
-    return -50; // Indica che non ho indicato alcuna modalità corretta
+    else if(mode==defaultHoming){
+        //..
+        //..
+        return 0;
+    }
+    return -50;
 }
 
 int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
