@@ -52,8 +52,12 @@ namespace common{
         // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
         int deinit();
                 int moveRelativeMillimeters(double deltaMillimeters);
+                int moveRelativeMillimetersHoming(double deltaMillimeters);
+                
                 int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase);
                 int moveAbsoluteMillimeters(double mm);
+                int moveAbsoluteMillimetersHoming(double mm);
+                
                 int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT){return 0;}
                 int resetAlarms(uint64_t alrm){return 0;}
                 

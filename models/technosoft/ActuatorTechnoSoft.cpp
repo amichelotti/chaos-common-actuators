@@ -133,6 +133,22 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
     return 0;
 }
 
+int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
+    DPRINT("moving relative %f mm",deltaMillimeters);
+    
+    // Calcolo argomento funzione moveRelativeSteps
+    double deltaMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+    if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
+        return -1;
+    
+    //long deltaMicroStepsL = deltaMicroSteps;
+    if(driver->moveRelativeStepsHoming((long)deltaMicroSteps)<0)
+        return -2;
+    
+    return 0;
+}
+
+
 int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase){
     
     if(driver->setSpeed(speed)<0){
@@ -163,6 +179,21 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
     
     //long nMicroStepsL = nMicroSteps;
     if(driver->moveAbsoluteSteps((long)nMicroSteps)<0)    
+        return -2;
+    
+    return 0;
+}
+
+int ActuatorTechnoSoft::moveAbsoluteMillimetersHoming(double millimeters){ 
+    
+    // Calcolo argomento funzione moveAbsoluteSteps
+    double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+    printf("nMicroSteps=%f\n",nMicroSteps);
+    if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
+        return -1;
+    
+    //long nMicroStepsL = nMicroSteps;
+    if(driver->moveAbsoluteStepsHoming((long)nMicroSteps)<0)    
         return -2;
     
     return 0;
@@ -281,13 +312,17 @@ int ActuatorTechnoSoft::homing(homingType mode){
 	return 0;
     }
     else if(mode==homing2){
-        /*	Movement parameters	*/
-	long position_mm = -100000000;		/* position command [drive internal position units, encoder counts] */
+        /*     Movement parameters     */
+	long position_mm = -1000000;		/* position command [drive internal position units, encoder counts] */
 	long home_position = 1000;		/* the homing position [drive internal position units, encoder counts] */
 	double high_speed = 10;			/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling]*/
-	double low_speed = 1.0;			/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
-	double acceleration = 0.6;		/* acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
+	                                        /* utilizzata in moveRelative*/
         
+        double low_speed = 1.0;			/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
+	                                        /* Utilizzata in moveAbsolute, riposizionamento*/
+        
+        double acceleration = 0.6;		/* acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
+                                                /*Utilizzata sia in moveRelative che in moveAbsolute*/
         //double iniTime_ms;
         //double currentTime_ms;
 //        BOOL wait_event = FALSE; 
@@ -322,12 +357,12 @@ int ActuatorTechnoSoft::homing(homingType mode){
         // member movement = UPDATE_IMMEDIATE;
         // member referenceBase = FROM_REFERENCE;
         
-        if(moveRelativeMillimeters(position_mm)<0){
+        if(moveRelativeMillimetersHoming(position_mm)<0){
             return -1;
         }
 	
         /*	Wait for the HIGH-LOW transition on negative limit switch */
-	if(driver->setEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, wait_event, no_stop)<0){
+	if(driver->setEventOnLimitSwitch()<0){
             if(driver->stopMotion()<0){
                 return -2;
             }
@@ -350,7 +385,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         int motionCompleted = 0;
         if(switchTransited){
             /*	Wait until the motor stops */
-            if(driver->setEventOnMotionComplete(wait_event,no_stop)<0){ 
+            if(driver->setEventOnMotionComplete()<0){ 
                 if(driver->stopMotion()<0){
                     return -6;
                 }
@@ -404,7 +439,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
 
         /*	Wait for positioning to end */
         
-	if(driver->setEventOnMotionComplete(wait_event,no_stop)<0){
+	if(driver->setEventOnMotionComplete()<0){
             if(driver->stopMotion()<0){
                 return -18;
             }
@@ -432,10 +467,17 @@ int ActuatorTechnoSoft::homing(homingType mode){
             return -22;
         }
         else{
-            return -50; // valore che scegliamo per denotare la scadenza del timeout
+            return -23; // valore che scegliamo per denotare la scadenza del timeout
         }
 //        //printf(" The motor position is set to %ld [position internal units]!\n\n", home_position);
 //	//printf(" Homing procedure done!\n");
+        
+        // Reset encoder e counter
+        if(driver->resetEncoder()<0)
+            return -24;
+        if(driver->resetCounter()<0)
+            return -25;
+        
 	return 0;
     }
     else if(mode==defaultHoming){

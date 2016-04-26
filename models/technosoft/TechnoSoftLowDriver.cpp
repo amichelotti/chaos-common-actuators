@@ -88,45 +88,101 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _maxAcceleration,
                         const BOOL _isAdditive, 
                         const short _moveMoment,
-                        const short _referenceBase, 
+                        const short _referenceBase,
+                        const double _highSpeedHoming,
+                        const double _lowSpeedHoming,
+                        const double _maxHighSpeedHoming,
+                        const double _maxLowSpeedHoming,
+                        const double _accelerationHoming,
+                        const double _maxAccelerationHoming,
+                        const BOOL _isAdditiveHoming,
+                        const short _movementHoming,
+                        const short _referenceBaseHoming,
                         const double _encoderLines){
     
-    // Set trapezoidal parameters
-    if(_speed<0 || _speed>_maxSpeed){
+    // Set trapezoidal profile parameters
+    if(_maxSpeed<=0){
         return -1;
     }
-    speed = _speed;
+    maxSpeed=_maxSpeed; 
     
-    if(_maxSpeed<=0){
+    if(_speed<0 || _speed>_maxSpeed){
         return -2;
     }
-    maxSpeed=_maxSpeed;    
+    speed = _speed; 
+    
+    if(_maxAcceleration<0){
+        return -3;
+    }
+    maxAcceleration=_maxAcceleration;
         
     if(_acceleration<0 || _acceleration>_maxAcceleration){
-        return -3;
+        return -4;
     }
     acceleration=_acceleration;
     
-    if(_maxAcceleration<0){
-        return -4;
-    }
-    maxAcceleration=_maxAcceleration;
-   
     if(_isAdditive!=TRUE && _isAdditive!=FALSE){
-        return -3;
+        return -5;
     }  
     isAdditive=_isAdditive;
     
     if((_moveMoment!=UPDATE_NONE) && (_moveMoment!=UPDATE_IMMEDIATE) && (_moveMoment!=UPDATE_ON_EVENT)){
-        return -4;
+        return -6;
     }
     movement=_moveMoment;
     
     if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
-        return -5;
+        return -7;
     }
     referenceBase=_referenceBase;
     
+    // Set homing parameters
+    if(_maxHighSpeedHoming<=0){
+        return -8;
+    }   
+    maxHighSpeedHoming = _maxHighSpeedHoming;
+    
+    if(_highSpeedHoming<0 || _highSpeedHoming>_maxHighSpeedHoming){
+        return -9;
+    }
+    highSpeedHoming = _highSpeedHoming;
+    
+    if(_maxLowSpeedHoming<=0){
+        return -10;
+    }   
+    maxLowSpeedHoming = _maxLowSpeedHoming;
+    
+    if((_lowSpeedHoming<0) || (_lowSpeedHoming>_maxLowSpeedHoming)){
+        return -11;
+    }
+    lowSpeedHoming=_lowSpeedHoming;
+    
+    if(_maxAccelerationHoming<=0){
+        return -12;
+    }
+    maxAccelerationHoming=_maxAccelerationHoming;
+    
+    if(_accelerationHoming<0 || _accelerationHoming>_maxAccelerationHoming){
+        return -13;
+    }
+    accelerationHoming = _accelerationHoming; 
+    
+    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
+        return -5;
+    }  
+    isAdditiveHoming=_isAdditiveHoming;
+    
+    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
+        return -11;
+    }
+    movementHoming=_movementHoming;  
+    
+    if((_referenceBaseHoming!=FROM_MEASURE) && _referenceBaseHoming!=FROM_REFERENCE){
+        return -12;
+    }
+    referenceBaseHoming=_referenceBaseHoming;
+    
+    //____________________________________
      if(_encoderLines<=0){
         return -6;
     }   
@@ -209,15 +265,18 @@ TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     
-//    if(!TS_SelectAxis(axisID)){
-//          DERR("error selecting axis");
-//      return -1;
-//    }
-    
-    
     DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed, acceleration, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
+        return -1;
+    }
+    return 0;
+}
+
+int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
+    DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    if(!TS_MoveRelative(deltaPosition, highSpeedHoming, accelerationHoming, isAdditiveHoming, movementHoming, referenceBaseHoming)){
+        DERR("error relative moving homing");
         return -1;
     }
     return 0;
@@ -304,6 +363,16 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
     }
     return 0;
 }
+
+int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
+    
+    if(!TS_MoveAbsolute(absPosition, lowSpeedHoming, accelerationHoming, movementHoming, referenceBaseHoming)){
+        DERR("error absolute moving");
+        return -1;
+    }
+    return 0;
+}
+
 
 int TechnoSoftLowDriver::stopMotion(){
     DPRINT("stop axis:%d",axisID);
@@ -523,14 +592,15 @@ int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
     return 0;
 }
 
-int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType = LSW_NEGATIVE , short transitionType = TRANSITION_HIGH_TO_LOW , BOOL waitEvent = 1, BOOL enableStop = 0){
+int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
     
-    if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)) 
+    if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)){
 	return -1;
+    }
     return 0;
 }
 
-int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent=1, BOOL enableStop=0){
+int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop){
     
     if(!TS_SetEventOnMotionComplete(waitEvent,enableStop)) 
 	return -1;

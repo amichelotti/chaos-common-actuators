@@ -48,11 +48,17 @@
 #define MAX_SPEED_DEFAULT 500.0                   //inizializzabile
 #define MAX_ACCELERATION_DEFAULT 2.0              //inizializzabile
 
+// Features of homing procedure
+#define HIGH_SPEED_HOMING_DEFAULT 10.0
+#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 
+#define LOW_SPEED_HOMING_DEFAULT 1.0
+#define MAXLOW_SPEED_HOMING_DEFAULT 5.0
+#define ACCELERATION_HOMING_DEFAULT 0.6
+#define MAX_ACCELERATION_HOMING_DEFAULT 0.9
 
 //#define MAX_LENGTH_STRING_FROM_SHELL 50
 //#define MAX_COMMAND_LENGTH 10
 
-            
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step (MDS)
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro
 #define N_ROUNDS_DEFAULT 20.0 
@@ -115,8 +121,15 @@ namespace common{
                 short referenceBase;
                 
                 // Speed parameters regarding homing procedure
-                
-                
+                double highSpeedHoming;
+                double lowSpeedHoming;
+                double maxHighSpeedHoming;
+                double maxLowSpeedHoming;
+                double accelerationHoming;
+                double maxAccelerationHoming;
+                BOOL isAdditiveHoming;
+                short movementHoming;
+                short referenceBaseHoming;
                  
                 // Additional parameters for s-curve profile
                 //long jerkTime;
@@ -141,6 +154,8 @@ namespace common{
                 bool alreadyopenedChannel; 
                 bool poweron;
                 
+                // Transition parameters
+                
             public:
                 // Costruttore device channel and device name
                 TechnoSoftLowDriver(const std::string dev, const std::string devName);
@@ -155,7 +170,16 @@ namespace common{
                         const double maxAcceleration = MAX_ACCELERATION_DEFAULT,
                         const BOOL isAdditive=FALSE, 
                         const short moveMoment =UPDATE_IMMEDIATE,
-                        const short referenceBase=FROM_REFERENCE, 
+                        const short referenceBase=FROM_REFERENCE,
+                        const double _highSpeedHoming=HIGH_SPEED_HOMING_DEFAULT,
+                        const double _lowSpeedHoming=LOW_SPEED_HOMING_DEFAULT,
+                        const double _maxHighSpeedHoming=MAX_HIGHSPEED_HOMING_DEFAULT,
+                        const double _maxLowSpeedHoming=MAXLOW_SPEED_HOMING_DEFAULT,
+                        const double _accelerationHoming=ACCELERATION_HOMING_DEFAULT,
+                        const double _maxAccelerationHoming=MAX_ACCELERATION_HOMING_DEFAULT,
+                        const BOOL _isAdditiveHoming=FALSE,
+                        const short _movementHoming=UPDATE_IMMEDIATE,
+                        const short _referenceBaseHoming=FROM_REFERENCE,
                         const double encoderLines=N_ENCODER_LINES_DEFAULT);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
@@ -164,16 +188,23 @@ namespace common{
                 int stopPower();
                 
                 int moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
+                //Set methods
+                int moveRelativeStepsHoming(const long& deltaPosition);
+                
                 int setSpeed(const double& speed);
                 int setAcceleration(const double& acceleration);
                 int setIsAdditive(const BOOL& isAdditive);
                 int setMovement(const short& movement);
                 int setReferenceBase(const short& referenceBase);
+                //Get methods
+                int getSpeed(double& speed);
+                                            
                 
                 //Encoder lines
                 int setEncoderLines(int& _encoderLines);
                 
                 int moveAbsoluteSteps(const long& position) const;
+                int moveAbsoluteStepsHoming(const long& position) const;
                 
                 // get methods for variables
                 channel_psh getMyChannel();
@@ -192,8 +223,8 @@ namespace common{
                 int executeTMLfunction(std::string& pszFunctionName);
                 int setVariable(LPCSTR pszName, long value);
                 int readHomingCallReg(short selIndex, WORD& status);
-                int setEventOnLimitSwitch(short lswType , short transitionType, BOOL waitEvent, BOOL enableStop);
-                int setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop);
+                int setEventOnLimitSwitch(short _lswType=LSW_NEGATIVE, short _transitionType=TRANSITION_HIGH_TO_LOW, BOOL _waitEvent=0, BOOL _enableStop=0);
+                int setEventOnMotionComplete(BOOL waitEvent=0, BOOL enableStop=0);
                 int setPosition(const long& posValue);
                 
                 int getLVariable(std::string& nameVar, long& var);
