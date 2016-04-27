@@ -10,7 +10,6 @@
 #include "ActuatorTechnoSoft.h"
 #include <boost/regex.hpp>
 
-
 #include <common/debug/core/debug.h>
 using namespace ::common::actuators::models;
 

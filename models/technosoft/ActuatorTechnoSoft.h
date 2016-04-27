@@ -55,6 +55,12 @@ namespace common{
                 int moveRelativeMillimetersHoming(double deltaMillimeters);
                 
                 int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase);
+                int setSpeed(double speed){return 0;}
+                int setAcceleration(double acceleration){return 0;}
+                int setIsAdditive(int isAdditive){return 0;}
+                int setMovement(short movement){return 0;}
+                int setReferenceBase(short referenceBase){return 0;}
+                
                 int moveAbsoluteMillimeters(double mm);
                 int moveAbsoluteMillimetersHoming(double mm);
                 

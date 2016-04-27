@@ -123,6 +123,16 @@ typedef enum {
         
         virtual int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase)=0;
 
+        virtual int setSpeed(double speed)=0;
+        
+        virtual int setAcceleration(double acceleration)=0;
+        
+        virtual int setIsAdditive(int isAdditive)=0;
+        
+        virtual int setMovement(short movement)=0;
+        
+        virtual int setReferenceBase(short referenceBase)=0;
+        
         /**
         @brief set the actuator speed in mm/s
         @return 0 if success or an error code
