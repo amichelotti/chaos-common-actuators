@@ -275,8 +275,10 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 
 int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
     DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    
     if(!TS_MoveRelative(deltaPosition, highSpeedHoming, accelerationHoming, isAdditiveHoming, movementHoming, referenceBaseHoming)){
         DERR("error relative moving homing");
+        printf("moveRelativeStepsHoming: %s\n",TS_GetLastErrorText());
         return -1;
     }
     return 0;
