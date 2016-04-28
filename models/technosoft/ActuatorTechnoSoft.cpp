@@ -178,7 +178,6 @@ int ActuatorTechnoSoft::setSpeed(double speed){
         return -1;
     }
     return 0;
-    
 }
 
 int ActuatorTechnoSoft::setAcceleration(double acceleration){
@@ -193,7 +192,6 @@ int ActuatorTechnoSoft::setAdditive(bool isAdditive){
         return -1;
     }
     return 0;
-                    
 }
 
 int ActuatorTechnoSoft::setMovement(int32_t movement){

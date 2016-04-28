@@ -58,7 +58,7 @@ namespace common{
                 int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase);
                 int setSpeed(double speed);
                 int setAcceleration(double acceleration);
-                int setIsAdditive(bool isAdditive);
+                int setAdditive(bool isAdditive);
                 int setMovement(int32_t movement);
                 int setReferenceBase(int32_t referenceBase);
                 
