@@ -127,7 +127,7 @@ typedef enum {
         
         virtual int setAcceleration(double acceleration)=0;
         
-        virtual int setIsAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
+        virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
         
         virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
         

@@ -194,7 +194,7 @@ namespace common{
                 
                 int setSpeed(const double& speed);
                 int setAcceleration(const double& acceleration);
-                int setIsAdditive(const BOOL& isAdditive);
+                int setAdditive(const BOOL& isAdditive);
                 int setMovement(const short& movement);
                 int setReferenceBase(const short& referenceBase);
                 //Get methods

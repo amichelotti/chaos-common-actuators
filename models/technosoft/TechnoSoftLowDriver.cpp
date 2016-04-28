@@ -302,7 +302,7 @@ int TechnoSoftLowDriver::setAcceleration(const double& _acceleration){
     acceleration = _acceleration;
     return 0;
 }
-int TechnoSoftLowDriver::setIsAdditive(const BOOL& _isAdditive){
+int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
     
     if(_isAdditive!=TRUE && _isAdditive!=FALSE){
         return -1;
@@ -366,6 +366,15 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
     return 0;
 }
 
+int TechnoSoftLowDriver::moveVelocityHoming(){
+    
+    if(!TS_MoveVelocity(lowSpeedHoming, accelerationHoming, movementHoming, referenceBaseHoming)){
+        DERR("Error moving velocity");
+        return -1;
+    }
+    return 0;
+}
+
 int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
     
     if(!TS_MoveAbsolute(absPosition, lowSpeedHoming, accelerationHoming, movementHoming, referenceBaseHoming)){
@@ -374,7 +383,6 @@ int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
     }
     return 0;
 }
-
 
 int TechnoSoftLowDriver::stopMotion(){
     DPRINT("stop axis:%d",axisID);

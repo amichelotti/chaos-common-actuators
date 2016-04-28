@@ -152,12 +152,6 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
     return 0;
 }
 
-int moveVelocityHoming(){
-    
-    
-    
-    return 0;
-}
 
 int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase){
     
@@ -167,7 +161,7 @@ int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration,
     if(driver->setAcceleration(acceleration)<0){
         return -2;
     }
-    if(driver->setIsAdditive(isAdditive)<0){
+    if(driver->setAdditive(isAdditive)<0){
         return -3;
     }
     if(driver->setMovement(movement)<0){
@@ -194,8 +188,8 @@ int ActuatorTechnoSoft::setAcceleration(double acceleration){
     return 0;
 }
 
-int ActuatorTechnoSoft::setIsAdditive(bool isAdditive){
-    if(driver->setIsAdditive((int)isAdditive)<0){
+int ActuatorTechnoSoft::setAdditive(bool isAdditive){
+    if(driver->setAdditive((int)isAdditive)<0){
         return -1;
     }
     return 0;
@@ -363,7 +357,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         DPRINT("************** Operazione di homing partita. Durera al massimo %lu ms**************", timeo_homing_ms);
         
         /*     Movement parameters     */
-	long position_mm = -1000;		/* position command [drive internal position units, encoder counts] */
+	//long position_mm = -1000;		/* position command [drive internal position units, encoder counts] */
 	long home_position = 1000;		/* the homing position [drive internal position units, encoder counts] */
 	double high_speed = 10;			/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling]*/
 	                                        /* utilizzata in moveRelative*/
@@ -407,7 +401,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         // member movement = UPDATE_IMMEDIATE;
         // member referenceBase = FROM_REFERENCE;
         
-        if(moveRelativeMillimetersHoming(position_mm)<0){
+        if(driver->moveVelocityHoming()<0){
             return -1;
         }
 	
