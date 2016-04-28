@@ -152,8 +152,14 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
     return 0;
 }
 
+int moveVelocityHoming(){
+    
+    
+    
+    return 0;
+}
 
-int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase){
+int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase){
     
     if(driver->setSpeed(speed)<0){
         return -1;
@@ -170,6 +176,43 @@ int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration,
     if(driver->setReferenceBase(referenceBase)<0){
         return -5;
     }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setSpeed(double speed){
+    if(driver->setSpeed(speed)<0){
+        return -1;
+    }
+    return 0;
+    
+}
+
+int ActuatorTechnoSoft::setAcceleration(double acceleration){
+    if(driver->setAcceleration(acceleration)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setIsAdditive(bool isAdditive){
+    if(driver->setIsAdditive((int)isAdditive)<0){
+        return -1;
+    }
+    return 0;
+                    
+}
+
+int ActuatorTechnoSoft::setMovement(int32_t movement){
+    if(driver->setMovement((short)movement)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setReferenceBase(int32_t referenceBase){
+    if(driver->setReferenceBase((short)referenceBase)<0){
+        return -1;
+    }                
     return 0;
 }
 
@@ -197,8 +240,9 @@ int ActuatorTechnoSoft::moveAbsoluteMillimetersHoming(double millimeters){
         return -1;
     
     //long nMicroStepsL = nMicroSteps;
-    if(driver->moveAbsoluteStepsHoming((long)nMicroSteps)<0)    
+    if(driver->moveAbsoluteStepsHoming((long)nMicroSteps)<0){    
         return -2;
+    }
     
     return 0;
 }
@@ -316,6 +360,8 @@ int ActuatorTechnoSoft::homing(homingType mode){
 	return 0;
     }
     else if(mode==homing2){
+        DPRINT("************** Operazione di homing partita. Durera al massimo %lu ms**************", timeo_homing_ms);
+        
         /*     Movement parameters     */
 	long position_mm = -1000;		/* position command [drive internal position units, encoder counts] */
 	long home_position = 1000;		/* the homing position [drive internal position units, encoder counts] */
@@ -337,7 +383,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         int switchTransited=0;
          
         double tol_ms = 0.000000001;
-        double perc1=0.8;
+        double perc1=0.9;
         double perc2=0.1;
         double perc3=0.1;
         // nota: perc1+perc2+perc3=1
@@ -377,19 +423,23 @@ int ActuatorTechnoSoft::homing(homingType mode){
         gettimeofday(&structTimeEval, NULL);
         iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
         currentTime_ms = iniTime_ms+tol_ms;
-       
-        while(!switchTransited && ((currentTime_ms - iniTime_ms) < timeo_homing_ms*perc1)){
+        double timeLimit = timeo_homing_ms*perc1;
+        
+        DPRINT("************** Time interval available for waiting the HIGH-LOW transition on negative limit switch: %f **************",timeLimit);
+        while(!switchTransited && ((currentTime_ms - iniTime_ms) <= timeLimit)){
             if(driver->checkEvent(switchTransited)<0){
                 if(driver->stopMotion()<0){
                     return -4;
                 }    
                 return -5;
             }  
+            gettimeofday(&structTimeEval, NULL);
             currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+            usleep(1000);
         }
         int motionCompleted = 0;
         if(switchTransited){
-            DPRINT("************** Negative limit switch transited**************");
+            DPRINT("************** Negative limit switch transited **************");
             /*	Wait until the motor stops */
             DPRINT("************** Wait until the motor stops**************");
             if(driver->setEventOnMotionComplete()<0){ 
@@ -401,7 +451,9 @@ int ActuatorTechnoSoft::homing(homingType mode){
             gettimeofday(&structTimeEval, NULL);
             iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
             currentTime_ms = iniTime_ms+tol_ms;
-            while(!motionCompleted && (currentTime_ms - iniTime_ms < timeo_homing_ms*perc2)){
+            timeLimit = timeo_homing_ms*perc2;
+            DPRINT("************** Time interval available for waiting the motor stops: %f **************",timeLimit);
+            while(!motionCompleted && ((currentTime_ms - iniTime_ms) <= timeLimit)){
                 if(driver->checkEvent(motionCompleted)<0){
                     if(driver->stopMotion()<0){
                         return -8;
@@ -410,76 +462,100 @@ int ActuatorTechnoSoft::homing(homingType mode){
                 }
                 gettimeofday(&structTimeEval, NULL);
                 currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+                usleep(1000);
             }
         }
         else{
+            DPRINT("************** Negative limit switch is not transited in the specified time interval %f ms**************",currentTime_ms - iniTime_ms);
             if(driver->stopMotion()<0){
                 return -11;
             }
             return -12; // valore che scegliamo per denotare la scadenza del timeout*perc1 senza che sono riuscito 
                        // a rilevare la transizione dello swicth
         }
-        
-//        if(motionCompleted){ // In questo caso il motore è fermo
-//            DPRINT("************** Motion completed**************");
-//            /*	Read the captured position on limit switch transition */
-//            DPRINT("************** Read the captured position on limit switch transition**************");
-//            std::string cappos = "CAPPOS";
-//            if(driver->getLVariable(cappos, cap_position)<0){ 
-////                if(driver->stopMotion()<0){
-////                    return -13;
-////                }
-//                return -14;
-//            }
-//            //printf(" The captured position is: %ld [drive internal position units]\n", cap_position);
-//        }
-//        else{
-//            if(driver->stopMotion()<0){
-//                return -15;
-//            }
-//            return -16; // valore che scegliamo per denotare la scadenza del timeout nell'attendere lo
-//                        // stop del motore una volta che la transizione dello switch è avvenuta
-//        }
-//
-//        /*	Command an absolute positioning on the captured position */
-//	if(moveAbsoluteMillimeters(cap_position)<0){
-//            DPRINT("************** Command an absolute positioning on the captured position **************");
-//            return -17;
-//        }
-//
-//        /*	Wait for positioning to end */
-//        DPRINT("************** Wait for positioning to end  **************");
-//	if(driver->setEventOnMotionComplete()<0){
-//            if(driver->stopMotion()<0){
-//                return -18;
-//            }
-//            return -19;
-//        }   
-//            
-//        gettimeofday(&structTimeEval, NULL);
-//        iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
-//        currentTime_ms = iniTime_ms+tol_ms;
-//        
-//        int absoluteMotionCompleted = 0;
-//        while(!absoluteMotionCompleted && (currentTime_ms - iniTime_ms < timeo_ms*perc3)){
-//            if(driver->checkEvent(absoluteMotionCompleted)<0){
+        if(motionCompleted){ // In questo caso il motore è fermo
+            DPRINT("************** Motion completed in %f ms from switch transition **************",currentTime_ms - iniTime_ms);
+            /*	Read the captured position on limit switch transition */
+            DPRINT("************** Read the captured position on limit switch transition**************");
+            std::string cappos = "CAPPOS";
+            if(driver->getLVariable(cappos, cap_position)<0){ 
 //                if(driver->stopMotion()<0){
-//                    return -20;
+//                    return -13;
 //                }
-//                return -21;
-//            }
-//            currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
-//        }
+                return -14;
+            }
+            DPRINT("************** the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
+            //printf(" The captured position is: %ld [drive internal position units]\n", cap_position);
+        }
+        else{
+            DPRINT("************** The motion is not completed in the specified time interval %f ms**************",currentTime_ms - iniTime_ms);
+            if(driver->stopMotion()<0){
+                return -15;
+            }
+            return -16; // valore che scegliamo per denotare la scadenza del timeout nell'attendere lo
+                        // stop del motore una volta che la transizione dello switch è avvenuta
+        }
+
+        DPRINT("************** Command an absolute positioning on the captured position **************");
+        /*	Command an absolute positioning on the captured position */
+        if(driver->moveAbsoluteStepsHoming(cap_position)<0){    
+            return -17;
+        }
+
+        /*	Wait for positioning to end */
+        DPRINT("************** Wait for positioning to end  **************");
+	if(driver->setEventOnMotionComplete()<0){
+            if(driver->stopMotion()<0){
+                return -18;
+            }
+            return -19;
+        }   
+            
+        gettimeofday(&structTimeEval, NULL);
+        iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+        currentTime_ms = iniTime_ms+tol_ms;
+        timeLimit = timeo_homing_ms*perc3;
+        
+        int count=0;
+        
+        int absoluteMotionCompleted = 0;
+        
+        DPRINT("************** Time interval available for waiting positioning to end: %f **************",timeLimit);
+        while(!absoluteMotionCompleted && ((currentTime_ms - iniTime_ms) < timeLimit)){
+            if(driver->checkEvent(absoluteMotionCompleted)<0){
+                if(driver->stopMotion()<0){
+                    return -20;
+                }
+                return -21;
+            }
+            gettimeofday(&structTimeEval, NULL);
+            currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+            usleep(1000);
+            
+            count++;
+        }
+        
+        DPRINT("************** Motor has been repositioned after checked %d times the motion completed event, after %f ms **************", count,currentTime_ms - iniTime_ms);
 //        
-//        /*	Set the home position */
-//        DPRINT("************** Set the home position  **************");
-//        if(absoluteMotionCompleted){
-//            if(driver->setPosition(home_position)<0) 
-//            return -22;
-//        }
-//        else{
-//            return -23; // valore che scegliamo per denotare la scadenza del timeout
-//        }
+        /*	Set the home position */
+        DPRINT("************** Set the home position  **************");
+        if(absoluteMotionCompleted){
+//            if(driver->setPosition(home_position)<0){ 
+//                return -22;
+//            }
+            // Reset encoder e counter
+            DPRINT("************** Reset encoder e counter **************");
+            if(driver->resetEncoder()<0){
+                return -23;
+            }
+            if(driver->resetCounter()<0){
+                return -24;
+            }
+        }
+        else{
+            DPRINT("************** The repositioning procedure is not finished in the time interval of %f ms  **************",timeLimit);
+            return -25; // valore che scegliamo per denotare la scadenza della terza parte del timeout
+        }
 ////        //printf(" The motor position is set to %ld [position internal units]!\n\n", home_position);
 ////	//printf(" Homing procedure done!\n");
 //        
@@ -489,12 +565,13 @@ int ActuatorTechnoSoft::homing(homingType mode){
 //            return -24;
 //        if(driver->resetCounter()<0)
 //            return -25;
-        
+        DPRINT("************** Operazione di homing terminata**************");
 	return 0;
     }
     else if(mode==defaultHoming){
         //..
         //..
+        DPRINT("************** Operazione di homing terminata**************");
         return 0;
     }
     return -50;

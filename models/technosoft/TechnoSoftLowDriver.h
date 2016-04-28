@@ -190,6 +190,7 @@ namespace common{
                 int moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
                 //Set methods
                 int moveRelativeStepsHoming(const long& deltaPosition);
+                int moveVelocityHoming();
                 
                 int setSpeed(const double& speed);
                 int setAcceleration(const double& acceleration);

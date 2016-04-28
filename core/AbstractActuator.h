@@ -121,17 +121,18 @@ typedef enum {
         
         virtual int moveRelativeMillimeters(double mm)=0;
         
-        virtual int setTrapezoidalProfile(double speed, double acceleration, int isAdditive, short movement, short referenceBase)=0;
+        virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;
 
         virtual int setSpeed(double speed)=0;
         
         virtual int setAcceleration(double acceleration)=0;
         
-        virtual int setIsAdditive(int isAdditive)=0;
+        virtual int setIsAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
         
-        virtual int setMovement(short movement)=0;
+        virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
         
-        virtual int setReferenceBase(short referenceBase)=0;
+        virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
+        
         
         /**
         @brief set the actuator speed in mm/s

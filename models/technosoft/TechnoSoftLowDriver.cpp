@@ -604,15 +604,17 @@ int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionTy
 
 int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop){
     
-    if(!TS_SetEventOnMotionComplete(waitEvent,enableStop)) 
+    if(!TS_SetEventOnMotionComplete(waitEvent,enableStop)){ 
 	return -1;
+    }
     return 0;
 }
 
 int TechnoSoftLowDriver::checkEvent(BOOL& event){
     
-    if(!TS_CheckEvent(event)) 
+    if(!TS_CheckEvent(event)){ 
         return -1;
+    }
     return 0;
 }
 
@@ -621,8 +623,10 @@ int TechnoSoftLowDriver::setPosition(const long& posValue){
 //        return -1;
 //  }
   
-    if(!TS_SetPosition(posValue)) 
+    if(!TS_SetPosition(posValue)){ 
+        DPRINT("Error at setting position: %s",TS_GetLastErrorText());
         return -1;
+    }
     return 0;
 }
 
