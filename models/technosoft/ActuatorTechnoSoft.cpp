@@ -631,7 +631,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
 		return -9;
 	}
     }
-    else{ 
+    else{ // La modalità specificata non è corretta
     	return -50;
     }
 }
