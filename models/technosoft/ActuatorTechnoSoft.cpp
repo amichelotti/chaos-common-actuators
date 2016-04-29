@@ -268,6 +268,8 @@ int ActuatorTechnoSoft::homing(homingType mode){
     struct timeval structTimeEval;
     long currentTime_ms;
     double iniTime_ms;
+    double tol_ms = 0.000000001;
+    double timeLimit;
     
     if(mode==nativeHoming15){
     /*	Settings of homing parameters for this example */
@@ -374,7 +376,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         int no_stop=0;
         int switchTransited=0;
          
-        double tol_ms = 0.000000001;
+        
         double perc1=0.9;
         double perc2=0.1;
         double perc3=0.1;
@@ -415,7 +417,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         gettimeofday(&structTimeEval, NULL);
         iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
         currentTime_ms = iniTime_ms+tol_ms;
-        double timeLimit = timeo_homing_ms*perc1;
+        timeLimit = timeo_homing_ms*perc1;
         
         DPRINT("************** Time interval available for waiting the HIGH-LOW transition on negative limit switch: %f **************",timeLimit);
         while(!switchTransited && ((currentTime_ms - iniTime_ms) <= timeLimit)){
@@ -465,7 +467,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
             return -12; // valore che scegliamo per denotare la scadenza del timeout*perc1 senza che sono riuscito 
                        // a rilevare la transizione dello swicth
         }
-        if(motionCompleted){ // In questo caso il motore è fermo
+        if(motionCompleted){ // Il motore si è fermato nell'intervallo di tempo specificato dopo la transizione dello switch
             DPRINT("************** Motion completed in %f ms from switch transition **************",currentTime_ms - iniTime_ms);
             /*	Read the captured position on limit switch transition */
             DPRINT("************** Read the captured position on limit switch transition**************");
@@ -538,13 +540,24 @@ int ActuatorTechnoSoft::homing(homingType mode){
             // Reset encoder e counter
             DPRINT("************** Reset encoder e counter **************");
             if(driver->resetEncoder()<0){
-                return -23;
+                //if(driver->stopMotion()<0){
+                    //return -23;
+                //}
+                return -22;
             }
             if(driver->resetCounter()<0){
-                return -24;
+                //if(driver->stopMotion()<0){
+                    //return -25;
+                //}
+                return -23;
             }
+	    DPRINT("************** Operazione di homing terminata correttamente nell'intervallo di tempo specificato **************");
+	    return 0;
         }
         else{
+	    if(driver->stopMotion()<0){
+            	return -24;
+            }
             DPRINT("************** The repositioning procedure is not finished in the time interval of %f ms  **************",timeLimit);
             return -25; // valore che scegliamo per denotare la scadenza della terza parte del timeout
         }
@@ -557,16 +570,70 @@ int ActuatorTechnoSoft::homing(homingType mode){
 //            return -24;
 //        if(driver->resetCounter()<0)
 //            return -25;
-        DPRINT("************** Operazione di homing terminata**************");
-	return 0;
     }
     else if(mode==defaultHoming){
-        //..
-        //..
-        DPRINT("************** Operazione di homing terminata**************");
-        return 0;
+        
+        if(driver->moveVelocityHoming()<0){
+            return -1;
+        }
+        
+        short indexRegMER = 5; // see constant REG_MER in TML_lib.h
+        uint16_t contentReg;
+        std::string descStr = "";
+        short homingDone = 0; 
+
+        gettimeofday(&structTimeEval, NULL);
+        iniTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+        currentTime_ms = iniTime_ms+tol_ms;
+        
+        while(!homingDone && ((currentTime_ms-iniTime_ms)<=timeo_homing_ms)){
+            
+            // lettura registro di interesse per fare il checking
+            if((driver->getStatusOrErrorReg(indexRegMER, contentReg, descStr))<0){
+                ERR("Reading state error: %s",descStr.c_str());
+                if(driver->stopMotion()<0){
+                    return -2;
+                }
+                return -3;
+            }
+            // lettura bit di interesse
+            homingDone=((contentReg & ((uint16_t)1)<<8) != 0 ? 1 : 0);
+            
+            gettimeofday(&structTimeEval, NULL);
+            currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
+            usleep(1000);
+        }
+       
+        if(homingDone){
+		// Reset encoder e counter
+            DPRINT("************** Reset encoder e counter **************");
+            if(driver->resetEncoder()<0){
+                if(driver->stopMotion()<0){
+                    return -4;
+                }
+                return -5;
+            }
+            if(driver->resetCounter()<0){
+                if(driver->stopMotion()<0){
+                    return -6;
+                }
+                return -7;
+            }
+	    DPRINT("************** Operazione di homing terminata correttamente nell'intervallo di tempo specificato **************");
+	    return 0;
+	}
+	else{ // Time needed is over time out
+		
+		if(driver->stopMotion()<0){
+                    return -8;
+                }
+		DPRINT("************** Operazione di homing non completata nell'intervallo di tempo specificato. Il motore è stato fermato **************");
+		return -9;
+	}
     }
-    return -50;
+    else{ 
+    	return -50;
+    }
 }
 
 int ActuatorTechnoSoft::getState(int* state, std::string& descStr){

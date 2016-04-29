@@ -100,7 +100,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const short _referenceBaseHoming,
                         const double _encoderLines){
     
-    // Set trapezoidal profile parameters
+    // Set trapezoidal profile parameters used for moveRelative(...)
     if(_maxSpeed<=0){
         return -1;
     }
@@ -136,21 +136,24 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
     referenceBase=_referenceBase;
     
-    // Set homing parameters
+    // ********************* Set homing parameters *********************
     if(_maxHighSpeedHoming<=0){
         return -8;
     }   
-    maxHighSpeedHoming = _maxHighSpeedHoming;
+    maxHighSpeedHoming = -_maxHighSpeedHoming; // N.B. Dalla tastiera verra' inserito un numero positivo, 
+                                               // che poi solo all'interno del drive ne verra' considerato 
+                                               // solamente il segno opposto
     
     if(_highSpeedHoming<0 || _highSpeedHoming>_maxHighSpeedHoming){
         return -9;
     }
-    highSpeedHoming = _highSpeedHoming;
+    highSpeedHoming = -_highSpeedHoming;
     
     if(_maxLowSpeedHoming<=0){
         return -10;
     }   
-    maxLowSpeedHoming = _maxLowSpeedHoming;
+    maxLowSpeedHoming = _maxLowSpeedHoming; // Verra' considerato il solo valore positivo perche' utilizzato
+                                            // nel moveAbsoluteHoming
     
     if((_lowSpeedHoming<0) || (_lowSpeedHoming>_maxLowSpeedHoming)){
         return -11;
@@ -368,7 +371,7 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 
 int TechnoSoftLowDriver::moveVelocityHoming(){
     
-    if(!TS_MoveVelocity(lowSpeedHoming, accelerationHoming, movementHoming, referenceBaseHoming)){
+    if(!TS_MoveVelocity(highSpeedHoming, accelerationHoming, movementHoming, referenceBaseHoming)){
         DERR("Error moving velocity");
         return -1;
     }
