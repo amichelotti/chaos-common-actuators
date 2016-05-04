@@ -10,6 +10,12 @@
 #include "TechnoSoftLowDriver.h"
 #include <sys/time.h>
 
+//#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step (MDS)
+//#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro
+//#define N_ROUNDS_DEFAULT 20.0 
+//#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
+
+
 #ifndef ActuatorTechnoSoft_h
 #define ActuatorTechnoSoft_h
 
@@ -29,6 +35,9 @@ namespace common{
 		    double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
                     bool readyState;
                     
+                    //double highSpeedHoming; // The homing travel speed
+                    //double range;
+                     
                 public:
 //                    typedef struct __technoinfo {
 //                        //const double range;
@@ -69,7 +78,7 @@ namespace common{
                 int resetAlarms(uint64_t alrm){return 0;}
                 
                 //int getPosition(readingTypes mode, double& deltaPosition_mm);
-                int stopMotion(){return 0;}
+                int stopMotion();
                 int getPosition(readingTypes mode, double* deltaPosition_mm);
                 int homing(homingType mode);
                 int getState(int* state, std::string& desc );   // **

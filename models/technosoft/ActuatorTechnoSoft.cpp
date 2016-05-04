@@ -17,7 +17,7 @@ using namespace ::common::actuators::models;
       
 
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,
-static const boost::regex driver_match("([\\w\\/]+),(\\w+),(.+),(\\d+)");
+static const boost::regex driver_match("([\\w\\/]+),(\\w+),(.+),(\\d+)"); //ATTENZIONE: DEVE ESSERE GESTITA LA QUINTA ESPRESSIONE REGOLARE
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     driver=NULL;
@@ -38,6 +38,22 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string dev_name=match[2]; 
         std::string conf_path=match[3];
         std::string axid=match[4];
+        //ATTENZIONE: DEVE ESSERE GESTITE LE SEGUENTI ESPRESSIONI REGOLARI.
+        // IL CONTROLLO DEI VALORI APPARTENENTI AL RANGE DI AMMISSIBILITA' DOVRA' ESSERE EFFETTUATO A QUESTO PUNTO
+        
+        
+        
+        std::string strhighSpeedHoming_mm_s = match[12];
+        double highSpeedHoming_mm_s = atof(strhighSpeedHoming_mm_s.c_str());
+        
+        
+        
+        std::string range_mm = match[21]; // valore sempre preso passato dal metadataserver che serve a questo 
+                                      // punto dell'esecuzione
+        if(atof(range_mm.c_str())<0){
+            return -1;
+        }
+        
         try{
             driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
             // ATTENZIONE: IL COSTRUTTORE TechnoSoftLowDriver DOVRÀ IN SEGUITO 
@@ -95,13 +111,11 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         
         // A questo punto siamo certi che l'apertura del canale è andata a buon fine
         // ed i parametri del drive/motor sono stati inizializzati correttamente
+	
+        //Initialize DEFAULT VALUE for timeout of homing procedure, dependent on the range of slit
+        timeo_homing_ms = (atof(range_mm.c_str())/(highSpeedHoming_mm_s/2))*1000;
         
         readyState = true;
-	//int state;
-	//std::string desc;
-	//this->getState(&state,desc);
-	//DPRINT("ALEDEBUG state is %d (%s)",state,desc.c_str());
-        
 	return 0;
     }
    ERR("error parsing initialization string:\"%s\"",params.c_str());
@@ -139,7 +153,7 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
     // Calcolo argomento funzione moveRelativeSteps
     double deltaMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     
-    if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
+    if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ 
         printf("Out of range\n");
         return -1;
     }
@@ -213,12 +227,14 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
     // Calcolo argomento funzione moveAbsoluteSteps
     double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     printf("nMicroSteps=%f\n",nMicroSteps);
-    if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
+    if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -1;
+    }
     
     //long nMicroStepsL = nMicroSteps;
-    if(driver->moveAbsoluteSteps((long)nMicroSteps)<0)    
+    if(driver->moveAbsoluteSteps((long)nMicroSteps)<0){     
         return -2;
+    }
     
     return 0;
 }
@@ -358,14 +374,14 @@ int ActuatorTechnoSoft::homing(homingType mode){
         
         /*     Movement parameters     */
 	//long position_mm = -1000;		/* position command [drive internal position units, encoder counts] */
-	long home_position = 1000;		/* the homing position [drive internal position units, encoder counts] */
-	double high_speed = 10;			/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling]*/
+	//long home_position = 1000;		/* the homing position [drive internal position units, encoder counts] */
+	//double high_speed = 10.0;			/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling]*/
 	                                        /* utilizzata in moveRelative*/
         
-        double low_speed = 1.0;			/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
+        //double low_speed = 1.0;			/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
 	                                        /* Utilizzata in moveAbsolute, riposizionamento*/
         
-        double acceleration = 0.6;		/* acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
+        //double acceleration = 0.6;		/* acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
                                                 /*Utilizzata sia in moveRelative che in moveAbsolute*/
         //double iniTime_ms;
         //double currentTime_ms;
@@ -822,170 +838,17 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
     }
     if(contentRegSRH & ((uint16_t)1<<11)){
         stCode|=ACTUATOR_I2T_WARNING_DRIVE;
-        descStr
-                +="Drive I2T protection warning";
+        descStr+="Drive I2T protection warning";
     }
 
     *alrm = stCode;
     return 0;
 }
-        
-//#if 0
-//BOOL ActuatorTechnoSoft::homing(int minutes,std::string& mode){
-//    
-//    if(mode.compare("mode_1")==0){
-//    /*	Settings of homing parameters for this example */
-//	double high_speed = 10;		/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling] */
-//	double low_speed = 1.;		/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
-//	double acceleration = 0.3;	/* the acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
-//	double deceleration = 1.5;	/* the decceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
-//	long home_position = 1000;	/* the homing position [drive internal position units, encoder counts]  */
-//	time_t long_time;
-//	struct tm *ini_time;
-//	struct tm *new_time;
-//	int iMinute, nMinute;
-//	WORD homing_done = 0;
-//        
-///*	Set the homing parameters */
-///*	--------------------------------------------------------------------*/
-///*	Set the acceleration rate for homing */
-//	if(!driver->setFixedVariable("CACC", acceleration)) 
-//		return -1;		
-///*	Set the deceleration rate for homing */
-//	if(!driver->setDecelerationParam(deceleration)) 
-//		return -2;	
-///*	Set the high speed for homing */
-//	if(!driver->setFixedVariable("CSPD", high_speed)) 
-//		return -3;		
-///*	Set the low speed for homing */
-//	if(!driver->setFixedVariable("HOMESPD", low_speed)) 
-//		return -4;	
-///*	Setup the home position at the end of the homing procedure */
-//	if(!driver->setVariable("HOMEPOS", home_position)) 
-//		return -5;	
-///*	--------------------------------------------------------------------*/
-//
-///*	Call the homing procedure stored in the non-volatile memory of the drive */
-//	/*if(!driver->executeTMLfunction("Homing15"))
-//		return -6;
-//*/
-///*	Wait until the homing process is ended */
-//	time( &long_time );
-//	ini_time = localtime( &long_time );
-//	iMinute = ini_time->tm_min;
-//	
-///*	Wait for homing procedure to end */	
-//	while(homing_done == 0){
-///*
-// * Check the SRL.8 bit - Homing active flag*/
-//
-//		if(!TS_ReadStatus(REG_SRL, &homing_done)){
-//                    /*	Cancel the homing procedure   */
-//                    if(!driver->abortNativeOperation()) 
-//                        return -7;
-//                    /*	Stop the motor */
-//                    if(!driver->stopMotion()) 
-//			return -8;
-//                    return -9;
-//                }
-//
-//		homing_done=((homing_done & 1<<8) == 0 ? 1 : 0);
-//
-///*	If the homing procedure doesn't ends in MINUTES time then abort it */
-//		time( &long_time );
-//		new_time = localtime( &long_time );
-//		nMinute = new_time->tm_min;
-//		if(nMinute - iMinute >= minutes){
-//			break;
-//		}
-//                usleep(1000); // Check each millisecond
-//	}
-//        /*if (homing_done != 0){
-//		printf(" The motor position is set to %ld [position internal units]!\n\n", home_position);
-//		printf(" Homing procedure done!\n");
-//	}
-//         * */
-//        if(homing_done == 0){
-//        /*	Cancel the homing procedure	*/
-//		if(!driver->abortNativeOperation()) 
-//			return -10;
-//
-//        /*	Stop the motor */
-//		if(!driver->stopMotion()) 
-//			return -11;
-//
-//		//printf(" After %d [min] the homing procedure was not finished!\n", minutes);
-//                
-//                return -12;
-//	}	
-//	return 0;
-//    }
-//    else if(mode.compare("mode_2")==0){
-//        /*	Movement parameters	*/
-//	long position = -100000000;		/* position command [drive internal position units, encoder counts] */
-//	long home_position = 1000;		/* the homing position [drive internal position units, encoder counts] */
-//	long cap_position = 0;			/* the position captures at HIGH-LOW transition of negative limit switch */
-//	//double high_speed = 10;			/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling]*/
-//	double low_speed = 1.0;			/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
-//	//double acceleration = 0.6;		/* acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
-//        
-///*	Command a trapezoidal positioning to search the negative limit switch */
-//   
-//        //if(!TS_MoveRelative(position, speed, acceleration, isAdditive,movement,referenceBase)) 
-//		//return FALSE;
-//        
-//        // ATTENZIONE: 
-//        // Adesso position sarà inteso in mm
-//        // ******** E' necessario settare i membri isAdditive,movement,referenceBase 
-//        // al valore desiderato.************
-//        
-//        if(!moveRelativeMillimeters(position))
-//            return -15;
-//	
-///*	Wait for the HIGH-LOW transition on negative limit switch */
-//	if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, WAIT_EVENT, NO_STOP)) 
-//		return FALSE;
-//
-///*	Wait until the motor stops */
-//	if(!TS_SetEventOnMotionComplete(WAIT_EVENT,NO_STOP)) 
-//		return FALSE;
-//
-///*	Read the captured position on limit switch transition */
-//	if(!TS_GetLongVariable("CAPPOS", &cap_position)) return FALSE;
-//	printf(" The captured position is: %ld [drive internal position units]\n", cap_position);
-//
-///*	Command an absolute positioning on the captured position */
-//	if(!TS_MoveAbsolute(cap_position, low_speed, acceleration, UPDATE_IMMEDIATE, FROM_REFERENCE)) 
-//		return FALSE;
-//
-///*	Wait for positioning to end */
-//	if(!TS_SetEventOnMotionComplete(WAIT_EVENT,NO_STOP)) 
-//		return FALSE;
-//
-///*	Set the home position */
-//	if(!TS_SetPosition(home_position)) 
-//		return FALSE;
-//	
-//	printf(" The motor position is set to %ld [position internal units]!\n\n", home_position);
-//	printf(" Homing procedure done!\n");
-//
-//	return TRUE;
-//    }
-//    return 0;
-//}
-
-//int getSWVersion(std::string& versionFm){
-//    
-//    /*	Read the firmware version programmed on the drive */
-//    char version[10];
-//    if (!MSK_GetDriveVersion(version)) 
-//	return -1;
-//    //printf("\n The drive is programmed with %s firmware.\n\n", FW_version);
-//    versionFm.assign(version);        
-//    
-//    return 0;
-//}
-
-
-
-//#endif
+     
+ int ActuatorTechnoSoft::stopMotion(){
+     
+     if(driver->stopMotion()<0){
+         return -1;
+     }
+     return 0;
+ }

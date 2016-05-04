@@ -43,28 +43,28 @@
 #define BAUDRATE	115200
 
 // Features of trapezoidal speed profile
-#define SPEED_DEFAULT 400.0 // 30.0               inizializzabile
-#define ACCELERATION_DEFAULT 0.1 // 0.6           inizializzabile
-#define MAX_SPEED_DEFAULT 500.0                   //inizializzabile
-#define MAX_ACCELERATION_DEFAULT 2.0              //inizializzabile
+#define SPEED_DEFAULT 400.0 // 30.0  [mm/s] 
+#define ACCELERATION_DEFAULT 0.1 // 0.6 [mm/s^2]     
+#define MAX_SPEED_DEFAULT 500.0    // [mm/s]               
+#define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          
 
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 10.0
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 
-#define LOW_SPEED_HOMING_DEFAULT 1.0
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0
-#define ACCELERATION_HOMING_DEFAULT 0.3
-#define MAX_ACCELERATION_HOMING_DEFAULT 0.6
+#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
+#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]
+#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
+#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]
+#define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
+#define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]
 
 //#define MAX_LENGTH_STRING_FROM_SHELL 50
 //#define MAX_COMMAND_LENGTH 10
+#define N_ENCODER_LINES_DEFAULT 800.0 //[mm]
 
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step (MDS)
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro
 #define N_ROUNDS_DEFAULT 20.0 
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
-#define N_ENCODER_LINES_DEFAULT 800.0 //[mm]
-#define RANGE_DEFAULT 20.0  
+ 
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -112,21 +112,21 @@ namespace common{
                 std::string devName;
                 
                 // Trapezoidal profile parameters for move relative and move absolute
-                double speed;
-                double maxSpeed;
-                double acceleration;
-                double maxAcceleration;
+                double speed_mm_s;
+                double maxSpeed_mm_s;
+                double acceleration_mm_s2;
+                double maxAcceleration_mm_s2;
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
                 
                 // Speed parameters regarding homing procedure
-                double highSpeedHoming;
-                double lowSpeedHoming;
-                double maxHighSpeedHoming;
-                double maxLowSpeedHoming;
-                double accelerationHoming;
-                double maxAccelerationHoming;
+                double highSpeedHoming_mm_s; // The homing travel speed
+                double lowSpeedHoming_mm_s;
+                double maxHighSpeedHoming_mm_s;
+                double maxLowSpeedHoming_mm_s;
+                double accelerationHoming_mm_s2;
+                double maxAccelerationHoming_mm_s2;
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
@@ -199,7 +199,8 @@ namespace common{
                 int setReferenceBase(const short& referenceBase);
                 //Get methods
                 int getSpeed(double& speed);
-                                            
+                  
+                int getHighSpeedHoming(double& _highSpeedHoming);
                 
                 //Encoder lines
                 int setEncoderLines(int& _encoderLines);
