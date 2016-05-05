@@ -708,7 +708,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
             return -1;
         }
         
-        short indexRegMER = 5; // see constant REG_MER in TML_lib.h
+        //short indexRegMER = 5; // see constant REG_MER in TML_lib.h
         uint16_t contentReg;
         std::string descStr = "";
         short homingDone = 0; 
@@ -720,7 +720,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         while(!homingDone && ((currentTime_ms-iniTime_ms)<=timeo_homing_ms)){
             
             // lettura registro di interesse per fare il checking
-            if((driver->getStatusOrErrorReg(indexRegMER, contentReg, descStr))<0){
+            if((driver->getStatusOrErrorReg(5, contentReg, descStr))<0){
                 ERR("Reading state error: %s",descStr.c_str());
                 if(driver->stopMotion()<0){
                     return -2;
