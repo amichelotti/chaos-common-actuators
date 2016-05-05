@@ -35,25 +35,10 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 
     if(regex_match(params, match, driver_match, boost::match_extra)){
         std::string dev=match[1];      
-        std::string dev_name=match[2]; 
-        std::string conf_path=match[3];
-        std::string axid=match[4];
+        std::string dev_name=match[2];
+        
         //ATTENZIONE: DEVE ESSERE GESTITE LE SEGUENTI ESPRESSIONI REGOLARI.
         // IL CONTROLLO DEI VALORI APPARTENENTI AL RANGE DI AMMISSIBILITA' DOVRA' ESSERE EFFETTUATO A QUESTO PUNTO
-        
-        
-        
-        std::string strhighSpeedHoming_mm_s = match[12];
-        double highSpeedHoming_mm_s = atof(strhighSpeedHoming_mm_s.c_str());
-        
-        
-        
-        std::string range_mm = match[21]; // valore sempre preso passato dal metadataserver che serve a questo 
-                                      // punto dell'esecuzione
-        if(atof(range_mm.c_str())<0){
-            return -1;
-        }
-        
         try{
             driver = new (std::nothrow) TechnoSoftLowDriver(dev,dev_name);
             // ATTENZIONE: IL COSTRUTTORE TechnoSoftLowDriver DOVRÀ IN SEGUITO 
@@ -77,12 +62,142 @@ int ActuatorTechnoSoft::init(void*initialization_string){
             return -2;                     
         }
         
-        DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
         //int rt= driver->init(conf_path,atoi(axid.c_str()));
         
         // INIZIALIZZAZIONE CANALE + DRIVE/MOTOR
+         // Set trapezoidal profile parameters used for moveRelative(...)
+        std::string conf_path=match[3];
+        
+        std::string straxid=match[4];
+        int axid = atoi(straxid.c_str());
+        if(axid<=0){
+            return -1;
+        }
+        
+        DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
+        
+//        std::string strMaxSpeed_mm_s = match[5];
+//        double maxSpeed_mm_s = atof(strMaxSpeed_mm_s.c_str());
+//        if(maxSpeed_mm_s<=0){
+//            return -1;
+//        }
+//        //maxSpeed_mm_s=_maxSpeed_mm_s; 
+//        
+//        std::string strspeed_mm_s = match[6];
+//        double speed_mm_s = atof(strspeed_mm_s.c_str());
+//        
+//        if(speed_mm_s<0 || speed_mm_s>maxSpeed_mm_s){
+//            return -2;
+//        }
+//        //speed_mm_s = _speed_mm_s; 
+//    
+//        std::string strmaxAcceleration_mm_s2 = match[7];
+//        double maxAcceleration_mm_s2 = atof(strmaxAcceleration_mm_s2.c_str());
+//        if(maxAcceleration_mm_s2<0){
+//            return -3;
+//        }
+//        //maxAcceleration_mm_s2=_maxAcceleration_mm_s2;
+//        
+//        std::string stracceleration_mm_s2 = match[8];
+//        double acceleration_mm_s2 = atof(stracceleration_mm_s2.c_str()); 
+//        if(acceleration_mm_s2 <0 || acceleration_mm_s2 >maxAcceleration_mm_s2){
+//            return -4;
+//        }
+//        acceleration_mm_s2=_acceleration_mm_s2;
+//    
+//        if(_isAdditive!=TRUE && _isAdditive!=FALSE){
+//            return -5;
+//        }  
+//        isAdditive=_isAdditive;
+//    
+//        if((_moveMoment!=UPDATE_NONE) && (_moveMoment!=UPDATE_IMMEDIATE) && (_moveMoment!=UPDATE_ON_EVENT)){
+//            return -6;
+//        }
+//        movement=_moveMoment;
+//    
+//        if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
+//            return -7;
+//        }
+//        referenceBase=_referenceBase;
+//    
+//        // ********************* Set homing parameters *********************
+//        if(_maxHighSpeedHoming_mm_s<=0){
+//            return -8;
+//        }   
+//        maxHighSpeedHoming_mm_s = -_maxHighSpeedHoming_mm_s; // N.B. Dalla tastiera verra' inserito un numero positivo, 
+//                                               // che poi solo all'interno del drive ne verra' considerato 
+//                                               // solamente il segno opposto
+//    
+//        if(_highSpeedHoming_mm_s<0 || _highSpeedHoming_mm_s>_maxHighSpeedHoming_mm_s){
+//            return -9;
+//        }
+//        highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+//    
+//        if(_maxLowSpeedHoming_mm_s<=0){
+//            return -10;
+//        }   
+//        maxLowSpeedHoming_mm_s = _maxLowSpeedHoming_mm_s; // Verra' considerato il solo valore positivo perche' utilizzato
+//                                            // nel moveAbsoluteHoming
+//    
+//        if((_lowSpeedHoming_mm_s<0) || (_lowSpeedHoming_mm_s>_maxLowSpeedHoming_mm_s)){
+//            return -11;
+//        }
+//        lowSpeedHoming_mm_s=_lowSpeedHoming_mm_s;
+//    
+//        if(_maxAccelerationHoming_mm_s2<=0){
+//            return -12;
+//        }
+//        maxAccelerationHoming_mm_s2=_maxAccelerationHoming_mm_s2;
+//    
+//        if(_accelerationHoming_mm_s2<0 || _accelerationHoming_mm_s2>_maxAccelerationHoming_mm_s2){
+//            return -13;
+//        }
+//        accelerationHoming_mm_s2 = _accelerationHoming_mm_s2; 
+//    
+//        if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
+//            return -5;
+//        }  
+//        isAdditiveHoming=_isAdditiveHoming;
+//    
+//        if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
+//            return -11;
+//        }
+//        movementHoming=_movementHoming;  
+//    
+//        if((_referenceBaseHoming!=FROM_MEASURE) && _referenceBaseHoming!=FROM_REFERENCE){
+//            return -12;
+//        }
+//        referenceBaseHoming=_referenceBaseHoming;
+//    
+//        //____________________________________
+//        if(_encoderLines<=0){
+//            return -6;
+//        }   
+//        encoderLines= _encoderLines;
+//        
+//        
+//        std::string strmaxHighSpeedHoming_mm_s = match[12];
+//        double maxHighSpeedHoming_mm_s = atof(strmaxHighSpeedHoming_mm_s.c_str());
+//        if(maxHighSpeedHoming_mm_s<=0){
+//            return -3;
+//        }
+//        maxHighSpeedHoming_mm_s = -maxHighSpeedHoming_mm_s;
+//        //
+//        std::string strhighSpeedHoming_mm_s = match[10];
+//        double highSpeedHoming_mm_s = atof(strhighSpeedHoming_mm_s.c_str());
+//        if(highSpeedHoming_mm_s<0 || highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
+//            return -4;
+//        }
+//        highSpeedHoming_mm_s = -highSpeedHoming_mm_s;
+//        //
+//        std::string range_mm = match[21]; // valore sempre preso passato dal metadataserver che serve a questo 
+//                                      // punto dell'esecuzione
+//        if(atof(range_mm.c_str())<0){
+//            return -5;
+//        }
+        //
         int val;
-        if((val=driver->init(conf_path,atoi(axid.c_str())))<0){
+        if((val=driver->init(conf_path,axid))<0){
             printf("Iipologia di errore in fase di inizializzazione %d \n",val);
             // Deallocazione oggetto canale ()
             try{
@@ -104,16 +219,16 @@ int ActuatorTechnoSoft::init(void*initialization_string){
                      //.....
                      //.....
                 e.badElectricPowerInfo();
-                return -3;
+                return -6;
             }
-            return -4;
+            return -7;
         }
         
         // A questo punto siamo certi che l'apertura del canale è andata a buon fine
         // ed i parametri del drive/motor sono stati inizializzati correttamente
 	
         //Initialize DEFAULT VALUE for timeout of homing procedure, dependent on the range of slit
-        timeo_homing_ms = (atof(range_mm.c_str())/(highSpeedHoming_mm_s/2))*1000;
+        //timeo_homing_ms = (atof(range_mm.c_str())/(highSpeedHoming_mm_s/2))*1000;
         
         readyState = true;
 	return 0;
