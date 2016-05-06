@@ -62,14 +62,13 @@ int main(int argc,const char* argv[]){
     }
     DPRINT("************** Current position counter %f, before movement **************",rpos1);
     
-    
     DPRINT("************** Prima movimentazione di 10 mm **************");
     // Spostamento della slitta 
     if(mySlit->moveRelativeMillimeters(10)<0){
 	fprintf(stderr,"************** Error returned by movement operation **************\n");
         return -5;
     }
-	 
+    	 
     sleep(30); // // Attesa completamento movimentazione, in seconds
     // Lettura posizione tramite encoder e counter
     if(mySlit->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
@@ -84,19 +83,18 @@ int main(int argc,const char* argv[]){
     }
     DPRINT("************** Current position counter %f, before movement **************",rpos1);
     
-    
     uint64_t timeo_homing_ms = 20000;
-    
+       
     if(mySlit->setTimeoutHoming(timeo_homing_ms)<0){ //Settiamo il timeout = 100000
         return -6;
     }
-
+      
     int respHoming;
-    if((respHoming=mySlit->homing(common::actuators::AbstractActuator::homing2))<0){
+    if((respHoming=mySlit->homing(common::actuators::AbstractActuator::defaultHoming))<0){
         fprintf(stderr,"************** Error returned by movement operation with code %d**************\n",respHoming);
         return -7;
     }
-    
+       
 ////    
 ////    int resp;
 ////    if((resp=mySlit->setTrapezoidalProfile(50, 0.2, 0, 1, 1))<0){

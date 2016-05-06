@@ -411,13 +411,13 @@ int TechnoSoftLowDriver::stopMotion(){
 
 int TechnoSoftLowDriver::providePower(){
     DPRINT("provide power to axis:%d",axisID);
-      if(!TS_SelectAxis(axisID)){
-        ERR("ALEDEBUG Error selecting axis");
-        return -1;
-    }
+//      if(!TS_SelectAxis(axisID)){
+//        ERR("ALEDEBUG Error selecting axis");
+//        return -1;
+//    }
 
     if(!TS_Power(POWER_ON)){
-        ERR("ALEDEBUG Error selecting axis");
+        //ERR("ALEDEBUG Error selecting axis");
         return -2;
     }
 				
@@ -427,13 +427,13 @@ int TechnoSoftLowDriver::providePower(){
         /* Check the status of the power stage */
         if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
 	    
-            ERR("ALEDEBUG Error TS_ReadStatus");
+            //ERR("ALEDEBUG Error TS_ReadStatus");
             return -3;
         }
 
         sAxiOn_flag=((sAxiOn_flag & 1<<15) != 0 ? 1 : 0);
     }
-    DPRINT("ALEDEBUG correctly powered on");
+    //DPRINT("ALEDEBUG correctly powered on");
     poweron=true;
     return 0;
 }
@@ -457,8 +457,9 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
         //return -1;
     //}
     
-    if(stopMotion()<0)
+    if(stopMotion()<0){
         return -1;
+    }
     // DA TOGLIERE IL PRIMA POSSIBILE QUESTA ISTRUZIONE
     if(poweron){
         if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
