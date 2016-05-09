@@ -113,9 +113,9 @@ namespace common{
                 
                 // Trapezoidal profile parameters for move relative and move absolute
                 double speed_mm_s;
-                double maxSpeed_mm_s;
+                double maxSpeed_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double acceleration_mm_s2;
-                double maxAcceleration_mm_s2;
+                double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
@@ -123,10 +123,10 @@ namespace common{
                 // Speed parameters regarding homing procedure
                 double highSpeedHoming_mm_s; // The homing travel speed
                 double lowSpeedHoming_mm_s;
-                double maxHighSpeedHoming_mm_s;
-                double maxLowSpeedHoming_mm_s;
+                double maxHighSpeedHoming_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double maxLowSpeedHoming_mm_s;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double accelerationHoming_mm_s2;
-                double maxAccelerationHoming_mm_s2;
+                double maxAccelerationHoming_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
@@ -192,6 +192,7 @@ namespace common{
                 int moveRelativeStepsHoming(const long& deltaPosition);
                 int moveVelocityHoming();
                 
+                // Set trapezoidal profile parameters
                 int setSpeed(const double& speed);
                 int setAcceleration(const double& acceleration);
                 int setAdditive(const BOOL& isAdditive);
@@ -201,6 +202,16 @@ namespace common{
                 int getSpeed(double& speed);
                   
                 int getHighSpeedHoming(double& _highSpeedHoming);
+                
+                
+                //Set homing parameters
+                int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
+                int setlowSpeedHoming(const double& _lowSpeedHoming_mm_s);
+                int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
+                int setAdditiveHoming(const BOOL& isAdditive);
+                int setMovementHoming(const short& movement);
+                int setReferenceBaseHoming(const short& referenceBase);
+                
                 
                 //Encoder lines
                 int setEncoderLines(int& _encoderLines);

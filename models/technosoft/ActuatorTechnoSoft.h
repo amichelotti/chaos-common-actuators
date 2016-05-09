@@ -71,6 +71,16 @@ namespace common{
                 int setMovement(int32_t movement); // NOTA: int32_t dovra' essere castato a short
                 int setReferenceBase(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
                 
+                // Set Homing parameters
+                int sethighSpeedHoming(double speed);
+                int setlowSpeedHoming(double speed);
+                
+                int setAccelerationHoming(double acceleration);
+                int setAdditiveHoming(bool isAdditive); // NOTA: bool dovra' essere castato a int
+                int setMovementHoming(int32_t movement); // NOTA: int32_t dovra' essere castato a short
+                int setReferenceBaseHoming(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
+                
+                
                 int moveAbsoluteMillimeters(double mm);
                 int moveAbsoluteMillimetersHoming(double mm);
                 
@@ -105,7 +115,7 @@ namespace common{
         int getHWVersion(std::string& version){version="technosofthw-0.0";return 0;}
 
             
-            };
+        };
 	}
     }
 }

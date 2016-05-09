@@ -120,18 +120,22 @@ typedef enum {
         
         
         virtual int moveRelativeMillimeters(double mm)=0;
-        
-        virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;
 
+        // Set trapezoidal profile parameters
         virtual int setSpeed(double speed)=0;
-        
         virtual int setAcceleration(double acceleration)=0;
-        
         virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
-        
         virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
-        
         virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
+        virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;
+        
+        // Set Homing parameters
+        virtual int sethighSpeedHoming(double speed)=0;
+        virtual int setlowSpeedHoming(double speed)=0;
+        virtual int setAccelerationHoming(double acceleration)=0;
+        virtual int setAdditiveHoming(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
+        virtual int setMovementHoming(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
+        virtual int setReferenceBaseHoming(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
         
         
         /**

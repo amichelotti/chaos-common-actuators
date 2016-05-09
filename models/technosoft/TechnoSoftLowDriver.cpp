@@ -327,7 +327,59 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
     referenceBase=_referenceBase; 
     return 0;
 }
-                
+  
+// Set homing parameters
+int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
+    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
+    
+    if(_highSpeedHoming_mm_s<0 || _highSpeedHoming_mm_s>maxSpeed_mm_s){
+        return -1;
+    }
+    highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
+    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
+    
+    if(_lowSpeedHoming_mm_s<0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+        return -1;
+    }
+    lowSpeedHoming_mm_s = _lowSpeedHoming_mm_s;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
+    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    if(_accelerationHoming_mm_s2<0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
+        return -1;
+    }
+    accelerationHoming_mm_s2 = _accelerationHoming_mm_s2;
+    return 0;
+}
+int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
+    
+    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
+        return -1;
+    }   
+    isAdditiveHoming = _isAdditiveHoming;
+    return 0;
+}
+int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
+    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
+        return -1;
+    }
+    movementHoming = _movementHoming;   
+    return 0;
+}
+int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
+    if((_referenceBaseHoming!=FROM_MEASURE) && _referenceBaseHoming!=FROM_REFERENCE){
+        return -1;
+    }
+    referenceBaseHoming=_referenceBaseHoming; 
+    return 0;
+}
+
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(int& _encoderLines){
     if(_encoderLines<=0){
