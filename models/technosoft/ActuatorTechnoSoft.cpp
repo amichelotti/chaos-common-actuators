@@ -74,12 +74,12 @@ int ActuatorTechnoSoft::init(void*initialization_string){
             return -3;
         }
         
-        // RANGE, utilizzato solo qui per calcolare il timeout dedicato alla procedura di homing
-        std::string strrange_mm = match[5]; // valore sempre preso passato dal metadataserver che serve a questo 
-                                      // punto dell'esecuzione
-        if((range_mm=atof(strrange_mm.c_str()))<=0){
-            return -4;
-        } 
+//        // RANGE, utilizzato solo qui per calcolare il timeout dedicato alla procedura di homing
+//        std::string strrange_mm = match[5]; // valore sempre preso passato dal metadataserver che serve a questo 
+//                                      // punto dell'esecuzione
+//        if((range_mm=atof(strrange_mm.c_str()))<=0){
+//            return -4;
+//        } 
         
         DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
         
@@ -239,10 +239,15 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 	
         //Initialize DEFAULT VALUE for timeout of homing procedure, dependent on the range of slit
         double highSpeedHoming_mm_s;
-        highSpeedHoming_mm_s = -driver->getHighSpeedHoming(highSpeedHoming_mm_s); // highSpeedHoming_mm_s < 0
-        timeo_homing_ms = (range_mm/(highSpeedHoming_mm_s/2))*1000;
+        driver->getHighSpeedHoming(highSpeedHoming_mm_s); // highSpeedHoming_mm_s < 0
+        DPRINT("highSpeedHoming_mm_s nell'init=%f",highSpeedHoming_mm_s);
         
+        range_mm = RANGE_MM_DEFAULT;
+        timeo_homing_ms = (uint64_t)((range_mm/(-highSpeedHoming_mm_s/2))*1000);
+        DPRINT("range_mm=%f",range_mm);
+        DPRINT("highSpeedHoming_mm_s/2=%f",highSpeedHoming_mm_s/2);
         
+        DPRINT("Valore calcolato per l'homing: %lu",timeo_homing_ms);
         
         readyState = true;
 	return 0;
@@ -466,6 +471,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
 	double acceleration = 0.3;	/* the acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
 	double deceleration = 1.5;	/* the decceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
 	long home_position = 1000;	/* the homing position [drive internal position units, encoder counts]  */
+        
         
 /*	Set the homing parameters */
 /*	--------------------------------------------------------------------*/

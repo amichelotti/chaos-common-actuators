@@ -20,6 +20,8 @@
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]                                               (da MDS)
+#define RANGE_MM_DEFAULT 100.0
+
 
 #ifndef ActuatorTechnoSoft_h
 #define ActuatorTechnoSoft_h

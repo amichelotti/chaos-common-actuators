@@ -86,14 +86,14 @@ int main(int argc,const char* argv[]){
     DPRINT("************** Current position encoder %f, after move relative **************",rpos);
     DPRINT("************** Current position counter %f, after move relative **************",rpos1);
     
-    uint64_t timeo_homing_ms = 20000;
-       
-    if(mySlit->setTimeoutHoming(timeo_homing_ms)<0){ //Settiamo il timeout = 100000
-        return -6;
-    }
+//    uint64_t timeo_homing_ms = 20000;
+//       
+//    if(mySlit->setTimeoutHoming(timeo_homing_ms)<0){ //Settiamo il timeout = 100000
+//        return -6;
+//    }
       
     int respHoming;
-    if((respHoming=mySlit->homing(common::actuators::AbstractActuator::nativeHoming15))<0){
+    if((respHoming=mySlit->homing(common::actuators::AbstractActuator::homing2))<0){
         fprintf(stderr,"************** Error returned by movement operation with code %d**************\n",respHoming);
         return -7;
     }

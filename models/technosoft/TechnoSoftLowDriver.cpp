@@ -422,6 +422,7 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 
 int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
     
+    DPRINT("Valore letto dell'high speed homing %f:", highSpeedHoming_mm_s);
     _highSpeedHoming_mm_s = highSpeedHoming_mm_s;
     return 0;
 }
