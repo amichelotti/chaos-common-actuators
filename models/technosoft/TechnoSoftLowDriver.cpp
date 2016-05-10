@@ -97,8 +97,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _maxAccelerationHoming_mm_s2,
                         const BOOL _isAdditiveHoming,
                         const short _movementHoming,
-                        const short _referenceBaseHoming,
-                        const double _encoderLines){
+                        const short _referenceBaseHoming){
     
     // Set trapezoidal profile parameters used for moveRelative(...)
     if(_maxSpeed_mm_s<=0){
@@ -185,11 +184,11 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
     referenceBaseHoming=_referenceBaseHoming;
     
-    //____________________________________
-     if(_encoderLines<=0){
-        return -6;
-    }   
-    encoderLines= _encoderLines;
+//    //____________________________________
+//     if(_encoderLines<=0){
+//        return -6;
+//    }   
+//    encoderLines= _encoderLines;
     
     // Inizializziamo l'asse ID del motore
     axisID=_axisID;
@@ -327,7 +326,59 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
     referenceBase=_referenceBase; 
     return 0;
 }
-                
+  
+// Set homing parameters
+int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
+    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
+    
+    if(_highSpeedHoming_mm_s<0 || _highSpeedHoming_mm_s>maxSpeed_mm_s){
+        return -1;
+    }
+    highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
+    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
+    
+    if(_lowSpeedHoming_mm_s<0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+        return -1;
+    }
+    lowSpeedHoming_mm_s = _lowSpeedHoming_mm_s;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
+    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    if(_accelerationHoming_mm_s2<0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
+        return -1;
+    }
+    accelerationHoming_mm_s2 = _accelerationHoming_mm_s2;
+    return 0;
+}
+int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
+    
+    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
+        return -1;
+    }   
+    isAdditiveHoming = _isAdditiveHoming;
+    return 0;
+}
+int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
+    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
+        return -1;
+    }
+    movementHoming = _movementHoming;   
+    return 0;
+}
+int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
+    if((_referenceBaseHoming!=FROM_MEASURE) && _referenceBaseHoming!=FROM_REFERENCE){
+        return -1;
+    }
+    referenceBaseHoming=_referenceBaseHoming; 
+    return 0;
+}
+
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(int& _encoderLines){
     if(_encoderLines<=0){
@@ -371,6 +422,7 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 
 int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
     
+    DPRINT("Valore letto dell'high speed homing %f:", highSpeedHoming_mm_s);
     _highSpeedHoming_mm_s = highSpeedHoming_mm_s;
     return 0;
 }
@@ -411,13 +463,13 @@ int TechnoSoftLowDriver::stopMotion(){
 
 int TechnoSoftLowDriver::providePower(){
     DPRINT("provide power to axis:%d",axisID);
-      if(!TS_SelectAxis(axisID)){
-        ERR("ALEDEBUG Error selecting axis");
-        return -1;
-    }
+//      if(!TS_SelectAxis(axisID)){
+//        ERR("ALEDEBUG Error selecting axis");
+//        return -1;
+//    }
 
     if(!TS_Power(POWER_ON)){
-        ERR("ALEDEBUG Error selecting axis");
+        //ERR("ALEDEBUG Error selecting axis");
         return -2;
     }
 				
@@ -427,13 +479,13 @@ int TechnoSoftLowDriver::providePower(){
         /* Check the status of the power stage */
         if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
 	    
-            ERR("ALEDEBUG Error TS_ReadStatus");
+            //ERR("ALEDEBUG Error TS_ReadStatus");
             return -3;
         }
 
         sAxiOn_flag=((sAxiOn_flag & 1<<15) != 0 ? 1 : 0);
     }
-    DPRINT("ALEDEBUG correctly powered on");
+    //DPRINT("ALEDEBUG correctly powered on");
     poweron=true;
     return 0;
 }
@@ -457,8 +509,9 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
         //return -1;
     //}
     
-    if(stopMotion()<0)
+    if(stopMotion()<0){
         return -1;
+    }
     // DA TOGLIERE IL PRIMA POSSIBILE QUESTA ISTRUZIONE
     if(poweron){
         if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto

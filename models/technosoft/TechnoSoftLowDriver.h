@@ -32,39 +32,33 @@
 #if defined(WINDOWS) || defined(WIN32)
 #define CHANNEL_NAME "COM1"
 #else
-#define CHANNEL_NAME "/dev/ttyr00" // == "COM1" in windows
+#define CHANNEL_NAME "/dev/ttyr00" // == "COM1" in windows  // (da MDS)
 #endif
 
-#define CHANNEL_TYPE CHANNEL_RS232
+#define CHANNEL_TYPE CHANNEL_RS232                          //(da MDS)
 #define NAXIS 1
 #undef HOST_ID
-#define HOST_ID		0
-#define AXIS_ID_01		14
-#define BAUDRATE	115200
+#define HOST_ID		 0                                  //(da MDS)
+#define AXIS_ID_01	14                                  //(da MDS)
+#define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
 #define SPEED_DEFAULT 400.0 // 30.0  [mm/s] 
 #define ACCELERATION_DEFAULT 0.1 // 0.6 [mm/s^2]     
-#define MAX_SPEED_DEFAULT 500.0    // [mm/s]               
-#define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          
+#define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS) 
+#define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
 
 // Features of homing procedure
 #define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]
+#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS)
 #define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]
+#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)
 #define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
-#define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]
+#define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
 
 //#define MAX_LENGTH_STRING_FROM_SHELL 50
 //#define MAX_COMMAND_LENGTH 10
-#define N_ENCODER_LINES_DEFAULT 800.0 //[mm]
 
-#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step (MDS)
-#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro
-#define N_ROUNDS_DEFAULT 20.0 
-#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
- 
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -113,9 +107,9 @@ namespace common{
                 
                 // Trapezoidal profile parameters for move relative and move absolute
                 double speed_mm_s;
-                double maxSpeed_mm_s;
+                double maxSpeed_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double acceleration_mm_s2;
-                double maxAcceleration_mm_s2;
+                double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
@@ -123,10 +117,10 @@ namespace common{
                 // Speed parameters regarding homing procedure
                 double highSpeedHoming_mm_s; // The homing travel speed
                 double lowSpeedHoming_mm_s;
-                double maxHighSpeedHoming_mm_s;
-                double maxLowSpeedHoming_mm_s;
+                double maxHighSpeedHoming_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double maxLowSpeedHoming_mm_s;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double accelerationHoming_mm_s2;
-                double maxAccelerationHoming_mm_s2;
+                double maxAccelerationHoming_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
@@ -179,8 +173,7 @@ namespace common{
                         const double _maxAccelerationHoming=MAX_ACCELERATION_HOMING_DEFAULT,
                         const BOOL _isAdditiveHoming=FALSE,
                         const short _movementHoming=UPDATE_IMMEDIATE,
-                        const short _referenceBaseHoming=FROM_REFERENCE,
-                        const double encoderLines=N_ENCODER_LINES_DEFAULT);
+                        const short _referenceBaseHoming=FROM_REFERENCE);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
@@ -192,6 +185,7 @@ namespace common{
                 int moveRelativeStepsHoming(const long& deltaPosition);
                 int moveVelocityHoming();
                 
+                // Set trapezoidal profile parameters
                 int setSpeed(const double& speed);
                 int setAcceleration(const double& acceleration);
                 int setAdditive(const BOOL& isAdditive);
@@ -201,6 +195,16 @@ namespace common{
                 int getSpeed(double& speed);
                   
                 int getHighSpeedHoming(double& _highSpeedHoming);
+                
+                
+                //Set homing parameters
+                int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
+                int setlowSpeedHoming(const double& _lowSpeedHoming_mm_s);
+                int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
+                int setAdditiveHoming(const BOOL& isAdditive);
+                int setMovementHoming(const short& movement);
+                int setReferenceBaseHoming(const short& referenceBase);
+                
                 
                 //Encoder lines
                 int setEncoderLines(int& _encoderLines);

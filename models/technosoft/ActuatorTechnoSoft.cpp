@@ -71,8 +71,15 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string straxid=match[4];
         int axid = atoi(straxid.c_str());
         if(axid<=0){
-            return -1;
+            return -3;
         }
+        
+//        // RANGE, utilizzato solo qui per calcolare il timeout dedicato alla procedura di homing
+//        std::string strrange_mm = match[5]; // valore sempre preso passato dal metadataserver che serve a questo 
+//                                      // punto dell'esecuzione
+//        if((range_mm=atof(strrange_mm.c_str()))<=0){
+//            return -4;
+//        } 
         
         DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
         
@@ -184,11 +191,14 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 //        maxHighSpeedHoming_mm_s = -maxHighSpeedHoming_mm_s;
 //        //
 //        std::string strhighSpeedHoming_mm_s = match[10];
-//        double highSpeedHoming_mm_s = atof(strhighSpeedHoming_mm_s.c_str());
+          //double highSpeedHoming_mm_s = atof(strhighSpeedHoming_mm_s.c_str());
+//          double highSpeedHoming_mm_s;
+//          double highSpeedHoming_mm_s = -driver->getHighSpeedHoming(highSpeedHoming_mm_s); // highSpeedHoming_mm_s < 0
+          
 //        if(highSpeedHoming_mm_s<0 || highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
 //            return -4;
 //        }
-//        highSpeedHoming_mm_s = -highSpeedHoming_mm_s;
+//          highSpeedHoming_mm_s = -highSpeedHoming_mm_s;
 //        //
 //        std::string range_mm = match[21]; // valore sempre preso passato dal metadataserver che serve a questo 
 //                                      // punto dell'esecuzione
@@ -228,7 +238,16 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         // ed i parametri del drive/motor sono stati inizializzati correttamente
 	
         //Initialize DEFAULT VALUE for timeout of homing procedure, dependent on the range of slit
-        //timeo_homing_ms = (atof(range_mm.c_str())/(highSpeedHoming_mm_s/2))*1000;
+        double highSpeedHoming_mm_s;
+        driver->getHighSpeedHoming(highSpeedHoming_mm_s); // highSpeedHoming_mm_s < 0
+        DPRINT("highSpeedHoming_mm_s nell'init=%f",highSpeedHoming_mm_s);
+        
+        range_mm = RANGE_MM_DEFAULT;
+        timeo_homing_ms = (uint64_t)((range_mm/(-highSpeedHoming_mm_s/2))*1000);
+        DPRINT("range_mm=%f",range_mm);
+        DPRINT("highSpeedHoming_mm_s/2=%f",highSpeedHoming_mm_s/2);
+        
+        DPRINT("Valore calcolato per l'homing: %lu",timeo_homing_ms);
         
         readyState = true;
 	return 0;
@@ -268,7 +287,7 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
     // Calcolo argomento funzione moveRelativeSteps
     double deltaMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     
-    if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ 
+    if(deltaMicroSteps<LONG_MIN || deltaMicroSteps>LONG_MAX){ 
         printf("Out of range\n");
         return -1;
     }
@@ -280,7 +299,6 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
     
     return 0;
 }
-
 
 int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase){
     
@@ -337,6 +355,50 @@ int ActuatorTechnoSoft::setReferenceBase(int32_t referenceBase){
     return 0;
 }
 
+// Set homing parameters
+int ActuatorTechnoSoft::sethighSpeedHoming(double speed){
+    if(driver->sethighSpeedHoming(speed)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setlowSpeedHoming(double speed){
+    if(driver->setlowSpeedHoming(speed)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setAccelerationHoming(double acceleration){
+    if(driver-> setaccelerationHoming(acceleration)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setAdditiveHoming(bool isAdditive){
+    if(driver->setAdditiveHoming((int)isAdditive)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setMovementHoming(int32_t movement){
+    if(driver->setMovementHoming((short)movement)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setReferenceBaseHoming(int32_t referenceBase){
+    if(driver->setReferenceBaseHoming((short)referenceBase)<0){
+        return -1;
+    }                
+    return 0;
+}
+
+// Move absolute homing
 int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){ 
     
     // Calcolo argomento funzione moveAbsoluteSteps
@@ -405,34 +467,41 @@ int ActuatorTechnoSoft::homing(homingType mode){
     if(mode==nativeHoming15){
     /*	Settings of homing parameters for this example */
 	double high_speed = 10;		/* the homing travel speed [drive internal speed units, encoder counts/slow loop sampling] */
-	double low_speed = 1.;		/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
+	double low_speed = 1.0;		/* the homing brake speed [drive internal speed units, encoder counts/slow loop sampling] */
 	double acceleration = 0.3;	/* the acceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
 	double deceleration = 1.5;	/* the decceleration rate [drive internal acceleration units, encoder counts/slow loop sampling^2] */
 	long home_position = 1000;	/* the homing position [drive internal position units, encoder counts]  */
         
+        
 /*	Set the homing parameters */
 /*	--------------------------------------------------------------------*/
 /*	Set the acceleration rate for homing */
-	if(driver->setFixedVariable("CACC", acceleration)<0) 
-		return -1;		
+	if(driver->setFixedVariable("CACC", acceleration)<0){ 
+		return -1;
+        }
 /*	Set the deceleration rate for homing */
-	if(driver->setDecelerationParam(deceleration)<0) 
-		return -2;	
+	if(driver->setDecelerationParam(deceleration)<0){  
+		return -2;
+        }
 /*	Set the high speed for homing */
-	if(driver->setFixedVariable("CSPD", high_speed)<0) 
-		return -3;		
+	if(driver->setFixedVariable("CSPD", high_speed)<0){
+		return -3;
+        }
 /*	Set the low speed for homing */
-	if(driver->setFixedVariable("HOMESPD", low_speed)<0) 
-		return -4;	
+	if(driver->setFixedVariable("HOMESPD", low_speed)<0){  
+		return -4;
+        }
 /*	Setup the home position at the end of the homing procedure */
-	if(driver->setVariable("HOMEPOS", home_position)<0) 
-		return -5;	
+	if(driver->setVariable("HOMEPOS", home_position)<0){ 
+		return -5;
+        }
 /*	--------------------------------------------------------------------*/
 
         std::string str="Homing15";
 /*	Call the homing procedure stored in the non-volatile memory of the drive */
-	if(driver->executeTMLfunction(str)<0) 
+	if(driver->executeTMLfunction(str)<0){ 
 		return -6;
+        }
 
 /*	Wait until the homing process is ended */
         //long currentTime_ms;
@@ -453,7 +522,8 @@ int ActuatorTechnoSoft::homing(homingType mode){
 			return -8; // HARD ERROR
                     return -9;
                 }
-		homing_done=((homing_done & 1<<8) == 0 ? 1 : 0);
+		homing_done=((homing_done & (uint16_t)1<<8) == 0 ? 1 : 0);
+                DPRINT("Lettura bit di interesse:%d",(homing_done & (uint16_t)1<<8));
 
 /*	If the homing procedure doesn't ends in MINUTES time then abort it */
                 gettimeofday(&structTimeEval, NULL);
@@ -466,22 +536,25 @@ int ActuatorTechnoSoft::homing(homingType mode){
         
         if(homing_done == 0){ // Time out scaduto
         /*	Cancel the homing procedure	*/
-		if(driver->abortNativeOperation()<0) 
+		if(driver->abortNativeOperation()<0){ 
 			return -10;
+                }
 
         /*	Stop the motor */
-		if(driver->stopMotion()<0) 
+		if(driver->stopMotion()<0){ 
 			return -11;
+                }
                 
                 return -12;
 	}
       
         // Reset encoder e counter
-        if(driver->resetEncoder()<0)
+        if(driver->resetEncoder()<0){
             return -13;
-        if(driver->resetCounter()<0)
+        }
+        if(driver->resetCounter()<0){
             return -14;
-        
+        }
 	return 0;
     }
     else if(mode==homing2){
@@ -728,7 +801,8 @@ int ActuatorTechnoSoft::homing(homingType mode){
                 return -3;
             }
             // lettura bit di interesse
-            homingDone=((contentReg & ((uint16_t)1)<<8) != 0 ? 1 : 0);
+            homingDone=((contentReg & ((uint16_t)1)<<7) != 0 ? 1 : 0);
+            //DPRINT("Lettura bit di interesse:%d",contentReg & ((uint16_t)1)<<7);
             
             gettimeofday(&structTimeEval, NULL);
             currentTime_ms = structTimeEval.tv_sec * 1000 + structTimeEval.tv_usec / 1000;
@@ -755,11 +829,11 @@ int ActuatorTechnoSoft::homing(homingType mode){
 	}
 	else{ // Time needed is over time out
 		
-		if(driver->stopMotion()<0){
-                    return -8;
-                }
-		DPRINT("************** Operazione di homing non completata nell'intervallo di tempo specificato. Il motore è stato fermato **************");
-		return -9;
+            if(driver->stopMotion()<0){
+                 return -8;
+            }
+            DPRINT("************** Operazione di homing non completata nell'intervallo di tempo specificato. Il motore è stato fermato **************");
+            return -9;
 	}
     }
     else{ // La modalità specificata non è corretta

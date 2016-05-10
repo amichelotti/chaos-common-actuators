@@ -15,6 +15,13 @@
 //#define N_ROUNDS_DEFAULT 20.0 
 //#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
 
+#define N_ENCODER_LINES_DEFAULT 800.0 //[mm]                                                          (da MDS)
+#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
+#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
+#define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
+#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]                                               (da MDS)
+#define RANGE_MM_DEFAULT 100.0
+
 
 #ifndef ActuatorTechnoSoft_h
 #define ActuatorTechnoSoft_h
@@ -71,6 +78,16 @@ namespace common{
                 int setMovement(int32_t movement); // NOTA: int32_t dovra' essere castato a short
                 int setReferenceBase(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
                 
+                // Set Homing parameters
+                int sethighSpeedHoming(double speed);
+                int setlowSpeedHoming(double speed);
+                
+                int setAccelerationHoming(double acceleration);
+                int setAdditiveHoming(bool isAdditive); // NOTA: bool dovra' essere castato a int
+                int setMovementHoming(int32_t movement); // NOTA: int32_t dovra' essere castato a short
+                int setReferenceBaseHoming(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
+                
+                
                 int moveAbsoluteMillimeters(double mm);
                 int moveAbsoluteMillimetersHoming(double mm);
                 
@@ -105,7 +122,7 @@ namespace common{
         int getHWVersion(std::string& version){version="technosofthw-0.0";return 0;}
 
             
-            };
+        };
 	}
     }
 }
