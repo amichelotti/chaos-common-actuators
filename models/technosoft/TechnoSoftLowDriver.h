@@ -32,39 +32,33 @@
 #if defined(WINDOWS) || defined(WIN32)
 #define CHANNEL_NAME "COM1"
 #else
-#define CHANNEL_NAME "/dev/ttyr00" // == "COM1" in windows
+#define CHANNEL_NAME "/dev/ttyr00" // == "COM1" in windows  // (da MDS)
 #endif
 
-#define CHANNEL_TYPE CHANNEL_RS232
+#define CHANNEL_TYPE CHANNEL_RS232                          //(da MDS)
 #define NAXIS 1
 #undef HOST_ID
-#define HOST_ID		0
-#define AXIS_ID_01		14
-#define BAUDRATE	115200
+#define HOST_ID		 0                                  //(da MDS)
+#define AXIS_ID_01	14                                  //(da MDS)
+#define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
 #define SPEED_DEFAULT 400.0 // 30.0  [mm/s] 
 #define ACCELERATION_DEFAULT 0.1 // 0.6 [mm/s^2]     
-#define MAX_SPEED_DEFAULT 500.0    // [mm/s]               
-#define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          
+#define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS) 
+#define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
 
 // Features of homing procedure
 #define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]
+#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS)
 #define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]
+#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)
 #define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
-#define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]
+#define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
 
 //#define MAX_LENGTH_STRING_FROM_SHELL 50
 //#define MAX_COMMAND_LENGTH 10
-#define N_ENCODER_LINES_DEFAULT 800.0 //[mm]
 
-#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step (MDS)
-#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro
-#define N_ROUNDS_DEFAULT 20.0 
-#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
- 
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -179,8 +173,7 @@ namespace common{
                         const double _maxAccelerationHoming=MAX_ACCELERATION_HOMING_DEFAULT,
                         const BOOL _isAdditiveHoming=FALSE,
                         const short _movementHoming=UPDATE_IMMEDIATE,
-                        const short _referenceBaseHoming=FROM_REFERENCE,
-                        const double encoderLines=N_ENCODER_LINES_DEFAULT);
+                        const short _referenceBaseHoming=FROM_REFERENCE);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);

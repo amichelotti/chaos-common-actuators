@@ -71,8 +71,15 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string straxid=match[4];
         int axid = atoi(straxid.c_str());
         if(axid<=0){
-            return -1;
+            return -3;
         }
+        
+        // RANGE, utilizzato solo qui per calcolare il timeout dedicato alla procedura di homing
+        std::string strrange_mm = match[5]; // valore sempre preso passato dal metadataserver che serve a questo 
+                                      // punto dell'esecuzione
+        if((range_mm=atof(strrange_mm.c_str()))<=0){
+            return -4;
+        } 
         
         DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
         
@@ -184,11 +191,14 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 //        maxHighSpeedHoming_mm_s = -maxHighSpeedHoming_mm_s;
 //        //
 //        std::string strhighSpeedHoming_mm_s = match[10];
-//        double highSpeedHoming_mm_s = atof(strhighSpeedHoming_mm_s.c_str());
+          //double highSpeedHoming_mm_s = atof(strhighSpeedHoming_mm_s.c_str());
+//          double highSpeedHoming_mm_s;
+//          double highSpeedHoming_mm_s = -driver->getHighSpeedHoming(highSpeedHoming_mm_s); // highSpeedHoming_mm_s < 0
+          
 //        if(highSpeedHoming_mm_s<0 || highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
 //            return -4;
 //        }
-//        highSpeedHoming_mm_s = -highSpeedHoming_mm_s;
+//          highSpeedHoming_mm_s = -highSpeedHoming_mm_s;
 //        //
 //        std::string range_mm = match[21]; // valore sempre preso passato dal metadataserver che serve a questo 
 //                                      // punto dell'esecuzione
@@ -228,7 +238,11 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         // ed i parametri del drive/motor sono stati inizializzati correttamente
 	
         //Initialize DEFAULT VALUE for timeout of homing procedure, dependent on the range of slit
-        //timeo_homing_ms = (atof(range_mm.c_str())/(highSpeedHoming_mm_s/2))*1000;
+        double highSpeedHoming_mm_s;
+        highSpeedHoming_mm_s = -driver->getHighSpeedHoming(highSpeedHoming_mm_s); // highSpeedHoming_mm_s < 0
+        timeo_homing_ms = (range_mm/(highSpeedHoming_mm_s/2))*1000;
+        
+        
         
         readyState = true;
 	return 0;
@@ -268,7 +282,7 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
     // Calcolo argomento funzione moveRelativeSteps
     double deltaMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     
-    if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ 
+    if(deltaMicroSteps<LONG_MIN || deltaMicroSteps>LONG_MAX){ 
         printf("Out of range\n");
         return -1;
     }
@@ -280,7 +294,6 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
     
     return 0;
 }
-
 
 int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase){
     

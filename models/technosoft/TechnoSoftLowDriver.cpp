@@ -97,8 +97,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _maxAccelerationHoming_mm_s2,
                         const BOOL _isAdditiveHoming,
                         const short _movementHoming,
-                        const short _referenceBaseHoming,
-                        const double _encoderLines){
+                        const short _referenceBaseHoming){
     
     // Set trapezoidal profile parameters used for moveRelative(...)
     if(_maxSpeed_mm_s<=0){
@@ -185,11 +184,11 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
     referenceBaseHoming=_referenceBaseHoming;
     
-    //____________________________________
-     if(_encoderLines<=0){
-        return -6;
-    }   
-    encoderLines= _encoderLines;
+//    //____________________________________
+//     if(_encoderLines<=0){
+//        return -6;
+//    }   
+//    encoderLines= _encoderLines;
     
     // Inizializziamo l'asse ID del motore
     axisID=_axisID;
