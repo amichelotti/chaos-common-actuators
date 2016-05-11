@@ -12,13 +12,23 @@ void ElectricPowerException::badElectricPowerInfo(){
     std::cerr<< "The electrical power has not been turned off." << std::endl; 
 }
 
+void StopMotionException::badStopMotionInfo(){
+    
+    std::cerr<< "The motion can not be stopped" << std::endl; 
+}
 
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType,const DWORD baudrate){
-    init(pszDevName,btType,baudrate);
+    init(pszDevName,btType,baudrate); // La funzione init non ritorna mai un numero negativo per quello che fa, quindi 
+                                       // e' inutile mettere il controllo. E poi se ritornasse un numero negativo bisognerebbe lanciare 
+                                      // una eccezione dato che si tratta di un metodo costruttore
 }
+
+
 std::string  SerialCommChannelTechnosoft::getDevName(){return this->pszDevName;}
 int SerialCommChannelTechnosoft::getbtType(){return this->btType;}
 int SerialCommChannelTechnosoft::getbaudrate(){return this->baudrate;}
+
+
 int SerialCommChannelTechnosoft::init(const std::string& _pszDevName,const BYTE& _btType,const DWORD& _baudrate){
     DPRINT("initializing dev %s type %d baud %d",_pszDevName.c_str(),_btType,_baudrate);
     pszDevName=_pszDevName;
@@ -33,6 +43,7 @@ void SerialCommChannelTechnosoft::close(){
     if(fd!=-1){
 	TS_CloseChannel(fd); // chiusura canale di comunicazione
     }
+    DPRINT("Chiusura canale di comunicazione in fase di deallocazione delle risorse");
 }
 
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
@@ -53,14 +64,15 @@ int SerialCommChannelTechnosoft::open(int hostID){
     return 0;
 }
 
-TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels;
+TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels; // Anche se non viene inizializzato...
 
 
 //----------------------------------------------
-TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::string name){
+TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& devName,const std::string& name){
     alreadyopenedChannel = false;
     poweron = false;
-    channel_map_t::iterator i=channels.find(devName);
+    
+    channel_map_t::iterator i=channels.find(devName); // iteratore alla mappa statica
     if(i!=channels.end()){
         my_channel = i->second;
         // In questo caso non dovrò più provare ad aprire il canale di comunicazione
@@ -68,12 +80,14 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string devName,const std::st
         // Settiamo dunque a true questo stato
         alreadyopenedChannel = true;
         // Verrà sfruttato il canale di comunicazione desiderato che è correntemente aperto
-    } else {
-        my_channel = channel_psh(new SerialCommChannelTechnosoft(devName));
+        DPRINT("Channel %s, with name %s has been already opened", devName.c_str(),name.c_str());
+    } 
+    else {
+        my_channel = channel_psh(new SerialCommChannelTechnosoft(devName));//********Altri due parametri OPZIONALI: const BYTE btType,const DWORD baudrate*******
         //*****Nota il nuovo canale creato deve essere inserito nella mappa:
-        //channels.insert( std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON GENERA MAI ECCEZIONE 
+        //channels.insert( std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI: QUESTA FUNZIONE NON GENERA MAI ECCEZIONE 
+        DPRINT("created channel  dev %s name %s", devName.c_str(),name.c_str());
     }
-    DPRINT("created channel  dev %s name %s", devName.c_str(),name.c_str());
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
@@ -202,10 +216,11 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(!alreadyopenedChannel){
         if((my_channel->open()<0)){
             DERR("error opening channel");
-            return -7;
+            return -13;
         }
+        alreadyopenedChannel=true; // Canale di comunicazione aperto e inizializzazione driver/motor andata a buon fine
+        DPRINT("channel just opened");
     }
-    DPRINT("channel opened");
     
     // Indipendentemente dal fatto che il canale era già stato aperto oppure 
     // che ne sia stato appena aperto un nuovo, segue la inizializzazione del drive/motor
@@ -213,49 +228,42 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
-        return -8;
+        return -14;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d",axisID);
-        return -9;
+        return -15;
     }
    
     if(!TS_SelectAxis(_axisID)){
         DERR("failed to select axis %d",_axisID);
-        return -10;
+        return -16;
     }
 
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
-        return -11;
+        DERR("Failed TS_Execute command");
+        return -17;
     }
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
-        return -12;
+        return -18;
     }
-    
-    //axisRef=_axisRef;
-    // Nota: in realtà l'axisID e l'axisRef potrebbero anche non essere definiti tra gli attributi privati perché
-    //non sono parametri dei successivi comandi per la movimentazione o lettura dei parametri
-  
-    
-    //printf("esito providePower: %d\n",providePower());
     
     // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
     if(providePower()<0){
         DERR("failed power providing");
-        return -13;
+        return -19;
     }
     
-    poweron=true;
+    poweron=true;  // alimentazione al drive motor erogata
     
-    if(!alreadyopenedChannel){
-        channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); 
-        // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON può GENERAre MAI ECCEZIONE
+    if(alreadyopenedChannel){
+        channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON può GENERAre MAI ECCEZIONE
     }
     return 0;
 }
@@ -504,45 +512,53 @@ int TechnoSoftLowDriver::stopPower(){
 }
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
-    DPRINT("deinitializing");
-    //if(!TS_Power(POWER_OFF)){
-        //return -1;
-    //}
     
-    if(stopMotion()<0){
-        return -1;
-    }
-    // DA TOGLIERE IL PRIMA POSSIBILE QUESTA ISTRUZIONE
-    if(poweron){
-        if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
+    // NOTA:
+    
+    // Il canale di comunicazione potrebbe essere stato aperto oppure no, in questo punto dell'esecuzione. Dipende
+    // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
+   
+    if(alreadyopenedChannel){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
+ 
+        if(stopMotion()<0){
+            throw StopMotionException();
+        }
+       
+        DPRINT("Motion is stopped");
+        
+        if(poweron){
+            if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
                      // oppure se il drive/motor non è stato inizializzato correttamente, 
                      // oppure se l'azione di erogazione dell'alimentazione non ha avuto buon fine.
                      // Errore che comunque non compromette il corretto svolgimento del programma.
-            // ATTENZIONE: DOVRA ESSERE GENERATA UNA ECCEZIONE IN CASO L'OPERAZIONE DI 
-            // SPEGNIMENTO DELL'ALIMENTAZIONE DEL MOTORE NON È ANDATA A BUON FINE
-            // ..................
-            // ..................
-            // ..................
-            throw ElectricPowerException();
-        }
-    // COSI COME BISOGNA TOGLIERE IL PRIMA POSSIBILE L'ISTRUZIONE providePower
-    // in INIT
+                // ATTENZIONE: DOVRA ESSERE GENERATA UNA ECCEZIONE IN CASO L'OPERAZIONE DI 
+                // SPEGNIMENTO DELL'ALIMENTAZIONE DEL MOTORE NON È ANDATA A BUON FINE
+                // ..................
+                // ..................
+                // ..................
+                throw ElectricPowerException();
+            }
+            DPRINT("Power is off");
+        }   
     }
- 
+    
+    // Eventuale chiusura canale di comunicazione, per deallocare risorse non piu' necessarie
     if(my_channel!=NULL){
+        
         if(my_channel.use_count()==2){
-            // In questo caso bisogna eliminare anche la riga relativa all'oggetto canale utilizzato 
-            // ,unicamente utilizzato dall'oggetto this, nella mappa statica.
+            // In questo caso bisogna eliminare anche la riga nella mappa statica relativa all'oggetto canale utilizzato 
+            // UNICAMENTE dall'oggetto this.
             // Questo garantisce che una volta distrutto l'oggetto this, anche l'oggetto canale
             // sarà automaticamente deallocato (e quindi chiuso anche il canale di comunicazione)
-            channels.erase(devName);
+            channels.erase(devName); // IPOTESI: NON VIENE GENERATA ALCUNA ECCEZIONE
         }
             
         my_channel.reset(); // Setto a NULL lo smart pointer (shared),
                             // cosicché se era l'unico a puntare all'oggetto canale,
                             // l'oggetto canale sarà anche esso deallocato (ed in quel caso
-                            // verrà anche chiuso l'associatocanale di comunicazione )
+                            // verrà anche chiuso l'associato canale di comunicazione)
     }
+    DPRINT("TechnoSoftLowDriver object is deallocated");
     return 0;
 }
 

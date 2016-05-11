@@ -72,6 +72,14 @@ namespace common{
                     ElectricPowerException(){}
                     void badElectricPowerInfo();
            };
+           
+           class StopMotionException{
+                public:
+                    StopMotionException(){}
+                    void badStopMotionInfo();
+           };
+           
+           
 
 	    //Channel class
             class SerialCommChannelTechnosoft{
@@ -83,7 +91,7 @@ namespace common{
                     int fd; // file descriptor of the channel
                 public:
                     SerialCommChannelTechnosoft(){}
-                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=CHANNEL_RS232,const DWORD baudrate=BAUDRATE);
+                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=CHANNEL_TYPE,const DWORD baudrate=BAUDRATE);
                     int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
                     int getFD(); 
 		    std::string  getDevName();
@@ -145,14 +153,14 @@ namespace common{
                 static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
                                               // percio e dichiarata di tipo static
                 
-                bool alreadyopenedChannel; 
-                bool poweron;
+                bool alreadyopenedChannel;  // Canale di comunicazione aperto
+                bool poweron; // alimentazione al drive motor erogata
                 
                 // Transition parameters
                 
             public:
                 // Costruttore device channel and device name
-                TechnoSoftLowDriver(const std::string dev, const std::string devName);
+                TechnoSoftLowDriver(const std::string& dev, const std::string& devName);
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor

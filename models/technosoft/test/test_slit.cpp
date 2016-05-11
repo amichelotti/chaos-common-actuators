@@ -147,6 +147,8 @@ int main(int argc,const char* argv[]){
     
     //mySlit->stopMotion();
     delete mySlit;
+    
+    sleep(600); //Sleep inserito per analizzare la corretta deallocazione delle risorse
 	
     //sleep(5);
     return 0;
