@@ -59,9 +59,7 @@ namespace common{
                     
                 // costruttore
                 ActuatorTechnoSoft();
-                ~ActuatorTechnoSoft(){
-                    deinit();
-                } 
+                ~ActuatorTechnoSoft();
                
         int init(void*initialization_string);
         // OK
