@@ -146,7 +146,18 @@ int main(int argc,const char* argv[]){
     DPRINT("************** Current position counter %f, after move relative **************",rpos1);
     
     //mySlit->stopMotion();
-    delete mySlit;
+    try {
+        delete mySlit;
+        DPRINT("Motion stopped. Electric power interrupted. Communication channel closed.");
+    }
+    catch(StopMotionException e){
+        e.badStopMotionInfo();
+        return -12;
+    }
+    catch(ElectricPowerException e){
+        e.badElectricPowerInfo();
+        return -13;
+    }
     
     sleep(600); //Sleep inserito per analizzare la corretta deallocazione delle risorse
 	

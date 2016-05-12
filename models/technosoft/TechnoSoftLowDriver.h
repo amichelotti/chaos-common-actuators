@@ -79,8 +79,7 @@ namespace common{
                     void badStopMotionInfo();
            };
            
-           
-
+ 
 	    //Channel class
             class SerialCommChannelTechnosoft{
                 

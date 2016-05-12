@@ -14,7 +14,7 @@ void ElectricPowerException::badElectricPowerInfo(){
 
 void StopMotionException::badStopMotionInfo(){
     
-    std::cerr<< "The motion can not be stopped" << std::endl; 
+    std::cerr<< "The eventual motion can not be stopped" << std::endl; 
 }
 
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType,const DWORD baudrate){
@@ -48,6 +48,7 @@ void SerialCommChannelTechnosoft::close(){
 
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
     close();
+    DPRINT("Deallocazione oggetto SerialCommChannelTechnosoft");
 }
 
 int SerialCommChannelTechnosoft::open(int hostID){
@@ -92,6 +93,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& devName,const std::s
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
     deinit();
+    DPRINT("Deallocazione oggetto TechnoSoftLowDriver");
 }
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
@@ -519,13 +521,12 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
    
     if(alreadyopenedChannel){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
- 
         if(stopMotion()<0){
             throw StopMotionException();
         }
        
         DPRINT("Motion is stopped");
-        
+         
         if(poweron){
             if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
                      // oppure se il drive/motor non è stato inizializzato correttamente, 
@@ -551,12 +552,12 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
             // Questo garantisce che una volta distrutto l'oggetto this, anche l'oggetto canale
             // sarà automaticamente deallocato (e quindi chiuso anche il canale di comunicazione)
             channels.erase(devName); // IPOTESI: NON VIENE GENERATA ALCUNA ECCEZIONE
-        }
-            
-        my_channel.reset(); // Setto a NULL lo smart pointer (shared),
+        }    
+        my_channel.reset(); // Setto a NULL lo smart pointer (shared), che e' un membro privato dell'oggetto TechnoSoftLowDriver che punta all'oggeto canale,
                             // cosicché se era l'unico a puntare all'oggetto canale,
-                            // l'oggetto canale sarà anche esso deallocato (ed in quel caso
-                            // verrà anche chiuso l'associato canale di comunicazione)
+                            // tale oggetto canale sarà deallocato immediatamente, prima che venga deallocato l'oggetto TechnoSoftLowDriver che punta ad esso
+        
+                            // Anche se sarebbe inutile questo comando...
     }
     DPRINT("TechnoSoftLowDriver object is deallocated");
     return 0;
