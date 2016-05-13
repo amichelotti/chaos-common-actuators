@@ -28,15 +28,14 @@ int main(int argc,const char* argv[]){
     axis=atoi(argv[3]); // [int], <axis>
     pos=atof(argv[4]);  // [float], <move position in mm>
     PRINT("************ using axis %d, moving of %f mm**************",axis,pos);
-    common::actuators::AbstractActuator*mySlit;
+    common::actuators::AbstractActuator*mySlit = NULL;
     
-    mySlit = new ActuatorTechnoSoft(); 
+    mySlit = new ActuatorTechnoSoft(); // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
     sprintf(sinit,"%s,myslit,%s,%d",dev,conf,axis);
 
     // Inizializzazione
     if((ret=mySlit->init((void*)sinit))!=0){
         DERR("*************Cannot init. In fact the value returned is %d ****************",ret);
-        delete mySlit;
         return -1;
     }
     DPRINT("************Operazione di inizializzazione andata a buon fine!***************");
@@ -145,10 +144,11 @@ int main(int argc,const char* argv[]){
     DPRINT("************** Current position encoder %f, after move relative **************",rpos);
     DPRINT("************** Current position counter %f, after move relative **************",rpos1);
     
-    //mySlit->stopMotion();
     try {
-        delete mySlit;
-        DPRINT("Motion stopped. Electric power interrupted. Communication channel closed.");
+        if(mySlit!=NULL){
+            delete mySlit;
+            DPRINT("Possible motion stopped (if channel has been opened). Possible electric power interrupted (if channel has been opened). Possible opened communication channel closed.");
+        }
     }
     catch(StopMotionException e){
         e.badStopMotionInfo();

@@ -524,11 +524,11 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
    
     if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
-        DPRINT("Fase di deinizializzazione: il canale era stato aperto");
+        DPRINT("Fase di deinizializzazione: il canale era stato aperto o e' stato appena aperto");
         if(stopMotion()<0){
             throw StopMotionException();
         }
-       
+        
         DPRINT("Motion is stopped");
          
         if(poweron){
