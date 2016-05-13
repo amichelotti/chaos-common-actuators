@@ -147,7 +147,7 @@ int main(int argc,const char* argv[]){
     try {
         if(mySlit!=NULL){
             delete mySlit;
-            DPRINT("Possible motion stopped (if channel has been opened). Possible electric power interrupted (if channel has been opened). Possible opened communication channel closed.");
+            DPRINT("Effect of the complete deallocation: possible motion stopped (if channel has been opened); possible electric power interrupted (if channel has been opened); possible opened communication channel closed.");
         }
     }
     catch(StopMotionException e){
