@@ -154,6 +154,7 @@ namespace common{
                 
                 bool alreadyopenedChannel;  // Canale di comunicazione aperto
                 bool poweron; // alimentazione al drive motor erogata
+                bool channelJustOpened;
                 
                 // Transition parameters
                 
