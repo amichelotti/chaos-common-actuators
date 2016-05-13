@@ -71,6 +71,7 @@ TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels; // Anche se no
 //----------------------------------------------
 TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& devName,const std::string& name){
     alreadyopenedChannel = false;
+    channelJustOpened = false;
     poweron = false;
     
     channel_map_t::iterator i=channels.find(devName); // iteratore alla mappa statica
@@ -87,7 +88,7 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& devName,const std::s
         my_channel = channel_psh(new SerialCommChannelTechnosoft(devName));//********Altri due parametri OPZIONALI: const BYTE btType,const DWORD baudrate*******
         //*****Nota il nuovo canale creato deve essere inserito nella mappa:
         //channels.insert( std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI: QUESTA FUNZIONE NON GENERA MAI ECCEZIONE 
-        DPRINT("created channel  dev %s name %s", devName.c_str(),name.c_str());
+        DPRINT("created channel  dev: %s, name: %s", devName.c_str(),name.c_str());
     }
 }
 
@@ -220,7 +221,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
             DERR("error opening channel");
             return -13;
         }
-        alreadyopenedChannel=true; // Canale di comunicazione aperto e inizializzazione driver/motor andata a buon fine
+        channelJustOpened = true;
+        //alreadyopenedChannel=true; // Canale di comunicazione aperto e inizializzazione driver/motor andata a buon fine
         DPRINT("channel just opened");
     }
     
@@ -264,8 +266,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     poweron=true;  // alimentazione al drive motor erogata
     
-    if(alreadyopenedChannel){
+    if(channelJustOpened){
         channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON può GENERAre MAI ECCEZIONE
+        alreadyopenedChannel=true;
     }
     return 0;
 }
@@ -460,14 +463,14 @@ int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
 }
 
 int TechnoSoftLowDriver::stopMotion(){
-    DPRINT("stop axis:%d",axisID);
+    
 //    if(!TS_SelectAxis(axisID)){
 //        return -1;
 //    }
-
     if(!TS_Stop()){
         return -1;
     }
+    DPRINT("stop axis:%d, %s",axisID, TS_GetLastErrorText());
     return 0;
 }
 
@@ -520,7 +523,8 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     // Il canale di comunicazione potrebbe essere stato aperto oppure no, in questo punto dell'esecuzione. Dipende
     // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
    
-    if(alreadyopenedChannel){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
+    if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
+        DPRINT("Fase di deinizializzazione: il canale era stato aperto");
         if(stopMotion()<0){
             throw StopMotionException();
         }

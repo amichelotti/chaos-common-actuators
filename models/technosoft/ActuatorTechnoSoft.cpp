@@ -58,7 +58,8 @@ int ActuatorTechnoSoft::init(void*initialization_string){
                                     // non è stato possibile allocarlo.
                                   
             ERR("## cannot create channel object");
-            delete driver; 
+            delete driver;
+           
             //readyState = false; //non è necessari questa assegnazione
             return -1;
         }
@@ -98,7 +99,8 @@ int ActuatorTechnoSoft::init(void*initialization_string){
                            // un errore nella inizializzazione del drive/motor), il canale di 
                            // comunicazione verrà anche chiuso nella fase di deallocazione dell'oggetto
                            // SerialCommChannel
-            // readyState = false; // non è necessaria questa istruzione 
+            // readyState = false; // non è necessaria questa istruzione
+                driver = NULL;
                 
             }
             catch(ElectricPowerException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
