@@ -280,7 +280,7 @@ TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     
-    //DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_mm_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
     if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
         return -1;
@@ -289,11 +289,11 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 }
 
 int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
-    //DPRINT("moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
+    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
     
     if(!TS_MoveRelative(deltaPosition, highSpeedHoming_mm_s, accelerationHoming_mm_s2, isAdditiveHoming, movementHoming, referenceBaseHoming)){
         DERR("error relative moving homing");
-        printf("moveRelativeStepsHoming: %s\n",TS_GetLastErrorText());
+   
         return -1;
     }
     return 0;
@@ -377,6 +377,7 @@ int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
     isAdditiveHoming = _isAdditiveHoming;
     return 0;
 }
+
 int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
     if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
         return -1;
@@ -384,6 +385,7 @@ int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
     movementHoming = _movementHoming;   
     return 0;
 }
+
 int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
     if((_referenceBaseHoming!=FROM_MEASURE) && _referenceBaseHoming!=FROM_REFERENCE){
         return -1;
@@ -426,8 +428,9 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 //    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
 //        return -4;
 //    }
+    DPRINT("moving Absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
     if(!TS_MoveAbsolute(absPosition, speed_mm_s, acceleration_mm_s2, movement, referenceBase)){
-        DERR("error absolute moving");
+        DERR("error absolute step moving");
         return -1;
     }
     return 0;
@@ -445,9 +448,9 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
     
     //double highSpeedHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*highSpeedHoming_mm_s)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     //double accelerationHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*accelerationHoming_mm_s2/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    
+    DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
     if(!TS_MoveVelocity(highSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
-        DERR("Error moving velocity");
+        DERR("(homing) Error moving velocity ");
         return -1;
     }
     return 0;
@@ -455,8 +458,9 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
 
 int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
     
+    DPRINT("(homing) moving absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
     if(!TS_MoveAbsolute(absPosition, lowSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
-        DERR("error absolute moving");
+        DERR("(homing) Error absolute steps moving");
         return -1;
     }
     return 0;
