@@ -141,8 +141,14 @@ int main(int argc,const char* argv[]){
     	fprintf(stderr,"************** Error at second position after homing reading by counter **************\n");
         return -11;
     }
-    DPRINT("************** Current position encoder %f, after move relative **************",rpos);
-    DPRINT("************** Current position counter %f, after move relative **************",rpos1);
+    DPRINT("************** Current position encoder %f, after homing**************",rpos);
+    DPRINT("************** Current position counter %f, after homing **************",rpos1);
+    
+    if(mySlit->getState(&status,desc)<0){
+	fprintf(stderr,"**************Error at reading status after homing**************\n");
+        return -14;
+    }
+    fprintf(stderr,"**************Reading status %d, %s after homing **************\n",status ,desc.c_str());
     
     try {
         if(mySlit!=NULL){

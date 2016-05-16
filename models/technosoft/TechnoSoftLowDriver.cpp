@@ -740,6 +740,20 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
     }
     return 0;
 }
+
+int TechnoSoftLowDriver::resetFault(){
+
+    if(!TS_ResetFault()){
+         return -1;
+         // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
+         // errors when the function is executed)
+    }
+    return 0;
+}
+
+
+
+
 /*****************************************************************/
 /*****************************************************************/
  void SerialCommChannelTechnosoft::PrintChannel()
@@ -748,3 +762,6 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 }
 /*****************************************************************/
  int  SerialCommChannelTechnosoft::getFD() {return this->fd;}
+
+ 
+ 

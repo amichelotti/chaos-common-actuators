@@ -227,6 +227,7 @@ namespace common{
                 // resetting methos
                 int resetCounter();// reset TPOS_register();
                 int resetEncoder();// reset APOS_register();
+                int resetFault();
                 int getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
                 //int getRegister()**********************;
                 int stopMotion();

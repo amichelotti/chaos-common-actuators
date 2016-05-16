@@ -931,3 +931,22 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      }
      return 0;
  }
+
+ int ActuatorTechnoSoft::resetAlarms(uint64_t alrm){
+     
+     // In the fault status the power stage is disabled, the MER register signals
+     // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
+     
+     if(driver->resetFault()<0){
+         return -1;
+         // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
+         // errors when the function is executed)
+     }
+     return 0;
+ }
+ 
+ 
+ int ActuatorTechnoSoft::resetSetup(){
+     
+     
+ }

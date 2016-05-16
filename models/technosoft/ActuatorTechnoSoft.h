@@ -90,7 +90,13 @@ namespace common{
                 int moveAbsoluteMillimetersHoming(double mm);
                 
                 int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT){return 0;}
-                int resetAlarms(uint64_t alrm){return 0;}
+                
+                // ************ Function for FAULT state reset: to be used when SRH.15 = 1 *******************  
+                // Set to 0 quasi tutti i bit del registro MER (tranne MER.15, MER.7, MER.6, MER.2),
+                // - the Ready ouput (if present) is set to ready level;
+                // - the Error output (if present) is set to no error level 
+                //and the drive motor returns to normal operation.
+                int resetAlarms(uint64_t alrm); 
                 
                 //int getPosition(readingTypes mode, double& deltaPosition_mm);
                 int stopMotion();
@@ -98,6 +104,7 @@ namespace common{
                 int homing(homingType mode);
                 int getState(int* state, std::string& desc );   // **
                 int getAlarms(uint64_t*alrm, std::string& descStr);
+                int resetSetup();
                 uint64_t getFeatures(){return 0;}
      
         /**
