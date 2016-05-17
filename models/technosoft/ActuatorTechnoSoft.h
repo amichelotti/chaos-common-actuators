@@ -104,7 +104,6 @@ namespace common{
                 int homing(homingType mode);
                 int getState(int* state, std::string& desc );   // **
                 int getAlarms(uint64_t*alrm, std::string& descStr);
-                int resetSetup();
                 uint64_t getFeatures(){return 0;}
      
         /**

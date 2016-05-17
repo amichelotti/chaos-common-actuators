@@ -246,16 +246,17 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         return -16;
     }
 
+    /*	Execute the initialization of the drive (ENDINIT) */
+    if(!TS_DriveInitialisation()){
+        DERR("failed Low driver initialisation");
+        return -18;
+    }
+    
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         DERR("Failed TS_Execute command");
         return -17;
-    }
-    /*	Execute the initialization of the drive (ENDINIT) */
-    if(!TS_DriveInitialisation()){
-        DERR("failed Low driver initialisation");
-        return -18;
     }
     
     // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
@@ -751,8 +752,66 @@ int TechnoSoftLowDriver::resetFault(){
     return 0;
 }
 
-
-
+int TechnoSoftLowDriver::resetSetup(){
+    
+//    if(!TS_Execute("ENDINIT")){
+//        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+//        DERR("Failed TS_Execute command");
+//        return -17;
+//    }
+    
+//    if(!TS_Save()){
+//         DERR("failed Low driver saving current setup: %s",TS_GetLastErrorText());
+//         return -1; 
+//    }
+    
+//    if(!TS_Reset()){
+//        DERR("failed Low driver reset: %s",TS_GetLastErrorText());
+//        return -1; 
+//    } 
+    
+//    if((my_channel->open()<0)){
+//         DERR("error opening channel");
+//         return -2;
+//    }
+     /*	Execute the initialization of the drive (ENDINIT) */
+    
+//    sleep(2);
+//    
+//    if(!TS_SetupAxis(axisID, axisRef)){
+//        DERR("failed to setup axis %d",axisID);
+//        return -15;
+//    }
+//    
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -4;
+//    }
+    
+    // SET THE SERIAL COMMUNICATION BAUD RATE TO 9600. AFTER RESET THE DRIVE COMMUNICATES USING 9600 BPS
+    //....................
+    //....................
+    //....................
+    
+    // RESTORE THE SERIAL COMMUNICATIONE BAUD RATE
+    //....................
+    //....................
+    //....................
+    
+    // Settare il registro per la lettura dell'encoder
+//    if(!TS_Execute("SCR=0x4338")){
+//        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+//        DERR("Failed TS_Execute command");
+//        return -17;
+//    }
+//    
+//    if(!TS_DriveInitialisation()){
+//        DERR("failed Low driver initialisation: %s",TS_GetLastErrorText());
+//        return -5;
+//    }
+    
+    return -1;
+}
 
 /*****************************************************************/
 /*****************************************************************/
