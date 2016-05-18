@@ -89,7 +89,7 @@ namespace common{
                 int moveAbsoluteMillimeters(double mm);
                 int moveAbsoluteMillimetersHoming(double mm);
                 
-                int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT){return 0;}
+                int poweron(uint32_t timeo_ms);
                 
                 // ************ Function for FAULT state reset: to be used when SRH.15 = 1 *******************  
                 // Set to 0 quasi tutti i bit del registro MER (tranne MER.15, MER.7, MER.6, MER.2),
@@ -116,7 +116,7 @@ namespace common{
            @param version returning string
            @return 0 if success or an error code
         */
-	int getSWVersion(std::string& version){version="technosoft-0.0.1";return 0;}
+	int getSWVersion(std::string& version);
 
         /**
         @brief returns the HW version of the actuator 

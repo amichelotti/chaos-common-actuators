@@ -26,6 +26,7 @@
 #	include <errno.h>
 #	include <fcntl.h>
 #	include "TML_lib.h"
+#	include "tmlcomm.h"
 //int getch();
 #endif
 
@@ -253,6 +254,8 @@ namespace common{
                 int getSRLregister();// read content of the low part of the status register
                 int getSRHregister();// read content of the high part of the status register
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
+                
+                int getFirmwareVers(char* firmwareVers);
            };
 	}// chiude namespace technosoft
 

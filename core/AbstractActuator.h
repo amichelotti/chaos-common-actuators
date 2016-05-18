@@ -190,13 +190,13 @@ typedef enum {
            @return 0 if success
           */
 
-            virtual int deinit()=0;                                    // ****Da implementare***
+            virtual int deinit()=0;                                     
         /**
            @brief returns the SW/FW version of the driver/FW
            @param version returning string
            @return 0 if success or an error code
         */
-            virtual int getSWVersion(std::string& version)=0;          // ****Da implementare***
+            virtual int getSWVersion(std::string& version)=0;        
 
         /**
         @brief returns the HW version of the actuator
@@ -211,7 +211,7 @@ typedef enum {
 
         @return 0 if success or an error code
         */
-            virtual int stopMotion()=0;
+            virtual int stopMotion()=0;                             
 
             typedef enum{
                 defaultHoming,

@@ -962,3 +962,22 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      return err;
  }
  
+ int ActuatorTechnoSoft::getSWVersion(std::string& version){
+     
+     char firmVers[100];
+     if(driver->getFirmwareVers(&firmVers[0])<0){
+        version = "No version retrivied";
+        return -1;
+     }
+     version.assign(firmVers);
+     return 0;
+                                        
+}
+ 
+int ActuatorTechnoSoft::poweron(uint32_t timeo_ms){
+     
+    if(driver->providePower()<0){
+        return -1;
+    }
+    return 0;
+ }

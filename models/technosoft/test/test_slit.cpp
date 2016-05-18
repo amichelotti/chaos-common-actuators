@@ -62,9 +62,17 @@ int main(int argc,const char* argv[]){
     DPRINT("************** Current position encoder %f, before move relative **************",rpos);
     DPRINT("************** Current position counter %f, before move relative **************",rpos1);
     
+    std::string version;
+    if(mySlit->getSWVersion(version)<0){
+    	fprintf(stderr,"**************Error at fgetSWVersion command **************\n");
+        return -5;
+    }
+    DPRINT("************** Firmware version: %s **************",version.c_str());
+    
     DPRINT("************** Reset alarms before move relative **************");
-    if(mySlit->resetAlarms(0)<0){
-    	fprintf(stderr,"************** Error setting alarms **************\n");
+    int respAlarms;
+    if((respAlarms=mySlit->resetAlarms(1))<0){
+    	fprintf(stderr,"************** Error setting alarms %d **************\n",respAlarms);
         return -5;
     }
     

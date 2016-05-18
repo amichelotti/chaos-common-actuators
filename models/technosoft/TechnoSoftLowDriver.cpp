@@ -752,6 +752,16 @@ int TechnoSoftLowDriver::resetFault(){
     return 0;
 }
 
+// retrieve firmware version of the active drive
+int TechnoSoftLowDriver::getFirmwareVers(char* firmwareVers){
+    
+    if(!MSK_GetDriveVersion(firmwareVers)){
+        DERR("Errore lettura versione driver");
+        return -1;
+    }
+    return 0;
+}
+
 int TechnoSoftLowDriver::resetSetup(){
     
 //    if(!TS_Execute("ENDINIT")){
@@ -760,15 +770,53 @@ int TechnoSoftLowDriver::resetSetup(){
 //        return -17;
 //    }
     
-//    if(!TS_Save()){
-//         DERR("failed Low driver saving current setup: %s",TS_GetLastErrorText());
-//         return -1; 
-//    }
+    if(!TS_Save()){
+         DERR("failed Low driver saving current setup: %s",TS_GetLastErrorText());
+         return -1; 
+    }
+//    char szDriveVersion[100];
+//    //char* szDriveVersion;
+//    if(!MSK_GetDriveVersion(szDriveVersion))
+//        DERR("Errore lettura versione driver");
+//        
+//    DPRINT("%s",szDriveVersion);
     
-//    if(!TS_Reset()){
-//        DERR("failed Low driver reset: %s",TS_GetLastErrorText());
-//        return -1; 
-//    } 
+    if(!TS_Reset()){
+        DERR("failed Low driver reset: %s",TS_GetLastErrorText());
+        return -1; 
+    } 
+    
+    sleep(10);
+    
+    if(!MSK_SetBaudRate(9600)){
+        DERR("MSK_SetBaudRate 1 %s",TS_GetLastErrorText());
+        //return -2;
+        return -2;
+    }
+    sleep(3);
+    
+    if(!MSK_SetBaudRate(115200)){
+        DERR("MSK_SetBaudRate 2 %s",TS_GetLastErrorText());
+        //return -2;
+        return -2;
+    }
+    
+    sleep(3);
+
+//    if(!TS_SelectAxis(axisID)){
+//       DERR("failed to select axis %d",axisID);
+//       return -4;
+//    }
+//    
+    if(!TS_DriveInitialisation()){
+        DERR("failed Low driver initialisation %s",TS_GetLastErrorText());
+        return -4;
+    }
+//    
+    if(providePower()<0){ // che in teoria non ci andrebbe qui dentro...
+        DERR("failed power providing %s,", TS_GetLastErrorText());// failed power providing Send message timeout.
+        return -5;
+    }
     
 //    if((my_channel->open()<0)){
 //         DERR("error opening channel");
@@ -810,7 +858,7 @@ int TechnoSoftLowDriver::resetSetup(){
 //        return -5;
 //    }
     
-    return -1;
+    return -6;
 }
 
 /*****************************************************************/
