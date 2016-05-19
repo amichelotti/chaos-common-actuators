@@ -139,6 +139,11 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         timeo_homing_ms = (uint64_t)((range_mm/(-highSpeedHoming_mm_s/2))*1000);
         DPRINT("Valore calcolato per l'homing: %lu",timeo_homing_ms);
         
+        //homing procedure parameters
+        internalHomingState=0;
+        state0activated = false;
+        
+        // now the motor is ready!
         readyState = true;
 	return 0;
     }
@@ -348,6 +353,82 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
 
 int ActuatorTechnoSoft::homing(homingType mode){
     
+    
+    if(internalHomingState==0){// Homing command called the first time
+        if(driver->moveVelocityHoming()<0){
+            if(driver->stopMotion()<0){
+                return -1;
+            }
+            return -2;
+        }
+        DPRINT("************** STATE 0: move velocity activated **************");
+        if(driver->setEventOnLimitSwitch()<0){
+            if(driver->stopMotion()<0){
+                return -3;
+            }
+            return -4;
+        }
+        DPRINT("************** STATE 0: event on limit switch activated **************");
+        internalHomingState = 1;
+        return 1;
+    }
+    else if(internalHomingState==1){ /*	Wait for the HIGH-LOW transition on negative limit switch */
+        int switchTransited=0;
+        if(driver->checkEvent(switchTransited)<0){
+            if(driver->stopMotion()<0){
+                internalHomingState = 0;// deve essere riinizializzato per successice operazione di homing
+                return -5;
+            }    
+            internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
+            return -6;
+        } 
+        DPRINT("************** Event on limit switch transition checked **************");
+        if(switchTransited){
+            if(driver->setEventOnMotionComplete()<0){ 
+                if(driver->stopMotion()<0){
+                    internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
+                    return -7;
+                }
+                internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
+                return -8;
+            }  
+            internalHomingState=2;
+            DPRINT("************** Negative limit switch transited. Event on motion completed set **************");
+        }
+        return 1;
+    }
+    else if(internalHomingState==2){/*	Wait until the motor stops */
+        int motionCompleted = 0;
+        if(driver->checkEvent(motionCompleted)<0){
+            if(driver->stopMotion()<0){
+                internalHomingState = 0;
+                return -9;
+            }
+            internalHomingState = 0;
+            return -10;
+        }
+        if(motionCompleted){
+            DPRINT("************** Motion completed after transition **************");
+            internalHomingState = 3;
+        }
+        return 1;
+    }
+    else if(internalHomingState==3){
+        
+        
+        
+        return 1;
+    }
+    
+    
+    
+    return 0;
+}
+
+
+
+int ActuatorTechnoSoft::homing(homingType mode){
+    
     struct timeval structTimeEval;
     long currentTime_ms;
     double iniTime_ms;
@@ -529,7 +610,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         if(switchTransited){
             DPRINT("************** Negative limit switch transited **************");
             /*	Wait until the motor stops */
-            DPRINT("************** Wait until the motor stops**************");
+            DPRINT("************** Wait until the motor stops **************");
             if(driver->setEventOnMotionComplete()<0){ 
                 if(driver->stopMotion()<0){
                     return -6;
@@ -966,7 +1047,7 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      
      char firmVers[100];
      if(driver->getFirmwareVers(&firmVers[0])<0){
-        version = "No version retrivied";
+        version = "No firmware version retrivied";
         return -1;
      }
      version.assign(firmVers);
