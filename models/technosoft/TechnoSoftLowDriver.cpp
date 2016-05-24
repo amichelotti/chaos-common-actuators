@@ -69,12 +69,23 @@ TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels; // Anche se no
 
 
 //----------------------------------------------
-TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& devName,const std::string& name){
+TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& _devName,const std::string& name){
+    
+    // Inizializzazione membri privati
     alreadyopenedChannel = false;
     channelJustOpened = false;
     poweron = false;
+    devName = _devName;
+    dev = name;
     
     channel_map_t::iterator i=channels.find(devName); // iteratore alla mappa statica
+    DPRINT("devName %s", devName.c_str());
+    
+    DPRINT("Dimensione mappa statica: %d",channels.size());
+    if(channels.size()>0){
+         DPRINT("Dimensione mappa statica: %d",channels.size());   
+    }
+    
     if(i!=channels.end()){
         my_channel = i->second;
         // In questo caso non dovrò più provare ad aprire il canale di comunicazione
@@ -187,17 +198,17 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     accelerationHoming_mm_s2 = _accelerationHoming_mm_s2; 
     
     if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
-        return -5;
+        return -14;
     }  
     isAdditiveHoming=_isAdditiveHoming;
     
     if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
-        return -11;
+        return -15;
     }
     movementHoming=_movementHoming;  
     
     if((_referenceBaseHoming!=FROM_MEASURE) && _referenceBaseHoming!=FROM_REFERENCE){
-        return -12;
+        return -16;
     }
     referenceBaseHoming=_referenceBaseHoming;
     
@@ -219,7 +230,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(!alreadyopenedChannel){
         if((my_channel->open()<0)){
             DERR("error opening channel");
-            return -13;
+            return -17;
         }
         channelJustOpened = true;
         //alreadyopenedChannel=true; // Canale di comunicazione aperto e inizializzazione driver/motor andata a buon fine
@@ -232,43 +243,45 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
-        return -14;
+        return -18;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d",axisID);
-        return -15;
+        return -19;
     }
    
     if(!TS_SelectAxis(_axisID)){
         DERR("failed to select axis %d",_axisID);
-        return -16;
+        return -20;
     }
 
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
-        return -18;
+        return -21;
     }
     
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         DERR("Failed TS_Execute command");
-        return -17;
+        return -22;
     }
     
     // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
     if(providePower()<0){
         DERR("failed power providing");
-        return -19;
+        return -23;
     }
     
     poweron=true;  // alimentazione al drive motor erogata
     
     if(channelJustOpened){
+        DPRINT("Inserimento elemento mappa: devName=%s",devName.c_str());
         channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON può GENERAre MAI ECCEZIONE
+        
         alreadyopenedChannel=true;
     }
     return 0;
@@ -870,5 +883,7 @@ int TechnoSoftLowDriver::resetSetup(){
 /*****************************************************************/
  int  SerialCommChannelTechnosoft::getFD() {return this->fd;}
 
+ 
+ 
  
  

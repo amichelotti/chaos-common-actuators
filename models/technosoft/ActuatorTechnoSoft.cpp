@@ -15,7 +15,6 @@ using namespace ::common::actuators::models;
 
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
       
-
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,
 static const boost::regex driver_match("([\\w\\/]+),(\\w+),(.+),(\\d+)"); //ATTENZIONE: DEVE ESSERE GESTITA LA QUINTA ESPRESSIONE REGOLARE
 
@@ -88,7 +87,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         
         int val;
         if((val=driver->init(conf_path,axid))<0){
-            ERR("Iipologia di errore in fase di inizializzazione dell'oggetto technsoft low driver %d \n",val);
+            ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technsoft low driver %d",val);
             // Deallocazione oggetto canale ()
             try{
                 delete driver; // Nota importante: l'indirizzo del canale 
@@ -369,14 +368,14 @@ int ActuatorTechnoSoft::homing(homingType mode){
                 }
                 risp = -2;
             }
-            DPRINT("************** STATE 0: move velocity activated **************");
+            DPRINT(" STATE 0: move velocity activated ");
             if(driver->setEventOnLimitSwitch()<0){
                 if(driver->stopMotion()<0){
                     risp = -3;
                 }
                 risp = -4;
             }
-            DPRINT("************** STATE 0: event on limit switch activated **************");
+            DPRINT("STATE 0: event on limit switch activated ");
             internalHomingState = 1;
             risp = 1;
             break; 
@@ -389,7 +388,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
                 internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
                 risp = -6;
             } 
-            DPRINT("************** STATE 1: possible limit switch transition just checked **************");
+            DPRINT(" STATE 1: possible limit switch transition just checked ");
             if(switchTransited){
                 if(driver->setEventOnMotionComplete()<0){ 
                     if(driver->stopMotion()<0){
@@ -401,7 +400,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
                 }  
                 //eventOnMotionCompleteSet = true;
                 internalHomingState=2;
-                DPRINT("************** STATE 1: Negative limit switch transited. Event on motion completed set **************");
+                DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
             }
             // **************DA IMPLEMENTARE:*****************
             // RESET ON Limit Switch Transition Event

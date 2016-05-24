@@ -41,37 +41,38 @@ int main(int argc,const char* argv[]){
     PRINT("************ using axis %d, moving of %f mm**************",axis2,pos2);
     common::actuators::AbstractActuator*mySlit2 = NULL;
     
-    // Inizializzazione ASSE 1
+    //
     mySlit1 = new ActuatorTechnoSoft(); // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
     sprintf(sinit,"%s,myslit1,%s,%d",dev1,conf1,axis1);
 
     if((ret=mySlit1->init((void*)sinit))!=0){
-        DERR("*************Cannot init axis 1. In fact the value returned is %d ****************",ret);
+        DERR("*************Cannot init axis %d. In fact the value returned is %d ****************",axis1,ret);
         return -1;
     }
-    DPRINT("************Operazione di inizializzazione andata a buon fine!***************");
+    DPRINT("Axis %d initialized!",axis1);
     
+    //*******************sleep(1);***********************
     // Inizializzazione ASSE 2
     mySlit2 = new ActuatorTechnoSoft(); // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
-    sprintf(sinit,"%s,myslit1,%s,%d",dev2,conf2,axis2);
+    sprintf(sinit,"%s,myslit2,%s,%d",dev2,conf2,axis2);
 
     if((ret=mySlit2->init((void*)sinit))!=0){
-        DERR("*************Cannot init axis 2. In fact the value returned is %d ****************",ret);
+        DERR("*************Cannot init axis %d. In fact the value returned is %d ****************",axis2,ret);
         return -1;
     }
-    DPRINT("************Operazione di inizializzazione andata a buon fine!***************");
+    DPRINT("*************Axis %d initialized!****************",axis2);
    
     // Lettura stato
     std::string desc;
     if(mySlit1->getState(&status,desc)<0){
-	fprintf(stderr,"**************Error at first reading status**************\n");
+	DERR("**************Axis %d: error at first reading status**************",axis1);
         return -2;
     }
-    fprintf(stderr,"**************First reading status %d, %s **************\n",status ,desc.c_str());
+    DPRINT("**************Axis %d: first reading status: %d, %s **************\n",axis1,status,desc.c_str());
   
     // Lettura posizione tramite encoder e counter
     if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-	fprintf(stderr,"**************Error at first position reading by encoder **************\n");
+	DERR("**************Axis %d: error at first position reading by encoder **************");
         return -3;
     }
     //DPRINT("************** Current position encoder %f, before movement **************",rpos);
@@ -80,28 +81,28 @@ int main(int argc,const char* argv[]){
     	fprintf(stderr,"**************Error at first position reading by counter **************\n");
         return -4;
     }
-    DPRINT("************** Current position encoder %f, before move relative **************",rpos);
-    DPRINT("************** Current position counter %f, before move relative **************",rpos1);
+    DPRINT("**************Axis %d: Current position encoder %f, before move relative **************",axis1,rpos);
+    DPRINT("**************Axis %d: Current position counter %f, before move relative **************",axis2,rpos1);
     
     std::string version;
     if(mySlit1->getSWVersion(version)<0){
-    	fprintf(stderr,"**************Error at fgetSWVersion command **************\n");
+    	DERR("**************Axis %d: Error at fgetSWVersion command **************",axis1);
         return -5;
     }
-    DPRINT("************** Firmware version: %s **************",version.c_str());
+    DPRINT("************** Axis %d: Firmware version: %s **************",version.c_str(),axis1);
     
-    DPRINT("************** Reset alarms before move relative **************");
+    DPRINT("************** Axis %d: Reset alarms before move relative **************",axis1);
     int respAlarms;
     if((respAlarms=mySlit1->resetAlarms(0))<0){
-    	fprintf(stderr,"************** Error setting alarms %d **************\n",respAlarms);
+    	DERR("**************Axis %d: Error setting alarms %d **************\n",axis1,respAlarms);
         return -5;
     }
     
     if(mySlit1->getState(&status,desc)<0){
-	fprintf(stderr,"**************Error at first reading status**************\n");
+	DERR("**************Axis %d: Error at first reading status**************",axis1);
         return -2;
     }
-    fprintf(stderr,"**************reading status after setting alarms %d, %s **************\n",status ,desc.c_str());
+    DERR("**************Axis %d: reading status after setting alarms %d, %s **************\n",axis1,status ,desc.c_str());
     
 //    if(mySlit->getState(&status,desc)<0){
 //	fprintf(stderr,"**************Error get status after reset fault**************\n");
@@ -110,36 +111,40 @@ int main(int argc,const char* argv[]){
 //    DPRINT("************** Reading status after reset alarms: %d, %s **************\n",status ,desc.c_str());
     
     
-    DPRINT("************** Prima movimentazione di 10 mm **************");
+    DPRINT("**************Axis %d: Prima movimentazione di 10 mm **************",axis1);
     // Spostamento della slitta 
-    if(mySlit2->moveRelativeMillimeters(10)<0){
-	fprintf(stderr,"************** Error returned by movement operation **************\n");
+    if(mySlit1->moveRelativeMillimeters(10)<0){
+	DERR("**************Axis %d: Error returned by movement operation **************",axis1);
         return -7;
     }
-    	 
-    //sleep(30); // Attesa completamento movimentazione, in seconds
-    
-    DPRINT("**************Move relative finished**************\n");
-    
-    if(mySlit1->getState(&status,desc)<0){
-	fprintf(stderr,"**************Error reading status after move relative**************\n");
+    DPRINT("**************Axis %d: Prima movimentazione di 10 mm **************",axis2);
+    if(mySlit2->moveRelativeMillimeters(10)<0){
+	DERR("**************Axis %d: Error returned by movement operation **************",axis2);
         return -8;
     }
-    fprintf(stderr,"**************Reading status %d, %s after move relative**************\n",status ,desc.c_str());
+    	 
+    sleep(30); // Attesa completamento movimentazione, in seconds
+    
+    DPRINT("**************move relative finished for both motors**************");
+    
+    if(mySlit2->getState(&status,desc)<0){
+	DERR("**************Error reading status after move relative**************",axis2);
+        return -8;
+    }
+    DPRINT("**************Axis %d: Reading status %d, %s after move relative**************",axis2,status ,desc.c_str());
     
     // Lettura posizione tramite encoder e counter
-    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-	fprintf(stderr,"**************Error position reading by encoder after move relative **************\n");
+    if(mySlit2->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+	DERR("**************Axis %d: Error position reading by encoder after move relative **************",axis2);
         return -9;
     }
-    DPRINT("************** Current position encoder %f, after move relative  **************",rpos);
     
-    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
-    	fprintf(stderr,"**************Error position reading by counter, after move relative **************\n");
+    if(mySlit2->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+    	DERR("**************Error position reading by counter, after move relative **************\n");
         return -10;
     }
-    DPRINT("************** Current position encoder %f, after move relative **************",rpos);
-    DPRINT("************** Current position counter %f, after move relative **************",rpos1);
+    DPRINT("**************Axis %d: Current position encoder %f, after move relative **************",axis2,rpos);
+    DPRINT("**************Axis %d: Current position counter %f, after move relative **************",axis2,rpos1);
     
 //    uint64_t timeo_homing_ms = 20000;
 //       
@@ -159,21 +164,21 @@ int main(int argc,const char* argv[]){
     sleep(10);
     for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
         // con successo o insuccesso
-        DPRINT("Procedura di homing n. %d iniziata",i);
+        DPRINT("*************Axis %d: Procedura di homing n. %d iniziata*************",axis1,i);
         while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-            DPRINT("******************** Procedura di homing n. %d **********************",i);
+            DPRINT("********************Axis %d: Procedura di homing n. %d **********************",axis1,i);
             respHoming = mySlit1->homing(common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
             usleep(1000);
             if(respHoming<0){ 
-                DPRINT("***************** Procedura di homing n. %d terminata con errore ***************",respHoming);   
+                DERR("***************Axis %d: Procedura di homing n. %d terminata con errore ***************",axis1,respHoming);   
                 break;
             }
         }
         if(respHoming==0){
-            DPRINT("************ Procedura di homing n. %d terminata con successo ***************");
+            DPRINT("************Axis %d: Procedura di homing n. %d terminata con successo ***************",axis1,i);
         }
         respHoming = 1;
-        sleep(5);
+        usleep(1000);
     }
     
 //    if(respHoming==0){
@@ -184,38 +189,38 @@ int main(int argc,const char* argv[]){
 //    }
     
     if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-	fprintf(stderr,"************** Error at second position after homing by encoder **************\n");
+	DERR("**************Axis %d: Error at second position after homing by encoder **************",axis1);
         return -10;
     }
     if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
-    	fprintf(stderr,"************** Error at second position after homing reading by counter **************\n");
+    	DERR("**************Axis %d: Error at second position after homing reading by counter **************",axis1);
         return -11;
     }
-    DPRINT("************** Current position encoder %f, after homing **************",rpos);
-    DPRINT("************** Current position counter %f, after homing **************",rpos1);
+    DPRINT("**************Axis %d: Current position encoder %f, after homing **************",axis1,rpos);
+    DPRINT("**************Axis %d: Current position counter %f, after homing **************",axis1,rpos1);
     
     if(mySlit1->getState(&status,desc)<0){
-	fprintf(stderr,"**************Error at reading status after homing**************\n");
+	DERR("**************Axis %d: Error at reading status after homing**************",axis1);
         return -14;
     }
-    fprintf(stderr,"**************Reading status %d, %s after homing **************\n",status ,desc.c_str());
+    DPRINT("************** Axis %d: Reading status %d, %s after homing **************",axis1,status ,desc.c_str());
     
-    sleep(10); //Sleep inserito per analizzare la corretta deallocazione delle risorse
+    //sleep(10); //Sleep inserito per analizzare la corretta deallocazione delle risorse
      
-    try {
-        if(mySlit1!=NULL){
-            delete mySlit1;
-            DPRINT("Effect of the complete deallocation: possible motion stopped (if channel has been opened); possible electric power interrupted (if channel has been opened); possible opened communication channel closed.");
-        }
-    }
-    catch(StopMotionException e){
-        e.badStopMotionInfo();
-        return -11;
-    }
-    catch(ElectricPowerException e){
-        e.badElectricPowerInfo();
-        return -12;
-    }
+//    try {
+//        if(mySlit1!=NULL){
+//            delete mySlit1;
+//            DPRINT("Effect of the complete deallocation: possible motion stopped (if channel has been opened); possible electric power interrupted (if channel has been opened); possible opened communication channel closed.");
+//        }
+//    }
+//    catch(StopMotionException e){
+//        e.badStopMotionInfo();
+//        return -11;
+//    }
+//    catch(ElectricPowerException e){
+//        e.badElectricPowerInfo();
+//        return -12;
+//    }
     //sleep(5);
     return 0;
 }
