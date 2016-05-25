@@ -1102,14 +1102,14 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
         descStr=descStr+"Ready. ";
     }
 
-    // Analysis of the register content SRH (bit 1,2,3,4)
-    bool overPositionTrigger = false;
-    for(int i=1; i<=4; i++){
-        if(contentRegSRH & ((uint16_t)1 << i)){
-            stCode |= ACTUATOR_OVER_POSITION_TRIGGER; // accendo il secondo bit
-            overPositionTrigger = true;
-        }
-    }
+//    // Analysis of the register content SRH (bit 1,2,3,4)
+//    bool overPositionTrigger = false;
+//    for(int i=1; i<=4; i++){
+//        if(contentRegSRH & ((uint16_t)1 << i)){
+//            stCode |= ACTUATOR_OVER_POSITION_TRIGGER; // accendo il secondo bit
+//            overPositionTrigger = true;
+//        }
+//    }
 
     if(overPositionTrigger){
         //desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
@@ -1141,11 +1141,11 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
         descStr+="Fault status. ";
     }
 
-    //  Analysis of the register content SRL
-    if(contentRegSRL & ((uint16_t)1<<10)){
-        stCode |= ACTUATOR_MOTION_COMPLETED;
-        descStr+="Actuator motion completed. ";
-    }
+//    //  Analysis of the register content SRL
+//    if(contentRegSRL & ((uint16_t)1<<10)){
+//        stCode |= ACTUATOR_MOTION_COMPLETED;
+//        descStr+="Actuator motion completed. ";
+//    }
     if(contentRegSRL & ((uint16_t)1<<15)){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         descStr += "Electrical power supplied.";
