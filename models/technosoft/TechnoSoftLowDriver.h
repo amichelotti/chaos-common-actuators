@@ -256,6 +256,8 @@ namespace common{
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
                 
                 int getFirmwareVers(char* firmwareVers);
+                
+                int selectAxis();
            };
 	}// chiude namespace technosoft
 

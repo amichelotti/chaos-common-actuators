@@ -256,7 +256,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         DERR("failed to select axis %d",_axisID);
         return -20;
     }
-
+    
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
@@ -295,9 +295,13 @@ TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     
     DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_mm_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
-        return -1;
+        return -2;
     }
     return 0;
 }
@@ -305,10 +309,13 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
     DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
     
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_MoveRelative(deltaPosition, highSpeedHoming_mm_s, accelerationHoming_mm_s2, isAdditiveHoming, movementHoming, referenceBaseHoming)){
         DERR("error relative moving homing");
-   
-        return -1;
+        return -2;
     }
     return 0;
 }
@@ -323,6 +330,7 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
     speed_mm_s = _speed_mm_s;
     return 0;
 }
+
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
     if(_acceleration_mm_s2<0 || _acceleration_mm_s2>maxAcceleration_mm_s2){
@@ -331,6 +339,7 @@ int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     acceleration_mm_s2 = _acceleration_mm_s2;
     return 0;
 }
+
 int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
     
     if(_isAdditive!=TRUE && _isAdditive!=FALSE){
@@ -339,6 +348,7 @@ int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
     isAdditive = _isAdditive;
     return 0;
 }
+
 int TechnoSoftLowDriver::setMovement(const short& _movement){
     if((_movement!=UPDATE_NONE) && (_movement!=UPDATE_IMMEDIATE) && (_movement!=UPDATE_ON_EVENT)){
         return -1;
@@ -346,6 +356,7 @@ int TechnoSoftLowDriver::setMovement(const short& _movement){
     movement = _movement;   
     return 0;
 }
+
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
     if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
         return -1;
@@ -443,9 +454,13 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 //        return -4;
 //    }
     DPRINT("moving Absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_MoveAbsolute(absPosition, speed_mm_s, acceleration_mm_s2, movement, referenceBase)){
         DERR("error absolute step moving");
-        return -1;
+        return -2;
     }
     return 0;
 }
@@ -457,15 +472,18 @@ int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
     return 0;
 }
 
-
 int TechnoSoftLowDriver::moveVelocityHoming(){
     
     //double highSpeedHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*highSpeedHoming_mm_s)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     //double accelerationHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*accelerationHoming_mm_s2/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_MoveVelocity(highSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
         DERR("(homing) Error moving velocity ");
-        return -1;
+        return -2;
     }
     return 0;
 }
@@ -473,9 +491,13 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
 int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
     
     DPRINT("(homing) moving absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_MoveAbsolute(absPosition, lowSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
         DERR("(homing) Error absolute steps moving");
-        return -1;
+        return -2;
     }
     return 0;
 }
@@ -485,8 +507,12 @@ int TechnoSoftLowDriver::stopMotion(){
 //    if(!TS_SelectAxis(axisID)){
 //        return -1;
 //    }
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_Stop()){
-        return -1;
+        return -2;
     }
     DPRINT("stop axis:%d, %s",axisID, TS_GetLastErrorText());
     return 0;
@@ -498,7 +524,10 @@ int TechnoSoftLowDriver::providePower(){
 //        ERR("ALEDEBUG Error selecting axis");
 //        return -1;
 //    }
-
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_Power(POWER_ON)){
         //ERR("ALEDEBUG Error selecting axis");
         return -2;
@@ -525,24 +554,28 @@ int TechnoSoftLowDriver::stopPower(){
     DPRINT("stop power to axis:%d",axisID);
 
 //    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-
     if(!TS_Power(POWER_OFF)){
-        return -1;
+        return -2;
     }
     return 0;
 }
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
     
-    // NOTA:
-    
     // Il canale di comunicazione potrebbe essere stato aperto oppure no, in questo punto dell'esecuzione. Dipende
     // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
    
     if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
         DPRINT("Fase di deinizializzazione: il canale era stato aperto o e' stato appena aperto");
+        
+        if(!TS_SelectAxis(axisID)){
+            DERR("failed to select axis %d",axisID);
+            return -1;
+        }
+        
         if(stopMotion()<0){
             throw StopMotionException();
         }
@@ -586,12 +619,12 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
 }
 
 int TechnoSoftLowDriver::getCounter(long& tposition){
-   // DPRINT("getting counter");
+    
     DPRINT("Reading COUNTER position");
 //    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-
     if(!TS_GetLongVariable("TPOS", tposition)){
         return -2;
     }
@@ -599,13 +632,12 @@ int TechnoSoftLowDriver::getCounter(long& tposition){
 }
 
 int TechnoSoftLowDriver::getEncoder(long& aposition){
+    
     DPRINT("Reading ENCODER position");
-    //if(!TS_SelectAxis(axisID)){
-	
-        //return -1;
-    //}
-
-   
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_GetLongVariable("APOS", aposition)){
         return -2;
     }
@@ -613,6 +645,10 @@ int TechnoSoftLowDriver::getEncoder(long& aposition){
 }
 
 int TechnoSoftLowDriver::getLVariable(std::string& nameVar, long& var) {
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_GetLongVariable(nameVar.c_str(), var)){
         return -1;
     }
@@ -620,7 +656,10 @@ int TechnoSoftLowDriver::getLVariable(std::string& nameVar, long& var) {
 }
 
 int TechnoSoftLowDriver::resetCounter(){
-    
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_Execute("SAP 0")){
         return -1;
     }
@@ -628,251 +667,312 @@ int TechnoSoftLowDriver::resetCounter(){
 }
 
 int TechnoSoftLowDriver::resetEncoder(){
-    
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_Execute("APOS=0")){
         return -1;
     }
     return 0;
 }
 
-int TechnoSoftLowDriver::getPower(BOOL& powered){
-    
-    powered = FALSE;
-    WORD power;
-    if(!TS_ReadStatus(REG_SRL,power)){
-        return -1;
-    }
-    power = ((power & 1<<15)==0 ? 1 : 0); //La forma generale dell'istruzione di SHIFT A SINISTRA e' del tipo:
-    //variabile_intera << numero_posizioni
-    if (power==1) {
-        powered = FALSE;
-        return -2;
-    }
-    else{
-        powered = TRUE;
-        return -3;
-    }
-}
+//int TechnoSoftLowDriver::getPower(BOOL& powered){
+//    
+//    powered = FALSE;
+//    WORD power;
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_ReadStatus(REG_SRL,power)){
+//        return -2;
+//    }
+//    power = ((power & 1<<15)==0 ? 1 : 0); //La forma generale dell'istruzione di SHIFT A SINISTRA e' del tipo:
+//    //variabile_intera << numero_posizioni
+//    if (power==1) {
+//        powered = FALSE;
+//        return -3;
+//    }
+//    else{
+//        powered = TRUE;
+//        return -4;
+//    }
+//}
 
-int TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
-//The function converts the value to type fixed and writes it in the TML data
-//pszName on the active axis
-    if(!TS_SetFixedVariable(pszName, value)){
-        return -1;
-    }
-    return 0;
-}
+//int TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
+////The function converts the value to type fixed and writes it in the TML data
+////pszName on the active axis
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_SetFixedVariable(pszName, value)){
+//        return -2;
+//    }
+//    return 0;
+//}
 
-int TechnoSoftLowDriver::abortNativeOperation(){
-    //The function aborts the execution of a TML function launched with a 
-    //cancelable call
-    if(!TS_ABORT()){
-        return -1;
-    }
-    return 0;
-}
+//int TechnoSoftLowDriver::abortNativeOperation(){
+//    //The function aborts the execution of a TML function launched with a 
+//    //cancelable call
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_ABORT()){
+//        return -2;
+//    }
+//    return 0;
+//}
 
 
-int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
-    // The function commands the active axis to execute the TML function stored
-    //at pszFunctionName
-    if(!TS_CancelableCALL_Label(pszFunctionName.c_str())){
-        printf("executeTMLfunction: %s\n",TS_GetLastErrorText());
-        return -1;
-    }
-    return 0;
-}
+//int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
+//    // The function commands the active axis to execute the TML function stored
+//    //at pszFunctionName
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_CancelableCALL_Label(pszFunctionName.c_str())){
+//        printf("executeTMLfunction: %s\n",TS_GetLastErrorText());
+//        return -2;
+//    }
+//    return 0;
+//}
 
-int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
-    // 
-    if(!TS_QuickStopDecelerationRate(deceleration)){
-        return -1;
-    }
-    return 0;
-}
+//int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
+//    // 
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_QuickStopDecelerationRate(deceleration)){
+//        return -2;
+//    }
+//    return 0;
+//}
 
-int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
-    if(!TS_SetLongVariable(pszName, value)){
-	return -1;
-    }
-    return 0;
-}
+//int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_SetLongVariable(pszName, value)){
+//	return -2;
+//    }
+//    return 0;
+//}
 
-int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
-    
-    if(!TS_ReadStatus(selIndex, status))
-        return FALSE;
-
-    status=((status & 1<<8) == 0 ? 1 : 0);
-    return 0;
-}
+//int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
+//    
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_ReadStatus(selIndex, status))
+//        return FALSE;
+//
+//    status=((status & 1<<8) == 0 ? 1 : 0);
+//    return 0;
+//}
 
 int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
-    
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)){
-	return -1;
+	return -2;
     }
     return 0;
 }
 
 int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop){
-    
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_SetEventOnMotionComplete(waitEvent,enableStop)){ 
-	return -1;
+	return -2;
     }
     return 0;
 }
 
 int TechnoSoftLowDriver::checkEvent(BOOL& event){
-    
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_CheckEvent(event)){ 
-        return -1;
+        return -2;
     }
     return 0;
 }
 
-int TechnoSoftLowDriver::setPosition(const long& posValue){
-//  if(!TS_SelectAxis(axisID)){
+//int TechnoSoftLowDriver::setPosition(const long& posValue){
+////  if(!TS_SelectAxis(axisID)){
+////        return -1;
+////  }
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
 //        return -1;
-//  }
-  
-    if(!TS_SetPosition(posValue)){ 
-        DPRINT("Error at setting position: %s",TS_GetLastErrorText());
-        return -1;
-    }
-    return 0;
-}
+//    }
+//    if(!TS_SetPosition(posValue)){ 
+//        DPRINT("Error at setting position: %s",TS_GetLastErrorText());
+//        return -1;
+//    }
+//    return 0;
+//}
 
 int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr){
-
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
     if(!TS_ReadStatus(regIndex,contentRegister)){
 
         //DERR("Error at the register reading: %s",TS_GetLastErrorText());
         //descrErr.assign(TS_GetLastErrorText());
         descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
-        return -1;
+        return -2;
     }
     return 0;
 }
 
 int TechnoSoftLowDriver::resetFault(){
-
+    
     if(!TS_ResetFault()){
-         return -1;
+         return -2;
          // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
          // errors when the function is executed)
     }
     return 0;
 }
 
-// retrieve firmware version of the active drive
-int TechnoSoftLowDriver::getFirmwareVers(char* firmwareVers){
-    
-    if(!MSK_GetDriveVersion(firmwareVers)){
-        DERR("Errore lettura versione driver");
+int TechnoSoftLowDriver::selectAxis(){
+     
+    if(!TS_SelectAxis(axisID)){
+        DERR("failed to select axis %d",axisID);
         return -1;
     }
     return 0;
 }
 
-int TechnoSoftLowDriver::resetSetup(){
-    
-//    if(!TS_Execute("ENDINIT")){
-//        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
-//        DERR("Failed TS_Execute command");
-//        return -17;
-//    }
-    
-    if(!TS_Save()){
-         DERR("failed Low driver saving current setup: %s",TS_GetLastErrorText());
-         return -1; 
-    }
-//    char szDriveVersion[100];
-//    //char* szDriveVersion;
-//    if(!MSK_GetDriveVersion(szDriveVersion))
-//        DERR("Errore lettura versione driver");
-//        
-//    DPRINT("%s",szDriveVersion);
-    
-    if(!TS_Reset()){
-        DERR("failed Low driver reset: %s",TS_GetLastErrorText());
-        return -1; 
-    } 
-    
-    sleep(10);
-    
-    if(!MSK_SetBaudRate(9600)){
-        DERR("MSK_SetBaudRate 1 %s",TS_GetLastErrorText());
-        //return -2;
-        return -2;
-    }
-    sleep(3);
-    
-    if(!MSK_SetBaudRate(115200)){
-        DERR("MSK_SetBaudRate 2 %s",TS_GetLastErrorText());
-        //return -2;
-        return -2;
-    }
-    
-    sleep(3);
-
-//    if(!TS_SelectAxis(axisID)){
-//       DERR("failed to select axis %d",axisID);
-//       return -4;
-//    }
-//    
-    if(!TS_DriveInitialisation()){
-        DERR("failed Low driver initialisation %s",TS_GetLastErrorText());
-        return -4;
-    }
-//    
-    if(providePower()<0){ // che in teoria non ci andrebbe qui dentro...
-        DERR("failed power providing %s,", TS_GetLastErrorText());// failed power providing Send message timeout.
-        return -5;
-    }
-    
-//    if((my_channel->open()<0)){
-//         DERR("error opening channel");
-//         return -2;
-//    }
-     /*	Execute the initialization of the drive (ENDINIT) */
-    
-//    sleep(2);
-//    
-//    if(!TS_SetupAxis(axisID, axisRef)){
-//        DERR("failed to setup axis %d",axisID);
-//        return -15;
-//    }
-//    
+// retrieve firmware version of the active drive
+int TechnoSoftLowDriver::getFirmwareVers(char* firmwareVers){
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
-//        return -4;
+//        return -1;
 //    }
-    
-    // SET THE SERIAL COMMUNICATION BAUD RATE TO 9600. AFTER RESET THE DRIVE COMMUNICATES USING 9600 BPS
-    //....................
-    //....................
-    //....................
-    
-    // RESTORE THE SERIAL COMMUNICATIONE BAUD RATE
-    //....................
-    //....................
-    //....................
-    
-    // Settare il registro per la lettura dell'encoder
-//    if(!TS_Execute("SCR=0x4338")){
-//        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
-//        DERR("Failed TS_Execute command");
-//        return -17;
+    if(!MSK_GetDriveVersion(firmwareVers)){
+        DERR("Errore lettura versione driver");
+        return -2;
+    }
+    return 0;
+}
+
+//int TechnoSoftLowDriver::resetSetup(){
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+////    if(!TS_Execute("ENDINIT")){
+////        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+////        DERR("Failed TS_Execute command");
+////        return -17;
+////    }
+//    
+//    if(!TS_Save()){
+//         DERR("failed Low driver saving current setup: %s",TS_GetLastErrorText());
+//         return -1; 
+//    }
+////    char szDriveVersion[100];
+////    //char* szDriveVersion;
+////    if(!MSK_GetDriveVersion(szDriveVersion))
+////        DERR("Errore lettura versione driver");
+////        
+////    DPRINT("%s",szDriveVersion);
+//    
+//    if(!TS_Reset()){
+//        DERR("failed Low driver reset: %s",TS_GetLastErrorText());
+//        return -1; 
+//    } 
+//    
+//    sleep(10);
+//    
+//    if(!MSK_SetBaudRate(9600)){
+//        DERR("MSK_SetBaudRate 1 %s",TS_GetLastErrorText());
+//        //return -2;
+//        return -2;
+//    }
+//    sleep(3);
+//    
+//    if(!MSK_SetBaudRate(115200)){
+//        DERR("MSK_SetBaudRate 2 %s",TS_GetLastErrorText());
+//        //return -2;
+//        return -2;
 //    }
 //    
+//    sleep(3);
+//
+////    if(!TS_SelectAxis(axisID)){
+////       DERR("failed to select axis %d",axisID);
+////       return -4;
+////    }
+////    
 //    if(!TS_DriveInitialisation()){
-//        DERR("failed Low driver initialisation: %s",TS_GetLastErrorText());
+//        DERR("failed Low driver initialisation %s",TS_GetLastErrorText());
+//        return -4;
+//    }
+////    
+//    if(providePower()<0){ // che in teoria non ci andrebbe qui dentro...
+//        DERR("failed power providing %s,", TS_GetLastErrorText());// failed power providing Send message timeout.
 //        return -5;
 //    }
-    
-    return -6;
-}
+//    
+////    if((my_channel->open()<0)){
+////         DERR("error opening channel");
+////         return -2;
+////    }
+//     /*	Execute the initialization of the drive (ENDINIT) */
+//    
+////    sleep(2);
+////    
+////    if(!TS_SetupAxis(axisID, axisRef)){
+////        DERR("failed to setup axis %d",axisID);
+////        return -15;
+////    }
+////    
+////    if(!TS_SelectAxis(axisID)){
+////        DERR("failed to select axis %d",axisID);
+////        return -4;
+////    }
+//    
+//    // SET THE SERIAL COMMUNICATION BAUD RATE TO 9600. AFTER RESET THE DRIVE COMMUNICATES USING 9600 BPS
+//    //....................
+//    //....................
+//    //....................
+//    
+//    // RESTORE THE SERIAL COMMUNICATIONE BAUD RATE
+//    //....................
+//    //....................
+//    //....................
+//    
+//    // Settare il registro per la lettura dell'encoder
+////    if(!TS_Execute("SCR=0x4338")){
+////        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+////        DERR("Failed TS_Execute command");
+////        return -17;
+////    }
+////    
+////    if(!TS_DriveInitialisation()){
+////        DERR("failed Low driver initialisation: %s",TS_GetLastErrorText());
+////        return -5;
+////    }
+//    
+//    return -6;
+//}
 
 /*****************************************************************/
 /*****************************************************************/
@@ -882,6 +982,8 @@ int TechnoSoftLowDriver::resetSetup(){
 }
 /*****************************************************************/
  int  SerialCommChannelTechnosoft::getFD() {return this->fd;}
+ 
+ 
 
  
  

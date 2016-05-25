@@ -92,6 +92,7 @@ namespace common{
                 int moveAbsoluteMillimetersHoming(double mm);
                 
                 int poweron(uint32_t timeo_ms);
+                int selectAxis();
                 
                 // ************ Function for FAULT state reset: to be used when SRH.15 = 1 *******************  
                 // Set to 0 quasi tutti i bit del registro MER (tranne MER.15, MER.7, MER.6, MER.2),

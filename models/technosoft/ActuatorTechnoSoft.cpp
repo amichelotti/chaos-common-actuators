@@ -165,12 +165,16 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
     
     // Calcolo argomento funzione moveRelativeSteps
     double deltaMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
+    if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -1;
+    }    
     
+    if(driver->selectAxis()<0){
+        return -2;
+    } 
     //long deltaMicroStepsL = deltaMicroSteps;
     if(driver->moveRelativeSteps((long)deltaMicroSteps)<0)
-        return -2;
+        return -3;
     
     return 0;
 }
@@ -186,10 +190,13 @@ int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
         printf("Out of range\n");
         return -1;
     }
-    
+    if(driver->selectAxis()<0){
+        return -2;
+    }
+
     //long deltaMicroStepsL = deltaMicroSteps;
     if(driver->moveRelativeStepsHoming((long)deltaMicroSteps)<0){
-        return -2;
+        return -3;
     }
     
     return 0;
@@ -302,10 +309,13 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -1;
     }
-    
+    if(driver->selectAxis()<0){
+        return -2;
+    }
+
     //long nMicroStepsL = nMicroSteps;
     if(driver->moveAbsoluteSteps((long)nMicroSteps)<0){     
-        return -2;
+        return -3;
     }
     
     return 0;
@@ -313,29 +323,37 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
 
 int ActuatorTechnoSoft::moveAbsoluteMillimetersHoming(double millimeters){ 
     
+
     // Calcolo argomento funzione moveAbsoluteSteps
     double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     printf("nMicroSteps=%f\n",nMicroSteps);
-    if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX) // solo per adesso e necessario questo filtro..
+    if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -1;
+    }
     
-    //long nMicroStepsL = nMicroSteps;
-    if(driver->moveAbsoluteStepsHoming((long)nMicroSteps)<0){    
+    if(driver->selectAxis()<0){
         return -2;
     }
     
+    //long nMicroStepsL = nMicroSteps;
+    if(driver->moveAbsoluteStepsHoming((long)nMicroSteps)<0){    
+        return -3;
+    }
     return 0;
 }
 
 int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm){
      
     DPRINT("Position reading");
+    if(driver->selectAxis()<0){
+        return -1;
+    }
 
     if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
         long tposition;
         if(driver->getCounter(tposition)<0){
             DERR("getting counter");
-            return -1;
+            return -2;
         }
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
         *deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
@@ -344,7 +362,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
         long aposition;
         
         if(driver->getEncoder(aposition)<0)
-            return -2;
+            return -3;
         //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
         *deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
     }
@@ -362,41 +380,47 @@ int ActuatorTechnoSoft::homing(homingType mode){
     
     switch (internalHomingState) {
         case 0:
+            if(driver->selectAxis()<0){
+                risp = -1;
+            }
             if(driver->moveVelocityHoming()<0){
                 if(driver->stopMotion()<0){
-                    risp = -1;
+                    risp = -2;
                 }
-                risp = -2;
+                risp = -3;
             }
             DPRINT(" STATE 0: move velocity activated ");
             if(driver->setEventOnLimitSwitch()<0){
                 if(driver->stopMotion()<0){
-                    risp = -3;
+                    risp = -4;
                 }
-                risp = -4;
+                risp = -5;
             }
             DPRINT("STATE 0: event on limit switch activated ");
             internalHomingState = 1;
             risp = 1;
             break; 
         case 1:
+            if(driver->selectAxis()<0){
+                risp = -6;
+            }
             if(driver->checkEvent(switchTransited)<0){
                 if(driver->stopMotion()<0){
                     internalHomingState = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
-                    risp = -5;
+                    risp = -7;
                 }    
                 internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
-                risp = -6;
+                risp = -8;
             } 
             DPRINT(" STATE 1: possible limit switch transition just checked ");
             if(switchTransited){
                 if(driver->setEventOnMotionComplete()<0){ 
                     if(driver->stopMotion()<0){
                         internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
-                        risp= -7;
+                        risp= -9;
                     }
                     internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
-                    risp =-8;
+                    risp =-10;
                 }  
                 //eventOnMotionCompleteSet = true;
                 internalHomingState=2;
@@ -407,13 +431,16 @@ int ActuatorTechnoSoft::homing(homingType mode){
             risp = 1;
             break; 
         case 2:
+            if(driver->selectAxis()<0){
+                risp = -1;
+            }
             if(driver->checkEvent(motionCompleted)<0){
                 if(driver->stopMotion()<0){
                     internalHomingState = 0;
-                    risp = -9;
+                    risp = -11;
                 }
                 internalHomingState = 0;
-                risp= -10;
+                risp= -12;
             }
             DPRINT("************** STATE 2: possible event on motion completed checked **************");
             if(motionCompleted){
@@ -425,19 +452,22 @@ int ActuatorTechnoSoft::homing(homingType mode){
         case 3:
             // The motor is not in motion
             DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
+            if(driver->selectAxis()<0){
+                risp = -13;
+            }
             if(driver->getLVariable(cappos, cap_position)<0){ 
     //                if(driver->stopMotion()<0){
     //                    return -13;
     //                }
                 internalHomingState=0;
-                risp = -10;
+                risp = -14;
             }
             DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
         
             /*	Command an absolute positioning on the captured position */
             if(driver->moveAbsoluteStepsHoming(cap_position)<0){  
                 internalHomingState=0;
-                risp = -11;
+                risp = -15;
             }
             DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
             internalHomingState = 4;
@@ -445,6 +475,9 @@ int ActuatorTechnoSoft::homing(homingType mode){
             break;
         case 4:
             DPRINT("************** STATE 4: wait for positioning to end **************");
+            if(driver->selectAxis()<0){
+                risp = -16;
+            }
 //        if(!eventOnMotionCompleteSet){
 //            if(driver->setEventOnMotionComplete()<0){
 //                if(driver->stopMotion()<0){
@@ -461,43 +494,46 @@ int ActuatorTechnoSoft::homing(homingType mode){
                 if(driver->stopMotion()<0){
                     //eventOnMotionCompleteSet = false;
                     internalHomingState = 0;
-                    risp= -14;
+                    risp= -17;
                 }
                 //eventOnMotionCompleteSet = false;
                 internalHomingState = 0;
-                risp= -15;
+                risp= -18;
             }
             if(absoluteMotionCompleted){
                 internalHomingState = 5;
                 DPRINT("************** STATE 4: motor positioned to end **************");
-                risp= 1;
             }
             // **************DA IMPLEMENTARE:*****************
             // RESET ON Event On Motion Complete
+            risp= 1;
             break;
         case 5:
             // The motor is positioned to end
+            if(driver->selectAxis()<0){
+                risp = -19;
+            }
         
             if(driver->resetEncoder()<0){
                 internalHomingState = 0;
                 //if(driver->stopMotion()<0){
                 //return -23;
                 //}
-                risp= -16;
+                risp= -20;
             }
             if(driver->resetCounter()<0){
                 internalHomingState = 0;
                 //if(driver->stopMotion()<0){
                     //return -25;
                 //}
-                risp= -17;
+                risp= -21;
             }
             DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
             internalHomingState = 0;
             risp= 0;
             break;
         default:
-            risp= -18;
+            risp= -22;
             break; 
     } 
     
@@ -1045,16 +1081,20 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
 
     uint16_t contentRegSRH; // remember typedef uint16_t WORD;
     uint16_t contentRegSRL;
+    
+    if(driver->selectAxis()<0){
+        return -1;
+    }
 
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
     if((driver->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
-        return -1;
+        return -2;
     }
     indexReg = 3; // see constant REG_SRL in TML_lib.h
     if((driver->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
-        return -2;
+        return -3;
     }
 
     if(readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
@@ -1125,17 +1165,21 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
 
     uint16_t contentRegMER; // remember typedef uint16_t WORD;
     uint16_t contentRegSRH;
-
+    
+    if(driver->selectAxis()<0){
+        return -1;
+    }
+    
     short indexRegMER = 5; // see constant REG_MER in TML_lib.h
     if(driver->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
-        return -1;
+        return -2;
     }
 
     short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
     if(driver->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
-        return -2;
+        return -3;
     }
 
     // ***********************RIPRENDERE DA QUI*********************
@@ -1228,9 +1272,11 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
 }
      
  int ActuatorTechnoSoft::stopMotion(){
-     
+     if(driver->selectAxis()<0){
+        return -1;
+     }
      if(driver->stopMotion()<0){
-         return -1;
+        return -2;
      }
      return 0;
  }
@@ -1240,47 +1286,64 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      // In the fault status the power stage is disabled, the MER register signals
      // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
      int err = 0;
-     
+     if(driver->selectAxis()<0){
+        return -1;
+     }
      switch(mode){
          case 0:
             if(driver->resetFault()<0){
-                err = -1;
+                err = -2;
                 // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
                 // errors when the function is executed)
             }
             DPRINT("FUNZIONE DI RESET ALARMS ESEGUITA");
             break;
          case 1:
-            if(driver->resetSetup()<0){
-                err = -2;
-                // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
-                // errors when the function is executed)
-            }
-            DPRINT("FUNZIONE DI RESET STATE ESEGUITA");
-            break;
-         default:
+//            if(driver->resetSetup()<0){
+//                err = -2;
+//                // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
+//                // errors when the function is executed)
+//            }
+//            DPRINT("FUNZIONE DI RESET STATE ESEGUITA");
+//            break;
              err = -3;
+             break;
+         default:
+             err = -4;
              break;
      }
      return err;
  }
  
  int ActuatorTechnoSoft::getSWVersion(std::string& version){
-     
+     if(driver->selectAxis()<0){
+        return -1;
+     }
      char firmVers[100];
      if(driver->getFirmwareVers(&firmVers[0])<0){
         version = "No firmware version retrivied";
-        return -1;
+        return -2;
      }
      version.assign(firmVers);
      return 0;
-                                        
-}
+ }
  
 int ActuatorTechnoSoft::poweron(uint32_t timeo_ms){
      
-    if(driver->providePower()<0){
+    if(driver->selectAxis()<0){
         return -1;
+    }
+    
+    if(driver->providePower()<0){
+        return -2;
     }
     return 0;
  }
+
+//int ActuatorTechnoSoft::selectAxis(){
+//     
+//    if(driver->selectAxis()<0){
+//        return -1;
+//    }
+//    return 0;
+// }
