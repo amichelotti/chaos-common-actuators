@@ -1111,10 +1111,10 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
 //        }
 //    }
 
-    if(overPositionTrigger){
-        //desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
-        descStr=descStr+"Over position trigger. ";
-    }
+//    if(overPositionTrigger){
+//        //desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
+//        descStr=descStr+"Over position trigger. ";
+//    }
     // con il contenuto corrente **************
     if(contentRegSRH & ((uint16_t)1<<5)){
         stCode |= ACTUATOR_AUTORUN_ENABLED;

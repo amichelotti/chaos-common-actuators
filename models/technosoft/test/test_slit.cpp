@@ -53,14 +53,14 @@ int main(int argc,const char* argv[]){
     
     //usleep(50000);
     // Inizializzazione ASSE 2
-    mySlit2 = new ActuatorTechnoSoft(); // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
-    sprintf(sinit,"%s,myslit2,%s,%d",dev2,conf2,axis2);
-
-    if((ret=mySlit2->init((void*)sinit))!=0){
-        DERR("*************Cannot init axis %d. In fact the value returned is %d ****************",axis2,ret);
-        return -1;
-    }
-    DPRINT("*************Axis %d initialized!****************",axis2);
+//    mySlit2 = new ActuatorTechnoSoft(); // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
+//    sprintf(sinit,"%s,myslit2,%s,%d",dev2,conf2,axis2);
+//
+//    if((ret=mySlit2->init((void*)sinit))!=0){
+//        DERR("*************Cannot init axis %d. In fact the value returned is %d ****************",axis2,ret);
+//        return -1;
+//    }
+//    DPRINT("*************Axis %d initialized!****************",axis2);
     
     // Due init CONSECUTIVE gestiscono correttamente lo scenario multiasse
    
@@ -119,21 +119,21 @@ int main(int argc,const char* argv[]){
 	DERR("**************Axis %d: Error returned by movement operation **************",axis1);
         return -3;
     }
-    sleep(25);
-    if(mySlit2->moveRelativeMillimeters(10)<0){
-	DERR("**************Axis %d: Error returned by movement operation **************",axis1);
-        return -4;
-    }
+//    sleep(25);
+//    if(mySlit2->moveRelativeMillimeters(10)<0){
+//	DERR("**************Axis %d: Error returned by movement operation **************",axis1);
+//        return -4;
+//    }
     sleep(25);
     if(mySlit1->moveRelativeMillimeters(10)<0){
 	DERR("**************Axis %d: Error returned by movement operation **************",axis1);
         return -5;
     }
     sleep(25);
-    if(mySlit2->moveRelativeMillimeters(10)<0){
-	DERR("**************Axis %d: Error returned by movement operation **************",axis1);
-        return -6;
-    }
+//    if(mySlit2->moveRelativeMillimeters(10)<0){
+//	DERR("**************Axis %d: Error returned by movement operation **************",axis1);
+//        return -6;
+//    }
     sleep(25); // Attesa completamento movimentazione, in seconds
     
 //    usleep(10000);
