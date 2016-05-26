@@ -173,9 +173,9 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
         return -2;
     } 
     //long deltaMicroStepsL = deltaMicroSteps;
-    if(driver->moveRelativeSteps((long)deltaMicroSteps)<0)
+    if(driver->moveRelativeSteps((long)deltaMicroSteps)<0){
         return -3;
-    
+    }
     return 0;
 }
 

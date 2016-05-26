@@ -41,7 +41,6 @@ int main(int argc,const char* argv[]){
     PRINT("************ using axis %d, moving of %f mm**************",axis2,pos2);
     common::actuators::AbstractActuator*mySlit2 = NULL;
     
-    //
     mySlit1 = new ActuatorTechnoSoft(); // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
     sprintf(sinit,"%s,myslit1,%s,%d",dev1,conf1,axis1);
 
