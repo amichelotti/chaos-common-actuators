@@ -253,7 +253,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
    
     if(!TS_SelectAxis(_axisID)){
-        DERR("failed to select axis %d",_axisID);
+        DERR("failed to select axis %d, %s",_axisID,TS_GetLastErrorText());
         return -20;
     }
     
