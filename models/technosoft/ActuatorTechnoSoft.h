@@ -15,12 +15,12 @@
 //#define N_ROUNDS_DEFAULT 20.0 
 //#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
 
-#define N_ENCODER_LINES_DEFAULT 800.0 //[mm]                                                          (da MDS)
+#define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]                                               (da MDS)
-#define RANGE_MM_DEFAULT 100.0
+//#define RANGE_MM_DEFAULT 100.0
 
 
 #ifndef ActuatorTechnoSoft_h
@@ -68,7 +68,7 @@ namespace common{
         // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
         int deinit();
                 int moveRelativeMillimeters(double deltaMillimeters);
-                int moveRelativeMillimetersHoming(double deltaMillimeters);
+                //int moveRelativeMillimetersHoming(double deltaMillimeters);
                 int moveVelocityHoming();
                 
                 int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase);
@@ -89,7 +89,7 @@ namespace common{
                 
                 
                 int moveAbsoluteMillimeters(double mm);
-                int moveAbsoluteMillimetersHoming(double mm);
+                //int moveAbsoluteMillimetersHoming(double mm);
                 
                 int poweron(uint32_t timeo_ms);
                 int selectAxis();

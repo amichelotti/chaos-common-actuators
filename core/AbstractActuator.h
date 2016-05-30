@@ -87,8 +87,8 @@ typedef enum {
 
         protected:
             double range_mm; //mechanical range of the slit (passato da MDS), [mm]
-            uint64_t timeo_ms;
-            uint64_t timeo_homing_ms;            
+            uint64_t timeo_ms; // ***** DA ELIMINARE *****
+            uint64_t timeo_homing_ms; // ***** DA ELIMINARE *****            
 
 //            // Trapezoidal profile parameters
 //            double speed;
@@ -98,25 +98,25 @@ typedef enum {
 //            int32_t referenceBase;
 
         public:
-        AbstractActuator() {timeo_ms=0;};
+        AbstractActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
         virtual ~AbstractActuator() {};
         /**
         @brief set timeout in ms for the completion of the operation (0 wait undefinitively)
         @return 0 if success or an error code
         */
-        int setTimeout(uint64_t timeo_ms);                // ****Da implementare***
+        int setTimeout(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
         /**
         @brief get timeout in ms for the completion of the operation
         @return 0 if success or an error code
         */
-        int getTimeout(uint64_t* timeo_ms);               // ****Da implementare***
+        int getTimeout(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
         /**
         @brief Move the actuator X millimeters away from current position
         @return 0 if success or an error code
         */
         
-        int setTimeoutHoming(uint64_t timeo_ms);
-        int getTimeoutHoming(uint64_t* timeo_ms);
+        int setTimeoutHoming(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
+        int getTimeoutHoming(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
         
         
         virtual int moveRelativeMillimeters(double mm)=0;
@@ -124,10 +124,10 @@ typedef enum {
         // Set trapezoidal profile parameters
         virtual int setSpeed(double speed)=0;
         virtual int setAcceleration(double acceleration)=0;
-        virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
-        virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
-        virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
-        virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;
+        virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int                                             IN REALTA' NON DOVRA' ESSERE USATO
+        virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short                                       IN REALTA' NON DOVRA' ESSERE USATO
+        virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short                             IN REALTA' NON DOVRA' ESSERE USATO
+        virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;//  IN REALTA' NON POTRA' ESSERE USATO
         
         // Set Homing parameters
         virtual int sethighSpeedHoming(double speed)=0;
@@ -136,7 +136,6 @@ typedef enum {
         virtual int setAdditiveHoming(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
         virtual int setMovementHoming(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
         virtual int setReferenceBaseHoming(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
-        
         
         /**
         @brief set the actuator speed in mm/s

@@ -13,85 +13,184 @@ using namespace common::actuators::models;
 
 void* function1(void* str){
     
-    int* errPtr = new int; // Nessun errore..
+    //int* errPtr = new int; // Nessun errore..
     
     char* strInit =(char*)str;
     common::actuators::AbstractActuator* mySlit1 = new ActuatorTechnoSoft(); // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
     
     int ret;
     if((ret=mySlit1->init((void*)strInit))!=0){
-        DERR("*************Cannot init axis. In fact the value returned is ****************");
-        * errPtr = -1;
+        DERR("*************Cannot init axis. In fact the value returned is %d****************",ret);
+        //* errPtr = -1;
+        delete mySlit1;
+        mySlit1 = NULL;
     }
-    // Lettura stato
-    std::string desc;
-    int status;
-    if(mySlit1->getState(&status,desc)<0){
+    else{
+        // Lettura stato
+        std::string desc;
+        int status;
+        if(mySlit1->getState(&status,desc)<0){
 	DERR("**************Axis: error at first reading status**************");
-        * errPtr = -2;
-    }
+        //* errPtr = -2;
+        }
    
-    // Lettura posizione tramite encoder e counter
-    double rpos=-1000000,rpos1=-1000000;
-    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-        * errPtr = -3;
-    } 
-    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
-    	DERR("************** Error at first position reading by encoder **************");
-        * errPtr = -4;
-    }
-    DPRINT("**************Current position encoder %f, before move relative **************",rpos);
-    DPRINT("**************Current position counter %f, before move relative **************",rpos1);
-    
-    DPRINT("************** Movement operation starting **************");
-    if(mySlit1->moveRelativeMillimeters(10)<0){
-	DERR("**************Error returned by movement operation **************");
-        * errPtr = -5;
-    }
-    sleep(25);
-    DPRINT("************** 1 done **************");
-//    if(mySlit1->moveRelativeMillimeters(10)<0){
-//	DERR("**************Error returned by movement operation **************");
-//        * errPtr = -6;
-//    }
-//    sleep(25);
-//    DPRINT("************** 2 done **************");
-//    if(mySlit1->moveRelativeMillimeters(10)<0){
-//	DERR("**************Error returned by movement operation **************");
-//        * errPtr = -7;
-//    }
-//    sleep(25);
-//    DPRINT("************** 3 done **************");
-//    if(mySlit1->moveRelativeMillimeters(10)<0){
-//	DERR("**************Error returned by movement operation **************");
-//        * errPtr = -8;
-//    }
-//    sleep(25); // Attesa completamento movimentazione, in seconds
-//    DPRINT("************** 4 done **************");
-//    if(mySlit1->moveRelativeMillimeters(10)<0){
-//	DERR("**************Error returned by movement operation **************");
-//        * errPtr = -9;
-//    }
-//    sleep(25);
-//    DPRINT("************** 5 done **************");
-//     if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-//        * errPtr = -10;
+        // Lettura posizione tramite encoder e counter
+        double rpos=-1000000,rpos1=-1000000;
+        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+            //* errPtr = -3;
+        } 
+        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+            DERR("************** Error at first position reading by encoder **************");
+            //* errPtr = -4;
+        }
+        DPRINT("**************Current position encoder %f, before move relative **************",rpos);
+        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
+//    
+        DPRINT("************** Movement operation starting **************");
+        if(mySlit1->moveRelativeMillimeters(10)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -5;
+        }
+        sleep(30);
+        
+        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
+            DERR("************** Error setReferenceBase **************");
+        }
+
+        if(mySlit1->moveRelativeMillimeters(10)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -5;
+        }
+        sleep(30);
+//    DPRINT("************** 1 done **************");
+//    
+//    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+//        * errPtr = -3;
 //    } 
 //    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
 //    	DERR("************** Error at first position reading by encoder **************");
-//        * errPtr = -11;
+//        * errPtr = -4;
 //    }
-    DPRINT("**************Current position encoder %f, before move relative **************",rpos);
-    DPRINT("**************Current position counter %f, before move relative **************",rpos1);
+//    DPRINT("**************Current position encoder %f,after move relative **************",rpos);
+//    DPRINT("**************Current position counter %f, after move relative **************",rpos1);
+//    
+////    if(mySlit1->moveRelativeMillimeters(10)<0){
+////	DERR("**************Error returned by movement operation **************");
+////        * errPtr = -6;
+////    }
+////    sleep(25);
+////    DPRINT("************** 2 done **************");
+////    if(mySlit1->moveRelativeMillimeters(10)<0){
+////	DERR("**************Error returned by movement operation **************");
+////        * errPtr = -7;
+////    }
+////    sleep(25);
+////    DPRINT("************** 3 done **************");
+////    if(mySlit1->moveRelativeMillimeters(10)<0){
+////	DERR("**************Error returned by movement operation **************");
+////        * errPtr = -8;
+////    }
+////    sleep(25); // Attesa completamento movimentazione, in seconds
+////    DPRINT("************** 4 done **************");
+////    if(mySlit1->moveRelativeMillimeters(10)<0){
+////	DERR("**************Error returned by movement operation **************");
+////        * errPtr = -9;
+////    }
+////    sleep(25);
+////    DPRINT("************** 5 done **************");
+////     if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+////        * errPtr = -10;
+////    } 
+////    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+////    	DERR("************** Error at first position reading by encoder **************");
+////        * errPtr = -11;
+////    }
+     // Move absolute millimeters homing
+        DPRINT("************** Absolute movement operation starting **************");
+        //double absoluteMovement = rpos+15;
+        if(mySlit1->moveAbsoluteMillimeters(20)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -6;
+        }
+        sleep(60);
+        
+//        if(mySlit1->setSpeed(100)<0){
+//            DERR("************** Error setSpeed **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setAcceleration(0.2)<0){
+//            DERR("************** Error setAcceleration **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setAdditive(1)<0){
+//            DERR("************** Error setAdditive **************");
+//        }
+//        if(mySlit1->setMovement(0)<0){
+//            DERR("************** Error setMovement **************");
+//        }
+//        if(mySlit1->setReferenceBase(0)<0){
+//            DERR("************** Error setReferenceBase **************");
+//        }
+        
+        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
+            DERR("************** Error setReferenceBase **************");
+        }
+        
+        if(mySlit1->moveAbsoluteMillimeters(10)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -6;
+        }
+        sleep(60);
+        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+            //* errPtr = -7;
+        } 
+        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+            DERR("************** Error at first position reading by encoder **************");
+            //* errPtr = -8;
+        }
+        DPRINT("**************Current position encoder %f, after absolute movement **************",rpos);
+        DPRINT("**************Current position counter %f, after absolute movement **************",rpos1);
     
-    // Deallochiamo tutto prima che termini il thread
-    delete mySlit1;
-    mySlit1 = NULL;
-    delete errPtr;
-    errPtr = NULL;
+//        int respHoming=1; // Operazione di homing non conclusa
+//        int numHoming = 10;
+//  
+//        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+//            // con successo o insuccesso
+//            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
+//            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+//                DPRINT("********************Procedura di homing n. %d **********************",i);
+//                respHoming = mySlit1->homing(common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
+//                usleep(100000);
+//                if(respHoming<0){ 
+//                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
+//                    break;
+//                }
+//            }
+//            if(respHoming==0){
+//                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+//            }
+//            respHoming = 1;
+//            usleep(10000000);
+//        }
+//    
+//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+//            //* errPtr = -7;
+//        } 
+//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+//            DERR("************** Error at first position reading by encoder **************");
+//            //* errPtr = -8;
+//        }
+//        DPRINT("**************Current position encoder %f, after homing **************",rpos);
+//        DPRINT("**************Current position counter %f, after homing **************",rpos1);
     
-    return 0;
-   
+        // Deallochiamo tutto prima che termini il thread
+        delete mySlit1;
+        mySlit1 = NULL;
+        //delete errPtr;
+        //errPtr = NULL;
+    
+        return 0;
+    }
     //sleep(5);
     //pthread_exit((void*)errPtr);
 }
@@ -166,8 +265,27 @@ void* function2(void* str){
 //    	DERR("************** Error at first position reading by encoder **************");
 //        * errPtr = -11;
 //    }
-    DPRINT("**************Current position encoder %f, before move relative **************",rpos);
-    DPRINT("**************Current position counter %f, before move relative **************",rpos1);
+//    DPRINT("**************Current position encoder %f, before move relative **************",rpos);
+//    DPRINT("**************Current position counter %f, before move relative **************",rpos1);
+    
+    // Move absolute millimeters homing
+    DPRINT("************** Absolute movement operation starting **************");
+    if(mySlit1->moveAbsoluteMillimeters(rpos+15)<0){
+	DERR("**************Error returned by movement operation **************");
+        * errPtr = -6;
+    }
+    sleep(45);
+    
+    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+        * errPtr = -7;
+    } 
+    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+    	DERR("************** Error at first position reading by encoder **************");
+        * errPtr = -8;
+    }
+    
+    DPRINT("**************Current position encoder %f, after absolute movement **************",rpos);
+    DPRINT("**************Current position counter %f, after absolute movement **************",rpos1);
     
     // Deallochiamo tutto prima che termini il thread
     delete mySlit1;
@@ -204,7 +322,7 @@ int main(int argc,const char* argv[]){
     conf1=argv[2];       // [string], <technosoft configuration>
     axis1=atoi(argv[3]); // [int], <axis>
     pos1=atof(argv[4]);  // [float], <move position in mm>
-    PRINT("************ using axis %d, moving of %f mm**************",axis1,pos1);
+    //PRINT("************ using axis %d, moving of %f mm**************",axis1,pos1);
     sprintf(sinit1,"%s,myslit1,%s,%d",dev1,conf1,axis1);
     common::actuators::AbstractActuator*mySlit1 = NULL;
     
@@ -213,7 +331,7 @@ int main(int argc,const char* argv[]){
     conf2=conf1;       // [string], <technosoft configuration>
     axis2=15; // [int], <axis>
     pos2=pos1;  // [float], <move position in mm>
-    PRINT("************ using axis %d, moving of %f mm**************",axis2,pos2);
+    //PRINT("************ using axis %d, moving of %f mm**************",axis2,pos2);
     sprintf(sinit2,"%s,myslit2,%s,%d",dev2,conf2,axis2);
     common::actuators::AbstractActuator*mySlit2 = NULL;
     
@@ -223,13 +341,13 @@ int main(int argc,const char* argv[]){
     pthread_create(&th1,NULL,function1,&sinit1[0]);
     //function1(&sinit1[0]);
     
-    pthread_create(&th2,NULL,function2,&sinit2[0]);
+    //pthread_create(&th2,NULL,function2,&sinit2[0]);
     
-    void* resp_th_1;
-    void* resp_th_2;
+    //void* resp_th_1;
+    //void* resp_th_2;
     
     pthread_join(th1,NULL); //pthread_join modifica il contenuto del puntatore resp_th_1 
-    pthread_join(th2,NULL);
+    //pthread_join(th2,NULL);
     
     //int res1 = *((int*)(resp_th_1));
     //int res2 = *((int*)(resp_th_2));
@@ -347,35 +465,7 @@ int main(int argc,const char* argv[]){
 //    DPRINT("**************Axis %d: Current position counter %f, after move relative **************",axis2,rpos1);
 //    
 //    
-////    int respHoming=1; // Operazione di homing non conclusa
-////    int numHoming = 5;
-////    
-//    //sleep(10);
-////    for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-////        // con successo o insuccesso
-////        DPRINT("*************Axis %d: Procedura di homing n. %d iniziata*************",axis1,i);
-////        while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-////            DPRINT("********************Axis %d: Procedura di homing n. %d **********************",axis1,i);
-////            respHoming = mySlit1->homing(common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
-////            usleep(1000);
-////            if(respHoming<0){ 
-////                DERR("***************Axis %d: Procedura di homing n. %d terminata con errore ***************",axis1,respHoming);   
-////                break;
-////            }
-////        }
-////        if(respHoming==0){
-////            DPRINT("************Axis %d: Procedura di homing n. %d terminata con successo ***************",axis1,i);
-////        }
-////        respHoming = 1;
-////        usleep(1000000);
-////    }
-//    
-////    if(respHoming==0){
-////        DPRINT("Ultima operazione di homing terminata con successo");
-////    }
-////    else{ 
-////        DPRINT("Operazione di homing terminata con errore");
-////    }
+ 
 //    
 //    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
 //	DERR("**************Axis %d: Error at second position after homing by encoder **************",axis1);
