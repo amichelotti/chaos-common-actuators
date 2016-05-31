@@ -365,9 +365,11 @@ int ActuatorTechnoSoft::homing(homingType mode){
     switch (internalHomingState) {
         case 0:
             if(driver->selectAxis()<0){
+                internalHomingState = 0;
                 risp = -1;
             }
             if(driver->moveVelocityHoming()<0){
+                internalHomingState = 0;
                 if(driver->stopMotion()<0){
                     risp = -2;
                 }
@@ -375,6 +377,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
             }
             DPRINT(" STATE 0: move velocity activated ");
             if(driver->setEventOnLimitSwitch()<0){
+                internalHomingState = 0;
                 if(driver->stopMotion()<0){
                     risp = -4;
                 }
@@ -386,24 +389,23 @@ int ActuatorTechnoSoft::homing(homingType mode){
             break; 
         case 1:
             if(driver->selectAxis()<0){
+                internalHomingState = 0;
                 risp = -6;
             }
             if(driver->checkEvent(switchTransited)<0){
+                internalHomingState = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
                 if(driver->stopMotion()<0){
-                    internalHomingState = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
                     risp = -7;
                 }    
-                internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
                 risp = -8;
             } 
             DPRINT(" STATE 1: possible limit switch transition just checked ");
             if(switchTransited){
                 if(driver->setEventOnMotionComplete()<0){ 
+                    internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
                     if(driver->stopMotion()<0){
-                        internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
                         risp= -9;
                     }
-                    internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
                     risp =-10;
                 }  
                 //eventOnMotionCompleteSet = true;
@@ -416,15 +418,15 @@ int ActuatorTechnoSoft::homing(homingType mode){
             break; 
         case 2:
             if(driver->selectAxis()<0){
-                risp = -1;
+                internalHomingState = 0;
+                risp = -11;
             }
             if(driver->checkEvent(motionCompleted)<0){
-                if(driver->stopMotion()<0){
-                    internalHomingState = 0;
-                    risp = -11;
-                }
                 internalHomingState = 0;
-                risp= -12;
+                if(driver->stopMotion()<0){
+                    risp = -12;
+                }
+                risp= -13;
             }
             DPRINT("************** STATE 2: possible event on motion completed checked **************");
             if(motionCompleted){
@@ -437,6 +439,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
             // The motor is not in motion
             DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
             if(driver->selectAxis()<0){
+                internalHomingState = 0;
                 risp = -13;
             }
             if(driver->getLVariable(cappos, cap_position)<0){ 
@@ -460,6 +463,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         case 4:
             DPRINT("************** STATE 4: wait for positioning to end **************");
             if(driver->selectAxis()<0){
+                internalHomingState = 0;
                 risp = -16;
             }
 //        if(!eventOnMotionCompleteSet){
@@ -475,13 +479,12 @@ int ActuatorTechnoSoft::homing(homingType mode){
 //            } 
 //        }
             if(driver->checkEvent(absoluteMotionCompleted)<0){
+                internalHomingState = 0;
                 if(driver->stopMotion()<0){
                     //eventOnMotionCompleteSet = false;
-                    internalHomingState = 0;
                     risp= -17;
                 }
                 //eventOnMotionCompleteSet = false;
-                internalHomingState = 0;
                 risp= -18;
             }
             if(absoluteMotionCompleted){
@@ -495,6 +498,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
         case 5:
             // The motor is positioned to end
             if(driver->selectAxis()<0){
+                internalHomingState = 0;
                 risp = -19;
             }
         
@@ -578,10 +582,10 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
         stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
         descStr+="Limit switch positive event/interrupt. ";
     }
-    if(contentRegSRH & ((uint16_t)1<<7)){
-        stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
-        descStr+="Limit switch negative event/interrupt. ";
-    }
+//    if(contentRegSRH & ((uint16_t)1<<7)){
+//        stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
+//        descStr+="Limit switch negative event/interrupt. ";
+//    }
     if(contentRegSRH & ((uint16_t)1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         descStr+="Gear ratio in electronic gearing mode. ";
@@ -594,7 +598,6 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
         stCode |= ACTUATOR_FAULT;
         descStr+="Fault status. ";
     }
-
 //    //  Analysis of the register content SRL
 //    if(contentRegSRL & ((uint16_t)1<<10)){
 //        stCode |= ACTUATOR_MOTION_COMPLETED;
@@ -604,6 +607,13 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         descStr += "Electrical power supplied.";
     }
+     
+    // Homing in progress state
+    if(internalHomingState>0){
+        stCode |= HOMING_IN_PROGRESS;
+        descStr += "Homing in progress.";
+    }
+    
     *state = stCode;
     return 0;
 }
@@ -650,7 +660,7 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
                 // bit a bit con la variabile a primo membro
                 // In corrispondenza di questo errore accendo il bit 0 di *alarm
                 //desc.assign("CAN bus error. ");
-                descStr+="CAN bus error. ";
+                descStr=descStr+"CAN bus error. ";
             }
             else if(i==1){
                 stCode|=ACTUATOR_SHORT_CIRCUIT; // In corrispondenza di questo errore accendo il bit 1 di *alarm
@@ -666,7 +676,7 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
             }
             else if(i==4){
                 stCode|=ACTUATOR_SERIAL_COMM_ERROR;
-                descStr+= "Communication error. ";
+                descStr= descStr+ "Communication error. ";
             }
             else if(i==5){
                 stCode|=ACTUATOR_HALL_SENSOR_MISSING;

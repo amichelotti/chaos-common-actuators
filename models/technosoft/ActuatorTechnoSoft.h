@@ -46,6 +46,7 @@ namespace common{
                     bool state0activated;
                     //double highSpeedHoming; // The homing travel speed
                     //double range;
+           
                      
                 public:
 //                    typedef struct __technoinfo {

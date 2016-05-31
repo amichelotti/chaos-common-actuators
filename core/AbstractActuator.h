@@ -55,7 +55,7 @@ typedef enum {
             // Low part of the status
             ACTUATOR_MOTION_COMPLETED = 0x100,
             ACTUATOR_POWER_SUPPLIED = 0x200,  // cambiare nome
-
+            HOMING_IN_PROGRESS = 0x400,
             // Unknown status
             ACTUATOR_UNKNOWN_STATUS // Unknown state of the actuator
         } actuatorStatus;
@@ -130,6 +130,7 @@ typedef enum {
         virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;//  IN REALTA' NON POTRA' ESSERE USATO
         
         // Set Homing parameters
+        // RIMANGONO DA TESTARE QUESTE  
         virtual int sethighSpeedHoming(double speed)=0;
         virtual int setlowSpeedHoming(double speed)=0;
         virtual int setAccelerationHoming(double acceleration)=0;

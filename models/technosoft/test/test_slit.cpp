@@ -27,41 +27,64 @@ void* function1(void* str){
     }
     else{
         // Lettura stato
-        std::string desc;
+        std::string desc1;
         int status;
-        if(mySlit1->getState(&status,desc)<0){
+        if(mySlit1->getState(&status,desc1)<0){
 	DERR("**************Axis: error at first reading status**************");
         //* errPtr = -2;
         }
-   
-        // Lettura posizione tramite encoder e counter
-        double rpos=-1000000,rpos1=-1000000;
-        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-            //* errPtr = -3;
-        } 
-        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
-            DERR("************** Error at first position reading by encoder **************");
-            //* errPtr = -4;
-        }
-        DPRINT("**************Current position encoder %f, before move relative **************",rpos);
-        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
-//    
-        DPRINT("************** Movement operation starting **************");
-        if(mySlit1->moveRelativeMillimeters(10)<0){
-            DERR("**************Error returned by movement operation **************");
-            //* errPtr = -5;
-        }
-        sleep(30);
+        DPRINT("************** State before move relative: %d, %s **************",status,desc1.c_str());
         
-        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
-            DERR("************** Error setReferenceBase **************");
+        uint64_t alarms;
+        std::string desc2;
+        if(mySlit1->getAlarms(&alarms,desc2)<0){
+	DERR("************** Error at first reading alarms **************");
+        //* errPtr = -2;
         }
-
-        if(mySlit1->moveRelativeMillimeters(10)<0){
-            DERR("**************Error returned by movement operation **************");
-            //* errPtr = -5;
+        DPRINT("************** Alarms before move relative: %lu, %s **************",alarms,desc2.c_str());
+        std::cout<<desc2<<std::endl;
+        
+        // Reset alarms
+        int respAlarms;
+        if((respAlarms=mySlit1->resetAlarms(0))<0){
+            DERR("**************Error setting alarms %d **************\n",respAlarms);
         }
-        sleep(30);
+        
+        if(mySlit1->getAlarms(&alarms,desc2)<0){
+	DERR("************** Reading alarms after reset **************");
+        //* errPtr = -2;
+        }
+        DPRINT("************** Reading alarms after reset: %lu, %s **************",alarms,desc2.c_str());
+        std::cout<<desc2<<std::endl;
+       
+//        // Lettura posizione tramite encoder e counter
+//        double rpos=-1000000,rpos1=-1000000;
+//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+//            //* errPtr = -3;
+//        } 
+//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+//            DERR("************** Error at first position reading by encoder **************");
+//            //* errPtr = -4;
+//        }
+//        DPRINT("**************Current position encoder %f, before move relative **************",rpos);
+//        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
+////    
+//        DPRINT("************** Movement operation starting **************");
+//        if(mySlit1->moveRelativeMillimeters(10)<0){
+//            DERR("**************Error returned by movement operation **************");
+//            //* errPtr = -5;
+//        }
+//        sleep(30);
+//        
+//        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
+//            DERR("************** Error setReferenceBase **************");
+//        }
+//
+//        if(mySlit1->moveRelativeMillimeters(10)<0){
+//            DERR("**************Error returned by movement operation **************");
+//            //* errPtr = -5;
+//        }
+//        sleep(30);
 //    DPRINT("************** 1 done **************");
 //    
 //    if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
@@ -106,13 +129,13 @@ void* function1(void* str){
 ////        * errPtr = -11;
 ////    }
      // Move absolute millimeters homing
-        DPRINT("************** Absolute movement operation starting **************");
-        //double absoluteMovement = rpos+15;
-        if(mySlit1->moveAbsoluteMillimeters(20)<0){
-            DERR("**************Error returned by movement operation **************");
-            //* errPtr = -6;
-        }
-        sleep(60);
+//        DPRINT("************** Absolute movement operation starting **************");
+//        //double absoluteMovement = rpos+15;
+//        if(mySlit1->moveAbsoluteMillimeters(20)<0){
+//            DERR("**************Error returned by movement operation **************");
+//            //* errPtr = -6;
+//        }
+//        sleep(60);
         
 //        if(mySlit1->setSpeed(100)<0){
 //            DERR("************** Error setSpeed **************");
@@ -132,24 +155,24 @@ void* function1(void* str){
 //            DERR("************** Error setReferenceBase **************");
 //        }
         
-        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
-            DERR("************** Error setReferenceBase **************");
-        }
-        
-        if(mySlit1->moveAbsoluteMillimeters(10)<0){
-            DERR("**************Error returned by movement operation **************");
-            //* errPtr = -6;
-        }
-        sleep(60);
-        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-            //* errPtr = -7;
-        } 
-        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
-            DERR("************** Error at first position reading by encoder **************");
-            //* errPtr = -8;
-        }
-        DPRINT("**************Current position encoder %f, after absolute movement **************",rpos);
-        DPRINT("**************Current position counter %f, after absolute movement **************",rpos1);
+//        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
+//            DERR("************** Error setReferenceBase **************");
+//        }
+//        
+//        if(mySlit1->moveAbsoluteMillimeters(10)<0){
+//            DERR("**************Error returned by movement operation **************");
+//            //* errPtr = -6;
+//        }
+//        sleep(60);
+//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+//            //* errPtr = -7;
+//        } 
+//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+//            DERR("************** Error at first position reading by encoder **************");
+//            //* errPtr = -8;
+//        }
+//        DPRINT("**************Current position encoder %f, after absolute movement **************",rpos);
+//        DPRINT("**************Current position counter %f, after absolute movement **************",rpos1);
     
 //        int respHoming=1; // Operazione di homing non conclusa
 //        int numHoming = 10;
