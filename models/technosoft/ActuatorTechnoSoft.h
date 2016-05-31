@@ -13,13 +13,7 @@
 //#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step (MDS)
 //#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro
 //#define N_ROUNDS_DEFAULT 20.0 
-//#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
-
-#define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
-#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
-#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
-#define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
-#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]                                               (da MDS)
+//#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]                                              (da MDS)
 //#define RANGE_MM_DEFAULT 100.0
 
 
@@ -43,11 +37,10 @@ namespace common{
                     bool readyState;
                     int internalHomingState;
                     //bool eventOnMotionCompleteSet;
-                    bool state0activated;
+                    //bool state0activated;
                     //double highSpeedHoming; // The homing travel speed
                     //double range;
-           
-                     
+              
                 public:
 //                    typedef struct __technoinfo {
 //                        //const double range;
@@ -64,30 +57,33 @@ namespace common{
                 ActuatorTechnoSoft();
                 ~ActuatorTechnoSoft();
                
-        int init(void*initialization_string);
+                int init(void*initialization_string);
         // OK
         // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
-        int deinit();
+                int deinit();
                 int moveRelativeMillimeters(double deltaMillimeters);
                 //int moveRelativeMillimetersHoming(double deltaMillimeters);
                 int moveVelocityHoming();
                 
                 int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase);
                 int setSpeed(double speed);
+                int setMaxSpeed(double speed); //[mm/s]
                 int setAcceleration(double acceleration);
+                int setMaxAcceleration(double acceleration);
                 int setAdditive(bool isAdditive); // NOTA: bool dovra' essere castato a int
                 int setMovement(int32_t movement); // NOTA: int32_t dovra' essere castato a short
                 int setReferenceBase(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
                 
                 // Set Homing parameters
                 int sethighSpeedHoming(double speed);
+                int setMaxhighSpeedHoming(double speed);
                 int setlowSpeedHoming(double speed);
-                
+                int setMaxlowSpeedHoming(double speed);
                 int setAccelerationHoming(double acceleration);
                 int setAdditiveHoming(bool isAdditive); // NOTA: bool dovra' essere castato a int
                 int setMovementHoming(int32_t movement); // NOTA: int32_t dovra' essere castato a short
                 int setReferenceBaseHoming(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
-                
+                int setMaxAccelerationHoming(double acceleration);
                 
                 int moveAbsoluteMillimeters(double mm);
                 //int moveAbsoluteMillimetersHoming(double mm);

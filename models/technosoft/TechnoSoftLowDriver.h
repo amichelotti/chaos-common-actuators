@@ -59,6 +59,11 @@
 
 //#define MAX_LENGTH_STRING_FROM_SHELL 50
 //#define MAX_COMMAND_LENGTH 10
+#define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
+#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
+#define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
+#define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
+#define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm] 
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -112,6 +117,12 @@ namespace common{
                 
                 std::string dev;
                 std::string devName;
+                
+                double n_encoder_lines; 
+                double const_mult_technsoft; 
+                double steps_per_rounds;    
+                double n_rounds;            
+                double linear_movement_per_n_rounds;
                 
                 // Trapezoidal profile parameters for move relative and move absolute
                 double speed_mm_s;
@@ -182,7 +193,12 @@ namespace common{
                         const double _maxAccelerationHoming=MAX_ACCELERATION_HOMING_DEFAULT,
                         const BOOL _isAdditiveHoming=FALSE,
                         const short _movementHoming=UPDATE_IMMEDIATE,
-                        const short _referenceBaseHoming=FROM_REFERENCE);
+                        const short _referenceBaseHoming=FROM_REFERENCE,
+                        const double _n_encoder_lines=N_ENCODER_LINES_DEFAULT, 
+                        const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT, 
+                        const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
+                        const double _n_rounds=N_ROUNDS_DEFAULT,            
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
                 
                 //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
                 //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
@@ -196,7 +212,9 @@ namespace common{
                 
                 // Set trapezoidal profile parameters
                 int setSpeed(const double& speed);
+                int setMaxSpeed(const double& maxspeed);
                 int setAcceleration(const double& acceleration);
+                int setMaxAcceleration(const double& maxAcceleration);
                 int setAdditive(const BOOL& isAdditive);
                 int setMovement(const short& movement);
                 int setReferenceBase(const short& referenceBase);
@@ -208,12 +226,14 @@ namespace common{
                 
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
+                int setMaxhighSpeedHoming(const double& _speed);
                 int setlowSpeedHoming(const double& _lowSpeedHoming_mm_s);
+                int setMaxlowSpeedHoming(const double& speed);
                 int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
+                int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
                 int setAdditiveHoming(const BOOL& isAdditive);
                 int setMovementHoming(const short& movement);
                 int setReferenceBaseHoming(const short& referenceBase);
-                
                 
                 //Encoder lines
                 int setEncoderLines(int& _encoderLines);

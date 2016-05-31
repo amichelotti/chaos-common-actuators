@@ -214,12 +214,27 @@ int ActuatorTechnoSoft::setSpeed(double speed){
     return 0;
 }
 
+int ActuatorTechnoSoft::setMaxSpeed(double speed){
+    if(driver->setMaxSpeed(speed)<0){
+        return -1;
+    }
+    return 0;
+}
+
 int ActuatorTechnoSoft::setAcceleration(double acceleration){
     if(driver->setAcceleration(acceleration)<0){
         return -1;
     }
     return 0;
 }
+
+int ActuatorTechnoSoft::setMaxAcceleration(double maxAcceleration){
+    if(driver->setMaxAcceleration(maxAcceleration)<0){
+        return -1;
+    }
+    return 0;
+}
+
 
 int ActuatorTechnoSoft::setAdditive(bool isAdditive){
     if(driver->setAdditive((int)isAdditive)<0){
@@ -250,6 +265,13 @@ int ActuatorTechnoSoft::sethighSpeedHoming(double speed){
     return 0;
 }
 
+int ActuatorTechnoSoft::setMaxhighSpeedHoming(double maxHighSpeed){
+    if(driver->setMaxhighSpeedHoming(maxHighSpeed)<0){
+        return -1;
+    }
+    return 0;
+}
+
 int ActuatorTechnoSoft::setlowSpeedHoming(double speed){
     if(driver->setlowSpeedHoming(speed)<0){
         return -1;
@@ -257,8 +279,22 @@ int ActuatorTechnoSoft::setlowSpeedHoming(double speed){
     return 0;
 }
 
+int ActuatorTechnoSoft::setMaxlowSpeedHoming(double speed){
+    if(driver->setMaxlowSpeedHoming(speed)<0){
+        return -1;
+    }
+    return 0;
+}
+
 int ActuatorTechnoSoft::setAccelerationHoming(double acceleration){
     if(driver-> setaccelerationHoming(acceleration)<0){
+        return -1;
+    }
+    return 0;
+}
+
+int ActuatorTechnoSoft::setMaxAccelerationHoming(double maxacceleration){
+    if(driver-> setMaxAccelerationHoming(maxacceleration)<0){
         return -1;
     }
     return 0;

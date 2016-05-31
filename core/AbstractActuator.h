@@ -118,22 +118,26 @@ typedef enum {
         int setTimeoutHoming(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
         int getTimeoutHoming(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
         
-        
         virtual int moveRelativeMillimeters(double mm)=0;
 
         // Set trapezoidal profile parameters
-        virtual int setSpeed(double speed)=0;
+        virtual int setSpeed(double speed)=0; //[mm/s]
+        virtual int setMaxSpeed(double speed)=0; //[mm/s]
         virtual int setAcceleration(double acceleration)=0;
+        virtual int setMaxAcceleration(double acceleration)=0;
         virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int                                             IN REALTA' NON DOVRA' ESSERE USATO
         virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short                                       IN REALTA' NON DOVRA' ESSERE USATO
         virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short                             IN REALTA' NON DOVRA' ESSERE USATO
         virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;//  IN REALTA' NON POTRA' ESSERE USATO
         
         // Set Homing parameters
-        // RIMANGONO DA TESTARE QUESTE  
+        // ******************* RIMANGONO DA TESTARE QUESTE  ****************************  
         virtual int sethighSpeedHoming(double speed)=0;
+        virtual int setMaxhighSpeedHoming(double speed)=0;
         virtual int setlowSpeedHoming(double speed)=0;
+        virtual int setMaxlowSpeedHoming(double speed)=0;
         virtual int setAccelerationHoming(double acceleration)=0;
+        virtual int setMaxAccelerationHoming(double acceleration)=0;
         virtual int setAdditiveHoming(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
         virtual int setMovementHoming(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
         virtual int setReferenceBaseHoming(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short

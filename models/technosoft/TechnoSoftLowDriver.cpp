@@ -125,7 +125,12 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _maxAccelerationHoming_mm_s2,
                         const BOOL _isAdditiveHoming,
                         const short _movementHoming,
-                        const short _referenceBaseHoming){
+                        const short _referenceBaseHoming,
+                        const double _n_encoder_lines, 
+                        const double _const_mult_technsoft, 
+                        const double _steps_per_rounds,    
+                        const double _n_rounds,            
+                        const double _linear_movement_per_n_rounds){
     
     // Set trapezoidal profile parameters used for moveRelative(...)
     if(_maxSpeed_mm_s<=0){
@@ -212,6 +217,31 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
     referenceBaseHoming=_referenceBaseHoming;
     
+    if(_n_encoder_lines<=0){
+        return -17;
+    }
+    n_encoder_lines=_n_encoder_lines;
+    
+    if(_const_mult_technsoft<=0){
+        return -19;
+    }
+    const_mult_technsoft=_const_mult_technsoft;
+    
+    if(_steps_per_rounds<=0){
+        return -20;
+    }
+    steps_per_rounds=_steps_per_rounds;
+    
+    if(_n_rounds<=0){
+        return -21;
+    }
+    n_rounds =_n_rounds;
+    
+    if(_linear_movement_per_n_rounds<=0){
+        return -22;
+    }
+    linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+ 
 //    //____________________________________
 //     if(_encoderLines<=0){
 //        return -6;
@@ -331,6 +361,15 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
     return 0;
 }
 
+int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
+    
+    if(_maxspeed_mm_s<0 || _maxspeed_mm_s<speed_mm_s){
+        return -1;
+    }
+    maxSpeed_mm_s = _maxspeed_mm_s;
+    return 0;  
+}
+
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
     if(_acceleration_mm_s2<0 || _acceleration_mm_s2>maxAcceleration_mm_s2){
@@ -338,6 +377,15 @@ int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     }
     acceleration_mm_s2 = _acceleration_mm_s2;
     return 0;
+}
+
+int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2){
+    
+    if(_maxacceleration_mm_s2<0 || _maxacceleration_mm_s2<acceleration_mm_s2){
+        return -1;
+    }
+    maxAcceleration_mm_s2 = _maxacceleration_mm_s2;
+    return 0;  
 }
 
 int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
@@ -369,10 +417,19 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
 int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
     
-    if(_highSpeedHoming_mm_s<0 || _highSpeedHoming_mm_s>maxSpeed_mm_s){
+    if(_highSpeedHoming_mm_s<0 || _highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
         return -1;
     }
     highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming_mm_s){
+    
+     if(_maxhighSpeedHoming_mm_s<0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
+        return -1;
+    }
+    maxHighSpeedHoming_mm_s = _maxhighSpeedHoming_mm_s;
     return 0;
 }
 
@@ -386,6 +443,15 @@ int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
     return 0;
 }
 
+int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_mm_s){
+    
+     if(_maxlowSpeedHoming_mm_s<0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+        return -1;
+    }
+    maxLowSpeedHoming_mm_s = _maxlowSpeedHoming_mm_s;
+    return 0;
+}
+
 int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
     if(_accelerationHoming_mm_s2<0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
@@ -394,6 +460,17 @@ int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHomin
     accelerationHoming_mm_s2 = _accelerationHoming_mm_s2;
     return 0;
 }
+
+int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAccelerationHoming_mm_s2){
+    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    if(_maxAccelerationHoming_mm_s2<0 || _maxAccelerationHoming_mm_s2<accelerationHoming_mm_s2){
+        return -1;
+    }
+    maxAccelerationHoming_mm_s2 = _maxAccelerationHoming_mm_s2;
+    return 0;
+}
+
+
 int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
     
     if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
