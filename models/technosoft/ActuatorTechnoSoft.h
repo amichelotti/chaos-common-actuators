@@ -35,7 +35,8 @@ namespace common{
                     double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
 		    double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
                     bool readyState;
-                    int internalHomingState;
+                    int internalHomingStateDefault;
+                    int internalHomingStateHoming2;
                     //bool eventOnMotionCompleteSet;
                     //bool state0activated;
                     //double highSpeedHoming; // The homing travel speed
@@ -123,9 +124,7 @@ namespace common{
         @param version returning string
         @return 0 if success or an error code
         */
-        int getHWVersion(std::string& version){version="technosofthw-0.0";return 0;}
-
-            
+        int getHWVersion(std::string& version);
         };
 	}
     }

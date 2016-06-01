@@ -336,6 +336,11 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
     return 0;
 }
 
+double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
+    
+    return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
+}
+
 int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
     DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
     
@@ -695,29 +700,56 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     return 0;
 }
 
-int TechnoSoftLowDriver::getCounter(long& tposition){
+//int TechnoSoftLowDriver::getCounter(long& tposition){
+//    
+//    DPRINT("Reading COUNTER position");
+////    if(!TS_SelectAxis(axisID)){
+////        DERR("failed to select axis %d",axisID);
+////        return -1;
+////    }
+//    if(!TS_GetLongVariable("TPOS", tposition)){
+//        return -2;
+//    }
+//    return 0;
+//}
+
+int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     
     DPRINT("Reading COUNTER position");
+    long tposition;
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
     if(!TS_GetLongVariable("TPOS", tposition)){
-        return -2;
+        return -1;
     }
+    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
     return 0;
 }
 
-int TechnoSoftLowDriver::getEncoder(long& aposition){
+
+//int TechnoSoftLowDriver::getEncoder(long& aposition){
+//    
+//    DPRINT("Reading ENCODER position");
+////    if(!TS_SelectAxis(axisID)){
+////        DERR("failed to select axis %d",axisID);
+////        return -1;
+////    }
+//    if(!TS_GetLongVariable("APOS", aposition)){
+//        return -2;
+//    }
+//    return 0;
+//}
+
+int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     
     DPRINT("Reading ENCODER position");
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
+    long aposition;
     if(!TS_GetLongVariable("APOS", aposition)){
-        return -2;
+        return -1;
     }
+    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
     return 0;
 }
 

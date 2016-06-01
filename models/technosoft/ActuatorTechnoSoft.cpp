@@ -123,7 +123,8 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         //DPRINT("Valore calcolato per l'homing: %lu",timeo_homing_ms);
         
         //homing procedure parameters
-        internalHomingState=0;
+        internalHomingStateDefault=0;
+        internalHomingStateHoming2=0;
         //state0activated = false;
         
         // now the motor is ready!
@@ -149,7 +150,9 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
     DPRINT("moving relative %f mm",deltaMillimeters);
     
     // Calcolo argomento funzione moveRelativeSteps
-    double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+    //double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+    double deltaMicroSteps=driver->getdeltaMicroSteps(deltaMillimeters);
+    DPRINT("deltaMicroSteps = %f mm",deltaMicroSteps);
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -1;
     }    
@@ -325,8 +328,10 @@ int ActuatorTechnoSoft::setReferenceBaseHoming(int32_t referenceBase){
 int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){ 
     
     // Calcolo argomento funzione moveAbsoluteSteps
-    double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    printf("nMicroSteps=%f\n",nMicroSteps);
+    //double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+    double nMicroSteps = driver->getdeltaMicroSteps(millimeters);
+    DPRINT("nMicroSteps=%f\n",nMicroSteps);
+    
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -1;
     }
@@ -370,197 +375,293 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
     }
 
     if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
-        long tposition;
-        if(driver->getCounter(tposition)<0){
+        //long tposition;
+        if(driver->getCounter(deltaPosition_mm)<0){
             DERR("getting counter");
             return -2;
         }
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
-        *deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
+        //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
     }
     else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
-        long aposition;
-        
-        if(driver->getEncoder(aposition)<0)
+        //long aposition;
+        if(driver->getEncoder(deltaPosition_mm)<0){
             return -3;
+        }
         //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
-        *deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
+        //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
     }
     return 0;
 }
 
 int ActuatorTechnoSoft::homing(homingType mode){
     // Attenzione: la variabile mode non viene utilizzata
-    int risp;
-    int switchTransited=0;
-    int motionCompleted = 0;
-    std::string cappos = "CAPPOS";
-    long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
-    int absoluteMotionCompleted = 0;
     
-    switch (internalHomingState) {
-        case 0:
-            if(driver->selectAxis()<0){
-                internalHomingState = 0;
-                risp = -1;
-            }
-            if(driver->moveVelocityHoming()<0){
-                internalHomingState = 0;
-                if(driver->stopMotion()<0){
-                    risp = -2;
+    if(mode==defaultHoming){
+        
+        int risp;
+        int switchTransited=0;
+        int motionCompleted = 0;
+        std::string cappos = "CAPPOS";
+        long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
+        int absoluteMotionCompleted = 0;
+    
+        switch (internalHomingStateDefault) {
+            case 0:
+                if(driver->selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -1;
+                    break;
                 }
-                risp = -3;
-            }
-            DPRINT(" STATE 0: move velocity activated ");
-            if(driver->setEventOnLimitSwitch()<0){
-                internalHomingState = 0;
-                if(driver->stopMotion()<0){
-                    risp = -4;
-                }
-                risp = -5;
-            }
-            DPRINT("STATE 0: event on limit switch activated ");
-            internalHomingState = 1;
-            risp = 1;
-            break; 
-        case 1:
-            if(driver->selectAxis()<0){
-                internalHomingState = 0;
-                risp = -6;
-            }
-            if(driver->checkEvent(switchTransited)<0){
-                internalHomingState = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
-                if(driver->stopMotion()<0){
-                    risp = -7;
-                }    
-                risp = -8;
-            } 
-            DPRINT(" STATE 1: possible limit switch transition just checked ");
-            if(switchTransited){
-                if(driver->setEventOnMotionComplete()<0){ 
-                    internalHomingState = 0; // deve essere riinizializzato per successive operazione di homing
+                if(driver->moveVelocityHoming()<0){
+                    internalHomingStateDefault = 0;
                     if(driver->stopMotion()<0){
-                        risp= -9;
+                        risp = -2;
+                        break;
                     }
-                    risp =-10;
-                }  
-                //eventOnMotionCompleteSet = true;
-                internalHomingState=2;
-                DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
-            }
-            // **************DA IMPLEMENTARE:*****************
-            // RESET ON Limit Switch Transition Event
-            risp = 1;
-            break; 
-        case 2:
-            if(driver->selectAxis()<0){
-                internalHomingState = 0;
-                risp = -11;
-            }
-            if(driver->checkEvent(motionCompleted)<0){
-                internalHomingState = 0;
-                if(driver->stopMotion()<0){
-                    risp = -12;
+                    risp = -3;
+                    break;
                 }
-                risp= -13;
-            }
-            DPRINT("************** STATE 2: possible event on motion completed checked **************");
-            if(motionCompleted){
-                DPRINT("************** STATE 2: Motion completed after transition **************");
-                internalHomingState = 3;
-            }
-            risp= 1;
-            break;
-        case 3:
-            // The motor is not in motion
-            DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
-            if(driver->selectAxis()<0){
-                internalHomingState = 0;
-                risp = -13;
-            }
-            if(driver->getLVariable(cappos, cap_position)<0){ 
+                DPRINT(" STATE 0: move velocity activated ");
+                if(driver->setEventOnLimitSwitch()<0){
+                    internalHomingStateDefault = 0;
+                    if(driver->stopMotion()<0){
+                        risp = -4;
+                        break;
+                    }
+                    risp = -5;
+                    break;
+                }
+                DPRINT("STATE 0: event on limit switch activated ");
+                internalHomingStateDefault = 1;
+                risp = 1;
+                break; 
+            case 1:
+                if(driver->selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -6;
+                    break;
+                }
+                if(driver->checkEvent(switchTransited)<0){
+                    internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
+                    if(driver->stopMotion()<0){
+                        risp = -7;
+                        break;
+                    }    
+                    risp = -8;
+                    break;
+                } 
+                DPRINT(" STATE 1: possible limit switch transition just checked ");
+                if(switchTransited){
+                    if(driver->setEventOnMotionComplete()<0){ 
+                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+                        if(driver->stopMotion()<0){
+                            risp= -9;
+                            break;
+                        }
+                        risp =-10;
+                        break;
+                    }  
+                    //eventOnMotionCompleteSet = true;
+                    internalHomingStateDefault=2;
+                    DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
+                }
+                // **************DA IMPLEMENTARE:*****************
+                // RESET ON Limit Switch Transition Event
+                risp = 1;
+                break; 
+            case 2:
+                if(driver->selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -11;
+                    break;
+                }
+                if(driver->checkEvent(motionCompleted)<0){
+                    internalHomingStateDefault = 0;
+                    if(driver->stopMotion()<0){
+                        risp = -12;
+                        break;
+                    }
+                    risp= -13;
+                    break;
+                }
+                DPRINT("************** STATE 2: possible event on motion completed checked **************");
+                if(motionCompleted){
+                    DPRINT("************** STATE 2: Motion completed after transition **************");
+                    internalHomingStateDefault = 3;
+                }
+                risp= 1;
+                break;
+            case 3:
+                // The motor is not in motion
+                DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
+                if(driver->selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -13;
+                    break;
+                }
+                if(driver->getLVariable(cappos, cap_position)<0){ 
     //                if(driver->stopMotion()<0){
     //                    return -13;
     //                }
-                internalHomingState=0;
-                risp = -14;
-            }
-            DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
+                    internalHomingStateDefault=0;
+                    risp = -14;
+                    break;
+                }
+                DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
         
             /*	Command an absolute positioning on the captured position */
-            if(driver->moveAbsoluteStepsHoming(cap_position)<0){  
-                internalHomingState=0;
-                risp = -15;
-            }
-            DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
-            internalHomingState = 4;
-            risp= 1;
-            break;
-        case 4:
-            DPRINT("************** STATE 4: wait for positioning to end **************");
-            if(driver->selectAxis()<0){
-                internalHomingState = 0;
-                risp = -16;
-            }
+                if(driver->moveAbsoluteStepsHoming(cap_position)<0){  
+                    internalHomingStateDefault=0;
+                    risp = -15;
+                    break;
+                }
+                DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
+                internalHomingStateDefault = 4;
+                risp= 1;
+                break;
+            case 4:
+                DPRINT("************** STATE 4: wait for positioning to end **************");
+                if(driver->selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -16;
+                    break;
+                }
 //        if(!eventOnMotionCompleteSet){
 //            if(driver->setEventOnMotionComplete()<0){
 //                if(driver->stopMotion()<0){
 //                    eventOnMotionCompleteSet = false;
-//                    internalHomingState = 0;
+//                    internalHomingStateDefault = 0;
 //                    return -12;
 //                }
 //                eventOnMotionCompleteSet = false;
-//                internalHomingState = 0;
+//                internalHomingStateDefault = 0;
 //                return -13;
 //            } 
 //        }
-            if(driver->checkEvent(absoluteMotionCompleted)<0){
-                internalHomingState = 0;
-                if(driver->stopMotion()<0){
+                if(driver->checkEvent(absoluteMotionCompleted)<0){
+                    internalHomingStateDefault = 0;
+                    if(driver->stopMotion()<0){
                     //eventOnMotionCompleteSet = false;
-                    risp= -17;
-                }
+                        risp= -17;
+                        break;
+                    }
                 //eventOnMotionCompleteSet = false;
-                risp= -18;
-            }
-            if(absoluteMotionCompleted){
-                internalHomingState = 5;
-                DPRINT("************** STATE 4: motor positioned to end **************");
-            }
+                    risp= -18;
+                    break;
+                }
+                if(absoluteMotionCompleted){
+                    internalHomingStateDefault = 5;
+                    DPRINT("************** STATE 4: motor positioned to end **************");
+                }
             // **************DA IMPLEMENTARE:*****************
             // RESET ON Event On Motion Complete
-            risp= 1;
-            break;
-        case 5:
-            // The motor is positioned to end
-            if(driver->selectAxis()<0){
-                internalHomingState = 0;
-                risp = -19;
-            }
+                risp= 1;
+                break;
+            case 5:
+                // The motor is positioned to end
+                if(driver->selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -19;
+                    break;
+                }
         
-            if(driver->resetEncoder()<0){
-                internalHomingState = 0;
-                //if(driver->stopMotion()<0){
-                //return -23;
-                //}
-                risp= -20;
-            }
-            if(driver->resetCounter()<0){
-                internalHomingState = 0;
-                //if(driver->stopMotion()<0){
+                if(driver->resetEncoder()<0){
+                    internalHomingStateDefault = 0;
+                    //if(driver->stopMotion()<0){
+                    //return -23;
+                    //}
+                    risp= -20;
+                    break;
+                }
+                if(driver->resetCounter()<0){
+                    internalHomingStateDefault = 0;
+                    //if(driver->stopMotion()<0){
                     //return -25;
-                //}
-                risp= -21;
-            }
-            DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
-            internalHomingState = 0;
-            risp= 0;
-            break;
-        default:
-            risp= -22;
-            break; 
-    } 
-    return risp;
+                    //}
+                    risp= -21;
+                    break;
+                }
+                DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
+                internalHomingStateDefault = 0;
+                risp= 0;
+                break;
+            default:
+                internalHomingStateDefault = 0;
+                risp= -22;
+                break; 
+        } 
+        return risp;
+    }
+    else if(mode==homing2){
+        int risp;
+        uint16_t contentReg;
+        std::string descStr = "";
+        short homingDone = 0;
+        switch (internalHomingStateHoming2) {
+            case 0:
+                DPRINT("************** Homing procedure Homing2. STATE 0. **************");
+                if(driver->moveVelocityHoming()<0){
+                    internalHomingStateHoming2=0;
+                    risp= -1;
+                    break;
+                }
+                internalHomingStateHoming2=1;
+                risp= 1;
+                break;
+            case 1:
+                DPRINT("************** Homing procedure Homing2. STATE 1. **************");
+                if((driver->getStatusOrErrorReg(5, contentReg, descStr))<0){
+                    //ERR("Reading state error: %s",descStr.c_str());
+                    internalHomingStateHoming2=0;
+                    if(driver->stopMotion()<0){
+                        risp= -2;
+                        break;
+                    }
+                    risp= -3;
+                    break;
+                }
+                // lettura bit di interesse
+                homingDone=((contentReg & ((uint16_t)1)<<7) != 0 ? 1 : 0);
+                if(homingDone){
+                   internalHomingStateHoming2=2;
+                }
+                risp= 1;
+                break;
+            case 2:
+                DPRINT("************** Homing procedure Homing2. STATE 2. **************");
+                DPRINT("************** Reset encoder e counter **************");
+                if(driver->resetEncoder()<0){
+                    internalHomingStateHoming2=0;
+                    if(driver->stopMotion()<0){
+                        risp= -4;
+                        break;
+                    }
+                    risp= -5;
+                    break;
+                }
+                if(driver->resetCounter()<0){
+                    internalHomingStateHoming2=0;
+                    if(driver->stopMotion()<0){
+                        risp= -6;
+                        break;
+                    }
+                    risp= -7;
+                    break;
+                }
+                internalHomingStateHoming2=0;
+                risp=0;
+                break;
+            default:
+                internalHomingStateHoming2 = 0;
+                risp=-22;
+                break;
+        }
+        return risp;
+    }
+    else{
+        return -100;
+    }
 }
 
 
@@ -645,7 +746,7 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
     }
      
     // Homing in progress state
-    if(internalHomingState>0){
+    if(internalHomingStateDefault>0 || internalHomingStateHoming2>0){
         stCode |= HOMING_IN_PROGRESS;
         descStr += "Homing in progress.";
     }
@@ -839,3 +940,9 @@ int ActuatorTechnoSoft::poweron(uint32_t timeo_ms){
     }
     return 0;
  }
+
+int ActuatorTechnoSoft::getHWVersion(std::string& version){
+    
+   version="hardware technosoft da specificare";
+   return 0; 
+}
