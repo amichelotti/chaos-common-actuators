@@ -206,6 +206,7 @@ namespace common{
                 int stopPower();
                 
                 int moveRelativeSteps(const long& deltaPosition);// (0 -> OK)  (different 0 -> error)
+                double getdeltaMicroSteps(const double& deltaMillimeters);
                 //Set methods
                 int moveRelativeStepsHoming(const long& deltaPosition);
                 int moveVelocityHoming();
@@ -243,8 +244,8 @@ namespace common{
                 
                 // get methods for variables
                 channel_psh getMyChannel();
-                int getCounter(long& tposition);
-                int getEncoder(long& aposition);
+                int getCounter(double* deltaPosition_mm);
+                int getEncoder(double* deltaPosition_mm);
                 // resetting methos
                 int resetCounter();// reset TPOS_register();
                 int resetEncoder();// reset APOS_register();

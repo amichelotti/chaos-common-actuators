@@ -890,6 +890,7 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      if(driver->selectAxis()<0){
         return -1;
      }
+     mode =0;
      switch(mode){
          case 0:
             if(driver->resetFault()<0){

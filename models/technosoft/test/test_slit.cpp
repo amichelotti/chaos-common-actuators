@@ -174,27 +174,26 @@ void* function1(void* str){
 //        DPRINT("**************Current position encoder %f, after absolute movement **************",rpos);
 //        DPRINT("**************Current position counter %f, after absolute movement **************",rpos1);
     
-//        int respHoming=1; // Operazione di homing non conclusa
-//        int numHoming = 10;
-//  
-//        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-//            // con successo o insuccesso
-//            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
-//            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-//                DPRINT("********************Procedura di homing n. %d **********************",i);
-//                respHoming = mySlit1->homing(common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
-//                usleep(100000);
-//                if(respHoming<0){ 
-//                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
-//                    break;
-//                }
-//            }
-//            if(respHoming==0){
-//                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
-//            }
-//            respHoming = 1;
-//            usleep(10000000);
-//        }
+        int respHoming=1; // Operazione di homing non conclusa
+        int numHoming = 10;
+  
+        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+            // con successo o insuccesso
+            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
+            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+                respHoming = mySlit1->homing(common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
+                usleep(100000); // FREQUENZA DI 1,5 ms
+                if(respHoming<0){ 
+                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
+                    break;
+                }
+            }
+            if(respHoming==0){
+                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+            }
+            respHoming = 1;
+            usleep(5000000);
+        }
 //    
 //        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
 //            //* errPtr = -7;
