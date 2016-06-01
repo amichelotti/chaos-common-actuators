@@ -260,7 +260,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(!alreadyopenedChannel){
         if((my_channel->open()<0)){
             DERR("error opening channel");
-            return -17;
+            return -23;
         }
         channelJustOpened = true;
         //alreadyopenedChannel=true; // Canale di comunicazione aperto e inizializzazione driver/motor andata a buon fine
@@ -273,37 +273,41 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
-        return -18;
+        return -24;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d",axisID);
-        return -19;
+        return -25;
     }
    
     if(!TS_SelectAxis(_axisID)){
         DERR("failed to select axis %d, %s",_axisID,TS_GetLastErrorText());
-        return -20;
+        return -26;
     }
     
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
-        return -21;
+        return -27;
     }
     
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         DERR("Failed TS_Execute command");
-        return -22;
+        return -28;
     }
     
     // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
     if(providePower()<0){
         DERR("failed power providing");
-        return -23;
+        return -29;
+    }
+    
+    if(!TS_SetEventOnMotionComplete(0,0)){ 
+	return -30;
     }
     
     poweron=true;  // alimentazione al drive motor erogata

@@ -735,11 +735,11 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
         stCode |= ACTUATOR_FAULT;
         descStr+="Fault status. ";
     }
-//    //  Analysis of the register content SRL
-//    if(contentRegSRL & ((uint16_t)1<<10)){
-//        stCode |= ACTUATOR_MOTION_COMPLETED;
-//        descStr+="Actuator motion completed. ";
-//    }
+    //  Analysis of the register content SRL
+    if(!(contentRegSRL & ((uint16_t)1<<10))){
+        stCode |= ACTUATOR_INMOTION;
+        descStr+="Actuator in motion.";
+    }
     if(contentRegSRL & ((uint16_t)1<<15)){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         descStr += "Electrical power supplied.";

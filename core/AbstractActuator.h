@@ -53,7 +53,7 @@ typedef enum {
             ACTUATOR_FAULT=0x80, // Fault status
 
             // Low part of the status
-            ACTUATOR_MOTION_COMPLETED = 0x100,
+            ACTUATOR_INMOTION = 0x100,
             ACTUATOR_POWER_SUPPLIED = 0x200,  // cambiare nome
             HOMING_IN_PROGRESS = 0x400,
             // Unknown status
@@ -122,9 +122,9 @@ typedef enum {
 
         // Set trapezoidal profile parameters
         virtual int setSpeed(double speed)=0; //[mm/s]
-        virtual int setMaxSpeed(double speed)=0; //[mm/s]
+        //virtual int setMaxSpeed(double speed)=0; //[mm/s]
         virtual int setAcceleration(double acceleration)=0;
-        virtual int setMaxAcceleration(double acceleration)=0;
+        //virtual int setMaxAcceleration(double acceleration)=0;
         virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int                                             IN REALTA' NON DOVRA' ESSERE USATO
         virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short                                       IN REALTA' NON DOVRA' ESSERE USATO
         virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short                             IN REALTA' NON DOVRA' ESSERE USATO
@@ -132,12 +132,12 @@ typedef enum {
         
         // Set Homing parameters
         // ******************* RIMANGONO DA TESTARE QUESTE  ****************************  
-        virtual int sethighSpeedHoming(double speed)=0;
-        virtual int setMaxhighSpeedHoming(double speed)=0;
-        virtual int setlowSpeedHoming(double speed)=0;
-        virtual int setMaxlowSpeedHoming(double speed)=0;
+        //virtual int sethighSpeedHoming(double speed)=0;
+        //virtual int setMaxhighSpeedHoming(double speed)=0;
+        //virtual int setlowSpeedHoming(double speed)=0;
+        //virtual int setMaxlowSpeedHoming(double speed)=0;
         virtual int setAccelerationHoming(double acceleration)=0;
-        virtual int setMaxAccelerationHoming(double acceleration)=0;
+        //virtual int setMaxAccelerationHoming(double acceleration)=0;
         virtual int setAdditiveHoming(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
         virtual int setMovementHoming(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
         virtual int setReferenceBaseHoming(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
