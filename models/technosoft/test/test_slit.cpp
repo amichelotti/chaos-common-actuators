@@ -81,20 +81,20 @@ void* function1(void* str){
             //* errPtr = -4;
         }
         
-        if(mySlit1->setMaxSpeed(501.0)<0){
-            DERR("************** Error at MaxSpeed **************");
-            //* errPtr = -4;
-        }
+//        if(mySlit1->setMaxSpeed(501.0)<0){
+//            DERR("************** Error at MaxSpeed **************");
+//            //* errPtr = -4;
+//        }
         
         if(mySlit1->setAcceleration(0.5)<0){
             DERR("************** Error at setAcceleration **************");
             //* errPtr = -4;
         }
         
-        if(mySlit1->setMaxAcceleration(1.7)<0){
-            DERR("************** Error at MaxAcceleration **************");
-            //* errPtr = -4;
-        }
+//        if(mySlit1->setMaxAcceleration(1.7)<0){
+//            DERR("************** Error at MaxAcceleration **************");
+//            //* errPtr = -4;
+//        }
         
         if(mySlit1->setAdditive(0)<0){
             DERR("************** Error at setAdditive **************");
@@ -108,30 +108,30 @@ void* function1(void* str){
             DERR("************** Error at referenceBase **************");
             //* errPtr = -4;
         }
-        if(mySlit1->sethighSpeedHoming(10.0)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setMaxhighSpeedHoming(16)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setlowSpeedHoming(1.0)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setMaxlowSpeedHoming(3.0)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setAccelerationHoming(0.4)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setMaxAccelerationHoming(0.7)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
+//        if(mySlit1->sethighSpeedHoming(10.0)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setMaxhighSpeedHoming(16)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setlowSpeedHoming(1.0)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setMaxlowSpeedHoming(3.0)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setAccelerationHoming(0.4)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setMaxAccelerationHoming(0.7)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
         if(mySlit1->setAdditiveHoming(0)<0){
             DERR("************** Error at referenceBase **************");
             //* errPtr = -4;
@@ -144,26 +144,26 @@ void* function1(void* str){
             DERR("************** Error at referenceBase **************");
             //* errPtr = -4;
         }
-        if(mySlit1->setEncoderLines(800.0)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setConst_mult_technsoft(256.0)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setSteps_per_rounds(200.0)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setN_rounds(20.0)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
-        if(mySlit1->setLinear_movement_per_n_rounds(1.5)<0){
-            DERR("************** Error at referenceBase **************");
-            //* errPtr = -4;
-        }
+//        if(mySlit1->setEncoderLines(800.0)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setConst_mult_technsoft(256.0)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setSteps_per_rounds(200.0)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setN_rounds(20.0)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
+//        if(mySlit1->setLinear_movement_per_n_rounds(1.5)<0){
+//            DERR("************** Error at referenceBase **************");
+//            //* errPtr = -4;
+//        }
         
         DPRINT("************** Movement operation starting 2**************");
         if(mySlit1->moveRelativeMillimeters(10)<0){
