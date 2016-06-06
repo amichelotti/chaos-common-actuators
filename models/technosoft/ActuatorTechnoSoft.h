@@ -86,6 +86,12 @@ namespace common{
                 int setReferenceBaseHoming(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
                 int setMaxAccelerationHoming(double acceleration);
                 
+                int setEncoderLines(double _encoderLines);
+                int setConst_mult_technsoft(double _const_mult_technsoft);
+                int setSteps_per_rounds(double _steps_per_rounds);
+                int setN_rounds(double _n_rounds);
+                int setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds);
+
                 int moveAbsoluteMillimeters(double mm);
                 //int moveAbsoluteMillimetersHoming(double mm);
                 

@@ -223,8 +223,7 @@ namespace common{
                 int getSpeed(double& speed);
                   
                 int getHighSpeedHoming(double& _highSpeedHoming);
-                
-                
+
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
                 int setMaxhighSpeedHoming(const double& _speed);
@@ -236,8 +235,14 @@ namespace common{
                 int setMovementHoming(const short& movement);
                 int setReferenceBaseHoming(const short& referenceBase);
                 
+                int setConst_mult_technsoft(double& _const_mult_technsoft);
+                int setSteps_per_rounds(double& _steps_per_rounds);
+                int setN_rounds(double& _n_rounds);
+                int setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
+                int setEncoderLines(double& _encoderLines);
+                
                 //Encoder lines
-                int setEncoderLines(int& _encoderLines);
+                
                 
                 int moveAbsoluteSteps(const long& position) const;
                 int moveAbsoluteStepsHoming(const long& position) const;

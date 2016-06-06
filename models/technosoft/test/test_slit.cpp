@@ -56,25 +56,130 @@ void* function1(void* str){
         }
         DPRINT("************** Reading alarms after reset: %lu, %s **************",alarms,desc2.c_str());
         std::cout<<desc2<<std::endl;
-       
-//        // Lettura posizione tramite encoder e counter
-//        double rpos=-1000000,rpos1=-1000000;
-//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
-//            //* errPtr = -3;
-//        } 
-//        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
-//            DERR("************** Error at first position reading by encoder **************");
-//            //* errPtr = -4;
-//        }
-//        DPRINT("**************Current position encoder %f, before move relative **************",rpos);
-//        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
-////    
-//        DPRINT("************** Movement operation starting **************");
-//        if(mySlit1->moveRelativeMillimeters(10)<0){
-//            DERR("**************Error returned by movement operation **************");
-//            //* errPtr = -5;
-//        }
-//        sleep(30);
+        
+        // Lettura posizione tramite encoder e counter
+        double rpos=-1000000,rpos1=-1000000;
+        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_ENCODER,&rpos)<0){
+            //* errPtr = -3;
+        } 
+        if(mySlit1->getPosition(common::actuators::AbstractActuator::READ_COUNTER,&rpos1)<0){
+            DERR("************** Error at first position reading by encoder **************");
+            //* errPtr = -4;
+        }
+        DPRINT("**************Current position encoder %f, before move relative **************",rpos);
+        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
+//    
+        DPRINT("************** Movement operation starting 1 **************");
+        if(mySlit1->moveRelativeMillimeters(10)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -5;
+        }
+        sleep(25);
+        
+        if(mySlit1->setSpeed(399.0)<0){
+            DERR("************** Error at setSpeed **************");
+            //* errPtr = -4;
+        }
+        
+        if(mySlit1->setMaxSpeed(501.0)<0){
+            DERR("************** Error at MaxSpeed **************");
+            //* errPtr = -4;
+        }
+        
+        if(mySlit1->setAcceleration(0.5)<0){
+            DERR("************** Error at setAcceleration **************");
+            //* errPtr = -4;
+        }
+        
+        if(mySlit1->setMaxAcceleration(1.7)<0){
+            DERR("************** Error at MaxAcceleration **************");
+            //* errPtr = -4;
+        }
+        
+        if(mySlit1->setAdditive(0)<0){
+            DERR("************** Error at setAdditive **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setMovement(1)<0){
+            DERR("************** Error at movement **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setReferenceBase(1)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->sethighSpeedHoming(10.0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setMaxhighSpeedHoming(16)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setlowSpeedHoming(1.0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setMaxlowSpeedHoming(3.0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setAccelerationHoming(0.4)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setMaxAccelerationHoming(0.7)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setAdditiveHoming(0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setMovementHoming(1)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setReferenceBaseHoming(1)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setEncoderLines(800.0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setConst_mult_technsoft(256.0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setSteps_per_rounds(200.0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setN_rounds(20.0)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        if(mySlit1->setLinear_movement_per_n_rounds(1.5)<0){
+            DERR("************** Error at referenceBase **************");
+            //* errPtr = -4;
+        }
+        
+        DPRINT("************** Movement operation starting 2**************");
+        if(mySlit1->moveRelativeMillimeters(10)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -5;
+        }
+        
+        sleep(25);
+        
+        if(mySlit1->moveAbsoluteMillimeters(27)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -5;
+        }
+        
+        sleep(25);
+      
 //        
 //        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
 //            DERR("************** Error setReferenceBase **************");
@@ -146,7 +251,7 @@ void* function1(void* str){
 //            //* errPtr = -4;
 //        }
 //        if(mySlit1->setAdditive(1)<0){
-//            DERR("************** Error setAdditive **************");
+//            DERRhoming2("************** Error setAdditive **************");
 //        }
 //        if(mySlit1->setMovement(0)<0){
 //            DERR("************** Error setMovement **************");
@@ -175,13 +280,13 @@ void* function1(void* str){
 //        DPRINT("**************Current position counter %f, after absolute movement **************",rpos1);
     
         int respHoming=1; // Operazione di homing non conclusa
-        int numHoming = 10;
+        int numHoming = 3;
   
         for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
             // con successo o insuccesso
             DPRINT("*************Procedura di homing n. %d iniziata*************",i);
             while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-                respHoming = mySlit1->homing(common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
+                respHoming = mySlit1->homing(common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
                 usleep(100000); // FREQUENZA DI 1,5 ms
                 if(respHoming<0){ 
                     DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   

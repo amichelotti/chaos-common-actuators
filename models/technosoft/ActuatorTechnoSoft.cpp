@@ -324,6 +324,41 @@ int ActuatorTechnoSoft::setReferenceBaseHoming(int32_t referenceBase){
     return 0;
 }
 
+int ActuatorTechnoSoft::setEncoderLines(double _encoderLines){
+    if(driver->setEncoderLines(_encoderLines)<0){
+        return -1;
+    }   
+    return 0;
+}
+
+int ActuatorTechnoSoft::setConst_mult_technsoft(double _const_mult_technsoft){
+    if(driver->setConst_mult_technsoft(_const_mult_technsoft)<0){
+        return -1;
+    }    
+    return 0;
+}
+
+int ActuatorTechnoSoft::setSteps_per_rounds(double _steps_per_rounds){
+    if(driver->setSteps_per_rounds(_steps_per_rounds)<0){
+        return -1;
+    }    
+    return 0;
+}
+
+int ActuatorTechnoSoft::setN_rounds(double _n_rounds){
+    if(driver->setN_rounds(_n_rounds)<0){
+        return -1;
+    }   
+    return 0;
+}
+
+int ActuatorTechnoSoft::setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds){
+    if(driver->setLinear_movement_per_n_rounds(_linear_movement_per_n_rounds)<0){
+        return -1;
+    }   
+    return 0;
+}
+           
 // Move absolute homing
 int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){ 
     

@@ -6,7 +6,6 @@
 using namespace common::actuators::models;
 
 //--------------------------------------------
-
 void ElectricPowerException::badElectricPowerInfo(){
     
     std::cerr<< "The electrical power has not been turned off." << std::endl; 
@@ -22,7 +21,6 @@ SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(const std::string& pszD
                                        // e' inutile mettere il controllo. E poi se ritornasse un numero negativo bisognerebbe lanciare 
                                       // una eccezione dato che si tratta di un metodo costruttore
 }
-
 
 std::string  SerialCommChannelTechnosoft::getDevName(){return this->pszDevName;}
 int SerialCommChannelTechnosoft::getbtType(){return this->btType;}
@@ -132,41 +130,52 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _n_rounds,            
                         const double _linear_movement_per_n_rounds){
     
+    
     // Set trapezoidal profile parameters used for moveRelative(...)
+    
+    DPRINT("Inizializzazione parametri");
+    
     if(_maxSpeed_mm_s<=0){
         return -1;
     }
-    maxSpeed_mm_s=_maxSpeed_mm_s; 
+    maxSpeed_mm_s=_maxSpeed_mm_s;
+    DPRINT("maxSpeed_mm_s = %f",maxSpeed_mm_s);
     
     if(_speed_mm_s<0 || _speed_mm_s>_maxSpeed_mm_s){
         return -2;
     }
     speed_mm_s = _speed_mm_s; 
+    DPRINT("speed_mm_s = %f",speed_mm_s);
     
     if(_maxAcceleration_mm_s2<0){
         return -3;
     }
     maxAcceleration_mm_s2=_maxAcceleration_mm_s2;
-        
+    DPRINT("maxAcceleration_mm_s2 = %f",maxAcceleration_mm_s2);
+    
     if(_acceleration_mm_s2<0 || _acceleration_mm_s2>_maxAcceleration_mm_s2){
         return -4;
     }
     acceleration_mm_s2=_acceleration_mm_s2;
+    DPRINT("acceleration_mm_s2 = %f",acceleration_mm_s2);
     
     if(_isAdditive!=TRUE && _isAdditive!=FALSE){
         return -5;
     }  
     isAdditive=_isAdditive;
+    DPRINT("isAdditive = %d",isAdditive);
     
     if((_moveMoment!=UPDATE_NONE) && (_moveMoment!=UPDATE_IMMEDIATE) && (_moveMoment!=UPDATE_ON_EVENT)){
         return -6;
     }
     movement=_moveMoment;
+    DPRINT("movement = %d",movement);
     
     if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
         return -7;
     }
     referenceBase=_referenceBase;
+    DPRINT("referenceBase = %d",referenceBase);
     
     // ********************* Set homing parameters *********************
     if(_maxHighSpeedHoming_mm_s<=0){
@@ -363,7 +372,8 @@ int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
 int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
     
-    if(_speed_mm_s<0 || _speed_mm_s>maxSpeed_mm_s){
+    if(_speed_mm_s<=0 || _speed_mm_s>maxSpeed_mm_s){
+        DERR("Speed = %f",_speed_mm_s);
         return -1;
     }
     speed_mm_s = _speed_mm_s;
@@ -372,7 +382,8 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
 
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
     
-    if(_maxspeed_mm_s<0 || _maxspeed_mm_s<speed_mm_s){
+    if(_maxspeed_mm_s<=0 || _maxspeed_mm_s<speed_mm_s){
+        DERR("Max speed = %f",_maxspeed_mm_s);
         return -1;
     }
     maxSpeed_mm_s = _maxspeed_mm_s;
@@ -381,7 +392,8 @@ int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
 
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    if(_acceleration_mm_s2<0 || _acceleration_mm_s2>maxAcceleration_mm_s2){
+    if(_acceleration_mm_s2<=0 || _acceleration_mm_s2>maxAcceleration_mm_s2){
+        DERR("Acceleration = %f",_acceleration_mm_s2);
         return -1;
     }
     acceleration_mm_s2 = _acceleration_mm_s2;
@@ -390,7 +402,8 @@ int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
 
 int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2){
     
-    if(_maxacceleration_mm_s2<0 || _maxacceleration_mm_s2<acceleration_mm_s2){
+    if(_maxacceleration_mm_s2<=0 || _maxacceleration_mm_s2<acceleration_mm_s2){
+        DERR("Max acceleration = %f",_maxacceleration_mm_s2);
         return -1;
     }
     maxAcceleration_mm_s2 = _maxacceleration_mm_s2;
@@ -399,7 +412,8 @@ int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2
 
 int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
     
-    if(_isAdditive!=TRUE && _isAdditive!=FALSE){
+    if((_isAdditive!=TRUE) && (_isAdditive!=FALSE)){
+        DERR("setAdditive= %d",_isAdditive);
         return -1;
     }   
     isAdditive = _isAdditive;
@@ -408,6 +422,7 @@ int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
 
 int TechnoSoftLowDriver::setMovement(const short& _movement){
     if((_movement!=UPDATE_NONE) && (_movement!=UPDATE_IMMEDIATE) && (_movement!=UPDATE_ON_EVENT)){
+        DERR("setMovement = %d",_movement);
         return -1;
     }
     movement = _movement;   
@@ -415,7 +430,8 @@ int TechnoSoftLowDriver::setMovement(const short& _movement){
 }
 
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
-    if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
+    if((_referenceBase!=FROM_MEASURE) && (_referenceBase!=FROM_REFERENCE)){
+        DERR("_referenceBase = %d",_referenceBase);
         return -1;
     }
     referenceBase=_referenceBase; 
@@ -426,7 +442,7 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
 int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
     
-    if(_highSpeedHoming_mm_s<0 || _highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
+    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
         return -1;
     }
     highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
@@ -435,7 +451,7 @@ int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s)
 
 int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming_mm_s){
     
-     if(_maxhighSpeedHoming_mm_s<0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
+     if(_maxhighSpeedHoming_mm_s<=0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
         return -1;
     }
     maxHighSpeedHoming_mm_s = _maxhighSpeedHoming_mm_s;
@@ -445,7 +461,7 @@ int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming
 int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
     
-    if(_lowSpeedHoming_mm_s<0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+    if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
         return -1;
     }
     lowSpeedHoming_mm_s = _lowSpeedHoming_mm_s;
@@ -454,7 +470,7 @@ int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
 
 int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_mm_s){
     
-     if(_maxlowSpeedHoming_mm_s<0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+    if(_maxlowSpeedHoming_mm_s<=0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
         return -1;
     }
     maxLowSpeedHoming_mm_s = _maxlowSpeedHoming_mm_s;
@@ -463,7 +479,7 @@ int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_m
 
 int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    if(_accelerationHoming_mm_s2<0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
+    if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
         return -1;
     }
     accelerationHoming_mm_s2 = _accelerationHoming_mm_s2;
@@ -472,13 +488,12 @@ int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHomin
 
 int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAccelerationHoming_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    if(_maxAccelerationHoming_mm_s2<0 || _maxAccelerationHoming_mm_s2<accelerationHoming_mm_s2){
+    if(_maxAccelerationHoming_mm_s2<=0 || _maxAccelerationHoming_mm_s2<accelerationHoming_mm_s2){
         return -1;
     }
     maxAccelerationHoming_mm_s2 = _maxAccelerationHoming_mm_s2;
     return 0;
 }
-
 
 int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
     
@@ -498,7 +513,7 @@ int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
 }
 
 int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
-    if((_referenceBaseHoming!=FROM_MEASURE) && _referenceBaseHoming!=FROM_REFERENCE){
+    if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
         return -1;
     }
     referenceBaseHoming=_referenceBaseHoming; 
@@ -506,13 +521,45 @@ int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHomin
 }
 
 // Set encoder lines
-int TechnoSoftLowDriver::setEncoderLines(int& _encoderLines){
+int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
     if(_encoderLines<=0){
         return -1;
     }   
     encoderLines=_encoderLines;
     return 0;
 }
+
+int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
+    if(_const_mult_technsoft<=0){
+        return -1;
+    }   
+    const_mult_technsoft=_const_mult_technsoft;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
+    if(_steps_per_rounds<=0){
+        return -1;
+    }   
+    steps_per_rounds=_steps_per_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
+    if(_n_rounds<=0){
+        return -1;
+    }   
+    n_rounds=_n_rounds;
+    return 0;
+}
+    
+int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
+    if(_linear_movement_per_n_rounds<=0){
+        return -1;
+    }   
+    linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    return 0;
+}  
 
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
     

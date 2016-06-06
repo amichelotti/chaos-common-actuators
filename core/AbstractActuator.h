@@ -122,9 +122,9 @@ typedef enum {
 
         // Set trapezoidal profile parameters
         virtual int setSpeed(double speed)=0; //[mm/s]
-        //virtual int setMaxSpeed(double speed)=0; //[mm/s]
+        virtual int setMaxSpeed(double speed)=0; //[mm/s]  DA COMMENTARE
         virtual int setAcceleration(double acceleration)=0;
-        //virtual int setMaxAcceleration(double acceleration)=0;
+        virtual int setMaxAcceleration(double acceleration)=0; //DA COMMENTARE
         virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int                                             IN REALTA' NON DOVRA' ESSERE USATO
         virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short                                       IN REALTA' NON DOVRA' ESSERE USATO
         virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short                             IN REALTA' NON DOVRA' ESSERE USATO
@@ -132,16 +132,23 @@ typedef enum {
         
         // Set Homing parameters
         // ******************* RIMANGONO DA TESTARE QUESTE  ****************************  
-        //virtual int sethighSpeedHoming(double speed)=0;
-        //virtual int setMaxhighSpeedHoming(double speed)=0;
-        //virtual int setlowSpeedHoming(double speed)=0;
-        //virtual int setMaxlowSpeedHoming(double speed)=0;
+        virtual int sethighSpeedHoming(double speed)=0; //DA COMMENTARE
+        virtual int setMaxhighSpeedHoming(double speed)=0; //DA COMMENTARE
+        virtual int setlowSpeedHoming(double speed)=0;  //DA COMMENTARE
+        virtual int setMaxlowSpeedHoming(double speed)=0; //DA COMMENTARE
         virtual int setAccelerationHoming(double acceleration)=0;
-        //virtual int setMaxAccelerationHoming(double acceleration)=0;
+        virtual int setMaxAccelerationHoming(double acceleration)=0; //DA COMMENTARE
         virtual int setAdditiveHoming(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
         virtual int setMovementHoming(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
         virtual int setReferenceBaseHoming(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
         
+        virtual int setEncoderLines(double _encoderLines)=0;
+        virtual int setConst_mult_technsoft(double _const_mult_technsoft)=0;
+        virtual int setSteps_per_rounds(double _steps_per_rounds)=0;
+        virtual int setN_rounds(double _n_rounds)=0;
+        virtual int setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds)=0;
+        
+
         /**
         @brief set the actuator speed in mm/s
         @return 0 if success or an error code
