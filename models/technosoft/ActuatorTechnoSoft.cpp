@@ -37,8 +37,8 @@ int ActuatorTechnoSoft::init(void*initialization_string){
     boost::smatch match;
 
     if(regex_match(params, match, driver_match, boost::match_extra)){
-        std::string dev=match[1];      
-        std::string dev_name=match[2];
+        dev=match[1];      
+        dev_name=match[2];
         std::string conf_path=match[3];
         std::string straxid=match[4];
         int axid = atoi(straxid.c_str());
@@ -137,6 +137,54 @@ int ActuatorTechnoSoft::init(void*initialization_string){
    return -6;
 }
 
+ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ // OVERLOADING COSTRUTTORE DI COPIA
+    
+    //std::string dev; // Serial channel name
+    dev = objActuator.dev;
+    //std::string dev_name; // ActuatorTechnoSoft name
+    dev_name = objActuator.dev_name;
+    
+    readyState = objActuator.readyState;
+    internalHomingStateDefault = objActuator.internalHomingStateDefault;
+    internalHomingStateHoming2 = objActuator.internalHomingStateHoming2;
+    
+    // GESTIONE OGGETTO TechnoSoftLowDriver
+    driver = new TechnoSoftLowDriver(objActuator.dev,objActuator.dev_name);
+    // Inizializzazione membri dell' oggetto TechnoSoftLowDriver
+    driver->axisID = (objActuator.driver)->axisID;
+    driver->axisRef = (objActuator.driver)->axisRef;
+    driver->n_encoder_lines = (objActuator.driver)->n_encoder_lines;
+    driver->const_mult_technsoft = (objActuator.driver)->const_mult_technsoft;
+    driver->steps_per_rounds = (objActuator.driver)->steps_per_rounds;
+    driver->n_rounds = (objActuator.driver)->n_rounds;
+    driver->linear_movement_per_n_rounds = (objActuator.driver)->linear_movement_per_n_rounds;
+    driver->speed_mm_s = (objActuator.driver)->speed_mm_s;
+    driver->maxSpeed_mm_s = (objActuator.driver)->maxSpeed_mm_s;
+    driver->acceleration_mm_s2 = (objActuator.driver)->acceleration_mm_s2;
+    driver->maxAcceleration_mm_s2 = (objActuator.driver)->maxAcceleration_mm_s2;
+    driver->isAdditive = (objActuator.driver)->isAdditive;
+    driver->movement = (objActuator.driver)->movement;
+    driver->referenceBase = (objActuator.driver)->referenceBase;
+    
+    driver->highSpeedHoming_mm_s = (objActuator.driver)->highSpeedHoming_mm_s;
+    driver->lowSpeedHoming_mm_s = (objActuator.driver)->lowSpeedHoming_mm_s;
+    driver->maxHighSpeedHoming_mm_s = (objActuator.driver)->maxHighSpeedHoming_mm_s;
+    driver->maxLowSpeedHoming_mm_s = (objActuator.driver)->maxLowSpeedHoming_mm_s;
+    driver->accelerationHoming_mm_s2 = (objActuator.driver)->accelerationHoming_mm_s2;
+    driver->maxAccelerationHoming_mm_s2 = (objActuator.driver)->maxAccelerationHoming_mm_s2;
+    driver->isAdditiveHoming = (objActuator.driver)->isAdditiveHoming;
+    driver->movementHoming = (objActuator.driver)->movementHoming;
+    driver->referenceBaseHoming = (objActuator.driver)->referenceBaseHoming;
+    
+    driver->my_channel = (objActuator.driver)->my_channel;
+    //driver->channels = (objActuator.driver)->channels;
+    driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
+    driver->poweron = (objActuator.driver)->poweron;
+    driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
+    
+    DPRINT("Costruttore di copia eseguito");
+}
+
 int ActuatorTechnoSoft::deinit(){
     readyState=false;
     if (driver!=NULL) {
@@ -144,6 +192,12 @@ int ActuatorTechnoSoft::deinit(){
     }
     DPRINT("ActuatorTechnoSoft object is deinitialized");
     return 0; 
+}
+
+int ActuatorTechnoSoft::setParameter(const std::string& parName,const std::string& value){
+        
+    
+    return 0;
 }
 
 int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
@@ -965,17 +1019,22 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      return 0;
  }
  
-int ActuatorTechnoSoft::poweron(uint32_t timeo_ms){
-     
+int ActuatorTechnoSoft::poweron(int on){
     if(driver->selectAxis()<0){
         return -1;
     }
-    
-    if(driver->providePower()<0){
-        return -2;
+    if(on){ // Accensione
+        if(driver->providePower()<0){
+            return -2;
+        }
+    }
+    else{ // Spegnimento
+        if(driver->stopPower()<0){
+            return -3;
+        }       
     }
     return 0;
- }
+}
 
 int ActuatorTechnoSoft::getHWVersion(std::string& version){
     

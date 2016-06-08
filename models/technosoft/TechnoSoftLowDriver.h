@@ -111,7 +111,7 @@ namespace common{
             //TechnoSoftLowDriver class
             class TechnoSoftLowDriver {
 
-	    private:
+	    public:
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
                 
@@ -146,17 +146,17 @@ namespace common{
                  
                 // Additional parameters for s-curve profile
                 //long jerkTime;
-                short decelerationType;
+                //short decelerationType;
                 
-                char setupFilePath[200];
+                //char setupFilePath[200];
                 
                 // ************** cosa rappresentano queste tre variabili? ***************
-                int absoluteSteps;// contatore software
-                int status_register;// Reg_MER
-                int error_register; 
+                //int absoluteSteps;// contatore software
+                //int status_register;// Reg_MER
+                //int error_register; 
                 
                 //Encoder parameter
-                int encoderLines; // (passato da MDS)
+                //int encoderLines; // (passato da MDS)
                 typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh;
                 channel_psh my_channel;
                 typedef std::map<std::string,channel_psh> channel_map_t;
@@ -200,8 +200,7 @@ namespace common{
                         const double _n_rounds=N_ROUNDS_DEFAULT,            
                         const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
                 
-                //LONG RelPosition, DOUBLE Speed, DOUBLE Acceleration, BOOL IsAdditive, SHORT MoveMoment, SHORT ReferenceBase)
-                //void setupTrapezoidalProfile(long, double, double, BOOL, short, short);
+            
                 int providePower();
                 int stopPower();
                 

@@ -118,6 +118,8 @@ typedef enum {
         int setTimeoutHoming(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
         int getTimeoutHoming(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
         
+        virtual int setParameter(const std::string& parName,const std::string& value)=0;
+        
         virtual int moveRelativeMillimeters(double mm)=0;
 
         // Set trapezoidal profile parameters
@@ -234,7 +236,7 @@ typedef enum {
             virtual int getState(int* state, std::string& desc)=0;   // ****Da implementare***
             virtual int getAlarms(uint64_t*alrm,std::string& desc)=0;
             virtual int resetAlarms(uint64_t alrm)=0;
-            virtual int poweron(uint32_t timeo_ms=ACTUATORS_DEFAULT_TIMEOUT)=0;
+            virtual int poweron(int on)=0;
             virtual uint64_t getFeatures()=0;
             virtual int moveAbsoluteMillimeters(double mm)=0;
     };

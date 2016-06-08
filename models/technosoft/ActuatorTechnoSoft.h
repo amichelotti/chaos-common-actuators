@@ -31,9 +31,9 @@ namespace common{
                 private:
                     TechnoSoftLowDriver *driver;
                     std::string dev; // Serial channel name
-                    std::string name; // ActuatorTechnoSoft name
-                    double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
-		    double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
+                    std::string dev_name; // ActuatorTechnoSoft name
+                    //double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
+		    //double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
                     bool readyState;
                     int internalHomingStateDefault;
                     int internalHomingStateHoming2;
@@ -56,8 +56,10 @@ namespace common{
                     
                 // costruttore
                 ActuatorTechnoSoft();
+                // Costruttore di copia
+                ActuatorTechnoSoft(const ActuatorTechnoSoft&);
                 ~ActuatorTechnoSoft();
-               
+
                 int init(void*initialization_string);
         // OK
         // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
@@ -66,6 +68,8 @@ namespace common{
                 //int moveRelativeMillimetersHoming(double deltaMillimeters);
                 int moveVelocityHoming();
                 
+                int setParameter(const std::string& parName,const std::string& value);
+                   
                 int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase);
                 int setSpeed(double speed);
                 int setMaxSpeed(double speed); //[mm/s]
@@ -95,7 +99,7 @@ namespace common{
                 int moveAbsoluteMillimeters(double mm);
                 //int moveAbsoluteMillimetersHoming(double mm);
                 
-                int poweron(uint32_t timeo_ms);
+                int poweron(int on);
                 int selectAxis();
                 
                 // ************ Function for FAULT state reset: to be used when SRH.15 = 1 *******************  
