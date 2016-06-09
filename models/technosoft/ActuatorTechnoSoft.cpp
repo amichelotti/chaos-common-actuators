@@ -194,7 +194,7 @@ int ActuatorTechnoSoft::deinit(){
     return 0; 
 }
 
-int ActuatorTechnoSoft::setParameter(const std::string& parName,const std::string& value){
+int ActuatorTechnoSoft::setParameter(const std::string parName,const std::string value){
         
     
     return 0;
