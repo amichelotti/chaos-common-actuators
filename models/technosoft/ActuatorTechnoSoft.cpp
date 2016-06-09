@@ -185,6 +185,61 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     DPRINT("Costruttore di copia eseguito");
 }
 
+ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objActuator){ // Overloading operatori di assegnamento
+    
+    if(this==& objActuator){
+        return *this;
+    } 
+    //std::string dev; // Serial channel name
+    dev = objActuator.dev;
+    //std::string dev_name; // ActuatorTechnoSoft name
+    dev_name = objActuator.dev_name;
+    
+    readyState = objActuator.readyState;
+    internalHomingStateDefault = objActuator.internalHomingStateDefault;
+    internalHomingStateHoming2 = objActuator.internalHomingStateHoming2;
+    
+    if(driver!=NULL){ // Focalizziamo la nostra attenzione sul membro TechnoSoftLowDriver    
+        delete driver;
+        driver = new TechnoSoftLowDriver(dev,dev_name);
+    }
+    
+    // copia valori membri oggetto TechnoSoftLowDriver a destra dell'uguale
+    driver->axisID = (objActuator.driver)->axisID;
+    driver->axisRef = (objActuator.driver)->axisRef;
+    driver->n_encoder_lines = (objActuator.driver)->n_encoder_lines;
+    driver->const_mult_technsoft = (objActuator.driver)->const_mult_technsoft;
+    driver->steps_per_rounds = (objActuator.driver)->steps_per_rounds;
+    driver->n_rounds = (objActuator.driver)->n_rounds;
+    driver->linear_movement_per_n_rounds = (objActuator.driver)->linear_movement_per_n_rounds;
+    driver->speed_mm_s = (objActuator.driver)->speed_mm_s;
+    driver->maxSpeed_mm_s = (objActuator.driver)->maxSpeed_mm_s;
+    driver->acceleration_mm_s2 = (objActuator.driver)->acceleration_mm_s2;
+    driver->maxAcceleration_mm_s2 = (objActuator.driver)->maxAcceleration_mm_s2;
+    driver->isAdditive = (objActuator.driver)->isAdditive;
+    driver->movement = (objActuator.driver)->movement;
+    driver->referenceBase = (objActuator.driver)->referenceBase;
+    
+    driver->highSpeedHoming_mm_s = (objActuator.driver)->highSpeedHoming_mm_s;
+    driver->lowSpeedHoming_mm_s = (objActuator.driver)->lowSpeedHoming_mm_s;
+    driver->maxHighSpeedHoming_mm_s = (objActuator.driver)->maxHighSpeedHoming_mm_s;
+    driver->maxLowSpeedHoming_mm_s = (objActuator.driver)->maxLowSpeedHoming_mm_s;
+    driver->accelerationHoming_mm_s2 = (objActuator.driver)->accelerationHoming_mm_s2;
+    driver->maxAccelerationHoming_mm_s2 = (objActuator.driver)->maxAccelerationHoming_mm_s2;
+    driver->isAdditiveHoming = (objActuator.driver)->isAdditiveHoming;
+    driver->movementHoming = (objActuator.driver)->movementHoming;
+    driver->referenceBaseHoming = (objActuator.driver)->referenceBaseHoming;
+    
+    driver->my_channel = (objActuator.driver)->my_channel;
+    //driver->channels = (objActuator.driver)->channels;
+    driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
+    driver->poweron = (objActuator.driver)->poweron;
+    driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
+    
+    DPRINT("Costruttore di copia eseguito");
+    return *this;
+}
+
 int ActuatorTechnoSoft::deinit(){
     readyState=false;
     if (driver!=NULL) {

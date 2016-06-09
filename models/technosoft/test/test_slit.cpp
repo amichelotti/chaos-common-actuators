@@ -336,13 +336,40 @@ void* function1(void* str){
 }
 
 int funzioneProva(ActuatorTechnoSoft slit){
-    DPRINT("************** Movement operation starting from function**************");
+    DPRINT("************** Movement operation starting from function **************");
     if(slit.moveRelativeMillimeters(10)<0){
             DERR("**************Error returned by movement operation **************");
             //* errPtr = -5;
             return -1;
     }
     sleep(25);
+    DPRINT("************** Movement absolute operation starting from function **************");
+    if(slit.moveAbsoluteMillimeters(27)<0){
+        DERR("**************Error returned by movement operation **************");
+        //* errPtr = -5;
+    }
+    sleep(180);
+    DPRINT("************** Homing operation starting from function **************");
+    int respHoming=1; // Operazione di homing non conclusa
+    int numHoming = 3;
+  
+    for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+        // con successo o insuccesso
+        DPRINT("*************Procedura di homing n. %d iniziata*************",i);
+        while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+            respHoming = slit.homing(common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
+            usleep(100000); // FREQUENZA DI 1,5 ms
+            if(respHoming<0){ 
+                DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
+                break;
+            }
+         }
+        if(respHoming==0){
+            DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+        }
+        respHoming = 1;
+        usleep(5000000);
+    }
     return 0;
 }
 
@@ -414,7 +441,14 @@ void* function2(void* str){
             DERR("**************Error returned by movement operation from function **************");
             //* errPtr = -5;
         }
-            
+         
+        DPRINT("************** Movement operation after functionProva **************");
+        if(mySlit1.moveRelativeMillimeters(10)<0){
+            DERR("**************Error returned by movement operation **************");
+            //* errPtr = -5;
+        }
+        sleep(25);
+        
 //        
 //        if(mySlit1.setSpeed(399.0)<0){
 //            DERR("************** Error at setSpeed **************");

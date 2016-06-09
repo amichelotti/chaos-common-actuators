@@ -701,35 +701,35 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     // Il canale di comunicazione potrebbe essere stato aperto oppure no, in questo punto dell'esecuzione. Dipende
     // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
    
-    if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
-        DPRINT("Fase di deinizializzazione: il canale era stato aperto o e' stato appena aperto");
-        
-        if(!TS_SelectAxis(axisID)){
-            DERR("failed to select axis %d",axisID);
-            return -1;
-        }
-        
-        if(stopMotion()<0){
-            throw StopMotionException();
-        }
-        
-        DPRINT("Motion is stopped");
-         
-        if(poweron){
-            if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
-                     // oppure se il drive/motor non è stato inizializzato correttamente, 
-                     // oppure se l'azione di erogazione dell'alimentazione non ha avuto buon fine.
-                     // Errore che comunque non compromette il corretto svolgimento del programma.
-                // ATTENZIONE: DOVRA ESSERE GENERATA UNA ECCEZIONE IN CASO L'OPERAZIONE DI 
-                // SPEGNIMENTO DELL'ALIMENTAZIONE DEL MOTORE NON È ANDATA A BUON FINE
-                // ..................
-                // ..................
-                // ..................
-                throw ElectricPowerException();
-            }
-            DPRINT("Power is off");
-        }   
-    }
+//    if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
+//        DPRINT("Fase di deinizializzazione: il canale era stato aperto o e' stato appena aperto");
+//        
+//        if(!TS_SelectAxis(axisID)){
+//            DERR("failed to select axis %d",axisID);
+//            return -1;
+//        }
+//        
+//        if(stopMotion()<0){
+//            throw StopMotionException();
+//        }
+//        
+//        DPRINT("Motion is stopped");
+//         
+//        if(poweron){
+//            if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
+//                     // oppure se il drive/motor non è stato inizializzato correttamente, 
+//                     // oppure se l'azione di erogazione dell'alimentazione non ha avuto buon fine.
+//                     // Errore che comunque non compromette il corretto svolgimento del programma.
+//                // ATTENZIONE: DOVRA ESSERE GENERATA UNA ECCEZIONE IN CASO L'OPERAZIONE DI 
+//                // SPEGNIMENTO DELL'ALIMENTAZIONE DEL MOTORE NON È ANDATA A BUON FINE
+//                // ..................
+//                // ..................
+//                // ..................
+//                throw ElectricPowerException();
+//            }
+//            DPRINT("Power is off");
+//        }   
+//    }
     
     // Eventuale chiusura canale di comunicazione, per deallocare risorse non piu' necessarie
     if(my_channel!=NULL){
