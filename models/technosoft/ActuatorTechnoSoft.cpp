@@ -199,7 +199,8 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     internalHomingStateDefault = objActuator.internalHomingStateDefault;
     internalHomingStateHoming2 = objActuator.internalHomingStateHoming2;
     
-    if(driver!=NULL){ // Focalizziamo la nostra attenzione sul membro TechnoSoftLowDriver    
+    if(driver!=NULL){ //Prima distruggiamo il vecchio oggetto tec   technosoftLowdriver, per evitare un 
+                      // un errore di memori leak. Infatti la copia viene eseguita su un oggetto gia' ESISTENTE!
         delete driver;
         driver = new TechnoSoftLowDriver(dev,dev_name);
     }
@@ -236,7 +237,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     driver->poweron = (objActuator.driver)->poweron;
     driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
     
-    DPRINT("Costruttore di copia eseguito");
+    DPRINT("Operatore di assegnamento eseguito");
     return *this;
 }
 
@@ -1078,21 +1079,29 @@ int ActuatorTechnoSoft::poweron(int on){
     if(driver->selectAxis()<0){
         return -1;
     }
-    if(on){ // Accensione
-        if(driver->providePower()<0){
-            return -2;
-        }
+    int resp;
+    switch (on) {
+        case 0:
+            if(driver->stopPower()<0){
+                resp=-2;
+            } 
+            resp=0;
+            break;       
+        case 1:
+            if(driver->providePower()<0){
+                resp=-3;
+            }
+            resp=0;
+            break;
+        default:
+            resp=-4;
+            break;
     }
-    else{ // Spegnimento
-        if(driver->stopPower()<0){
-            return -3;
-        }       
-    }
-    return 0;
+    return resp;
 }
 
 int ActuatorTechnoSoft::getHWVersion(std::string& version){
     
-   version="hardware technosoft da specificare";
+   version=" Technosoft IDM stepper open loop mode";
    return 0; 
 }
