@@ -79,10 +79,10 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(const std::string& _devName,const std::
     channel_map_t::iterator i=channels.find(devName); // iteratore alla mappa statica
     DPRINT("devName %s", devName.c_str());
     
-    DPRINT("Dimensione mappa statica: %d",channels.size());
-    if(channels.size()>0){
-         DPRINT("Dimensione mappa statica: %d",channels.size());   
-    }
+    DPRINT("Dimensione mappa statica all'inizio prima di controllarla: %d",channels.size());
+//    if(channels.size()>0){
+//         DPRINT("Dimensione mappa statica: %d",channels.size());   
+//    }
     
     if(i!=channels.end()){
         my_channel = i->second;
@@ -128,7 +128,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _const_mult_technsoft, 
                         const double _steps_per_rounds,    
                         const double _n_rounds,            
-                        const double _linear_movement_per_n_rounds){
+                        const double _linear_movement_per_n_rounds,
+                        const int _hostID){
     
     
     // Set trapezoidal profile parameters used for moveRelative(...)
@@ -139,43 +140,43 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         return -1;
     }
     maxSpeed_mm_s=_maxSpeed_mm_s;
-    DPRINT("maxSpeed_mm_s = %f",maxSpeed_mm_s);
+    //DPRINT("maxSpeed_mm_s = %f",maxSpeed_mm_s);
     
-    if(_speed_mm_s<0 || _speed_mm_s>_maxSpeed_mm_s){
+    if(_speed_mm_s<=0 || _speed_mm_s>_maxSpeed_mm_s){
         return -2;
     }
     speed_mm_s = _speed_mm_s; 
-    DPRINT("speed_mm_s = %f",speed_mm_s);
+    //DPRINT("speed_mm_s = %f",speed_mm_s);
     
-    if(_maxAcceleration_mm_s2<0){
+    if(_maxAcceleration_mm_s2<=0){
         return -3;
     }
     maxAcceleration_mm_s2=_maxAcceleration_mm_s2;
-    DPRINT("maxAcceleration_mm_s2 = %f",maxAcceleration_mm_s2);
+    //DPRINT("maxAcceleration_mm_s2 = %f",maxAcceleration_mm_s2);
     
-    if(_acceleration_mm_s2<0 || _acceleration_mm_s2>_maxAcceleration_mm_s2){
+    if(_acceleration_mm_s2<=0 || _acceleration_mm_s2>_maxAcceleration_mm_s2){
         return -4;
     }
     acceleration_mm_s2=_acceleration_mm_s2;
-    DPRINT("acceleration_mm_s2 = %f",acceleration_mm_s2);
+    //DPRINT("acceleration_mm_s2 = %f",acceleration_mm_s2);
     
     if(_isAdditive!=TRUE && _isAdditive!=FALSE){
         return -5;
     }  
     isAdditive=_isAdditive;
-    DPRINT("isAdditive = %d",isAdditive);
+    //DPRINT("isAdditive = %d",isAdditive);
     
     if((_moveMoment!=UPDATE_NONE) && (_moveMoment!=UPDATE_IMMEDIATE) && (_moveMoment!=UPDATE_ON_EVENT)){
         return -6;
     }
     movement=_moveMoment;
-    DPRINT("movement = %d",movement);
+    //DPRINT("movement = %d",movement);
     
     if((_referenceBase!=FROM_MEASURE) && _referenceBase!=FROM_REFERENCE){
         return -7;
     }
     referenceBase=_referenceBase;
-    DPRINT("referenceBase = %d",referenceBase);
+    //DPRINT("referenceBase = %d",referenceBase);
     
     // ********************* Set homing parameters *********************
     if(_maxHighSpeedHoming_mm_s<=0){
@@ -185,7 +186,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                                                // che poi solo all'interno del drive ne verra' considerato 
                                                // solamente il segno opposto
     
-    if(_highSpeedHoming_mm_s<0 || _highSpeedHoming_mm_s>_maxHighSpeedHoming_mm_s){
+    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>_maxHighSpeedHoming_mm_s){
         return -9;
     }
     highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
@@ -196,7 +197,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     maxLowSpeedHoming_mm_s = _maxLowSpeedHoming_mm_s; // Verra' considerato il solo valore positivo perche' utilizzato
                                             // nel moveAbsoluteHoming
     
-    if((_lowSpeedHoming_mm_s<0) || (_lowSpeedHoming_mm_s>_maxLowSpeedHoming_mm_s)){
+    if((_lowSpeedHoming_mm_s<=0) || (_lowSpeedHoming_mm_s>_maxLowSpeedHoming_mm_s)){
         return -11;
     }
     lowSpeedHoming_mm_s=_lowSpeedHoming_mm_s;
@@ -206,7 +207,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
     maxAccelerationHoming_mm_s2=_maxAccelerationHoming_mm_s2;
     
-    if(_accelerationHoming_mm_s2<0 || _accelerationHoming_mm_s2>_maxAccelerationHoming_mm_s2){
+    if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>_maxAccelerationHoming_mm_s2){
         return -13;
     }
     accelerationHoming_mm_s2 = _accelerationHoming_mm_s2; 
@@ -250,6 +251,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         return -22;
     }
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    
+    hostID=_hostID;
  
 //    //____________________________________
 //     if(_encoderLines<=0){
@@ -267,7 +270,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     DPRINT("during low driver init"); 
     
     if(!alreadyopenedChannel){
-        if((my_channel->open()<0)){
+        if((my_channel->open(hostID)<0)){
             DERR("error opening channel");
             return -23;
         }
@@ -275,6 +278,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         //alreadyopenedChannel=true; // Canale di comunicazione aperto e inizializzazione driver/motor andata a buon fine
         DPRINT("channel just opened");
     }
+    else
+        DPRINT("channel channel was already opened");
     
     // Indipendentemente dal fatto che il canale era già stato aperto oppure 
     // che ne sia stato appena aperto un nuovo, segue la inizializzazione del drive/motor
@@ -309,17 +314,17 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         return -28;
     }
     
-    // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
-    if(providePower()<0){
-        DERR("failed power providing");
-        return -29;
-    }
+//    // DA TOGLIERE IL PRIMA POSSIBILE IL SEGUENTE BLOCCO DI CODICE
+//    if(providePower()<0){
+//        DERR("failed power providing");
+//        return -29;
+//    }
     
     if(!TS_SetEventOnMotionComplete(0,0)){ 
 	return -30;
     }
     
-    poweron=true;  // alimentazione al drive motor erogata
+    //poweron=true;  // alimentazione al drive motor erogata
     
     if(channelJustOpened){
         DPRINT("Inserimento elemento mappa: devName=%s",devName.c_str());
@@ -327,6 +332,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         
         alreadyopenedChannel=true;
     }
+    DPRINT("Dimensione mappa statica alla fine della inizializzazione: %d",channels.size());
     return 0;
 }
 
@@ -701,35 +707,35 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     // Il canale di comunicazione potrebbe essere stato aperto oppure no, in questo punto dell'esecuzione. Dipende
     // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
    
-    if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
-        DPRINT("Fase di deinizializzazione: il canale era stato aperto o e' stato appena aperto");
-        
-        if(!TS_SelectAxis(axisID)){
-            DERR("failed to select axis %d",axisID);
-            return -1;
-        }
-        
-        if(stopMotion()<0){
-            throw StopMotionException();
-        }
-        
-        DPRINT("Motion is stopped");
-         
-        if(poweron){
-            if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
-                     // oppure se il drive/motor non è stato inizializzato correttamente, 
-                     // oppure se l'azione di erogazione dell'alimentazione non ha avuto buon fine.
-                     // Errore che comunque non compromette il corretto svolgimento del programma.
-                // ATTENZIONE: DOVRA ESSERE GENERATA UNA ECCEZIONE IN CASO L'OPERAZIONE DI 
-                // SPEGNIMENTO DELL'ALIMENTAZIONE DEL MOTORE NON È ANDATA A BUON FINE
-                // ..................
-                // ..................
-                // ..................
-                throw ElectricPowerException();
-            }
-            DPRINT("Power is off");
-        }   
-    }
+//    if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
+//        DPRINT("Fase di deinizializzazione: il canale era stato aperto o e' stato appena aperto");
+//        
+//        if(!TS_SelectAxis(axisID)){
+//            DERR("failed to select axis %d",axisID);
+//            return -1;
+//        }
+//        
+//        if(stopMotion()<0){
+//            throw StopMotionException();
+//        }
+//        
+//        DPRINT("Motion is stopped");
+//         
+//        if(poweron){
+//            if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
+//                     // oppure se il drive/motor non è stato inizializzato correttamente, 
+//                     // oppure se l'azione di erogazione dell'alimentazione non ha avuto buon fine.
+//                     // Errore che comunque non compromette il corretto svolgimento del programma.
+//                // ATTENZIONE: DOVRA ESSERE GENERATA UNA ECCEZIONE IN CASO L'OPERAZIONE DI 
+//                // SPEGNIMENTO DELL'ALIMENTAZIONE DEL MOTORE NON È ANDATA A BUON FINE
+//                // ..................
+//                // ..................
+//                // ..................
+//                throw ElectricPowerException();
+//            }
+//            DPRINT("Power is off");
+//        }   
+//    }
     
     // Eventuale chiusura canale di comunicazione, per deallocare risorse non piu' necessarie
     if(my_channel!=NULL){

@@ -57,7 +57,8 @@ namespace common{
                 // costruttore
                 ActuatorTechnoSoft();
                 // Costruttore di copia
-                ActuatorTechnoSoft(const ActuatorTechnoSoft&);
+                ActuatorTechnoSoft(const ActuatorTechnoSoft&); // Overloading costruttore di copia
+                ActuatorTechnoSoft& operator=(const ActuatorTechnoSoft& objActuator); // Overloading operatore assegnamento 
                 ~ActuatorTechnoSoft();
 
                 int init(void*initialization_string);

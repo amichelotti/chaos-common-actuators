@@ -39,7 +39,7 @@
 #define CHANNEL_TYPE CHANNEL_RS232                          //(da MDS)
 #define NAXIS 1
 #undef HOST_ID
-#define HOST_ID		 0                                  //(da MDS)
+#define HOST_ID		 14                                  //(da MDS)
 #define AXIS_ID_01	14                                  //(da MDS)
 #define BAUDRATE	115200                              //(da MDS)
 
@@ -104,7 +104,7 @@ namespace common{
 		    int getbaudrate();
 		    void PrintChannel();
                     ~SerialCommChannelTechnosoft();
-                    int open(int hostID=HOST_ID);
+                    int open(int hostID);
                     void close();
             };
         
@@ -112,6 +112,8 @@ namespace common{
             class TechnoSoftLowDriver {
 
 	    public:
+                
+                int hostID;
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
                 
@@ -198,9 +200,9 @@ namespace common{
                         const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT, 
                         const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
                         const double _n_rounds=N_ROUNDS_DEFAULT,            
-                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-                
-            
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
+                        int _hostID=HOST_ID);
+
                 int providePower();
                 int stopPower();
                 
