@@ -39,7 +39,7 @@
 #define CHANNEL_TYPE CHANNEL_RS232                          //(da MDS)
 #define NAXIS 1
 #undef HOST_ID
-#define HOST_ID		 0                                  //(da MDS)
+#define HOST_ID		 14                                  //(da MDS)
 #define AXIS_ID_01	14                                  //(da MDS)
 #define BAUDRATE	115200                              //(da MDS)
 

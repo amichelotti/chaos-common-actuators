@@ -18,6 +18,7 @@ void* function1(void* str){
     
     char* strInit =(char*)str;
     ActuatorTechnoSoft mySlit1; // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
+    DPRINT("%s",strInit);
 
     double pos2;
     int axis2;
@@ -30,6 +31,8 @@ void* function1(void* str){
     sprintf(sinit2,"%s,myslit2,%s,%d",dev2,conf2,axis2);
     ActuatorTechnoSoft mySlit2;
     //&& ((ret=mySlit2.init((void*)strInit))!=0)
+    
+    
     if((ret=mySlit2.init((void*)strInit))!=0){
         DERR("*************Cannot init axis. In fact the value returned is %d****************",ret);
         //* errPtr = -1;
@@ -467,6 +470,7 @@ void* function2(void* str){
     sprintf(sinit2,"%s,myslit2,%s,%d",dev2,conf2,axis2);
     ActuatorTechnoSoft mySlit2;
     //&& ((ret=mySlit2.init((void*)strInit))!=0)
+    
     if((ret=mySlit2.init((void*)strInit))!=0){
         DERR("*************Cannot init axis. In fact the value returned is %d****************",ret);
         //* errPtr = -1;
@@ -890,18 +894,18 @@ int main(int argc,const char* argv[]){
     
     pthread_t th1;
     pthread_t th2;
-    
-    
+    DPRINT("main eseguito");
+    DPRINT("%s",sinit1);
     //function1(&sinit1[0]);
     
-    pthread_create(&th2,NULL,function1,&sinit1[0]);
-    pthread_create(&th1,NULL,function2,&sinit1[0]);
+    pthread_create(&th1,NULL,function1,&sinit1[0]);
+    //pthread_create(&th1,NULL,function2,&sinit1[0]);
     
     //void* resp_th_1;
     //void* resp_th_2;
     
     pthread_join(th1,NULL); //pthread_join modifica il contenuto del puntatore resp_th_1 
-    pthread_join(th2,NULL);
+    //pthread_join(th2,NULL);
     
     //int res1 = *((int*)(resp_th_1));
     //int res2 = *((int*)(resp_th_2));
