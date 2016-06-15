@@ -218,6 +218,12 @@ typedef enum {
         */
             virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
 
+/**
+@brief returns a string containing the dataset attributes from driver which responds to SetParameter method
+
+
+*/
+            virtual int sendDataset(std::string& dataset)=0;         // ****Da implementare***
          /**
 
         @brief stop the motion of the actuator 

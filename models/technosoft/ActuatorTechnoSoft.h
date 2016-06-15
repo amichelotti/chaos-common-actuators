@@ -127,6 +127,8 @@ namespace common{
            @param version returning string
            @return 0 if success or an error code
         */
+	
+
 	int getSWVersion(std::string& version);
 
         /**
@@ -135,6 +137,13 @@ namespace common{
         @return 0 if success or an error code
         */
         int getHWVersion(std::string& version);
+        /**
+        @brief returns dataset of the driver settable with setParameter method 
+        @param  dataset returning string
+        @return 0 if success or an error code
+        */
+	
+	int sendDataset(std::string& dataset);
         };
 	}
     }
