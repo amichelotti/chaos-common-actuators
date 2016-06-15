@@ -17,18 +17,18 @@ void* function1(void* str){
     int ret;
     
     char* strInit =(char*)str;
-    ActuatorTechnoSoft mySlit1; // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
-    DPRINT("%s",strInit);
-
-    double pos2;
-    int axis2;
-    const char *dev2,*conf2;
-    char sinit2[256];
-    // Inizializzazione parametri ASSE 2
-    dev2="/dev/ttyr1d";        // [string], <dev/tty>
-    conf2="../common/actuators/models/technosoft/conf/1setup001.t.zip";       // [string], <technosoft configuration>
-    axis2=15; // [int], <axis>
-    sprintf(sinit2,"%s,myslit2,%s,%d",dev2,conf2,axis2);
+//    ActuatorTechnoSoft mySlit1; // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
+//    DPRINT("%s",strInit);
+//
+//    double pos2;
+//    int axis2;
+//    const char *dev2,*conf2;
+//    char sinit2[256];
+//    // Inizializzazione parametri ASSE 2
+//    dev2="/dev/ttyr1d";        // [string], <dev/tty>
+//    conf2="../common/actuators/models/technosoft/conf/1setup001.t.zip";       // [string], <technosoft configuration>
+//    axis2=15; // [int], <axis>
+//    sprintf(sinit2,"%s,myslit2,%s,%d",dev2,conf2,axis2);
     ActuatorTechnoSoft mySlit2;
     //&& ((ret=mySlit2.init((void*)strInit))!=0)
     
@@ -46,6 +46,8 @@ void* function1(void* str){
 //        //mySlit1 = NULL;
 //    }
     else{
+        
+        mySlit2.setParameter("         cIaO  ","      CorE    ");
 //        // Lettura stato
 //        std::string desc1;
 //        int status;
@@ -866,11 +868,12 @@ int main(int argc,const char* argv[]){
     double rpos=-1000,rpos1=-1000;
     int ret;
     int status;
+    int hostID;
     
     const char *dev1,*conf1,*dev2,*conf2;
     char sinit1[256];
     char sinit2[256];
-    if(argc!=5){
+    if(argc!=6){
         USAGE;
         return -1;
     }
@@ -879,8 +882,10 @@ int main(int argc,const char* argv[]){
     conf1=argv[2];       // [string], <technosoft configuration>
     axis1=atoi(argv[3]); // [int], <axis>
     pos1=atof(argv[4]);  // [float], <move position in mm>
+    hostID=atoi(argv[5]);
+    
     //PRINT("************ using axis %d, moving of %f mm**************",axis1,pos1);
-    sprintf(sinit1,"%s,myslit1,%s,%d",dev1,conf1,axis1);
+    sprintf(sinit1,"%s,myslit1,%s,%d,%d",dev1,conf1,axis1,hostID);
     common::actuators::AbstractActuator*mySlit1 = NULL;
     
 //    // Inizializzazione parametri ASSE 2

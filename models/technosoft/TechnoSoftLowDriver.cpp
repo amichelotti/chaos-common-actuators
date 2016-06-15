@@ -108,6 +108,7 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const int& _axisID,
+                        const int& _hostID,
                         const double _speed_mm_s,
                         const double _maxSpeed_mm_s, 
                         const double _acceleration_mm_s2,
@@ -128,8 +129,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _const_mult_technsoft, 
                         const double _steps_per_rounds,    
                         const double _n_rounds,            
-                        const double _linear_movement_per_n_rounds,
-                        const int _hostID){
+                        const double _linear_movement_per_n_rounds){
     
     
     // Set trapezoidal profile parameters used for moveRelative(...)

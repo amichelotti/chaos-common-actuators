@@ -180,6 +180,7 @@ namespace common{
                 // Inizializzazione singolo drive/motor
                 int init(const std::string& setupFilePath,
                         const int& axisID,
+                        const int& _hostID = HOST_ID,
                         const double speed=SPEED_DEFAULT,
                         const double maxSpeed=MAX_SPEED_DEFAULT, 
                         const double acceleration=ACCELERATION_DEFAULT,
@@ -200,8 +201,7 @@ namespace common{
                         const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT, 
                         const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
                         const double _n_rounds=N_ROUNDS_DEFAULT,            
-                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
-                        int _hostID=HOST_ID);
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
 
                 int providePower();
                 int stopPower();

@@ -69,7 +69,7 @@ namespace common{
                 //int moveRelativeMillimetersHoming(double deltaMillimeters);
                 int moveVelocityHoming();
                 
-                int setParameter(const std::string parName,const std::string value);
+                int setParameter(std::string parName,std::string value);
                    
                 int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase);
                 int setSpeed(double speed);

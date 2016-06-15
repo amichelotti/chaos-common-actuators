@@ -118,7 +118,7 @@ typedef enum {
         int setTimeoutHoming(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
         int getTimeoutHoming(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
         
-        virtual int setParameter(const std::string parName,const std::string value)=0;
+        virtual int setParameter(std::string parName,std::string value)=0;
         
         virtual int moveRelativeMillimeters(double mm)=0;
 

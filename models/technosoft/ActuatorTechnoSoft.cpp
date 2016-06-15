@@ -10,12 +10,23 @@
 #include "ActuatorTechnoSoft.h"
 #include <boost/regex.hpp>
 #include <common/debug/core/debug.h>
-using namespace ::common::actuators::models;
+//#include <boost/algorithm/string/trim.hpp>
+//#include <boost/algorithm/string/case_conv.hpp>
 
+#include <boost/algorithm/string.hpp>  
+#include <boost/algorithm/string/trim.hpp>
+#include <algorithm> 
+#include <functional> 
+#include <cctype>
+#include <locale>         // std::locale, std::toupper
+
+using namespace boost;
+using namespace ::common::actuators::models;
+        
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
       
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,
-static const boost::regex driver_match("([\\w\\/]+),(\\w+),(.+),(\\d+)"); //ATTENZIONE: DEVE ESSERE GESTITA LA QUINTA ESPRESSIONE REGOLARE
+static const boost::regex driver_match("([\\w\\/]+),(\\w+),(.+),(\\d+),(\\d+)"); //ATTENZIONE: DEVE ESSERE GESTITA LA QUINTA ESPRESSIONE REGOLARE
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     driver=NULL;
@@ -42,6 +53,9 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string conf_path=match[3];
         std::string straxid=match[4];
         int axid = atoi(straxid.c_str());
+        std::string strHostID=match[5];
+        int hostID = atoi(strHostID.c_str());
+        
         DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
         
         //ATTENZIONE: DEVE ESSERE GESTITE LE SEGUENTI ESPRESSIONI REGOLARI.
@@ -70,7 +84,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         // Inizializzazione oggetto TechnoSoft low driver costruito
         
         int val;
-        if((val=driver->init(conf_path,axid))<0){
+        if((val=driver->init(conf_path,axid,hostID))<0){
             ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technsoft low driver %d",val);
             // Deallocazione oggetto canale ()
             try{
@@ -250,10 +264,70 @@ int ActuatorTechnoSoft::deinit(){
     return 0; 
 }
 
-int ActuatorTechnoSoft::setParameter(const std::string parName,const std::string value){
-        
+void trim2(std::string& str){
+  std::string::size_type pos = str.find_last_not_of(' ');
+  if(pos != std::string::npos) {
+    str.erase(pos + 1);
+    pos = str.find_first_not_of(' ');
+    if(pos != std::string::npos){ 
+        str.erase(0, pos);
+        }
+  }
+  else str.erase(str.begin(), str.end());
+}
+
+void setUpperCase(const std::string& str,std::string& strResult){
+    std::locale loc;
+    strResult.assign("");
+    for (std::string::size_type i=0; i<str.length(); ++i){
+        strResult += std::toupper(str[i],loc);
+    }     
+}
+
+bool to_bool(const std::string & s) {
+     return s != "0";
+}
+
+int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparName){
     
-    return 0;
+    // trim
+    trim2(parName);
+    trim2(valueOfparName);
+    // To upper case
+    std::string strResultparName;
+    std::string strResultparvalue;
+    setUpperCase(parName,strResultparName);
+    setUpperCase(valueOfparName,strResultparvalue);
+    
+    double doubleValue;
+    int intValue;
+    bool boolValue;
+    
+    if(strResultparName.compare("speed")==0){ 
+        doubleValue = atof(valueOfparName.c_str());
+        if(setSpeed(doubleValue)<0){
+            return -1;
+        }
+        return 0;
+    }    
+    else if(strResultparName.compare("acc")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if(setAcceleration(doubleValue)<0){ 
+            return -2;
+        }
+        return 0;
+    }   
+    else if(strResultparName.compare("isAdd")==0){
+        // Conversion from string to bool
+        boolValue = to_bool(valueOfparName);
+        if(setAdditive(boolValue)<0){ 
+            return -3;
+        }
+        return 0;
+    }
+    else{
+        return -1;
+    }
 }
 
 int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
@@ -1109,6 +1183,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset.clear();
    dataset="{\"attributes\":[";
    dataset+="{\"name\":\"maxSpeed\",\"description\":\"max Speed acceptable\",\"datatype\":\"double\",\"direction\":\"Input\"}"; 
+   dataset+="{\"name\":\"maxAcceleration\",\"description\":\"max Acceleration acceptable\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}"; 
    dataset+="]}";
    return 0; 
 }
