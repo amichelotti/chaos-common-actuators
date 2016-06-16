@@ -447,8 +447,15 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;   
     } 
+    else if(strResultparName.compare("LINMOV")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if(driver->setLinear_movement_per_n_rounds(doubleValue)<0){ 
+            return -21;
+        }
+        return 0;   
+    } 
     else{
-        return -21;
+        return -22;
     }
 }
 
