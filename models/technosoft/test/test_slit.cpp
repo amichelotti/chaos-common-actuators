@@ -47,7 +47,6 @@ void* function1(void* str){
 //    }
     else{
         
-        mySlit2.setParameter("         cIaO  ","      CorE    ");
 //        // Lettura stato
 //        std::string desc1;
 //        int status;
@@ -114,8 +113,15 @@ void* function1(void* str){
             DERR("************** Error returned by movement operation **************");
             //* errPtr = -5;
         }
-        DPRINT("************** Sono la function 1. Movimentazione partita. Rimarro' in attesa 400 s per far finire la movimentazione **************");
-        sleep(400);
+        DPRINT("************** Sono la function 1. Movimentazione partita. Rimarro' in attesa 400 s per far finire la movimentazione **************");    
+        sleep(100);
+        
+        mySlit2.setParameter("  SPEed       ","   127    ");
+        if(mySlit2.moveRelativeMillimeters(17)<0){
+            DERR("************** Error returned by movement operation **************");
+            //* errPtr = -5;
+        }
+        sleep(100);
         
 //        mySlit2=mySlit1;
 //        DPRINT("************** Operazione di assegnamento eseguita **************");
