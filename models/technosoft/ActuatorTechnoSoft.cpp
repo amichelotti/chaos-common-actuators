@@ -347,35 +347,35 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;
     }
-    else if(strResultparName.compare("REFERENCE")==0){
+    else if(strResultparName.compare("REFERENCEBASE")==0){
         intValue = atoi(valueOfparName.c_str());
         if(driver->setReferenceBase((short)intValue)<0){ 
             return -7;
         }
         return 0;   
     }
-    else if(strResultparName.compare("MAXHIGHSPEED")==0){
+    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setMaxhighSpeedHoming(doubleValue)<0){ 
             return -8;
         }
         return 0;   
     }
-    else if(strResultparName.compare("HIGHSPEED")==0){
+    else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->sethighSpeedHoming(doubleValue)<0){ 
             return -9;
         }
         return 0;       
     }
-    else if(strResultparName.compare("MAXLOWSPEED")==0){
+    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setMaxlowSpeedHoming(doubleValue)<0){ 
             return -10;
         }
         return 0;   
     }
-    else if(strResultparName.compare("LOWSPEED")==0){
+    else if(strResultparName.compare("LOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setlowSpeedHoming(doubleValue)<0){ 
             return -11;
@@ -412,21 +412,21 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;
     }
-    else if(strResultparName.compare("REFERENCEHOMING")==0){
+    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if(driver->setReferenceBaseHoming((short)intValue)<0){ 
             return -16;
         }
         return 0;   
     }//_________________________________________________________________________
-    else if(strResultparName.compare("ENCODERLINES")==0){
+    else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setEncoderLines(doubleValue)<0){ 
             return -17;
         }
         return 0;   
     }
-    else if(strResultparName.compare("MICROSTEPSPERSTEP")==0){
+    else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setConst_mult_technsoft(doubleValue)<0){ 
             return -18;
@@ -440,14 +440,14 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;   
     } 
-    else if(strResultparName.compare("FIXEDNUMBEROFSTEPS")==0){
+    else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setN_rounds(doubleValue)<0){ 
             return -20;
         }
         return 0;   
     } 
-    else if(strResultparName.compare("LINEARMOVEMENTIN[MM]")==0){
+    else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setLinear_movement_per_n_rounds(doubleValue)<0){ 
             return -21;
@@ -1311,8 +1311,32 @@ int ActuatorTechnoSoft::getHWVersion(std::string& version){
 int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset.clear();
    dataset="{\"attributes\":[";
-   dataset+="{\"name\":\"maxSpeed\",\"description\":\"max Speed acceptable\",\"datatype\":\"double\",\"direction\":\"Input\"}"; 
-   dataset+="{\"name\":\"maxAcceleration\",\"description\":\"max Acceleration acceptable\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}"; 
+   //dataset+="{\"name\":\"maxSpeed\",\"description\":\"Upper bound for max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"500\"}";
+   dataset+="{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"500.0\",\"default\":\"400.0\"}";
+   //dataset+="{\"name\":\"maxAcceleration\",\"description\":\"Upper bound for acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}"; 
+   dataset+="{\"name\":\"acceleration\",\"description\":\"Acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"2.0\",\"default\":\"0.6\"}";
+   dataset+="{\"name\":\"isadditive\",\"description\":\"Specifies how is computed the position to reach\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"}";
+   dataset+="{\"name\":\"movement\",\"description\":\"Defines the moment when the motion is started\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"}";
+   dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"}";
+   //dataset+="{\"name\":\"maxhighspeedhoming\",\"description\":\"Upper bound for max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}";
+   dataset+="{\"name\":\"highspeedhoming\",\"description\":\"Max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"15.0\",\"default\":\"10.0\"}";
+   //dataset+="{\"name\":\"maxlowspeedhoming\",\"description\":\"Upper bound for speed of trapezoidal profile for homing procedure, for repositioning the slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}";
+   dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"}";
+   //dataset+="{\"name\":\"maxaccelerationhoming\",\"description\":\"Upper bound for acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}";
+   dataset+="{\"name\":\"accelerationhoming\",\"description\":\"Acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"0.6\",\"default\":\"0.3\"}";
+   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"}";
+   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"}";
+   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"}";
+   
+   dataset+="{\"name\":\"numencoderlines\",\"description\":\"Number of encoder lines\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"800\"}";
+   dataset+="{\"name\":\"nummicrostepspersteps\",\"description\":\"Number of micro steps per step\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"256\"}";
+   dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"}";
+   dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"}";
+   dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"}";
+   
    dataset+="]}";
+   
    return 0; 
 }
+
+
