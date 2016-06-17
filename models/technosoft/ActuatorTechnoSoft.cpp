@@ -303,7 +303,7 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
     int intValue;
     bool boolValue;
     
-    if(strResultparName.compare("MXSPEED")==0){
+    if(strResultparName.compare("MAXSPEED")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setMaxSpeed(doubleValue)<0){ 
             return -1;
@@ -317,21 +317,21 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;
     }   
-    else if(strResultparName.compare("MXACC")==0){
+    else if(strResultparName.compare("MAXACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setMaxAcceleration(doubleValue)<0){ 
             return -3;
         }
         return 0;
     } 
-    else if(strResultparName.compare("ACC")==0){
+    else if(strResultparName.compare("ACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setAcceleration(doubleValue)<0){ 
             return -4;
         }
         return 0;
     }
-    else if(strResultparName.compare("ADD")==0){
+    else if(strResultparName.compare("ISADDITIVE")==0){
         // Conversion from string to bool
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
@@ -340,63 +340,63 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;
     }
-    else if(strResultparName.compare("MOV")==0){
+    else if(strResultparName.compare("MOVEMENT")==0){
         intValue = atoi(valueOfparName.c_str());
         if(driver->setMovement((short)intValue)<0){ 
             return -6;
         }
         return 0;
     }
-    else if(strResultparName.compare("REF")==0){
+    else if(strResultparName.compare("REFERENCE")==0){
         intValue = atoi(valueOfparName.c_str());
         if(driver->setReferenceBase((short)intValue)<0){ 
             return -7;
         }
         return 0;   
     }
-    else if(strResultparName.compare("MXHSPEED")==0){
+    else if(strResultparName.compare("MAXHIGHSPEED")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setMaxhighSpeedHoming(doubleValue)<0){ 
             return -8;
         }
         return 0;   
     }
-    else if(strResultparName.compare("HSPEED")==0){
+    else if(strResultparName.compare("HIGHSPEED")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->sethighSpeedHoming(doubleValue)<0){ 
             return -9;
         }
         return 0;       
     }
-    else if(strResultparName.compare("MXLSPEED")==0){
+    else if(strResultparName.compare("MAXLOWSPEED")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setMaxlowSpeedHoming(doubleValue)<0){ 
             return -10;
         }
         return 0;   
     }
-    else if(strResultparName.compare("LSPEED")==0){
+    else if(strResultparName.compare("LOWSPEED")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setlowSpeedHoming(doubleValue)<0){ 
             return -11;
         }
         return 0;   
     }
-    else if(strResultparName.compare("MXACCH")==0){
+    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setMaxAccelerationHoming(doubleValue)<0){ 
             return -12;
         }
         return 0;   
     }
-    else if(strResultparName.compare("ACCHOM")==0){
+    else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setaccelerationHoming(doubleValue)<0){ 
             return -13;
         }
         return 0;   
     }
-    else if(strResultparName.compare("ADDHOM")==0){
+    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
         // Conversion from string to bool
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
@@ -405,49 +405,49 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;
     }
-    else if(strResultparName.compare("MOVHOM")==0){
+    else if(strResultparName.compare("MOVEMENTHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if(driver->setMovementHoming((short)intValue)<0){ 
             return -15;
         }
         return 0;
     }
-    else if(strResultparName.compare("REFHOM")==0){
+    else if(strResultparName.compare("REFERENCEHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if(driver->setReferenceBaseHoming((short)intValue)<0){ 
             return -16;
         }
         return 0;   
     }//_________________________________________________________________________
-    else if(strResultparName.compare("ENCLIN")==0){
+    else if(strResultparName.compare("ENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setEncoderLines(doubleValue)<0){ 
             return -17;
         }
         return 0;   
     }
-    else if(strResultparName.compare("CONSTTECH")==0){
+    else if(strResultparName.compare("MICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setConst_mult_technsoft(doubleValue)<0){ 
             return -18;
         }
         return 0;   
     } 
-    else if(strResultparName.compare("STEPSRD")==0){
+    else if(strResultparName.compare("STEPSPERROUND")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setSteps_per_rounds(doubleValue)<0){ 
             return -19;
         }
         return 0;   
     } 
-    else if(strResultparName.compare("NROUND")==0){
+    else if(strResultparName.compare("FIXEDNUMBEROFSTEPS")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setN_rounds(doubleValue)<0){ 
             return -20;
         }
         return 0;   
     } 
-    else if(strResultparName.compare("LINMOV")==0){
+    else if(strResultparName.compare("LINEARMOVEMENTIN[MM]")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setLinear_movement_per_n_rounds(doubleValue)<0){ 
             return -21;
