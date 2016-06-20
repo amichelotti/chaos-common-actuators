@@ -45,7 +45,7 @@
 
 // Features of trapezoidal speed profile
 #define SPEED_DEFAULT 400.0 // 30.0  [mm/s] 
-#define ACCELERATION_DEFAULT 0.1 // 0.6 [mm/s^2]     
+#define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]     
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS) 
 #define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
 
