@@ -1311,7 +1311,7 @@ int ActuatorTechnoSoft::getHWVersion(std::string& version){
 int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset.clear();
    dataset="{\"attributes\":[";
-   dataset+="{\"name\":\"maxSpeed\",\"description\":\"max Speed acceptable\",\"datatype\":\"double\",\"direction\":\"Input\"}"; 
+   dataset+="{\"name\":\"maxSpeed\",\"description\":\"max Speed acceptable\",\"datatype\":\"double\",\"direction\":\"Input\"},"; 
    dataset+="{\"name\":\"maxAcceleration\",\"description\":\"max Acceleration acceptable\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}"; 
    dataset+="]}";
    return 0; 
