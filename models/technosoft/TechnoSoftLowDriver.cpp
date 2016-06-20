@@ -377,7 +377,7 @@ int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
 // Set trapezoidal parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    
+    DPRINT("Chiamata setspeed");
     if(_speed_mm_s<=0 || _speed_mm_s>maxSpeed_mm_s){
         DERR("Speed = %f",_speed_mm_s);
         return -1;
@@ -398,6 +398,7 @@ int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
 
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    DPRINT("Chiamata setAcceleration");
     if(_acceleration_mm_s2<=0 || _acceleration_mm_s2>maxAcceleration_mm_s2){
         DERR("Acceleration = %f",_acceleration_mm_s2);
         return -1;
@@ -417,7 +418,7 @@ int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2
 }
 
 int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
-    
+    DPRINT("Chiamata setAdditive");
     if((_isAdditive!=TRUE) && (_isAdditive!=FALSE)){
         DERR("setAdditive= %d",_isAdditive);
         return -1;
@@ -427,6 +428,7 @@ int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
 }
 
 int TechnoSoftLowDriver::setMovement(const short& _movement){
+    DPRINT("Chiamata setMovement");
     if((_movement!=UPDATE_NONE) && (_movement!=UPDATE_IMMEDIATE) && (_movement!=UPDATE_ON_EVENT)){
         DERR("setMovement = %d",_movement);
         return -1;
@@ -436,6 +438,7 @@ int TechnoSoftLowDriver::setMovement(const short& _movement){
 }
 
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
+    DPRINT("Chiamata setReferenceBase");
     if((_referenceBase!=FROM_MEASURE) && (_referenceBase!=FROM_REFERENCE)){
         DERR("_referenceBase = %d",_referenceBase);
         return -1;
@@ -447,7 +450,7 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
 // Set homing parameters
 int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    
+    DPRINT("Chiamata sethighSpeedHoming");
     if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
         return -1;
     }
@@ -466,7 +469,7 @@ int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming
 
 int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    
+    DPRINT("Chiamata setlowSpeedHoming");
     if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
         return -1;
     }
@@ -485,6 +488,7 @@ int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_m
 
 int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    DPRINT("Chiamata setaccelerationHoming");
     if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
         return -1;
     }
@@ -502,7 +506,7 @@ int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAcceleratio
 }
 
 int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
-    
+    DPRINT("Chiamata setAdditiveHoming");
     if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
         return -1;
     }   
@@ -511,6 +515,7 @@ int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
 }
 
 int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
+    DPRINT("Chiamata setMovementHoming");
     if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
         return -1;
     }
@@ -519,6 +524,7 @@ int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
 }
 
 int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
+    DPRINT("Chiamata setReferenceBaseHoming");
     if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
         return -1;
     }
@@ -528,6 +534,7 @@ int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHomin
 
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
+    DPRINT("Chiamata setEncoderLines");
     if(_encoderLines<=0){
         return -1;
     }   
@@ -536,6 +543,7 @@ int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
 }
 
 int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
+    DPRINT("Chiamata setConst_mult_technsoft");
     if(_const_mult_technsoft<=0){
         return -1;
     }   
@@ -544,6 +552,7 @@ int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
 }
 
 int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
+    DPRINT("Chiamata setSteps_per_rounds");
     if(_steps_per_rounds<=0){
         return -1;
     }   
@@ -552,6 +561,7 @@ int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
 }
 
 int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
+    DPRINT("Chiamata setN_rounds");
     if(_n_rounds<=0){
         return -1;
     }   
@@ -560,6 +570,7 @@ int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
 }
     
 int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
+    DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_linear_movement_per_n_rounds<=0){
         return -1;
     }   

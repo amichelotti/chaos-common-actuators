@@ -303,27 +303,27 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
     int intValue;
     bool boolValue;
     
-    if(strResultparName.compare("MAXSPEED")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if(driver->setMaxSpeed(doubleValue)<0){ 
-            return -1;
-        }
-        return 0;
-    } 
-    else if(strResultparName.compare("SPEED")==0){ 
+//    if(strResultparName.compare("MAXSPEED")==0){
+//        doubleValue = atof(valueOfparName.c_str());
+//        if(driver->setMaxSpeed(doubleValue)<0){ 
+//            return -1;
+//        }
+//        return 0;
+//    } 
+    if(strResultparName.compare("SPEED")==0){ 
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setSpeed(doubleValue)<0){
             return -2;
         }
         return 0;
     }   
-    else if(strResultparName.compare("MAXACCELERATION")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if(driver->setMaxAcceleration(doubleValue)<0){ 
-            return -3;
-        }
-        return 0;
-    } 
+//    else if(strResultparName.compare("MAXACCELERATION")==0){
+//        doubleValue = atof(valueOfparName.c_str());
+//        if(driver->setMaxAcceleration(doubleValue)<0){ 
+//            return -3;
+//        }
+//        return 0;
+//    } 
     else if(strResultparName.compare("ACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setAcceleration(doubleValue)<0){ 
@@ -354,13 +354,13 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;   
     }
-    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if(driver->setMaxhighSpeedHoming(doubleValue)<0){ 
-            return -8;
-        }
-        return 0;   
-    }
+//    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
+//        doubleValue = atof(valueOfparName.c_str());
+//        if(driver->setMaxhighSpeedHoming(doubleValue)<0){ 
+//            return -8;
+//        }
+//        return 0;   
+//    }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->sethighSpeedHoming(doubleValue)<0){ 
@@ -368,13 +368,13 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;       
     }
-    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if(driver->setMaxlowSpeedHoming(doubleValue)<0){ 
-            return -10;
-        }
-        return 0;   
-    }
+//    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
+//        doubleValue = atof(valueOfparName.c_str());
+//        if(driver->setMaxlowSpeedHoming(doubleValue)<0){ 
+//            return -10;
+//        }
+//        return 0;   
+//    }
     else if(strResultparName.compare("LOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setlowSpeedHoming(doubleValue)<0){ 
@@ -382,13 +382,13 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
         }
         return 0;   
     }
-    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if(driver->setMaxAccelerationHoming(doubleValue)<0){ 
-            return -12;
-        }
-        return 0;   
-    }
+//    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
+//        doubleValue = atof(valueOfparName.c_str());
+//        if(driver->setMaxAccelerationHoming(doubleValue)<0){ 
+//            return -12;
+//        }
+//        return 0;   
+//    }
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if(driver->setaccelerationHoming(doubleValue)<0){ 
@@ -1329,7 +1329,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"}";
    
    dataset+="{\"name\":\"numencoderlines\",\"description\":\"Number of encoder lines\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"800\"}";
-   dataset+="{\"name\":\"nummicrostepspersteps\",\"description\":\"Number of micro steps per step\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"256\"}";
+   dataset+="{\"name\":\"nummicrostepsperstep\",\"description\":\"Number of micro steps per step\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"256\"}";
    dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"}";
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"}";
    dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"}";
@@ -1338,5 +1338,3 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    
    return 0; 
 }
-
-
