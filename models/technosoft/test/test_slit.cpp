@@ -32,7 +32,6 @@ void* function1(void* str){
     ActuatorTechnoSoft mySlit2;
     //&& ((ret=mySlit2.init((void*)strInit))!=0)
     
-    
     if((ret=mySlit2.init((void*)strInit))!=0){
         DERR("*************Cannot init axis. In fact the value returned is %d****************",ret);
         //* errPtr = -1;
@@ -108,20 +107,20 @@ void* function1(void* str){
 //        }
 //        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
 //        
-//        DPRINT("************** Movement operation motor 2 **************");
+        DPRINT("************** Movement operation motor thread 1 **************");
         if(mySlit2.moveRelativeMillimeters(10)<0){
             DERR("************** Error returned by movement operation **************");
             //* errPtr = -5;
         }
-        DPRINT("************** Sono la function 1. Movimentazione partita. Rimarro' in attesa 400 s per far finire la movimentazione **************");    
+        DPRINT("************** Sono la function 1. Movimentazione partita. Rimarro' in attesa 100 s per far finire la movimentazione **************");    
         sleep(100);
         
-        mySlit2.setParameter("  SPEed       ","   127    ");
-        if(mySlit2.moveRelativeMillimeters(17)<0){
-            DERR("************** Error returned by movement operation **************");
-            //* errPtr = -5;
-        }
-        sleep(100);
+//        mySlit2.setParameter("  SPEed       ","   127    ");
+//        if(mySlit2.moveRelativeMillimeters(17)<0){
+//            DERR("************** Error returned by movement operation **************");
+//            //* errPtr = -5;
+//        }
+//        sleep(100);
         
 //        mySlit2=mySlit1;
 //        DPRINT("************** Operazione di assegnamento eseguita **************");
@@ -259,8 +258,7 @@ void* function1(void* str){
 //        
 //        sleep(25);
       
-        
-        
+             
 //        
 //        if(mySlit1->setTrapezoidalProfile(100,0.2,1,0,0)<0){
 //            DERR("************** Error setReferenceBase **************");
@@ -416,6 +414,7 @@ void* function1(void* str){
 //            //* errPtr = -5;
 //        }
         //sleep(500);
+        DPRINT("Thread 1 terminato");
         return 0;
     }
     //sleep(5);
@@ -461,24 +460,28 @@ int funzioneProva(ActuatorTechnoSoft slit){
 }
 
 void* function2(void* str){
+    
     //int* errPtr = new int; // Nessun errore..
     int ret;
     
     char* strInit =(char*)str;
-    ActuatorTechnoSoft mySlit1; // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
-
-    double pos2;
-    int axis2;
-    const char *dev2,*conf2;
-    char sinit2[256];
-    // Inizializzazione parametri ASSE 2
-    dev2="/dev/ttyr1d";        // [string], <dev/tty>
-    conf2="../common/actuators/models/technosoft/conf/1setup001.t.zip";       // [string], <technosoft configuration>
-    axis2=15; // [int], <axis>
-    sprintf(sinit2,"%s,myslit2,%s,%d",dev2,conf2,axis2);
+//    ActuatorTechnoSoft mySlit1; // ATTENZIONE: NON E' STATA GESTITA L'ECCEZIONE BAD_ALLOC
+//    DPRINT("%s",strInit);
+//
+//    double pos2;
+//    int axis2;
+//    const char *dev2,*conf2;
+//    char sinit2[256];
+//    // Inizializzazione parametri ASSE 2
+//    dev2="/dev/ttyr1d";        // [string], <dev/tty>
+//    conf2="../common/actuators/models/technosoft/conf/1setup001.t.zip";       // [string], <technosoft configuration>
+//    axis2=15; // [int], <axis>
+//    sprintf(sinit2,"%s,myslit2,%s,%d",dev2,conf2,axis2);
     ActuatorTechnoSoft mySlit2;
     //&& ((ret=mySlit2.init((void*)strInit))!=0)
     
+    sleep(5);
+    DPRINT("************* Sono la function 2. Inizio fase di inizializzazione dopo 5 s di attesa ****************");
     if((ret=mySlit2.init((void*)strInit))!=0){
         DERR("*************Cannot init axis. In fact the value returned is %d****************",ret);
         //* errPtr = -1;
@@ -492,6 +495,7 @@ void* function2(void* str){
 //        //mySlit1 = NULL;
 //    }
     else{
+        
 //        // Lettura stato
 //        std::string desc1;
 //        int status;
@@ -534,7 +538,8 @@ void* function2(void* str){
 //        }
 //        DPRINT("**************Current position encoder %f, before move relative **************",rpos);
 //        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
-//    
+
+       
         if(mySlit2.poweron(1)<0){
             DERR("**************Error returned by stop motion operation **************");
             //* errPtr = -5;
@@ -553,16 +558,23 @@ void* function2(void* str){
 //        }
 //        DPRINT("**************Current position counter %f, before move relative **************",rpos1);
 //        
-        
-        
-        DPRINT("************** Sono la function 2. Rimarro' in attesa 60 s prima di effettuare la movimentazione **************");
-        sleep(60);
+//        DPRINT("************** Movement operation motor 2 **************");
+        DPRINT("************** Movement operation motor thread 2 **************");
         if(mySlit2.moveRelativeMillimeters(10)<0){
-            DERR("**************Error returned by movement operation **************");
+            DERR("************** Error returned by movement operation **************");
             //* errPtr = -5;
         }
-        DPRINT("************** Sono la function 2. Movimentazione partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
-        sleep(30);
+        
+//        DPRINT("%s",sinit1);
+//        DPRINT("************** Sono la function 1. Movimentazione partita. Rimarro' in attesa 400 s per far finire la movimentazione **************");    
+//        sleep(300);
+//        
+//        mySlit2.setParameter("  SPEed       ","   127    ");
+//        if(mySlit2.moveRelativeMillimeters(17)<0){
+//            DERR("************** Error returned by movement operation **************");
+//            //* errPtr = -5;
+//        }
+//        sleep(100);
         
 //        mySlit2=mySlit1;
 //        DPRINT("************** Operazione di assegnamento eseguita **************");
@@ -857,6 +869,7 @@ void* function2(void* str){
 //            //* errPtr = -5;
 //        }
         //sleep(500);
+        DPRINT("Thread 2 terminato");
         return 0;
     }
     //sleep(5);
@@ -876,7 +889,7 @@ int main(int argc,const char* argv[]){
     int status;
     int hostID;
     
-    const char *dev1,*conf1,*dev2,*conf2;
+    const char *dev1,*dev2,*conf1,*conf2;
     char sinit1[256];
     char sinit2[256];
     if(argc!=6){
@@ -892,7 +905,7 @@ int main(int argc,const char* argv[]){
     
     //PRINT("************ using axis %d, moving of %f mm**************",axis1,pos1);
     sprintf(sinit1,"%s,myslit1,%s,%d,%d",dev1,conf1,axis1,hostID);
-    common::actuators::AbstractActuator*mySlit1 = NULL;
+    //common::actuators::AbstractActuator*mySlit1 = NULL;
     
 //    // Inizializzazione parametri ASSE 2
 //    dev2="/dev/ttyr1d";        // [string], <dev/tty>
@@ -906,17 +919,24 @@ int main(int argc,const char* argv[]){
     pthread_t th1;
     pthread_t th2;
     DPRINT("main eseguito");
-    DPRINT("%s",sinit1);
+    //DPRINT("%s",sinit1);
     //function1(&sinit1[0]);
     
     pthread_create(&th1,NULL,function1,&sinit1[0]);
-    //pthread_create(&th1,NULL,function2,&sinit1[0]);
+    
+    dev2=dev1;
+    conf2=conf1;
+    axis2=15;
+    pos2 = pos1;
+    sprintf(sinit2,"%s,myslit2,%s,%d,%d",dev2,conf2,axis2,hostID);
+    DPRINT("%s",sinit2);
+    pthread_create(&th2,NULL,function2,&sinit2[0]);
     
     //void* resp_th_1;
     //void* resp_th_2;
     
     pthread_join(th1,NULL); //pthread_join modifica il contenuto del puntatore resp_th_1 
-    //pthread_join(th2,NULL);
+    pthread_join(th2,NULL);
     
     //int res1 = *((int*)(resp_th_1));
     //int res2 = *((int*)(resp_th_2));
