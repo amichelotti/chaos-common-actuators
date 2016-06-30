@@ -202,6 +202,8 @@ typedef enum {
            @brief de-initialize the actuator and close the communication
            @return 0 if success
           */
+            
+            virtual int configAxis(void*initialization_string)=0;
 
             virtual int deinit()=0;                                     
         /**

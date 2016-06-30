@@ -30,7 +30,7 @@ namespace common{
     
                 private:
                     TechnoSoftLowDriver *driver;
-                    std::string dev; // Serial channel name
+                    //std::string dev; // Serial channel name
                     std::string dev_name; // ActuatorTechnoSoft name
                     //double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
 		    //double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
@@ -41,6 +41,9 @@ namespace common{
                     //bool state0activated;
                     //double highSpeedHoming; // The homing travel speed
                     //double range;
+                    uint8_t btType;
+                    uint32_t baudrate;
+                    int hostID;
               
                 public:
 //                    typedef struct __technoinfo {
@@ -62,6 +65,7 @@ namespace common{
                 ~ActuatorTechnoSoft();
 
                 int init(void*initialization_string);
+                int configAxis(void*initialization_string);
         // OK
         // all'interno di initActuator dovra essere richiamata la funzione initTechnoSoft
                 int deinit();

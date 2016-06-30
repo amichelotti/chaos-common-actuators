@@ -25,8 +25,10 @@ using namespace ::common::actuators::models;
         
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
       
-// initialisation format <device>,<device name>,<configuration path>,<axisid>,
-static const boost::regex driver_match("([\\w\\/]+),(\\w+),(.+),(\\d+),(\\d+)"); //ATTENZIONE: DEVE ESSERE GESTITA LA QUINTA ESPRESSIONE REGOLARE
+
+static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
+// initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
+static const boost::regex driver_match2("(\\d+),(.+)");
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     driver=NULL;
@@ -38,57 +40,105 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     DPRINT("Deallocazione oggetto actuator TechnSoft");
 }
 
+// La nuova funzione init si dovra' occupare della sola inizializzazione del canale
+// quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale 
+// apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
-    std::string params;
-    if(readyState==true){
-        DPRINT("already initialized");
-        return 0;
+    
+    if(readyState==true){ // Nel caso venga richiamata la procedura di inizializzazione di nuovo sullo stesso oggetto gia' inizializzato
+        DPRINT("already initialized channel and motor");
+        return -1;
     }
+    
+    std::string params;
     params.assign((const char*)initialization_string);
     boost::smatch match;
-
-    if(regex_match(params, match, driver_match, boost::match_extra)){
-        dev=match[1];      
-        dev_name=match[2];
-        std::string conf_path=match[3];
-        std::string straxid=match[4];
-        int axid = atoi(straxid.c_str());
-        std::string strHostID=match[5];
-        int hostID = atoi(strHostID.c_str());
+    
+    DPRINT("Initialization string %s", params.c_str());
+    
+    if(regex_match(params, match, driver_match1, boost::match_extra)){
         
-        DPRINT("initializing \"%s\" dev:\"%s\" conf path:\"%s\"",dev_name.c_str(),dev.c_str(),conf_path.c_str());
+        std::string strHostID = match[1]; 
+        hostID = atoi(strHostID.c_str());
+        //printf("hostID = %d",hostID);
+        //dev_name=match[2]; // nome seriale
+        std::string strbtType = match[2];
+        btType = atoi(strbtType.c_str());
+        //printf("btType = %d",btType);
+        std::string strbaudrate = match[3]; 
+        baudrate = atoi(strbaudrate.c_str());
+        //printf("baudrate = %d",baudrate);
+        dev_name=match[4]; // nome seriale
+        
+        DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
         
         //ATTENZIONE: DEVE ESSERE GESTITE LE SEGUENTI ESPRESSIONI REGOLARI.
         // IL CONTROLLO DEI VALORI APPARTENENTI AL RANGE DI AMMISSIBILITA' DOVRA' ESSERE EFFETTUATO A QUESTO PUNTO
         try{
-            driver = new TechnoSoftLowDriver(dev,dev_name);
+            driver = new TechnoSoftLowDriver(hostID,dev_name,btType,baudrate);
             // ATTENZIONE: IL COSTRUTTORE TechnoSoftLowDriver DOVRÀ IN SEGUITO 
             // GENERARE UNA ECCEZIONE nel caso l'oggetto SerialCommChannelTechnosoft 
             // non venga allocato.
             // L'istruzione precedente dovrà essere invocata facendo uso di un blocco 
             // try/catch. Nel caso l'eccezione venga catturata dovrà essere restituito
             // un numero negativo
+            return 0;
         }
         catch(std::bad_alloc& e){ // Eccezione derivante dal fatto che l'oggetto TechnoSoftLowDriver oppure
                                   // l'oggetto canale di comunicazione non è stato possibile allocarlo.
-                                  
             ERR("## cannot create TechnoSoftLowDriver or channel object");
             if(driver!=NULL){ 
                 delete driver;
+                driver = NULL;
             }
-            
             //readyState = false; //non è necessari questa assegnazione
-            return -1;
+            return -2;
         }
+        catch(OpeningChannelException e){
         
-        // Inizializzazione oggetto TechnoSoft low driver costruito
+            e.badOpeningChannelInfo();
+            if(driver!=NULL){ 
+                delete driver;
+                driver = NULL;
+            }
+        return -3;
+        }
+    }
+    ERR("error parsing initialization string:\"%s\" .Technosoft and channel object was not initialized.",params.c_str());
+    return -4;
+}
+
+
+int ActuatorTechnoSoft::configAxis(void*initialization_string){
+    std::string params;
+    if(readyState==true){
+        DPRINT("already initialized channel and motor");
+        return -1;
+    }
+    params.assign((const char*)initialization_string);
+    boost::smatch match;
+
+    DPRINT("Configuration string %s", params.c_str());
+    
+    if(regex_match(params, match, driver_match2, boost::match_extra)){
+//        dev=match[1];      
+//        dev_name=match[2];
+        std::string conf_path=match[2];
+        std::string straxid=match[1];
+        int axid = atoi(straxid.c_str());
+//        std::string strHostID=match[5];
+//        int hostID = atoi(strHostID.c_str());
+        
+        DPRINT("Configuration axis \"%d\" from path:\"%s\"",axid,conf_path.c_str());
         
         int val;
-        if((val=driver->init(conf_path,axid,hostID))<0){
+        if((val=driver->init(conf_path,axid))<0){
             ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technsoft low driver %d",val);
             // Deallocazione oggetto canale ()
-            try{
-                delete driver; // Nota importante: l'indirizzo del canale 
+            //try{
+            if(driver!=NULL){
+                delete driver;
+            }          // Nota importante: l'indirizzo del canale 
                            // non è stato ancora memorizzato nella mappa. Essendo l'oggetto
                            // canale puntato da un solo oggetto TechnoSOftLowDriver,
                            // anche l'oggetto canale sarà deallocato (funzionamento smartpointer).
@@ -97,29 +147,29 @@ int ActuatorTechnoSoft::init(void*initialization_string){
                            // comunicazione verrà anche chiuso nella fase di deallocazione dell'oggetto
                            // SerialCommChannel
             // readyState = false; // non è necessaria questa istruzione
-                driver = NULL;
+            driver = NULL;
                 
-            }
-            catch(ElectricPowerException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
-                     // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
-                     // DEL MOTORE.
-                     //.....
-                     //.....
-                     //.....
-                e.badElectricPowerInfo();
-                return -3;
-            }
-            catch(StopMotionException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
-                     // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
-                     // DEL MOTORE.
-                     //.....
-                     //.....
-                     //.....
-                e.badStopMotionInfo();
-                return -4;
-            }
+            //}
+//            catch(ElectricPowerException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
+//                     // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
+//                     // DEL MOTORE.
+//                     //.....
+//                     //.....
+//                     //.....
+//                e.badElectricPowerInfo();
+//                return -3;
+//            }
+//            catch(StopMotionException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
+//                     // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
+//                     // DEL MOTORE.
+//                     //.....
+//                     //.....
+//                     //.....
+//                e.badStopMotionInfo();
+//                return -4;
+//            }
             
-            return -5;
+            return -2;
         }
         
         // A questo punto siamo certi che l'apertura del canale è andata a buon fine
@@ -146,15 +196,15 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         readyState = true;
 	return 0;
     }
-   ERR("error parsing initialization string:\"%s\" .Technosoft and channel object was not initialized.",params.c_str());
+   ERR("error parsing initialization string:\"%s\" ",params.c_str());
    
-   return -6;
+   return -3;
 }
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ // OVERLOADING COSTRUTTORE DI COPIA
     
     //std::string dev; // Serial channel name
-    dev = objActuator.dev;
+    //dev = objActuator.dev;
     //std::string dev_name; // ActuatorTechnoSoft name
     dev_name = objActuator.dev_name;
     
@@ -163,7 +213,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     internalHomingStateHoming2 = objActuator.internalHomingStateHoming2;
     
     // GESTIONE OGGETTO TechnoSoftLowDriver
-    driver = new TechnoSoftLowDriver(objActuator.dev,objActuator.dev_name);
+    driver = new TechnoSoftLowDriver(hostID,dev_name,btType,baudrate);
     // Inizializzazione membri dell' oggetto TechnoSoftLowDriver
     driver->axisID = (objActuator.driver)->axisID;
     driver->axisRef = (objActuator.driver)->axisRef;
@@ -192,9 +242,9 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     
     driver->my_channel = (objActuator.driver)->my_channel;
     //driver->channels = (objActuator.driver)->channels;
-    driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
+    //driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
     driver->poweron = (objActuator.driver)->poweron;
-    driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
+    //driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
     
     DPRINT("Costruttore di copia eseguito");
 }
@@ -205,7 +255,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
         return *this;
     } 
     //std::string dev; // Serial channel name
-    dev = objActuator.dev;
+    //dev = objActuator.dev;
     //std::string dev_name; // ActuatorTechnoSoft name
     dev_name = objActuator.dev_name;
     
@@ -216,7 +266,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     if(driver!=NULL){ //Prima distruggiamo il vecchio oggetto tec   technosoftLowdriver, per evitare un 
                       // un errore di memori leak. Infatti la copia viene eseguita su un oggetto gia' ESISTENTE!
         delete driver;
-        driver = new TechnoSoftLowDriver(dev,dev_name);
+        driver = new TechnoSoftLowDriver(hostID,dev_name,btType,baudrate);
     }
     
     // copia valori membri oggetto TechnoSoftLowDriver a destra dell'uguale
@@ -247,9 +297,9 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     
     driver->my_channel = (objActuator.driver)->my_channel;
     //driver->channels = (objActuator.driver)->channels;
-    driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
+    //driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
     driver->poweron = (objActuator.driver)->poweron;
-    driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
+    //driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
     
     DPRINT("Operatore di assegnamento eseguito");
     return *this;
@@ -1319,7 +1369,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"movement\",\"description\":\"Defines the moment when the motion is started\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    //dataset+="{\"name\":\"maxhighspeedhoming\",\"description\":\"Upper bound for max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}";
-   dataset+="{\"name\":\"highspeedhoming\",\"description\":\"Max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"15.0\",\"default\":\"10.0\"},";
+   dataset+="{\"name\":\"hi gghspeedhoming\",\"description\":\"Max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"15.0\",\"default\":\"10.0\"},";
    //dataset+="{\"name\":\"maxlowspeedhoming\",\"description\":\"Upper bound for speed of trapezoidal profile for homing procedure, for repositioning the slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}";
    dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"},";
    //dataset+="{\"name\":\"maxaccelerationhoming\",\"description\":\"Upper bound for acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\"}";

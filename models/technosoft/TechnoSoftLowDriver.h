@@ -85,6 +85,12 @@ namespace common{
                     void badStopMotionInfo();
            };
            
+           class OpeningChannelException{
+                public:
+                    OpeningChannelException(){}
+                    void badOpeningChannelInfo();
+           };
+           
  
 	    //Channel class
             class SerialCommChannelTechnosoft{
@@ -93,18 +99,19 @@ namespace common{
                     std::string pszDevName; // The communication channel to be opened
                     BYTE btType; // the type of the communication channel and the CAN-bus communication protocol
                     DWORD baudrate; // communication baud rate
+                    int hostID;
                     int fd; // file descriptor of the channel
                 public:
                     SerialCommChannelTechnosoft(){}
-                    SerialCommChannelTechnosoft(const std::string& pszDevName,const BYTE btType=CHANNEL_TYPE,const DWORD baudrate=BAUDRATE);
-                    int init(const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
+                    SerialCommChannelTechnosoft(int hostID, const std::string& pszDevName,BYTE btType=CHANNEL_TYPE,DWORD baudrate=BAUDRATE);
+                    int init(int hostID, const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
                     int getFD(); 
 		    std::string  getDevName();
 		    int getbtType();
 		    int getbaudrate();
 		    void PrintChannel();
                     ~SerialCommChannelTechnosoft();
-                    int open(int hostID);
+                    int open();
                     void close();
             };
         
@@ -113,11 +120,10 @@ namespace common{
 
 	    public:
                 
-                int hostID;
+                //int hostID;
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
                 
-                std::string dev;
                 std::string devName;
                 
                 double n_encoder_lines; 
@@ -166,21 +172,20 @@ namespace common{
                 static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
                                               // percio e dichiarata di tipo static
                 
-                bool alreadyopenedChannel;  // Canale di comunicazione aperto
+                //bool alreadyopenedChannel;  // Canale di comunicazione aperto
                 bool poweron; // alimentazione al drive motor erogata
-                bool channelJustOpened;
+                //bool channelJustOpened;
                 
                 // Transition parameters
                 
             public:
                 // Costruttore device channel and device name
-                TechnoSoftLowDriver(const std::string& dev, const std::string& devName);
+                TechnoSoftLowDriver(int hostID, const std::string& devName, BYTE btType, DWORD baudrate);
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
                 int init(const std::string& setupFilePath,
                         const int& axisID,
-                        const int& _hostID = HOST_ID,
                         const double speed=SPEED_DEFAULT,
                         const double maxSpeed=MAX_SPEED_DEFAULT, 
                         const double acceleration=ACCELERATION_DEFAULT,
