@@ -32,12 +32,24 @@ void* function1(void* str){
     ActuatorTechnoSoft mySlit2;
     //&& ((ret=mySlit2.init((void*)strInit))!=0)
     
+    // INIZILIZZAZIONE
     if((ret=mySlit2.init((void*)strInit))!=0){
-        DERR("*************Cannot init axis. In fact the value returned is %d****************",ret);
+        DERR("*************Cannot init channel. In fact the value returned is %d****************",ret);
         //* errPtr = -1;
         //delete mySlit1;
         //mySlit1 = NULL;
     }
+    // CONFIGURAZIONE
+    
+    std::string strConfig = "14,../common/actuators/models/technosoft/conf/1setup001.t.zip";
+    
+    if((ret=mySlit2.configAxis((void*)strConfig.c_str()))!=0){
+        DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
+        //* errPtr = -1;
+        //delete mySlit1;
+        //mySlit1 = NULL;
+    }
+    
 //    if((ret=mySlit2.init((void*)sinit2))!=0){
 //        DERR("*************Cannot init axis. In fact the value returned is %d****************",ret);
 //        //* errPtr = -1;
@@ -880,7 +892,7 @@ void* function2(void* str){
 
 int main(int argc,const char* argv[]){
     
-    int axis1;
+    int axis1ID;
     int axis2;
     
     double pos1,pos2;
@@ -888,23 +900,31 @@ int main(int argc,const char* argv[]){
     int ret;
     int status;
     int hostID;
+    int btType;
+    int baudrate;
     
-    const char *dev1,*dev2,*conf1,*conf2;
+    const char *dev1,*conf1;
     char sinit1[256];
-    char sinit2[256];
-    if(argc!=6){
+    //char sinit2[256];
+    if(argc!=5){
         USAGE;
         return -1;
     }
     // Inizializzazione parametri ASSE 1
-    dev1=argv[1];        // [string], <dev/tty>
-    conf1=argv[2];       // [string], <technosoft configuration>
-    axis1=atoi(argv[3]); // [int], <axis>
-    pos1=atof(argv[4]);  // [float], <move position in mm>
-    hostID=atoi(argv[5]);
+//    dev1=argv[1];        // [string], <dev/tty>
+//    conf1=argv[2];       // [string], <technosoft configuration>
+//    axis1=atoi(argv[3]); // [int], <axis>
+//    pos1=atof(argv[4]);  // [float], <move position in mm>
+    hostID =   atoi(argv[1]);
+    btType =   atoi(argv[2]);
+    baudrate = atoi(argv[3]);
+    dev1 = argv[4];        // [string], <dev/tty>
+    
+    
     
     //PRINT("************ using axis %d, moving of %f mm**************",axis1,pos1);
-    sprintf(sinit1,"%s,myslit1,%s,%d,%d",dev1,conf1,axis1,hostID);
+    sprintf(sinit1,"%d,%d,%d,%s",hostID,btType,baudrate,dev1);
+    
     //common::actuators::AbstractActuator*mySlit1 = NULL;
     
 //    // Inizializzazione parametri ASSE 2
@@ -918,25 +938,26 @@ int main(int argc,const char* argv[]){
     
     pthread_t th1;
     pthread_t th2;
+    DPRINT("%s",sinit1);
     DPRINT("main eseguito");
     //DPRINT("%s",sinit1);
     //function1(&sinit1[0]);
     
     pthread_create(&th1,NULL,function1,&sinit1[0]);
-    
-    dev2=dev1;
-    conf2=conf1;
-    axis2=15;
-    pos2 = pos1;
-    sprintf(sinit2,"%s,myslit2,%s,%d,%d",dev2,conf2,axis2,hostID);
-    DPRINT("%s",sinit2);
-    pthread_create(&th2,NULL,function2,&sinit2[0]);
+//    
+//    dev2=dev1;
+//    conf2=conf1;
+//    axis2=15;
+//    pos2 = pos1;
+//    sprintf(sinit2,"%s,myslit2,%s,%d,%d",dev2,conf2,axis2,hostID);
+//    DPRINT("%s",sinit2);
+//    pthread_create(&th2,NULL,function2,&sinit2[0]);
     
     //void* resp_th_1;
     //void* resp_th_2;
     
     pthread_join(th1,NULL); //pthread_join modifica il contenuto del puntatore resp_th_1 
-    pthread_join(th2,NULL);
+//    pthread_join(th2,NULL);
     
     //int res1 = *((int*)(resp_th_1));
     //int res2 = *((int*)(resp_th_2));
