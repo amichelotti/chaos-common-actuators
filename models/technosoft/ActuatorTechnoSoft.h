@@ -35,6 +35,7 @@ namespace common{
                     //double movementUnit_mm; // 1.5 mm or 1 mm (MDS) 
 		    //double mechanicalReduceFactor; // fattore di riduzione albero motore/slitta
                     bool readyState;
+                    bool partialInit;
                     int internalHomingStateDefault;
                     int internalHomingStateHoming2;
                     //bool eventOnMotionCompleteSet;
