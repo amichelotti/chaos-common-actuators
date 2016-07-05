@@ -37,7 +37,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    deinit();
+    //deinit(); // *********************ATTENZIONE******************************************************* SOLO PER AZZITTIRE TEMPORANEMENTE IL COMPILATORE
     DPRINT("Deallocazione oggetto actuator TechnSoft");
 }
 
@@ -123,21 +123,16 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
     DPRINT("Configuration string %s", params.c_str());
     
     if(regex_match(params, match, driver_match2, boost::match_extra)){
-//        dev=match[1];      
-//        dev_name=match[2];
+
         std::string conf_path=match[2];
         std::string straxid=match[1];
         int axid = atoi(straxid.c_str());
-//        std::string strHostID=match[5];
-//        int hostID = atoi(strHostID.c_str());
         
         DPRINT("Configuration axis \"%d\" from path:\"%s\"",axid,conf_path.c_str());
         
         int val;
         if((val=driver->init(conf_path,axid))<0){
             ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technsoft low driver %d",val);
-            // Deallocazione oggetto canale ()
-            //try{
             if(driver!=NULL){
                 delete driver;
             }          // Nota importante: l'indirizzo del canale 
@@ -150,64 +145,22 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                            // SerialCommChannel
             // readyState = false; // non è necessaria questa istruzione
             driver = NULL;
-                
-            //}
-//            catch(ElectricPowerException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
-//                     // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
-//                     // DEL MOTORE.
-//                     //.....
-//                     //.....
-//                     //.....
-//                e.badElectricPowerInfo();
-//                return -3;
-//            }
-//            catch(StopMotionException e){ //DOVRA' CATTURARE UN'ECCEZIONE DEFINITA DALL'UTENTE CHE
-//                     // STA AD INDICARE IL MANCATO SPEGNIMENTO DELL'ALIMENTAZIONE
-//                     // DEL MOTORE.
-//                     //.....
-//                     //.....
-//                     //.....
-//                e.badStopMotionInfo();
-//                return -4;
-//            }
-            
             return -2;
         }
-        
-        // A questo punto siamo certi che l'apertura del canale è andata a buon fine
-        // ed i parametri del drive/motor sono stati inizializzati correttamente
-	
-        //Initialize DEFAULT VALUE for timeout of homing procedure, dependent on the range of slit
-        //double highSpeedHoming_mm_s;
-        //driver->getHighSpeedHoming(highSpeedHoming_mm_s); // highSpeedHoming_mm_s < 0
-        //DPRINT("highSpeedHoming_mm_s nell'init=%f",highSpeedHoming_mm_s);
-        
-        //range_mm = RANGE_MM_DEFAULT;
-        //DPRINT("range_mm=%f",range_mm);
-        
-        //timeo_homing_ms = (uint64_t)((range_mm/(-highSpeedHoming_mm_s/2))*1000);
-        //DPRINT("Valore calcolato per l'homing: %lu",timeo_homing_ms);
-        
+
         //homing procedure parameters
         internalHomingStateDefault=0;
         internalHomingStateHoming2=0;
-        //state0activated = false;
-        
-        // now the motor is ready!
-        //eventOnMotionCompleteSet = false;
+      
         readyState = true;
 	return 0;
     }
-   ERR("error parsing initialization string:\"%s\" ",params.c_str());
-   
-   return -3;
+    ERR("error parsing initialization string:\"%s\" ",params.c_str());
+    return -3;
 }
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ // OVERLOADING COSTRUTTORE DI COPIA
     
-    //std::string dev; // Serial channel name
-    //dev = objActuator.dev;
-    //std::string dev_name; // ActuatorTechnoSoft name
     dev_name = objActuator.dev_name;
     
     readyState = objActuator.readyState;
@@ -243,10 +196,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     driver->referenceBaseHoming = (objActuator.driver)->referenceBaseHoming;
     
     driver->my_channel = (objActuator.driver)->my_channel;
-    //driver->channels = (objActuator.driver)->channels;
-    //driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
     driver->poweron = (objActuator.driver)->poweron;
-    //driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
     
     DPRINT("Costruttore di copia eseguito");
 }
@@ -298,16 +248,13 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     driver->referenceBaseHoming = (objActuator.driver)->referenceBaseHoming;
     
     driver->my_channel = (objActuator.driver)->my_channel;
-    //driver->channels = (objActuator.driver)->channels;
-    //driver->alreadyopenedChannel = (objActuator.driver)->alreadyopenedChannel;
     driver->poweron = (objActuator.driver)->poweron;
-    //driver->channelJustOpened = (objActuator.driver)->channelJustOpened;
     
     DPRINT("Operatore di assegnamento eseguito");
     return *this;
 }
 
-int ActuatorTechnoSoft::deinit(){
+int ActuatorTechnoSoft::deinit(int axisID){
     readyState=false;
     if (driver!=NULL) {
         delete driver;
@@ -340,7 +287,7 @@ bool to_bool(const std::string & s) {
      return s != "0";
 }
 
-int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparName){
+int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string valueOfparName){
     
     // trim
     trim2(parName);
@@ -511,7 +458,7 @@ int ActuatorTechnoSoft::setParameter(std::string parName,std::string valueOfparN
     }
 }
 
-int ActuatorTechnoSoft::moveRelativeMillimeters(double deltaMillimeters){
+int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimeters){
     DPRINT("moving relative %f mm",deltaMillimeters);
     
     // Calcolo argomento funzione moveRelativeSteps
@@ -725,7 +672,7 @@ int ActuatorTechnoSoft::setLinear_movement_per_n_rounds(double _linear_movement_
 }
            
 // Move absolute homing
-int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){ 
+int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){ 
     
     // Calcolo argomento funzione moveAbsoluteSteps
     //double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
@@ -739,7 +686,6 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
         return -2;
     }
 
-    //long nMicroStepsL = nMicroSteps;
     if(driver->moveAbsoluteSteps((long)nMicroSteps)<0){     
         return -3;
     }
@@ -767,7 +713,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(double millimeters){
 //    return 0;
 //}
 
-int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm){
+int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
      
     DPRINT("Position reading");
     if(driver->selectAxis()<0){
@@ -794,7 +740,7 @@ int ActuatorTechnoSoft::getPosition(readingTypes mode, double* deltaPosition_mm)
     return 0;
 }
 
-int ActuatorTechnoSoft::homing(homingType mode){
+int ActuatorTechnoSoft::homing(int axisID,homingType mode){
     // Attenzione: la variabile mode non viene utilizzata
     
     if(mode==defaultHoming){
@@ -1065,7 +1011,7 @@ int ActuatorTechnoSoft::homing(homingType mode){
 }
 
 
-int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
+int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
     DPRINT("Getting state of the actuator. ");
 
@@ -1155,7 +1101,7 @@ int ActuatorTechnoSoft::getState(int* state, std::string& descStr){
     return 0;
 }
 
-int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
+int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descStr){
 
     * alrm = ACTUATOR_NO_ALARMS_DETECTED;
     descStr.assign("");
@@ -1272,7 +1218,7 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
     return 0;
 }
      
- int ActuatorTechnoSoft::stopMotion(){
+ int ActuatorTechnoSoft::stopMotion(int axisID){
      if(driver->selectAxis()<0){
         return -1;
      }
@@ -1282,7 +1228,7 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      return 0;
  }
 
- int ActuatorTechnoSoft::resetAlarms(uint64_t mode){
+ int ActuatorTechnoSoft::resetAlarms(int axisID,uint64_t mode){
      
      // In the fault status the power stage is disabled, the MER register signals
      // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
@@ -1330,7 +1276,7 @@ int ActuatorTechnoSoft::getAlarms(uint64_t* alrm, std::string& descStr){
      return 0;
  }
  
-int ActuatorTechnoSoft::poweron(int on){
+int ActuatorTechnoSoft::poweron(int axisID,int on){
     if(driver->selectAxis()<0){
         return -1;
     }

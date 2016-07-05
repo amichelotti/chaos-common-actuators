@@ -31,7 +31,6 @@ std::string  SerialCommChannelTechnosoft::getDevName(){return this->pszDevName;}
 int SerialCommChannelTechnosoft::getbtType(){return this->btType;}
 int SerialCommChannelTechnosoft::getbaudrate(){return this->baudrate;}
 
-
 int SerialCommChannelTechnosoft::init(int _hostID, const std::string& _pszDevName,const BYTE& _btType,const DWORD& _baudrate){
     DPRINT("initializing dev %s type %d baud %d",_pszDevName.c_str(),_btType,_baudrate);
     pszDevName=_pszDevName;
@@ -70,7 +69,6 @@ int SerialCommChannelTechnosoft::open(){
 }
 
 TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels; // Anche se non viene inizializzato...
-
 
 //----------------------------------------------
 TechnoSoftLowDriver::TechnoSoftLowDriver(int hostID, const std::string& _devName, BYTE btType, DWORD baudrate){
