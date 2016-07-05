@@ -80,7 +80,7 @@ typedef enum {
             ACTUATOR_NO_ALARMS_DETECTED
         } actuatorAlarms;
 
-    class AbstractRotaryActuator {
+    class AbstractActuator {
 
         protected:
             double range_mm; //mechanical range of the slit (passato da MDS), [mm]
@@ -88,8 +88,8 @@ typedef enum {
             uint64_t timeo_homing_ms; // ***** DA ELIMINARE *****            
 
         public:
-        AbstractRotaryActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
-        virtual ~AbstractRotaryActuator() {};
+        AbstractActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
+        virtual ~AbstractActuator() {};
         /**
         @brief set timeout in ms for the completion of the operation (0 wait undefinitively)
         @return 0 if success or an error code
