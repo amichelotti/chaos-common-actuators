@@ -23,23 +23,23 @@
 
 using namespace common::actuators;
 
-int AbstractActuator::setTimeout(uint64_t _timeo_ms){ // ******* DA ELIMINARE *******
-    timeo_ms=_timeo_ms;
-    return 0;
-}        
-int AbstractActuator::getTimeout(uint64_t* _timeo_ms){ // ******* DA ELIMINARE *******
-    *_timeo_ms=timeo_ms;
-    return 0;
-}
-
-int AbstractActuator::setTimeoutHoming(uint64_t timeo_ms){ // ******* DA ELIMINARE  *******
-    timeo_homing_ms = timeo_ms;
-    return 0;
-}
-int AbstractActuator::getTimeoutHoming(uint64_t* timeo_ms){ // ******* DA ELIMINARE  *******
-    * timeo_ms = timeo_homing_ms;
-    return 0;
-}
+//int AbstractActuator::setTimeout(uint64_t _timeo_ms){ // ******* DA ELIMINARE *******
+//    timeo_ms=_timeo_ms;
+//    return 0;
+//}        
+//int AbstractActuator::getTimeout(uint64_t* _timeo_ms){ // ******* DA ELIMINARE *******
+//    *_timeo_ms=timeo_ms;
+//    return 0;
+//}
+//
+//int AbstractActuator::setTimeoutHoming(uint64_t timeo_ms){ // ******* DA ELIMINARE  *******
+//    timeo_homing_ms = timeo_ms;
+//    return 0;
+//}
+//int AbstractActuator::getTimeoutHoming(uint64_t* timeo_ms){ // ******* DA ELIMINARE  *******
+//    * timeo_ms = timeo_homing_ms;
+//    return 0;
+//}
 
 //int AbstractActuator::setSpeed(double speed_mm_per_sec){
 //     speed=speed_mm_per_sec;

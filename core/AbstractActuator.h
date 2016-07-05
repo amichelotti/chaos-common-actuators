@@ -44,10 +44,7 @@ typedef enum {
             ACTUATOR_AUTORUN_ENABLED = 0x4, // Auto run mode status
             ACTUATOR_LSP_EVENT_INTERRUPUT = 0x8, // Limit switch positive event/interrupt
             ACTUATOR_LSN_EVENT_INTERRUPT = 0x10, // Limit switch negative event/interrupt
-            //ACTUATOR_CAPTURE_EVENT_INTERRUPT = 0x20, // Capture event/interrupt
-            //ACTUATOR_TARGET_REACHED = 0x40, // Target command
-            //ACTUATOR_I2T_WARNING_MOTOR = 0x80, // Motor I2T protection warning
-            //ACTUATOR_I2T_WARNING_DRIVE = 0x100, // Drive I2T protection warning
+           
             ACTUATOR_IN_GEAR = 0x20, // Gear ratio in electronic gearing mode
             ACTUATOR_IN_CAM = 0x40, // Reference position in absolute electronic camming mode
             ACTUATOR_FAULT=0x80, // Fault status
@@ -83,104 +80,38 @@ typedef enum {
             ACTUATOR_NO_ALARMS_DETECTED
         } actuatorAlarms;
 
-    class AbstractActuator {
+    class AbstractRotaryActuator {
 
         protected:
             double range_mm; //mechanical range of the slit (passato da MDS), [mm]
             uint64_t timeo_ms; // ***** DA ELIMINARE *****
             uint64_t timeo_homing_ms; // ***** DA ELIMINARE *****            
 
-//            // Trapezoidal profile parameters
-//            double speed;
-//            double acceleration;
-//            bool isAdditive;
-//            int32_t movement;
-//            int32_t referenceBase;
-
         public:
-        AbstractActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
-        virtual ~AbstractActuator() {};
+        AbstractRotaryActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
+        virtual ~AbstractRotaryActuator() {};
         /**
         @brief set timeout in ms for the completion of the operation (0 wait undefinitively)
         @return 0 if success or an error code
         */
-        int setTimeout(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
+        //int setTimeout(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
         /**
         @brief get timeout in ms for the completion of the operation
         @return 0 if success or an error code
         */
-        int getTimeout(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
+        //int getTimeout(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
         /**
         @brief Move the actuator X millimeters away from current position
         @return 0 if success or an error code
         */
         
-        int setTimeoutHoming(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
-        int getTimeoutHoming(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
+        //int setTimeoutHoming(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
+        //int getTimeoutHoming(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
         
-        virtual int setParameter(std::string parName,std::string value)=0;
-        
-        virtual int moveRelativeMillimeters(double mm)=0;
-
-        // Set trapezoidal profile parameters
-        virtual int setSpeed(double speed)=0; //[mm/s]
-//        virtual int setMaxSpeed(double speed)=0; //[mm/s]  DA COMMENTARE
-        virtual int setAcceleration(double acceleration)=0;
-//        virtual int setMaxAcceleration(double acceleration)=0; //DA COMMENTARE
-        virtual int setAdditive(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int                                             IN REALTA' NON DOVRA' ESSERE USATO
-        virtual int setMovement(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short                                       IN REALTA' NON DOVRA' ESSERE USATO
-        virtual int setReferenceBase(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short                             IN REALTA' NON DOVRA' ESSERE USATO
-        virtual int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase)=0;//  IN REALTA' NON POTRA' ESSERE USATO
-        
-        // Set Homing parameters
-        // ******************* RIMANGONO DA TESTARE QUESTE  ****************************  
-//        virtual int sethighSpeedHoming(double speed)=0; //DA COMMENTARE
-//        virtual int setMaxhighSpeedHoming(double speed)=0; //DA COMMENTARE
-//        virtual int setlowSpeedHoming(double speed)=0;  //DA COMMENTARE
-//        virtual int setMaxlowSpeedHoming(double speed)=0; //DA COMMENTARE
-        virtual int setAccelerationHoming(double acceleration)=0;
-//        virtual int setMaxAccelerationHoming(double acceleration)=0; //DA COMMENTARE
-        virtual int setAdditiveHoming(bool isAdditive)=0; // NOTA: bool dovra' essere castato a int
-        virtual int setMovementHoming(int32_t movement)=0; // NOTA: int32_t dovra' essere castato a short
-        virtual int setReferenceBaseHoming(int32_t referenceBase)=0; // NOTA: int32_t dovra' essere castato a short
-        
-//        virtual int setEncoderLines(double _encoderLines)=0;
-//        virtual int setConst_mult_technsoft(double _const_mult_technsoft)=0;
-//        virtual int setSteps_per_rounds(double _steps_per_rounds)=0;
-//        virtual int setN_rounds(double _n_rounds)=0;
-//        virtual int setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds)=0;
-        
-
-        /**
-        @brief set the actuator speed in mm/s
-        @return 0 if success or an error code
-        */
-        // virtual int setSpeed(double speed_mm_per_sec);
-
-        /**
-        @brief set the actuator acceleration in mm/s^2
-        @return 0 if success or an error code
-        */
-        //    virtual int setAcceleration(double acceleration_mm_per_sec2);
-
-        /**
-        @brief specify how is computed the position to reach
-        */
-        //    virtual void setAdditive(bool isAdditive);
-
-        /**
-        @brief define the moment when the motion is started
-        @return 0 if success or an error code
-        */
-        //    virtual int setMovement(int32_t movement);  //********** per ora ritorna un valore ***********
-
-        /**
-        @brief specify how the motion reference is computed is computed: from
-         * actual values of position and speed reference or from actual values
-         * of load/motor position and speed
-        @return 0 if success or an error code
-        */
-        //    virtual int setReferenceBase(int32_t referenceBase); //********** per ora ritorna un valore ***********
+        // Funzioni relative al drive-motor in generale (1)
+        // Funzioni relative ad uno SPECIFICO motore (2)
+        virtual int setParameter(int axisID, std::string parName,std::string value)=0; // (2)
+        virtual int moveRelativeMillimeters(int axisID,double mm)=0;  // (2)
 
         /**
         @brief get the actuator position using the readingType mode chosen for reading
@@ -191,7 +122,7 @@ typedef enum {
             READ_COUNTER
         } readingTypes;
 
-        virtual int getPosition(readingTypes mode,double *deltaPosition_mm)=0;   //***OK***
+        virtual int getPosition(int axisID,readingTypes mode,double *deltaPosition_mm)=0;   //***OK***
 
         /**
         @brief initialize and poweron the motor
@@ -205,7 +136,7 @@ typedef enum {
             
             virtual int configAxis(void*initialization_string)=0;
 
-            virtual int deinit()=0;                                     
+            virtual int deinit(int axisID)=0; // (2)                                    
         /**
            @brief returns the SW/FW version of the driver/FW
            @param version returning string
@@ -218,21 +149,21 @@ typedef enum {
         @param version returning string
         @return 0 if success or an error code
         */
-            virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
+        virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
 
 /**
 @brief returns a string containing the dataset attributes from driver which responds to SetParameter method
 
 
 */
-            virtual int sendDataset(std::string& dataset)=0;         // ****Da implementare***
+        virtual int sendDataset(std::string& dataset)=0; // ****Da implementare***  (2)
          /**
 
         @brief stop the motion of the actuator 
 
         @return 0 if success or an error code
         */
-            virtual int stopMotion()=0;                             
+            virtual int stopMotion(int axisID)=0;    // (2)                          
 
             typedef enum{
                 defaultHoming,
@@ -240,13 +171,13 @@ typedef enum {
                 nativeHoming15
             } homingType;
 
-            virtual int homing(homingType mode)=0;
-            virtual int getState(int* state, std::string& desc)=0;   // ****Da implementare***
-            virtual int getAlarms(uint64_t*alrm,std::string& desc)=0;
-            virtual int resetAlarms(uint64_t alrm)=0;
-            virtual int poweron(int on)=0;
+            virtual int homing(int axisID,homingType mode)=0;                        // (2) 
+            virtual int getState(int axisID,int* state, std::string& desc)=0;        // (2) 
+            virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
+            virtual int resetAlarms(int axisID,uint64_t alrm)=0;                                // (2)
+            virtual int poweron(int axisID,int on)=0;
             virtual uint64_t getFeatures()=0;
-            virtual int moveAbsoluteMillimeters(double mm)=0;
+            virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
     };
 }
 }
