@@ -28,7 +28,7 @@ namespace common{
                     std::string dev_name; // ActuatorTechnoSoft name
                     
                     bool readyState;
-                    bool partialInit;
+                    bool initAlreadyDone;
                     int internalHomingStateDefault;
                     int internalHomingStateHoming2;
                     
@@ -36,8 +36,7 @@ namespace common{
                     uint32_t baudrate;
                     int hostID;
                     
-                    typedef std::map<int,TechnoSoftLowDriver *> motor_map_t;
-                    static motor_map_t motors;
+                    static std::map<int,TechnoSoftLowDriver *> motors;
                 
                 public:
                     
@@ -47,7 +46,7 @@ namespace common{
                     ActuatorTechnoSoft(const ActuatorTechnoSoft&); // Overloading costruttore di copia
                     ActuatorTechnoSoft& operator=(const ActuatorTechnoSoft& objActuator); // Overloading operatore assegnamento 
                     ~ActuatorTechnoSoft();
-
+                    
                     int init(void*initialization_string);
                     int configAxis(void*initialization_string);
 
@@ -90,11 +89,11 @@ namespace common{
                 
                     int resetAlarms(int axisID,uint64_t alrm); 
 
-                    int stopMotion(int axisID);
-                    int getPosition(int axisID,readingTypes mode, double* deltaPosition_mm);
+                    int stopMotion(int axisID);                                              // *******OK********
+                    int getPosition(int axisID,readingTypes mode, double* deltaPosition_mm); // *******OK********
                     int homing(int axisID,homingType mode);
-                    int getState(int axisID,int* state, std::string& desc );   // **
-                    int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);
+                    int getState(int axisID,int* state, std::string& desc );                 // *******OK********
+                    int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);           // *******OK********
                     uint64_t getFeatures(){return 0;}
      
         /**

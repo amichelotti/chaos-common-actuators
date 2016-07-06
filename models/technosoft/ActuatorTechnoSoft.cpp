@@ -30,10 +30,12 @@ static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
 static const boost::regex driver_match2("(\\d+),(.+)");
 
+std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
+
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     driver=NULL;
     readyState=false;
-    partialInit = false;
+    initAlreadyDone = false;
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
@@ -46,11 +48,11 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
     
-    if(readyState || partialInit){ // Nel caso venga richiamata la procedura di inizializzazione di nuovo sullo stesso oggetto gia' inizializzato
-        DPRINT("already initialized channel and motor");
+    if(initAlreadyDone){
+        DPRINT("This object has already a communication channel correctly initialized");
         return -1;
     }
-    
+ 
     std::string params;
     params.assign((const char*)initialization_string);
     boost::smatch match;
@@ -61,62 +63,28 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         
         std::string strHostID = match[1]; 
         hostID = atoi(strHostID.c_str());
-        //printf("hostID = %d",hostID);
-        //dev_name=match[2]; // nome seriale
         std::string strbtType = match[2];
         btType = atoi(strbtType.c_str());
-        //printf("btType = %d",btType);
         std::string strbaudrate = match[3]; 
         baudrate = atoi(strbaudrate.c_str());
-        //printf("baudrate = %d",baudrate);
-        dev_name=match[4]; // nome seriale
+        dev_name=match[4];
         
         DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
         
-        //ATTENZIONE: DEVE ESSERE GESTITE LE SEGUENTI ESPRESSIONI REGOLARI.
-        // IL CONTROLLO DEI VALORI APPARTENENTI AL RANGE DI AMMISSIBILITA' DOVRA' ESSERE EFFETTUATO A QUESTO PUNTO
-        try{
-            driver = new TechnoSoftLowDriver(hostID,dev_name,btType,baudrate);
-            // ATTENZIONE: IL COSTRUTTORE TechnoSoftLowDriver DOVRÀ IN SEGUITO 
-            // GENERARE UNA ECCEZIONE nel caso l'oggetto SerialCommChannelTechnosoft 
-            // non venga allocato.
-            // L'istruzione precedente dovrà essere invocata facendo uso di un blocco 
-            // try/catch. Nel caso l'eccezione venga catturata dovrà essere restituito
-            // un numero negativo
-            partialInit = true;
-            return 0;
-        }
-        catch(std::bad_alloc& e){ // Eccezione derivante dal fatto che l'oggetto TechnoSoftLowDriver oppure
-                                  // l'oggetto canale di comunicazione non è stato possibile allocarlo.
-            ERR("## cannot create TechnoSoftLowDriver or channel object");
-            if(driver!=NULL){ 
-                delete driver;
-                driver = NULL;
-            }
-            //readyState = false; //non è necessari questa assegnazione
+        SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
+        if(objChannel.open()<0){
             return -2;
         }
-        catch(OpeningChannelException e){
-        
-            e.badOpeningChannelInfo();
-            if(driver!=NULL){ 
-                delete driver;
-                driver = NULL;
-            }
-        return -3;
-        }
+        initAlreadyDone = true;
+        return 0;
     }
-    ERR("error parsing initialization string:\"%s\" .Technosoft and channel object was not initialized.",params.c_str());
-    return -4;
+    ERR("Cannot possible init channel",params.c_str());
+    return -3;
 }
-
 
 int ActuatorTechnoSoft::configAxis(void*initialization_string){
     std::string params;
-    if(readyState==true){
-        DPRINT("already initialized channel and motor");
-        return -1;
-    }
+
     params.assign((const char*)initialization_string);
     boost::smatch match;
 
@@ -128,30 +96,35 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         std::string straxid=match[1];
         int axid = atoi(straxid.c_str());
         
-        DPRINT("Configuration axis \"%d\" from path:\"%s\"",axid,conf_path.c_str());
+        // Controllo mappa motori
+        std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axid); // iteratore alla mappa statica
         
-        int val;
-        if((val=driver->init(conf_path,axid))<0){
-            ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technsoft low driver %d",val);
-            if(driver!=NULL){
+        if(i==motors.end()){ // Il motore con il corrente axis id non e' stato configurato. 
+                             // In questo caso creero' un nuovo oggetto motore.
+            TechnoSoftLowDriver* driver = new (std::nothrow) TechnoSoftLowDriver(); 
+            if(driver==NULL){
+                return -1;
+            }  
+            int val;
+            if((val=driver->init(conf_path,axid))<0){
+                ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
-            }          // Nota importante: l'indirizzo del canale 
-                           // non è stato ancora memorizzato nella mappa. Essendo l'oggetto
-                           // canale puntato da un solo oggetto TechnoSOftLowDriver,
-                           // anche l'oggetto canale sarà deallocato (funzionamento smartpointer).
-                           // Se il canale di comunicazione è stato aperto (abbiamo quindi avuto
-                           // un errore nella inizializzazione del drive/motor), il canale di 
-                           // comunicazione verrà anche chiuso nella fase di deallocazione dell'oggetto
-                           // SerialCommChannel
-            // readyState = false; // non è necessaria questa istruzione
-            driver = NULL;
-            return -2;
-        }
-
-        //homing procedure parameters
+                driver = NULL;
+                return -2;
+            }
+            DPRINT("Axis id %d configurato correttamente.", axid);
+            motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
+            DPRINT("Dimensione mappa statica alla fine della configurazione ndell'axisID %d: %d",axid,motors.size());
+        } 
+        
+        //HOMING procedure parameters 
+        //**********************************************************************
+        //**********************************************************************
+        //Le seguenti tre variabili sono relative a ciascun oggetto TechnoSoftLowDriver  
+        //**********************************************************************
+        //**********************************************************************
         internalHomingStateDefault=0;
-        internalHomingStateHoming2=0;
-      
+        internalHomingStateHoming2=0;  
         readyState = true;
 	return 0;
     }
@@ -168,7 +141,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     internalHomingStateHoming2 = objActuator.internalHomingStateHoming2;
     
     // GESTIONE OGGETTO TechnoSoftLowDriver
-    driver = new TechnoSoftLowDriver(hostID,dev_name,btType,baudrate);
+    driver = new TechnoSoftLowDriver();
     // Inizializzazione membri dell' oggetto TechnoSoftLowDriver
     driver->axisID = (objActuator.driver)->axisID;
     driver->axisRef = (objActuator.driver)->axisRef;
@@ -196,7 +169,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     driver->referenceBaseHoming = (objActuator.driver)->referenceBaseHoming;
     
     driver->my_channel = (objActuator.driver)->my_channel;
-    driver->poweron = (objActuator.driver)->poweron;
+    //driver->poweron = (objActuator.driver)->poweron;
     
     DPRINT("Costruttore di copia eseguito");
 }
@@ -218,7 +191,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     if(driver!=NULL){ //Prima distruggiamo il vecchio oggetto tec   technosoftLowdriver, per evitare un 
                       // un errore di memori leak. Infatti la copia viene eseguita su un oggetto gia' ESISTENTE!
         delete driver;
-        driver = new TechnoSoftLowDriver(hostID,dev_name,btType,baudrate);
+        driver = new TechnoSoftLowDriver();
     }
     
     // copia valori membri oggetto TechnoSoftLowDriver a destra dell'uguale
@@ -248,7 +221,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     driver->referenceBaseHoming = (objActuator.driver)->referenceBaseHoming;
     
     driver->my_channel = (objActuator.driver)->my_channel;
-    driver->poweron = (objActuator.driver)->poweron;
+    //driver->poweron = (objActuator.driver)->poweron;
     
     DPRINT("Operatore di assegnamento eseguito");
     return *this;
@@ -714,25 +687,33 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
 //}
 
 int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
-     
-    DPRINT("Position reading");
-    if(driver->selectAxis()<0){
+    DPRINT("Position reading, axisID %d",axisID);
+    
+    // ************************** Operazione di selezione axisID ***************************
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato
         return -1;
+    }
+   
+    if((i->second)->selectAxis()<0){
+        return -2;
     }
 
     if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
         //long tposition;
-        if(driver->getCounter(deltaPosition_mm)<0){
+        if((i->second)->getCounter(deltaPosition_mm)<0){
             DERR("getting counter");
-            return -2;
+            return -3;
         }
         //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
         //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
     }
     else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
         //long aposition;
-        if(driver->getEncoder(deltaPosition_mm)<0){
-            return -3;
+        if((i->second)->getEncoder(deltaPosition_mm)<0){
+            return -4;
         }
         //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
         //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
@@ -1017,45 +998,39 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
     *state  = ACTUATOR_UNKNOWN_STATUS;
     descStr.assign("");
-
+    
+    // ************************** Operazione di selezione axisID ***************************
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato
+        return -1;
+    }
+    
     int stCode=0;
 
     uint16_t contentRegSRH; // remember typedef uint16_t WORD;
     uint16_t contentRegSRL;
     
-    if(driver->selectAxis()<0){
-        return -1;
+    if((i->second)->selectAxis()<0){
+        return -2;
     }
 
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
-    if((driver->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
-        ERR("Reading state error: %s",descStr.c_str());
-        return -2;
-    }
-    indexReg = 3; // see constant REG_SRL in TML_lib.h
-    if((driver->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
+    if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
         return -3;
+    }
+    indexReg = 3; // see constant REG_SRL in TML_lib.h
+    if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
+        ERR("Reading state error: %s",descStr.c_str());
+        return -4;
     }
 
     if(readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
     }
-
-//    // Analysis of the register content SRH (bit 1,2,3,4)
-//    bool overPositionTrigger = false;
-//    for(int i=1; i<=4; i++){
-//        if(contentRegSRH & ((uint16_t)1 << i)){
-//            stCode |= ACTUATOR_OVER_POSITION_TRIGGER; // accendo il secondo bit
-//            overPositionTrigger = true;
-//        }
-//    }
-
-//    if(overPositionTrigger){
-//        //desc.assign("Position trigger. "); // **************DA QUI IN POI LA STRINGA DOVRÀ ESSERE CONCATENATA
-//        descStr=descStr+"Over position trigger. ";
-//    }
     // con il contenuto corrente **************
     if(contentRegSRH & ((uint16_t)1<<5)){
         stCode |= ACTUATOR_AUTORUN_ENABLED;
@@ -1065,10 +1040,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
         descStr+="Limit switch positive event/interrupt. ";
     }
-//    if(contentRegSRH & ((uint16_t)1<<7)){
-//        stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
-//        descStr+="Limit switch negative event/interrupt. ";
-//    }
+
     if(contentRegSRH & ((uint16_t)1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         descStr+="Gear ratio in electronic gearing mode. ";
@@ -1103,36 +1075,40 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
 int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descStr){
 
+    DPRINT("Getting alarms of the actuator");
+    
     * alrm = ACTUATOR_NO_ALARMS_DETECTED;
     descStr.assign("");
-
+    
+    // ************************** Operazione di selezione axisID ***************************
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato
+        return -1;
+    }
+    
     int stCode=0;
-
-    DPRINT("Getting alarms of the actuator");
 
     uint16_t contentRegMER; // remember typedef uint16_t WORD;
     uint16_t contentRegSRH;
     
-    if(driver->selectAxis()<0){
-        return -1;
+    if((i->second)->selectAxis()<0){
+        return -2;
     }
     
     short indexRegMER = 5; // see constant REG_MER in TML_lib.h
-    if(driver->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
-        DERR("Reading alarms error: %s",descStr.c_str());
-        return -2;
-    }
-
-    short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
-    if(driver->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
+    if((i->second)->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
         return -3;
     }
 
-    // ***********************RIPRENDERE DA QUI*********************
-    //WORD base2 = 2;
-    // Analysis of the register content REG_MER
-    // (WORD)(base2^i)
+    short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
+    if((i->second)->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
+        DERR("Reading alarms error: %s",descStr.c_str());
+        return -4;
+    }
+
     for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
         if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
             if(i==0){
@@ -1218,12 +1194,22 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     return 0;
 }
      
+
  int ActuatorTechnoSoft::stopMotion(int axisID){
-     if(driver->selectAxis()<0){
+     
+     // ************************** Operazione di selezione axisID ***************************
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato
         return -1;
-     }
-     if(driver->stopMotion()<0){
+    }
+     
+     if((i->second)->selectAxis()<0){
         return -2;
+     }
+     if((i->second)->stopMotion()<0){
+        return -3;
      }
      return 0;
  }

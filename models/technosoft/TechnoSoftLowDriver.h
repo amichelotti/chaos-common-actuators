@@ -120,7 +120,6 @@ namespace common{
 
 	    public:
                 
-                //int hostID;
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
                 
@@ -173,14 +172,14 @@ namespace common{
                                               // percio e dichiarata di tipo static
                 
                 //bool alreadyopenedChannel;  // Canale di comunicazione aperto
-                bool poweron; // alimentazione al drive motor erogata
+                //bool poweron; // alimentazione al drive motor erogata
                 //bool channelJustOpened;
                 
                 // Transition parameters
                 
             public:
                 // Costruttore device channel and device name
-                TechnoSoftLowDriver(int hostID, const std::string& devName, BYTE btType, DWORD baudrate);
+                TechnoSoftLowDriver();
                 // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
