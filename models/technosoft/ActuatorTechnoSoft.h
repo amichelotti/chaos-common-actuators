@@ -35,6 +35,9 @@ namespace common{
                     uint8_t btType;
                     uint32_t baudrate;
                     int hostID;
+                    
+                    typedef std::map<int,TechnoSoftLowDriver *> motor_map_t;
+                    static motor_map_t motors;
                 
                 public:
                     

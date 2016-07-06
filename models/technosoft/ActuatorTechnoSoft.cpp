@@ -37,7 +37,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    //deinit(); // *********************ATTENZIONE******************************************************* SOLO PER AZZITTIRE TEMPORANEMENTE IL COMPILATORE
+    deinit(1);
     DPRINT("Deallocazione oggetto actuator TechnSoft");
 }
 
