@@ -23,14 +23,14 @@ namespace common{
           class ActuatorTechnoSoft:public ::common::actuators::AbstractActuator{
     
                 private:
-                    TechnoSoftLowDriver *driver;
+                    //TechnoSoftLowDriver *driver;
                   
                     std::string dev_name; // ActuatorTechnoSoft name
                     
                     bool readyState;
                     bool initAlreadyDone;
-                    int internalHomingStateDefault;
-                    int internalHomingStateHoming2;
+                    //int internalHomingStateDefault;
+                    //int internalHomingStateHoming2;
                     
                     uint8_t btType;
                     uint32_t baudrate;
@@ -48,50 +48,49 @@ namespace common{
                     ~ActuatorTechnoSoft();
                     
                     int init(void*initialization_string);
-                    int configAxis(void*initialization_string);
+                    int configAxis(void*initialization_string);     
 
-                    int deinit(int axisID);
-                    int moveRelativeMillimeters(int axisID,double deltaMillimeters);
-                    int moveVelocityHoming();
+                    int deinit(int axisID); // Rimane da gestire la fase di deinit
+                    int moveRelativeMillimeters(int axisID,double deltaMillimeters); // Non e' relativa a ciascun axis ID
                 
-                    int setParameter(int axisID,std::string parName,std::string value);
+                    int setParameter(int axisID,std::string parName,std::string value); // Non e' relativa a ciascun axis ID
                    
-                    int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase);
-                    int setSpeed(double speed);
-                    int setMaxSpeed(double speed); //[mm/s]
-                    int setAcceleration(double acceleration);
-                    int setMaxAcceleration(double acceleration);
-                    int setAdditive(bool isAdditive); // NOTA: bool dovra' essere castato a int
-                    int setMovement(int32_t movement); // NOTA: int32_t dovra' essere castato a short
-                    int setReferenceBase(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
-                
-                    // Set Homing parameters
-                    int sethighSpeedHoming(double speed);
-                    int setMaxhighSpeedHoming(double speed);
-                    int setlowSpeedHoming(double speed);
-                    int setMaxlowSpeedHoming(double speed);
-                    int setAccelerationHoming(double acceleration);
-                    int setAdditiveHoming(bool isAdditive); // NOTA: bool dovra' essere castato a int
-                    int setMovementHoming(int32_t movement); // NOTA: int32_t dovra' essere castato a short
-                    int setReferenceBaseHoming(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short
-                    int setMaxAccelerationHoming(double acceleration);
-                
-                    int setEncoderLines(double _encoderLines);
-                    int setConst_mult_technsoft(double _const_mult_technsoft);
-                    int setSteps_per_rounds(double _steps_per_rounds);
-                    int setN_rounds(double _n_rounds);
-                    int setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds);
+//                    //int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase); // Non e' relativa a ciascun axis ID
+//                    int setSpeed(double speed); // Non e' relativa a ciascun axis ID
+//                    int setMaxSpeed(double speed); //[mm/s], // Non e' relativa a ciascun axis ID
+//                    int setAcceleration(double acceleration); // Non e' relativa a ciascun axis ID
+//                    int setMaxAcceleration(double acceleration); // non e' relativa a ciascun axis ID
+//                    int setAdditive(bool isAdditive); // NOTA: bool dovra' essere castato a int, non e' relativa a ciascun axis ID
+//                    int setMovement(int32_t movement); // NOTA: int32_t dovra' essere castato a short, non e' relativa a ciascun axis ID
+//                    int setReferenceBase(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short, non e' relativa a ciascun axis ID
+//                
+//                    // Set Homing parameters
+//                    int sethighSpeedHoming(double speed); // Non e' relativa a ciascun axis ID
+//                    int setMaxhighSpeedHoming(double speed); // Non e' relativa a ciascun axis ID
+//                    int setlowSpeedHoming(double speed); // Non e' relativa a ciascun axis ID
+//                    int setMaxlowSpeedHoming(double speed); // Non e' relativa a ciascun axis ID
+//                    int setAccelerationHoming(double acceleration); // Non e' relativa a ciascun axis ID
+//                    int setAdditiveHoming(bool isAdditive); // NOTA: bool dovra' essere castato a int, non e' relativa a ciascun axis ID
+//                    int setMovementHoming(int32_t movement); // NOTA: int32_t dovra' essere castato a short, non e' relativa a ciascun axis ID
+//                    int setReferenceBaseHoming(int32_t referenceBase); // NOTA: int32_t dovra' essere castato a short, non e' relativa a ciascun axis ID
+//                    int setMaxAccelerationHoming(double acceleration); // Non e' relativa a ciascun axis ID
+//                    
+//                    int setEncoderLines(double _encoderLines); // Non e' relativa a ciascun axis ID
+//                    int setConst_mult_technsoft(double _const_mult_technsoft);// Non e' relativa a ciascun axis ID 
+//                    int setSteps_per_rounds(double _steps_per_rounds); // Non e' relativa a ciascun axis ID
+//                    int setN_rounds(double _n_rounds); // Non e' relativa a ciascun axis ID
+//                    int setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds); // Non e' relativa a ciascun axis ID
 
-                    int moveAbsoluteMillimeters(int axisID,double mm);
+                    int moveAbsoluteMillimeters(int axisID,double mm);                       // *******OK********
                     
-                    int poweron(int axisID,int on);
-                    int selectAxis();
+                    int poweron(int axisID,int on);                                          // *******OK********
+                    //int selectAxis(); // Non e' relativa a ciascun axis ID
                 
                     int resetAlarms(int axisID,uint64_t alrm); 
 
                     int stopMotion(int axisID);                                              // *******OK********
                     int getPosition(int axisID,readingTypes mode, double* deltaPosition_mm); // *******OK********
-                    int homing(int axisID,homingType mode);
+                    int homing(int axisID,homingType mode);                                  // ************* GESTIONE HOMING **************
                     int getState(int axisID,int* state, std::string& desc );                 // *******OK********
                     int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);           // *******OK********
                     uint64_t getFeatures(){return 0;}

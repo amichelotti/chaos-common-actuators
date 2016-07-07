@@ -163,21 +163,21 @@ typedef enum {
 
         @return 0 if success or an error code
         */
-            virtual int stopMotion(int axisID)=0;    // (2)                          
+        virtual int stopMotion(int axisID)=0;    // (2)                          
 
-            typedef enum{
-                defaultHoming,
-                homing2,
-                nativeHoming15
-            } homingType;
+        typedef enum{   // Importante non cambiare l'ordine di tali elementi
+            defaultHoming,
+            homing2,
+            nativeHoming15
+        } homingType;
 
-            virtual int homing(int axisID,homingType mode)=0;                        // (2) 
-            virtual int getState(int axisID,int* state, std::string& desc)=0;        // (2) 
-            virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
-            virtual int resetAlarms(int axisID,uint64_t alrm)=0;                                // (2)
-            virtual int poweron(int axisID,int on)=0;
-            virtual uint64_t getFeatures()=0;
-            virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
+        virtual int homing(int axisID,homingType mode)=0;                        // (2) 
+        virtual int getState(int axisID,int* state, std::string& desc)=0;        // (2) 
+        virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
+        virtual int resetAlarms(int axisID,uint64_t alrm)=0;                     // (2)
+        virtual int poweron(int axisID,int on)=0;
+        virtual uint64_t getFeatures()=0;
+        virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
     };
 }
 }

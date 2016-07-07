@@ -150,6 +150,9 @@ namespace common{
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
+                
+                int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
+                int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                  
                 // Additional parameters for s-curve profile
                 //long jerkTime;
@@ -206,6 +209,12 @@ namespace common{
                         const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
                         const double _n_rounds=N_ROUNDS_DEFAULT,            
                         const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+                
+                int homing(int mode);
+                
+                int getinternalHomingStateDefault();
+                int getinternalHomingStateHoming2();
+                
 
                 int providePower();
                 int stopPower();
@@ -247,8 +256,7 @@ namespace common{
                 int setEncoderLines(double& _encoderLines);
                 
                 //Encoder lines
-                
-                
+
                 int moveAbsoluteSteps(const long& position) const;
                 int moveAbsoluteStepsHoming(const long& position) const;
                 

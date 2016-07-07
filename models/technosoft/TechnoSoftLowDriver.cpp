@@ -121,6 +121,8 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(){
 //        DPRINT("channel just opened");
 //        DPRINT("created channel  %s", devName.c_str());
 //    }
+        internalHomingStateDefault=0;
+        internalHomingStateHoming2=0; 
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
@@ -309,6 +311,276 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
     
     return my_channel;
+}
+
+int TechnoSoftLowDriver::homing(int mode){
+    // Attenzione: la variabile mode non viene utilizzata
+    
+    if(mode==0){
+        
+        int risp;
+        int switchTransited=0;
+        int motionCompleted = 0;
+        std::string cappos = "CAPPOS";
+        long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
+        int absoluteMotionCompleted = 0;
+    
+        switch (internalHomingStateDefault) {
+            case 0:
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -1;
+                    break;
+                }
+                if(moveVelocityHoming()<0){
+                    internalHomingStateDefault = 0;
+                    if(stopMotion()<0){
+                        risp = -2;
+                        break;
+                    }
+                    risp = -3;
+                    break;
+                }
+                DPRINT(" STATE 0: move velocity activated ");
+                if(setEventOnLimitSwitch()<0){
+                    internalHomingStateDefault = 0;
+                    if(stopMotion()<0){
+                        risp = -4;
+                        break;
+                    }
+                    risp = -5;
+                    break;
+                }
+                DPRINT("STATE 0: event on limit switch activated ");
+                internalHomingStateDefault = 1;
+                risp = 1;
+                break; 
+            case 1:
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -6;
+                    break;
+                }
+                if(checkEvent(switchTransited)<0){
+                    internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
+                    if(stopMotion()<0){
+                        risp = -7;
+                        break;
+                    }    
+                    risp = -8;
+                    break;
+                } 
+                DPRINT(" STATE 1: possible limit switch transition just checked ");
+                if(switchTransited){
+                    if(setEventOnMotionComplete()<0){ 
+                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+                        if(stopMotion()<0){
+                            risp= -9;
+                            break;
+                        }
+                        risp =-10;
+                        break;
+                    }  
+                    //eventOnMotionCompleteSet = true;
+                    internalHomingStateDefault=2;
+                    DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
+                }
+                // **************DA IMPLEMENTARE:*****************
+                // RESET ON Limit Switch Transition Event
+                risp = 1;
+                break; 
+            case 2:
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -11;
+                    break;
+                }
+                if(checkEvent(motionCompleted)<0){
+                    internalHomingStateDefault = 0;
+                    if(stopMotion()<0){
+                        risp = -12;
+                        break;
+                    }
+                    risp= -13;
+                    break;
+                }
+                DPRINT("************** STATE 2: possible event on motion completed checked **************");
+                if(motionCompleted){
+                    DPRINT("************** STATE 2: Motion completed after transition **************");
+                    internalHomingStateDefault = 3;
+                }
+                risp= 1;
+                break;
+            case 3:
+                // The motor is not in motion
+                DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -13;
+                    break;
+                }
+                if(getLVariable(cappos, cap_position)<0){ 
+    //                if(stopMotion()<0){
+    //                    return -13;
+    //                }
+                    internalHomingStateDefault=0;
+                    risp = -14;
+                    break;
+                }
+                DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
+        
+            /*	Command an absolute positioning on the captured position */
+                if(moveAbsoluteStepsHoming(cap_position)<0){  
+                    internalHomingStateDefault=0;
+                    risp = -15;
+                    break;
+                }
+                DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
+                internalHomingStateDefault = 4;
+                risp= 1;
+                break;
+            case 4:
+                DPRINT("************** STATE 4: wait for positioning to end **************");
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -16;
+                    break;
+                }
+//        if(!eventOnMotionCompleteSet){
+//            if(setEventOnMotionComplete()<0){
+//                if(stopMotion()<0){
+//                    eventOnMotionCompleteSet = false;
+//                    internalHomingStateDefault = 0;
+//                    return -12;
+//                }
+//                eventOnMotionCompleteSet = false;
+//                internalHomingStateDefault = 0;
+//                return -13;
+//            } 
+//        }
+                if(checkEvent(absoluteMotionCompleted)<0){
+                    internalHomingStateDefault = 0;
+                    if(stopMotion()<0){
+                    //eventOnMotionCompleteSet = false;
+                        risp= -17;
+                        break;
+                    }
+                //eventOnMotionCompleteSet = false;
+                    risp= -18;
+                    break;
+                }
+                if(absoluteMotionCompleted){
+                    internalHomingStateDefault = 5;
+                    DPRINT("************** STATE 4: motor positioned to end **************");
+                }
+            // **************DA IMPLEMENTARE:*****************
+            // RESET ON Event On Motion Complete
+                risp= 1;
+                break;
+            case 5:
+                // The motor is positioned to end
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -19;
+                    break;
+                }
+        
+                if(resetEncoder()<0){
+                    internalHomingStateDefault = 0;
+                    //if(stopMotion()<0){
+                    //return -23;
+                    //}
+                    risp= -20;
+                    break;
+                }
+                if(resetCounter()<0){
+                    internalHomingStateDefault = 0;
+                    //if(stopMotion()<0){
+                    //return -25;
+                    //}
+                    risp= -21;
+                    break;
+                }
+                DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
+                internalHomingStateDefault = 0;
+                risp= 0;
+                break;
+            default:
+                internalHomingStateDefault = 0;
+                risp= -22;
+                break; 
+        } 
+        return risp;
+    }
+    else if(mode==1){
+        int risp;
+        uint16_t contentReg;
+        std::string descStr = "";
+        short homingDone = 0;
+        switch (internalHomingStateHoming2) {
+            case 0:
+                DPRINT("************** Homing procedure Homing2. STATE 0. **************");
+                if(moveVelocityHoming()<0){
+                    internalHomingStateHoming2=0;
+                    risp= -1;
+                    break;
+                }
+                internalHomingStateHoming2=1;
+                risp= 1;
+                break;
+            case 1:
+                DPRINT("************** Homing procedure Homing2. STATE 1. **************");
+                if((getStatusOrErrorReg(5, contentReg, descStr))<0){
+                    //ERR("Reading state error: %s",descStr.c_str());
+                    internalHomingStateHoming2=0;
+                    if(stopMotion()<0){
+                        risp= -2;
+                        break;
+                    }
+                    risp= -3;
+                    break;
+                }
+                // lettura bit di interesse
+                homingDone=((contentReg & ((uint16_t)1)<<7) != 0 ? 1 : 0);
+                if(homingDone){
+                   internalHomingStateHoming2=2;
+                }
+                risp= 1;
+                break;
+            case 2:
+                DPRINT("************** Homing procedure Homing2. STATE 2. **************");
+                DPRINT("************** Reset encoder e counter **************");
+                if(resetEncoder()<0){
+                    internalHomingStateHoming2=0;
+                    if(stopMotion()<0){
+                        risp= -4;
+                        break;
+                    }
+                    risp= -5;
+                    break;
+                }
+                if(resetCounter()<0){
+                    internalHomingStateHoming2=0;
+                    if(stopMotion()<0){
+                        risp= -6;
+                        break;
+                    }
+                    risp= -7;
+                    break;
+                }
+                internalHomingStateHoming2=0;
+                risp=0;
+                break;
+            default:
+                internalHomingStateHoming2 = 0;
+                risp=-22;
+                break;
+        }
+        return risp;
+    }
+    else{
+        return -100;
+    }
 }
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
@@ -781,6 +1053,8 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //    return 0;
 //}
 
+
+
 int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     
     DPRINT("Reading ENCODER position");
@@ -1019,6 +1293,18 @@ int TechnoSoftLowDriver::getFirmwareVers(char* firmwareVers){
     }
     return 0;
 }
+
+int TechnoSoftLowDriver::getinternalHomingStateDefault(){
+    
+    return internalHomingStateDefault;
+}
+
+int TechnoSoftLowDriver::getinternalHomingStateHoming2(){
+    
+    return internalHomingStateHoming2;
+}
+
+int getHoming2Procedure();
 
 //int TechnoSoftLowDriver::resetSetup(){
 //    if(!TS_SelectAxis(axisID)){
