@@ -229,9 +229,17 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 
 int ActuatorTechnoSoft::deinit(int axisID){
     readyState=false;
-//    if (driver!=NULL) {
-//        delete driver;
-//    }
+    
+    // Controllo costruzione oggetto axisID
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato, non c'e' quindi alcun motore da inizializzare
+        return -1;
+    }
+    delete (i->second);
+    
+    
     DPRINT("ActuatorTechnoSoft object is deinitialized");
     return 0; 
 }
