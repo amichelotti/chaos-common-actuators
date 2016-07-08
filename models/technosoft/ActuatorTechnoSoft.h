@@ -27,14 +27,15 @@ namespace common{
                   
                     std::string dev_name; // ActuatorTechnoSoft name
                     
-                    bool readyState;
-                    bool initAlreadyDone;
+                    //bool readyState;
+                    bool initChannelAlreadyDone;
                     //int internalHomingStateDefault;
                     //int internalHomingStateHoming2;
                     
                     uint8_t btType;
                     uint32_t baudrate;
                     int hostID;
+                    SerialCommChannelTechnosoft *channel;
                     
                     static std::map<int,TechnoSoftLowDriver *> motors;
                 
@@ -49,12 +50,12 @@ namespace common{
                     
                     int init(void*initialization_string);
                     int configAxis(void*initialization_string);     
-
+                    
                     int deinit(int axisID); // Rimane da gestire la fase di deinit
                     int moveRelativeMillimeters(int axisID,double deltaMillimeters); // Non e' relativa a ciascun axis ID
-                
+                    
                     int setParameter(int axisID,std::string parName,std::string value); // Non e' relativa a ciascun axis ID
-                   
+                    
 //                    //int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase); // Non e' relativa a ciascun axis ID
 //                    int setSpeed(double speed); // Non e' relativa a ciascun axis ID
 //                    int setMaxSpeed(double speed); //[mm/s], // Non e' relativa a ciascun axis ID

@@ -34,13 +34,17 @@ std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     //driver=NULL;
-    readyState=false;
-    initAlreadyDone = false;
+    channel = NULL;
+    initChannelAlreadyDone = false;
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    deinit(1);
-    DPRINT("Deallocazione oggetto actuator TechnSoft");
+    // show content:
+    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+        deinit(it->first); 
+        
+        DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+    } 
 }
 
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
@@ -48,11 +52,11 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
     
-    if(initAlreadyDone){
+    if(initChannelAlreadyDone){
         DPRINT("This object has already a communication channel correctly initialized");
         return -1;
     }
- 
+    
     std::string params;
     params.assign((const char*)initialization_string);
     boost::smatch match;
@@ -71,15 +75,21 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         
         DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
         
-        SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
-        if(objChannel.open()<0){
+        //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
+        channel = new (std::nothrow) SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
+        if(channel==NULL){
             return -2;
         }
-        initAlreadyDone = true;
+        else{
+            if(channel->open()<0){
+                return -3;
+            }
+        }
+        initChannelAlreadyDone = true;
         return 0;
     }
-    ERR("Cannot possible init channel",params.c_str());
-    return -3;
+    ERR("Cannot possible init channel %s",params.c_str());
+    return -4;
 }
 
 int ActuatorTechnoSoft::configAxis(void*initialization_string){
@@ -114,9 +124,8 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             }
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione ndell'axisID %d: %d",axid,motors.size());
+            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d: %d",axid,motors.size());
         } 
-        
         //HOMING procedure parameters 
         //**********************************************************************
         //**********************************************************************
@@ -124,8 +133,9 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         //**********************************************************************
         //**********************************************************************
 //        internalHomingStateDefault=0;
-//        internalHomingStateHoming2=0;  
-        readyState = true;
+//        internalHomingStateHoming2=0; 
+        // ***********************GESTIONE_READY_STATE*************************
+        initChannelAlreadyDone = true;
 	return 0;
     }
     ERR("error parsing initialization string:\"%s\" ",params.c_str());
@@ -228,7 +238,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 //}
 
 int ActuatorTechnoSoft::deinit(int axisID){
-    readyState=false;
+    //readyState=false;
     
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
@@ -237,10 +247,25 @@ int ActuatorTechnoSoft::deinit(int axisID){
         // In questo caso il motore axisID non e' stato configurato, non c'e' quindi alcun motore da inizializzare
         return -1;
     }
+    // Invio comando stop di movimentazione al motore
+    if((i->second)->selectAxis()<0)
+        return -2;
+    if((i->second)->stopMotion()<0)
+        return -3;
+    if((i->second)->stopPower()<0)
+        return -4;
+    
+    // Invio comando apertura circuito alimentazione motore
     delete (i->second);
+    motors.erase(axisID);
     
-    
-    DPRINT("ActuatorTechnoSoft object is deinitialized");
+    // Controllo lista vuota. Se e' vuota bisogna chiudere il canale!!!!!
+    if(motors.size()==0){
+        if(channel!=NULL){
+            delete channel; 
+        }
+    }  
+    DPRINT("Motor with axisID = %d is deinitialized",axisID);
     return 0; 
 }
 
@@ -1040,7 +1065,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         return -4;
     }
 
-    if(readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
+    if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
     }
@@ -1207,8 +1232,7 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     return 0;
 }
      
-
- int ActuatorTechnoSoft::stopMotion(int axisID){
+int ActuatorTechnoSoft::stopMotion(int axisID){
      
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);

@@ -57,8 +57,6 @@
 #define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
 #define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
 
-//#define MAX_LENGTH_STRING_FROM_SHELL 50
-//#define MAX_COMMAND_LENGTH 10
 #define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
@@ -91,7 +89,6 @@ namespace common{
                     void badOpeningChannelInfo();
            };
            
- 
 	    //Channel class
             class SerialCommChannelTechnosoft{
                 
@@ -153,6 +150,8 @@ namespace common{
                 
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
+                
+                bool readyState;
                  
                 // Additional parameters for s-curve profile
                 //long jerkTime;
@@ -167,11 +166,11 @@ namespace common{
                 
                 //Encoder parameter
                 //int encoderLines; // (passato da MDS)
-                typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh;
-                channel_psh my_channel;
-                typedef std::map<std::string,channel_psh> channel_map_t;
+//                typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh;
+//                channel_psh my_channel;
+//                typedef std::map<std::string,channel_psh> channel_map_t;
                 
-                static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
+                //static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
                                               // percio e dichiarata di tipo static
                 
                 //bool alreadyopenedChannel;  // Canale di comunicazione aperto
@@ -261,7 +260,7 @@ namespace common{
                 int moveAbsoluteStepsHoming(const long& position) const;
                 
                 // get methods for variables
-                channel_psh getMyChannel();
+                //channel_psh getMyChannel();
                 int getCounter(double* deltaPosition_mm);
                 int getEncoder(double* deltaPosition_mm);
                 // resetting methos

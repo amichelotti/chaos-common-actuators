@@ -51,7 +51,7 @@ void SerialCommChannelTechnosoft::close(){
 
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
     close();
-    DPRINT("Deallocazione oggetto SerialCommChannelTechnosoft");
+    DPRINT("Deallocazione oggetto SerialCommChannelTechnosoft. Invio comando di chiusura canale di comunicazione effettuato");
 }
 
 int SerialCommChannelTechnosoft::open(){
@@ -68,7 +68,7 @@ int SerialCommChannelTechnosoft::open(){
     return 0;
 }
 
-TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels; // Anche se non viene inizializzato...
+//TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels; // Anche se non viene inizializzato...
 
 //----------------------------------------------
 TechnoSoftLowDriver::TechnoSoftLowDriver(){
@@ -121,8 +121,9 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(){
 //        DPRINT("channel just opened");
 //        DPRINT("created channel  %s", devName.c_str());
 //    }
-        internalHomingStateDefault=0;
-        internalHomingStateHoming2=0; 
+    readyState = true;
+    internalHomingStateDefault=0;
+    internalHomingStateHoming2=0; 
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
@@ -305,13 +306,15 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(!TS_SetEventOnMotionComplete(0,0)){ 
 	return -30;
     }
+    
+    readyState = true;
     return 0;
 }
 
-TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
-    
-    return my_channel;
-}
+//TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
+//    
+//    return my_channel;
+//}
 
 int TechnoSoftLowDriver::homing(int mode){
     // Attenzione: la variabile mode non viene utilizzata
@@ -957,56 +960,6 @@ int TechnoSoftLowDriver::stopPower(){
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
     
-    // Il canale di comunicazione potrebbe essere stato aperto oppure no, in questo punto dell'esecuzione. Dipende
-    // dal tipo di errore ritornato in fase di inizializzazione di TechnoSoftLowDriver
-   
-//    if(alreadyopenedChannel || channelJustOpened){ // Se in fase di inizializzazione il canale di comunicazione e' stato aperto
-//        DPRINT("Fase di deinizializzazione: il canale era stato aperto o e' stato appena aperto");
-//        
-//        if(!TS_SelectAxis(axisID)){
-//            DERR("failed to select axis %d",axisID);
-//            return -1;
-//        }
-//        
-//        if(stopMotion()<0){
-//            throw StopMotionException();
-//        }
-//        
-//        DPRINT("Motion is stopped");
-//         
-//        if(poweron){
-//            if(stopPower()<0){ // questa istruzione potrebbe restituire errore se il canale non è stato aperto
-//                     // oppure se il drive/motor non è stato inizializzato correttamente, 
-//                     // oppure se l'azione di erogazione dell'alimentazione non ha avuto buon fine.
-//                     // Errore che comunque non compromette il corretto svolgimento del programma.
-//                // ATTENZIONE: DOVRA ESSERE GENERATA UNA ECCEZIONE IN CASO L'OPERAZIONE DI 
-//                // SPEGNIMENTO DELL'ALIMENTAZIONE DEL MOTORE NON È ANDATA A BUON FINE
-//                // ..................
-//                // ..................
-//                // ..................
-//                throw ElectricPowerException();
-//            }
-//            DPRINT("Power is off");
-//        }   
-//    }
-    
-    // Eventuale chiusura canale di comunicazione, per deallocare risorse non piu' necessarie
-    if(my_channel!=NULL){
-        
-        if(my_channel.use_count()==2){
-            // In questo caso bisogna eliminare anche la riga nella mappa statica relativa all'oggetto canale utilizzato 
-            // UNICAMENTE dall'oggetto this.
-            // Questo garantisce che una volta distrutto l'oggetto this, anche l'oggetto canale
-            // sarà automaticamente deallocato (e quindi chiuso anche il canale di comunicazione)
-            channels.erase(devName); // IPOTESI: NON VIENE GENERATA ALCUNA ECCEZIONE   
-        } 
-        my_channel.reset(); // Setto a NULL lo smart pointer (shared), che e' un membro privato dell'oggetto TechnoSoftLowDriver che punta all'oggeto canale,
-                            // cosicché se era l'unico a puntare all'oggetto canale,
-                            // tale oggetto canale sarà deallocato immediatamente, prima che venga deallocato l'oggetto TechnoSoftLowDriver che punta ad esso
-        
-                            // Anche se sarebbe inutile questo comando...
-        DPRINT("Sono dentro il blocco if(my_channel!=NULL)");
-    }
     DPRINT("TechnoSoftLowDriver object is deallocated");
     return 0;
 }
