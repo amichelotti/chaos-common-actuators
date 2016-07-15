@@ -127,8 +127,8 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(){
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
-    deinit();
-    DPRINT("Deallocazione oggetto TechnoSoftLowDriver");
+    //deinit();
+    //DPRINT("Deallocazione oggetto TechnoSoftLowDriver");
 }    
  
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
@@ -272,6 +272,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         return -22;
     }
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    
+    axisID = _axisID;
  
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
@@ -907,9 +909,9 @@ int TechnoSoftLowDriver::stopMotion(){
 //        return -1;
 //    }
     if(!TS_Stop()){
-        return -2;
+        return -1;
     }
-    DPRINT("stop axis:%d, %s",axisID, TS_GetLastErrorText());
+    DPRINT("Motor with axis = %d is stopped, %s",axisID, TS_GetLastErrorText());
     return 0;
 }
 
@@ -946,21 +948,23 @@ int TechnoSoftLowDriver::providePower(){
 }
 
 int TechnoSoftLowDriver::stopPower(){
-    DPRINT("stop power to axis:%d",axisID);
+    //DPRINT("stopping power to axis:%d",axisID);
 
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
     if(!TS_Power(POWER_OFF)){
-        return -2;
+        return -1;
     }
+    DPRINT("Motor with axis id = %d is power off",axisID);
+    
     return 0;
 }
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
     
-    DPRINT("TechnoSoftLowDriver object is deallocated");
+    DPRINT("TechnoSoftLowDriver %d object is deallocated",axisID);
     return 0;
 }
 

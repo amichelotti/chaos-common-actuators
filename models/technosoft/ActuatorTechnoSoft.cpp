@@ -36,15 +36,28 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
     //driver=NULL;
     channel = NULL;
     initChannelAlreadyDone = false;
+    delectingActuator = false;
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     // show content:
+    DPRINT("Deleting Actuator Technosoft");
+    delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
         deinit(it->first); 
-        
-        DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
     } 
+    // Remove all the element from the map container
+    motors.clear();
+    
+    DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
+    
+    // close the communication channel
+    if(channel!=NULL){
+        delete channel; 
+        channel = NULL;
+    }
+    DPRINT("Object Actuator Technosoft is deleted");   
 }
 
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
@@ -71,7 +84,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         btType = atoi(strbtType.c_str());
         std::string strbaudrate = match[3]; 
         baudrate = atoi(strbaudrate.c_str());
-        dev_name=match[4];
+        dev_name=match[4]; 
         
         DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
         
@@ -256,16 +269,23 @@ int ActuatorTechnoSoft::deinit(int axisID){
         return -4;
     
     // Invio comando apertura circuito alimentazione motore
-    delete (i->second);
-    motors.erase(axisID);
+    if(i->second!=NULL){
+        delete (i->second);
+        i->second = NULL;
+    }
     
+    if(!delectingActuator){
+        motors.erase(axisID);
+        if(motors.size()==0){
+            if(channel!=NULL){
+                delete channel; 
+                channel = NULL;
+            }
+        }  
+    }
+    
+    DPRINT("Object technosoftlowdriver with axisID = %d is deinitialized",axisID);
     // Controllo lista vuota. Se e' vuota bisogna chiudere il canale!!!!!
-    if(motors.size()==0){
-        if(channel!=NULL){
-            delete channel; 
-        }
-    }  
-    DPRINT("Motor with axisID = %d is deinitialized",axisID);
     return 0; 
 }
 
@@ -1295,17 +1315,22 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
      return err;
  }
  
- int ActuatorTechnoSoft::getSWVersion(std::string& version){
-//     if(driver->selectAxis()<0){
-//        return -1;
-//     }
-     //char firmVers[100];
-     //if(driver->getFirmwareVers(&firmVers[0])<0){
-     //version = "No firmware version retrivied";
-        //return -2;
-     //}
-     //version.assign(firmVers);
-     version = "No firmware version retrivied";
+ int ActuatorTechnoSoft::getSWVersion(int axisID, std::string& version){
+     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+     // Controlliamo comunque se l'axis id e' stato configurato
+     if(i==motors.end()){ 
+         // In questo caso il motore axisID non e' stato configurato
+         return -1;
+     }
+     if((i->second)->selectAxis()<0){
+        return -2;
+     }
+     char firmVers[100];
+     if((i->second)->getFirmwareVers(&firmVers[0])<0){
+        version = "No firmware version retrivied";
+        return -3;
+     }
+     version.assign(firmVers);
      return 0;
  }
  
@@ -1346,8 +1371,16 @@ int ActuatorTechnoSoft::poweron(int axisID,int on){
      return resp;
 }
 
-int ActuatorTechnoSoft::getHWVersion(std::string& version){
-    
+int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+     // Controlliamo comunque se l'axis id e' stato configurato
+     if(i==motors.end()){ 
+         // In questo caso il motore axisID non e' stato configurato
+         return -1;
+     }
+     if((i->second)->selectAxis()<0){
+        return -2;
+     }
    version=" Technosoft IDM stepper open loop mode";
    return 0; 
 }

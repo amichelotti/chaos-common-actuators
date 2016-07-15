@@ -29,6 +29,7 @@ namespace common{
                     
                     //bool readyState;
                     bool initChannelAlreadyDone;
+                    bool delectingActuator;
                     //int internalHomingStateDefault;
                     //int internalHomingStateHoming2;
                     
@@ -108,14 +109,14 @@ namespace common{
         */
 	
 
-	int getSWVersion(std::string& version);
+	int getSWVersion(int axisID, std::string& version);
 
         /**
         @brief returns the HW version of the actuator 
         @param version returning string
         @return 0 if success or an error code
         */
-        int getHWVersion(std::string& version);
+        int getHWVersion(int axisID, std::string& version);
         /**
         @brief returns dataset of the driver settable with setParameter method 
         @param  dataset returning string

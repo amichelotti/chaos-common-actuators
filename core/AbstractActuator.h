@@ -142,14 +142,14 @@ typedef enum {
            @param version returning string
            @return 0 if success or an error code
         */
-            virtual int getSWVersion(std::string& version)=0;        
+            virtual int getSWVersion(int axisID, std::string& version)=0;        
 
         /**
         @brief returns the HW version of the actuator
         @param version returning string
         @return 0 if success or an error code
         */
-        virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
+        virtual int getHWVersion(int axisID, std::string& version)=0;         // ****Da implementare***
 
 /**
 @brief returns a string containing the dataset attributes from driver which responds to SetParameter method
