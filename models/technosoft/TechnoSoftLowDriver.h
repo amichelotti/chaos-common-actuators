@@ -92,11 +92,11 @@ namespace common{
 	    //Channel class
             class SerialCommChannelTechnosoft{
                 
-                private:
+                public:                    
                     std::string pszDevName; // The communication channel to be opened
                     BYTE btType; // the type of the communication channel and the CAN-bus communication protocol
                     DWORD baudrate; // communication baud rate
-                    int hostID;
+                    int hostID;   
                     int fd; // file descriptor of the channel
                 public:
                     SerialCommChannelTechnosoft(){}
@@ -115,7 +115,7 @@ namespace common{
             //TechnoSoftLowDriver class
             class TechnoSoftLowDriver {
 
-	    public:
+	    private:
                 
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
@@ -148,6 +148,7 @@ namespace common{
                 short movementHoming;
                 short referenceBaseHoming;
                 
+            public:
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 

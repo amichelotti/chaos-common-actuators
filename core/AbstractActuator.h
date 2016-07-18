@@ -176,7 +176,7 @@ typedef enum {
         virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
         virtual int resetAlarms(int axisID,uint64_t alrm)=0;                     // (2)
         virtual int poweron(int axisID,int on)=0;
-        virtual uint64_t getFeatures()=0;
+        virtual uint64_t getFeatures(int axisID, std::string& descStr)=0;
         virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
     };
 }

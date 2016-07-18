@@ -36,7 +36,7 @@ namespace common{
                     uint8_t btType;
                     uint32_t baudrate;
                     int hostID;
-                    SerialCommChannelTechnosoft *channel;
+                    SerialCommChannelTechnosoft *channel;  
                     
                     static std::map<int,TechnoSoftLowDriver *> motors;
                 
@@ -95,7 +95,7 @@ namespace common{
                     int homing(int axisID,homingType mode);                                  // ************* GESTIONE HOMING **************
                     int getState(int axisID,int* state, std::string& desc );                 // *******OK********
                     int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);           // *******OK********
-                    uint64_t getFeatures(){return 0;}
+                    uint64_t getFeatures(int axisID, std::string& descStr){return 0;}
      
         /**
         @brief get the actuator position using the readingType mode chosen for reading
