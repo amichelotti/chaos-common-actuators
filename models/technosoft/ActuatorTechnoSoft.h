@@ -29,7 +29,7 @@ namespace common{
                     
                     //bool readyState;
                     bool initChannelAlreadyDone;
-                    bool configAxisAlreadyDone;
+                    //bool configAxisAlreadyDone;
                     bool delectingActuator;
                     //int internalHomingStateDefault;
                     //int internalHomingStateHoming2;

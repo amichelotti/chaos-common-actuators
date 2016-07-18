@@ -36,7 +36,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
     //driver=NULL;
     channel = NULL;
     initChannelAlreadyDone = false;
-    configAxisAlreadyDone = false,
+    //configAxisAlreadyDone = false,
     delectingActuator = false;
 }
 
