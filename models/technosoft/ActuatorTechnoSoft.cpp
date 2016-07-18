@@ -137,8 +137,11 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             }
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d: %d",axid,motors.size());
+            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            return 0;     
         } 
+        DPRINT("Axis id %d è stato già configurato correttamente.", axid);
+        return -3;
         //HOMING procedure parameters 
         //**********************************************************************
         //**********************************************************************
@@ -148,11 +151,10 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 //        internalHomingStateDefault=0;
 //        internalHomingStateHoming2=0; 
         // ***********************GESTIONE_READY_STATE*************************
-        configAxisAlreadyDone = true;
-	return 0;
+	//return 0;
     }
     ERR("error parsing initialization string:\"%s\" ",params.c_str());
-    return -3;
+    return -4;
 }
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ // OVERLOADING COSTRUTTORE DI COPIA
