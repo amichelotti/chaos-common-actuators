@@ -36,11 +36,12 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
     //driver=NULL;
     channel = NULL;
     initChannelAlreadyDone = false;
+    configAxisAlreadyDone = false,
     delectingActuator = false;
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    // show content:
+    // show content:                       
     DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
@@ -93,11 +94,10 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         if(channel==NULL){
             return -2;
         }
-        else{
-            if(channel->open()<0){
-                return -3;
-            }
+        if(channel->open()<0){
+            return -3;
         }
+       
         initChannelAlreadyDone = true;
         return 0;
     }
@@ -148,7 +148,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 //        internalHomingStateDefault=0;
 //        internalHomingStateHoming2=0; 
         // ***********************GESTIONE_READY_STATE*************************
-        initChannelAlreadyDone = true;
+        configAxisAlreadyDone = true;
 	return 0;
     }
     ERR("error parsing initialization string:\"%s\" ",params.c_str());

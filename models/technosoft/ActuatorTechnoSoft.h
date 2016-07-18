@@ -29,6 +29,7 @@ namespace common{
                     
                     //bool readyState;
                     bool initChannelAlreadyDone;
+                    bool configAxisAlreadyDone;
                     bool delectingActuator;
                     //int internalHomingStateDefault;
                     //int internalHomingStateHoming2;
@@ -95,7 +96,7 @@ namespace common{
                     int homing(int axisID,homingType mode);                                  // ************* GESTIONE HOMING **************
                     int getState(int axisID,int* state, std::string& desc );                 // *******OK********
                     int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);           // *******OK********
-                    uint64_t getFeatures(int axisID, std::string& descStr){return 0;}
+                    uint64_t getFeatures(){return 0;}
      
         /**
         @brief get the actuator position using the readingType mode chosen for reading

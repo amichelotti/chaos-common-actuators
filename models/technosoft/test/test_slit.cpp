@@ -75,10 +75,37 @@ void* function1(void* str){
         DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
         sleep(30);
         
-        DPRINT("************** Homing operation starting for axis 14 **************");
+     // HOMING OPERATION
         int respHoming=1; // Operazione di homing non conclusa
         int numHoming = 3;
   
+        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
+        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+            // con successo o insuccesso
+            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
+            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
+                usleep(100000); // FREQUENZA DI 1,5 ms
+                if(respHoming<0){ 
+                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
+                    break;
+                }
+            }
+            if(respHoming==0){
+                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+            }
+            respHoming = 1;
+            usleep(5000000);
+        }
+        
+        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
+        sleep(10);
+        
+        // HOMING OPERATION
+        respHoming=1; // Operazione di homing non conclusa
+        numHoming = 3;
+        axisID = 15;
+        DPRINT("************** Homing operation starting for axis 15. Total homing procedure = %d **************", numHoming);
         for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
             // con successo o insuccesso
             DPRINT("*************Procedura di homing n. %d iniziata*************",i);
