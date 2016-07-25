@@ -34,7 +34,7 @@ void* function1(void* str){
     }
     else{ // FORMA invio comandi ai motori  
     
-        int axisID = 14;
+        int axisID = 0;
         
         // MOVIMENTAZIONE ASSE 14
         if(OBJ->poweron(axisID,1)<0){
@@ -42,110 +42,117 @@ void* function1(void* str){
             //* errPtr = -5;
         }
         DPRINT("************** Movimentazione asse 14 **************");
-        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
-            DERR("************** Error returned by movement operation **************");
+        int resp;
+        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
+            DERR("************** Error returned by movement operatio, code error %d **************",resp);
+            //* errPtr = -5;
+        }
+        int state;
+        std::string descStr;
+        if((resp=OBJ->getState(axisID,&state, descStr))<0){
+            DERR("************** Error returned by movement operatio, code error %d **************",resp);
             //* errPtr = -5;
         }
         DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
         sleep(30);
         
-        // MOVIMENTAZIONE ASSE 15
-        axisID = 15;
-        if(OBJ->poweron(axisID,1)<0){
-            DERR("**************Error returned by stop motion operation **************");
-            //* errPtr = -5;
-        }
-        
-        DPRINT("************** Movimentazione asse 15 **************");
-        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
-            DERR("************** Error returned by movement operation **************");
-            //* errPtr = -5;
-        }
-        DPRINT("************** Movimentazione asse 15 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
-        sleep(30);
-        
-        // MOVIMENTAZIONE ASSE 14
-        axisID = 14;
-      
-        DPRINT("************** Movimentazione asse 14 **************");
-        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
-            DERR("************** Error returned by movement operation **************");
-            //* errPtr = -5;
-        }
-        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
-        sleep(30);
-        
-     // HOMING OPERATION
-        int respHoming=1; // Operazione di homing non conclusa
-        int numHoming = 3;
-  
-        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
-        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-            // con successo o insuccesso
-            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
-            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
-                usleep(100000); // FREQUENZA DI 1,5 ms
-                if(respHoming<0){ 
-                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
-                    break;
-                }
-            }
-            if(respHoming==0){
-                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
-            }
-            respHoming = 1;
-            usleep(5000000);
-        }
-        
-        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
-        sleep(10);
-        
-        // HOMING OPERATION
-        respHoming=1; // Operazione di homing non conclusa
-        numHoming = 3;
-        axisID = 15;
-        DPRINT("************** Homing operation starting for axis 15. Total homing procedure = %d **************", numHoming);
-        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-            // con successo o insuccesso
-            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
-            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
-                usleep(100000); // FREQUENZA DI 1,5 ms
-                if(respHoming<0){ 
-                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
-                    break;
-                }
-            }
-            if(respHoming==0){
-                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
-            }
-            respHoming = 1;
-            usleep(5000000);
-        }
-        
-        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
-        sleep(10);
-        
-        axisID = 14;
-        if(OBJ->poweron(axisID,0)<0){
-            DERR("**************Error returned by stop motion operation **************");
-            //* errPtr = -5;
-        }
-        axisID = 15;
-        if(OBJ->poweron(axisID,0)<0){
-            DERR("**************Error returned by stop motion operation **************");
-            //* errPtr = -5;
-        }
-        
-        DPRINT("************** deinit Asse 14 **************"); 
-        OBJ->deinit(14);
-      
-        DPRINT("************** deinit Asse 15 **************");
-        OBJ->deinit(15);
-        
-        DPRINT("************** delete ActuatorTechnoSoft OBJ **************");
-        delete OBJ;
+//        // MOVIMENTAZIONE ASSE 15
+//        axisID = 15;
+//        if(OBJ->poweron(axisID,1)<0){
+//            DERR("**************Error returned by stop motion operation **************");
+//            //* errPtr = -5;
+//        }
+//        
+//        DPRINT("************** Movimentazione asse 15 **************");
+//        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
+//            DERR("************** Error returned by movement operation **************");
+//            //* errPtr = -5;
+//        }
+//        DPRINT("************** Movimentazione asse 15 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
+//        sleep(30);
+//        
+//        // MOVIMENTAZIONE ASSE 14
+//        axisID = 14;
+//      
+//        DPRINT("************** Movimentazione asse 14 **************");
+//        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
+//            DERR("************** Error returned by movement operation **************");
+//            //* errPtr = -5;
+//        }
+//        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
+//        sleep(30);
+//        
+//     // HOMING OPERATION
+//        int respHoming=1; // Operazione di homing non conclusa
+//        int numHoming = 3;
+//  
+//        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
+//        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+//            // con successo o insuccesso
+//            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
+//            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+//                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
+//                usleep(100000); // FREQUENZA DI 1,5 ms
+//                if(respHoming<0){ 
+//                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
+//                    break;
+//                }
+//            }
+//            if(respHoming==0){
+//                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+//            }
+//            respHoming = 1;
+//            usleep(5000000);
+//        }
+//        
+//        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
+//        sleep(10);
+//        
+//        // HOMING OPERATION
+//        respHoming=1; // Operazione di homing non conclusa
+//        numHoming = 3;
+//        axisID = 15;
+//        DPRINT("************** Homing operation starting for axis 15. Total homing procedure = %d **************", numHoming);
+//        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+//            // con successo o insuccesso
+//            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
+//            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+//                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
+//                usleep(100000); // FREQUENZA DI 1,5 ms
+//                if(respHoming<0){ 
+//                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);   
+//                    break;
+//                }
+//            }
+//            if(respHoming==0){
+//                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+//            }
+//            respHoming = 1;
+//            usleep(5000000);
+//        }
+//        
+//        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
+//        sleep(10);
+//        
+//        axisID = 14;
+//        if(OBJ->poweron(axisID,0)<0){
+//            DERR("**************Error returned by stop motion operation **************");
+//            //* errPtr = -5;
+//        }
+//        axisID = 15;
+//        if(OBJ->poweron(axisID,0)<0){
+//            DERR("**************Error returned by stop motion operation **************");
+//            //* errPtr = -5;
+//        }
+//        
+//        DPRINT("************** deinit Asse 14 **************"); 
+//        OBJ->deinit(14);
+//      
+//        DPRINT("************** deinit Asse 15 **************");
+//        OBJ->deinit(15);
+//        
+//        DPRINT("************** delete ActuatorTechnoSoft OBJ **************");
+//        delete OBJ;
         
         return 0;
     }

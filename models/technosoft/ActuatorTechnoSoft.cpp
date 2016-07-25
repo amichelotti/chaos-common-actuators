@@ -1334,7 +1334,7 @@ int ActuatorTechnoSoft::poweron(int axisID,int on){
              resp=-5;
              break;
      }
-     return resp;
+     return resp;                              
 }
 
 int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
@@ -1347,8 +1347,8 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
      if((i->second)->selectAxis()<0){
         return -2;
      }
-   version=" Technosoft IDM stepper open loop mode";
-   return 0; 
+    version=" Technosoft IDM 240 stepper open loop mode";
+    return 0; 
 }
 
 int ActuatorTechnoSoft::sendDataset(std::string& dataset){
