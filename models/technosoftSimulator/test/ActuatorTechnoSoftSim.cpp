@@ -241,21 +241,28 @@ int ActuatorTechnoSoft::deinit(int axisID){
     // Invio comando stop di movimentazione al motore
 //    if((i->second)->selectAxis()<0)
 //        return -2;
+    // ************* Simula INVIO comando selectAxis ****************
     int random_variable = std::rand();
-    if(random_variable<(RAND_MAX/20)) 
+    if(random_variable<(RAND_MAX/40)) 
         return -2;
+// ************* Simula INVIO comando stopMotion() ****************
 //    if((i->second)->stopMotion()<0)
 //        return -3;
     random_variable = std::rand();
-    if(random_variable<(RAND_MAX/20)) 
+    if(random_variable<(RAND_MAX/40)) 
         return -3;
+    
+    if(((i->second)->actuatorInMotion)==true)
+        // ............... GESTIRE LO STOP VIRTUALE DEL MOTORE ATTRAVERSO IL LOCK ...............
+    
+    // Stoppiamo effettivamente il motion e la corrente
     
 //    if((i->second)->stopPower()<0)
 //        return -4;
     random_variable = std::rand();
-    if(random_variable<(RAND_MAX/20)) 
+    if(random_variable<(RAND_MAX/40)) 
         return -4;
-    
+
     // Invio comando apertura circuito alimentazione motore
     if(i->second!=NULL){
         delete (i->second);
@@ -302,6 +309,8 @@ bool to_bool(const std::string & s) {
 }
 
 int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string valueOfparName){
+    
+    //git addaaaaaaaaaaaaaa
     
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);

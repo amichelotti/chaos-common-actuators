@@ -92,6 +92,7 @@ namespace common{
            };
            
            struct containerIncrementPosition{
+               bool stopMotion;
                long position;
                long deltaPosition;
                pthread_mutex_t mu;
@@ -160,10 +161,12 @@ namespace common{
 //                double positionCounter;
 //                double positionEncoder;
                 
-                containerIncrementPosition cIP;
+                
                 void* incrDecrPosition(void*arg);
                 
             public:
+                bool actuatorInMotion;
+                containerIncrementPosition cIP;
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 
@@ -230,7 +233,6 @@ namespace common{
                 
                 int getinternalHomingStateDefault();
                 int getinternalHomingStateHoming2();
-                
 
                 int providePower();
                 int stopPower();
@@ -253,7 +255,7 @@ namespace common{
                 int getSpeed(double& speed);
                   
                 int getHighSpeedHoming(double& _highSpeedHoming);
-
+                
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
                 int setMaxhighSpeedHoming(const double& _speed);

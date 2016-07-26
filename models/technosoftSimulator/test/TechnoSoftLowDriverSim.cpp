@@ -284,7 +284,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     std::srand(std::time(0));
     
     int random_variable = std::rand();
-    if(random_variable<1*(RAND_MAX/20)) 
+    if(random_variable<1*(RAND_MAX/40)) 
         return -24;
     
     /*	Setup the axis based on the setup data previously, for axisID*/
@@ -293,7 +293,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -25;
 //    }
     random_variable = std::rand();
-    if(random_variable<1*(RAND_MAX/20)) 
+    if(random_variable<1*(RAND_MAX/40)) 
         return -25;
    
 //    if(!TS_SelectAxis(_axisID)){
@@ -301,7 +301,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -26;
 //    }
     random_variable = std::rand();
-    if(random_variable<1*(RAND_MAX/20)) 
+    if(random_variable<1*(RAND_MAX/40)) 
         return -26;
     
     /*	Execute the initialization of the drive (ENDINIT) */
@@ -310,7 +310,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -27;
 //    }
     random_variable = std::rand();
-    if(random_variable<1*(RAND_MAX/20)) 
+    if(random_variable<1*(RAND_MAX/40)) 
         return -27;
     
      // Settare il registro per la lettura dell'encoder
@@ -320,16 +320,17 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -28;
 //    }
     random_variable = std::rand();
-    if(random_variable<1*(RAND_MAX/20)) 
+    if(random_variable<1*(RAND_MAX/40)) 
         return -28;
   
 //    if(!TS_SetEventOnMotionComplete(0,0)){ 
 //	return -30;
 //    }
     random_variable = std::rand();
-    if(random_variable<1*(RAND_MAX/20)) 
+    if(random_variable<1*(RAND_MAX/40)) 
         return -29;
     
+    actuatorInMotion = false;
     readyState = true;
     internalHomingStateDefault=0;
     internalHomingStateHoming2=0;
@@ -617,25 +618,35 @@ void* TechnoSoftLowDriver::incrDecrPosition(void* arg){
     
     // Stima grossolana tempo necessario per la movimentazione
     double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+    double tol = 30;
+    deltaT += (deltaT*tol/100);
+    bool stopMotion = ((containerIncrementPosition*)arg)->stopMotion;
     // Hp: deltaPosition [micro step], speed_ms_s [micro step/s]
     // Intervallo di tempo necessario al completamento della movimentazione, espresso in secondi [s]
     // Dobbiamo tenere conto che in realta' il profilo di velocita' e' trapezoidale...
-    deltaT += (deltaT*30/100);
     
     double totalTimeInterval = 0;   // solo per far partire il ciclo while
     struct timeval startTime,endTime;
     
     gettimeofday(&startTime,NULL);
-    while(totalTimeInterval<=deltaT){
+    while(totalTimeInterval<=deltaT && !stopMotion){
+        actuatorInMotion = true;
         // L'incremento deve avvenire ad una determinata velocita'
         if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
             
         }
-            if(((containerIncrementPosition*)arg)->deltaPosition>=0)
+            if(((containerIncrementPosition*)arg)->deltaPosition>=0){
                 cIP.position+=speed_ms_s;
-            else
+            }    
+            else{
                 cIP.position-=speed_ms_s;
-       
+            }
+   
+            // Aggiornamento deltaT 
+            deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+            deltaT += (deltaT*tol/100);
+            stopMotion = ((containerIncrementPosition*)arg)->stopMotion;
+             
         if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
             
         }
@@ -644,6 +655,7 @@ void* TechnoSoftLowDriver::incrDecrPosition(void* arg){
         totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
         sleep(1); // Sleep for 1 second   
     }
+    actuatorInMotion = false;
     pthread_exit(NULL);
 }
 
