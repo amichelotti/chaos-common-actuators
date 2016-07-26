@@ -50,7 +50,7 @@ typedef enum {
             ACTUATOR_FAULT=0x80, // Fault status
 
             // Low part of the status
-            ACTUATOR_INMOTION = 0x100,
+            ACTUATOR_INMOTION = 0x100, 
             ACTUATOR_POWER_SUPPLIED = 0x200,  // cambiare nome
             HOMING_IN_PROGRESS = 0x400,
             // Unknown status

@@ -121,9 +121,9 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(){
 //        DPRINT("channel just opened");
 //        DPRINT("created channel  %s", devName.c_str());
 //    }
-    readyState = true;
-    internalHomingStateDefault=0;
-    internalHomingStateHoming2=0; 
+//    readyState = true;
+//    internalHomingStateDefault=0;
+//    internalHomingStateHoming2=0; 
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
@@ -310,6 +310,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     }
     
     readyState = true;
+    internalHomingStateDefault=0;
+    internalHomingStateHoming2=0;
+    
     return 0;
 }
 
