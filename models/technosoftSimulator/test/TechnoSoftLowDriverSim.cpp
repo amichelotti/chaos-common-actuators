@@ -334,7 +334,13 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     readyState = true;
     internalHomingStateDefault=0;
     internalHomingStateHoming2=0;
+    
+    // Inizializzazione mutex
+    pthread_mutex_init(&(cIP.mu),NULL);
+    
     cIP.position = 0;
+    cIP.motionIsOff = false;
+    cIP.powerIsOff = false;
     
     return 0;
 }
@@ -620,7 +626,8 @@ void* TechnoSoftLowDriver::incrDecrPosition(void* arg){
     double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
     double tol = 30;
     deltaT += (deltaT*tol/100);
-    bool stopMotion = ((containerIncrementPosition*)arg)->stopMotion;
+    bool motionIsOff = ((containerIncrementPosition*)arg)->motionIsOff;
+    bool powerIsOff = ((containerIncrementPosition*)arg)->powerIsOff;
     // Hp: deltaPosition [micro step], speed_ms_s [micro step/s]
     // Intervallo di tempo necessario al completamento della movimentazione, espresso in secondi [s]
     // Dobbiamo tenere conto che in realta' il profilo di velocita' e' trapezoidale...
@@ -629,8 +636,8 @@ void* TechnoSoftLowDriver::incrDecrPosition(void* arg){
     struct timeval startTime,endTime;
     
     gettimeofday(&startTime,NULL);
-    while(totalTimeInterval<=deltaT && !stopMotion){
-        actuatorInMotion = true;
+    while(totalTimeInterval<=deltaT && !motionIsOff && !powerIsOff){
+        actuatorIDInMotion = true;
         // L'incremento deve avvenire ad una determinata velocita'
         if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
             
@@ -640,22 +647,30 @@ void* TechnoSoftLowDriver::incrDecrPosition(void* arg){
             }    
             else{
                 cIP.position-=speed_ms_s;
-            }
-   
-            // Aggiornamento deltaT 
-            deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-            deltaT += (deltaT*tol/100);
-            stopMotion = ((containerIncrementPosition*)arg)->stopMotion;
-             
+            }          
         if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
             
         }
+        // Aggiornamento deltaT, stopMotion, stopPower   
+        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+        deltaT += (deltaT*tol/100);
+        motionIsOff = ((containerIncrementPosition*)arg)->motionIsOff;
+        powerIsOff = ((containerIncrementPosition*)arg)->powerIsOff;
         
         gettimeofday(&endTime,NULL);
         totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
         sleep(1); // Sleep for 1 second   
     }
-    actuatorInMotion = false;
+    actuatorIDInMotion = false;
+    
+    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
+            
+        }
+        ((containerIncrementPosition*)arg)->motionIsOff = false;
+    
+    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+            
+    }
     pthread_exit(NULL);
 }
 
@@ -686,39 +701,39 @@ double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
 }
 
-void* TechnoSoftLowDriver::incrDecrPositionHoming(void* arg){
-    
-    // Stima grossolana tempo necessario per la movimentazione
-    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/highSpeedHoming_mm_s); //[s]
-    // Hp: deltaPosition [micro step], speed_ms_s [micro step/s]
-    // Intervallo di tempo necessario al completamento della movimentazione, espresso in secondi [s]
-    // Dobbiamo tenere conto che in realta' il profilo di velocita' e' trapezoidale...
-    deltaT += (deltaT*30/100);
-    
-    double totalTimeInterval = 0;   // solo per far partire il ciclo while
-    struct timeval startTime,endTime;
-    
-    gettimeofday(&startTime,NULL);
-    while(totalTimeInterval<=deltaT){
-        // L'incremento deve avvenire ad una determinata velocita'
-        if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
-            
-        }
-            if(((containerIncrementPosition*)arg)->deltaPosition>=0)
-                cIP.position+=speed_ms_s;
-            else
-                cIP.position-=speed_ms_s;
-       
-        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-            
-        }
-        
-        gettimeofday(&endTime,NULL);
-        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
-        sleep(1); // Sleep for 1 second   
-    }
-    pthread_exit(NULL);
-}
+//void* TechnoSoftLowDriver::incrDecrPositionHoming(void* arg){
+//    
+//    // Stima grossolana tempo necessario per la movimentazione
+//    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/highSpeedHoming_mm_s); //[s]
+//    // Hp: deltaPosition [micro step], speed_ms_s [micro step/s]
+//    // Intervallo di tempo necessario al completamento della movimentazione, espresso in secondi [s]
+//    // Dobbiamo tenere conto che in realta' il profilo di velocita' e' trapezoidale...
+//    deltaT += (deltaT*30/100);
+//    
+//    double totalTimeInterval = 0;   // solo per far partire il ciclo while
+//    struct timeval startTime,endTime;
+//    
+//    gettimeofday(&startTime,NULL);
+//    while(totalTimeInterval<=deltaT){
+//        // L'incremento deve avvenire ad una determinata velocita'
+//        if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//            
+//        }
+//            if(((containerIncrementPosition*)arg)->deltaPosition>=0)
+//                cIP.position+=speed_ms_s;
+//            else
+//                cIP.position-=speed_ms_s;
+//       
+//        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//            
+//        }
+//        
+//        gettimeofday(&endTime,NULL);
+//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
+//        sleep(1); // Sleep for 1 second   
+//    }
+//    pthread_exit(NULL);
+//}
 
 int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
     DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
