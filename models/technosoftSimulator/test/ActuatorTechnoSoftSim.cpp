@@ -1,3 +1,9 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 //
 //  ActuatorTechnoSoft.cpp
 //  
@@ -7,9 +13,11 @@
 //
 
 #include <stdio.h>
-#include "ActuatorTechnoSoft.h"
+#include "ActuatorTechnoSoftSim.h"
 #include <boost/regex.hpp>
 #include <common/debug/core/debug.h>
+#include <cstdlib.h>
+
 //#include <boost/algorithm/string/trim.hpp>
 //#include <boost/algorithm/string/case_conv.hpp>
 
@@ -94,10 +102,14 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         if(channel==NULL){
             return -2;
         }
-        if(channel->open()<0){
+        // Tentativo apertura canale di comunicazione, simulato
+//        if(channel->open()<0){
+//            return -3;
+//        }
+        std::srand(std::time(0));
+        int random_variable = std::rand();
+        if(random_variable<(RAND_MAX/20)) 
             return -3;
-        }
-       
         initChannelAlreadyDone = true;
         return 0;
     }
@@ -227,13 +239,30 @@ int ActuatorTechnoSoft::deinit(int axisID){
         return -1;
     }
     // Invio comando stop di movimentazione al motore
-    if((i->second)->selectAxis()<0)
+//    if((i->second)->selectAxis()<0)
+//        return -2;
+    // ************* Simula INVIO comando selectAxis ****************
+    int random_variable = std::rand();
+    if(random_variable<(RAND_MAX/40)) 
         return -2;
-    if((i->second)->stopMotion()<0)
+// ************* Simula INVIO comando stopMotion() ****************
+//    if((i->second)->stopMotion()<0)
+//        return -3;
+    random_variable = std::rand();
+    if(random_variable<(RAND_MAX/40)) 
         return -3;
-    if((i->second)->stopPower()<0)
-        return -4;
     
+    if(((i->second)->actuatorInMotion)==true)
+        // ............... GESTIRE LO STOP VIRTUALE DEL MOTORE ATTRAVERSO IL LOCK ...............
+    
+    // Stoppiamo effettivamente il motion e la corrente
+    
+//    if((i->second)->stopPower()<0)
+//        return -4;
+    random_variable = std::rand();
+    if(random_variable<(RAND_MAX/40)) 
+        return -4;
+
     // Invio comando apertura circuito alimentazione motore
     if(i->second!=NULL){
         delete (i->second);
@@ -281,6 +310,8 @@ bool to_bool(const std::string & s) {
 
 int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string valueOfparName){
     
+    //git addaaaaaaaaaaaaaa
+    
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
@@ -288,8 +319,6 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-    
-    DPRINT("setParameter execution");
     
     // trim
     trim2(parName);
@@ -304,15 +333,11 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     int intValue;
     bool boolValue;
     
-    DPRINT("Stringa elaborata %s",strResultparName.c_str());
-    
     if(strResultparName.compare("SPEED")==0){ 
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSpeed(doubleValue)<0){
-            DPRINT("setParameter execution error");
             return -2;
         }
-        
         return 0;
     }   
     else if(strResultparName.compare("ACCELERATION")==0){
@@ -452,204 +477,13 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimete
     if((i->second)->selectAxis()<0){
         return -3;
     } 
+    
     //long deltaMicroStepsL = deltaMicroSteps;
     if((i->second)->moveRelativeSteps((long)deltaMicroSteps)<0){
         return -4;
     }
     return 0;
 }
-
-//int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
-//    
-//    DPRINT("moving relative %f mm",deltaMillimeters);
-//    
-//    // Calcolo argomento funzione moveRelativeSteps
-//    double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-//    
-//    if(deltaMicroSteps<LONG_MIN || deltaMicroSteps>LONG_MAX){ 
-//        printf("Out of range\n");
-//        return -1;
-//    }
-//    if(driver->selectAxis()<0){
-//        return -2;
-//    }
-//
-//    //long deltaMicroStepsL = deltaMicroSteps;
-//    if(driver->moveRelativeStepsHoming((long)deltaMicroSteps)<0){
-//        return -3;
-//    }
-//    
-//    return 0;
-//}
-
-//int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase){
-//    
-//    if(driver->setSpeed(speed)<0){
-//        return -1;
-//    }
-//    if(driver->setAcceleration(acceleration)<0){
-//        return -2;
-//    }
-//    if(driver->setAdditive(isAdditive)<0){
-//        return -3;
-//    }
-//    if(driver->setMovement(movement)<0){
-//        return -4;
-//    }
-//    if(driver->setReferenceBase(referenceBase)<0){
-//        return -5;
-//    }
-//    return 0;
-//}
-
-//int ActuatorTechnoSoft::setSpeed(double speed){
-//    if(driver->setSpeed(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxSpeed(double speed){
-//    if(driver->setMaxSpeed(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setAcceleration(double acceleration){
-//    if(driver->setAcceleration(acceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxAcceleration(double maxAcceleration){
-//    if(driver->setMaxAcceleration(maxAcceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//
-//int ActuatorTechnoSoft::setAdditive(bool isAdditive){
-//    if(driver->setAdditive((int)isAdditive)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMovement(int32_t movement){
-//    if(driver->setMovement((short)movement)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setReferenceBase(int32_t referenceBase){
-//    if(driver->setReferenceBase((short)referenceBase)<0){
-//        return -1;
-//    }                
-//    return 0;
-//}
-//
-//// Set homing parameters
-//int ActuatorTechnoSoft::sethighSpeedHoming(double speed){
-//    if(driver->sethighSpeedHoming(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxhighSpeedHoming(double maxHighSpeed){
-//    if(driver->setMaxhighSpeedHoming(maxHighSpeed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setlowSpeedHoming(double speed){
-//    if(driver->setlowSpeedHoming(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxlowSpeedHoming(double speed){
-//    if(driver->setMaxlowSpeedHoming(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setAccelerationHoming(double acceleration){
-//    if(driver-> setaccelerationHoming(acceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxAccelerationHoming(double maxacceleration){
-//    if(driver-> setMaxAccelerationHoming(maxacceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setAdditiveHoming(bool isAdditive){
-//    if(driver->setAdditiveHoming((int)isAdditive)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMovementHoming(int32_t movement){
-//    if(driver->setMovementHoming((short)movement)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setReferenceBaseHoming(int32_t referenceBase){
-//    if(driver->setReferenceBaseHoming((short)referenceBase)<0){
-//        return -1;
-//    }                
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setEncoderLines(double _encoderLines){
-//    if(driver->setEncoderLines(_encoderLines)<0){
-//        return -1;
-//    }   
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setConst_mult_technsoft(double _const_mult_technsoft){
-//    if(driver->setConst_mult_technsoft(_const_mult_technsoft)<0){
-//        return -1;
-//    }    
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setSteps_per_rounds(double _steps_per_rounds){
-//    if(driver->setSteps_per_rounds(_steps_per_rounds)<0){
-//        return -1;
-//    }    
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setN_rounds(double _n_rounds){
-//    if(driver->setN_rounds(_n_rounds)<0){
-//        return -1;
-//    }   
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds){
-//    if(driver->setLinear_movement_per_n_rounds(_linear_movement_per_n_rounds)<0){
-//        return -1;
-//    }   
-//    return 0;
-//}
            
 // Move absolute homing
 int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){ 

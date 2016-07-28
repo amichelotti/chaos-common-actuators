@@ -1,5 +1,5 @@
 //
-//  ActuatorTechnoSoft.h
+//  ActuatorTechnoSoft.dh
 //  prova
 //
 //  Created by MacBookProINFN on 29/01/16.
@@ -7,7 +7,7 @@
 //
 
 #include <common/actuators/core/AbstractActuator.h>
-#include "TechnoSoftLowDriver.h"
+#include "TechnoSoftLowDriverSim.h"
 #include <sys/time.h>
 
 

@@ -8,7 +8,9 @@
 #include <cmath>
 #include <limits.h>
 #include <string.h>
-
+#include <cstdlib.h>
+#include <pthread.h>
+#include <math.h>       /* fabs */
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
@@ -89,6 +91,13 @@ namespace common{
                     void badOpeningChannelInfo();
            };
            
+           struct containerIncrementPosition{
+               bool stopMotion;
+               long position;
+               long deltaPosition;
+               pthread_mutex_t mu;
+           };
+           
 	    //Channel class
             class SerialCommChannelTechnosoft{
                 
@@ -129,7 +138,7 @@ namespace common{
                 double linear_movement_per_n_rounds;
                 
                 // Trapezoidal profile parameters for move relative and move absolute
-                double speed_mm_s;
+                double speed_ms_s;
                 double maxSpeed_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double acceleration_mm_s2;
                 double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
@@ -148,7 +157,16 @@ namespace common{
                 short movementHoming;
                 short referenceBaseHoming;
                 
+//                double position;
+//                double positionCounter;
+//                double positionEncoder;
+                
+                
+                void* incrDecrPosition(void*arg);
+                
             public:
+                bool actuatorInMotion;
+                containerIncrementPosition cIP;
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 
@@ -210,11 +228,11 @@ namespace common{
                         const double _n_rounds=N_ROUNDS_DEFAULT,            
                         const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
                 
+                
                 int homing(int mode);
                 
                 int getinternalHomingStateDefault();
                 int getinternalHomingStateHoming2();
-                
 
                 int providePower();
                 int stopPower();
@@ -237,7 +255,7 @@ namespace common{
                 int getSpeed(double& speed);
                   
                 int getHighSpeedHoming(double& _highSpeedHoming);
-
+                
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
                 int setMaxhighSpeedHoming(const double& _speed);
@@ -297,6 +315,8 @@ namespace common{
                 int getFirmwareVers(char* firmwareVers);
                 
                 int selectAxis();
+                void* incrDecrPositionHoming(void* arg);
+                void* incrDecrPosition(void* arg);
            };
 	}// chiude namespace technosoft
 

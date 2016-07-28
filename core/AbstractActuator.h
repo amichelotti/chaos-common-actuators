@@ -50,7 +50,7 @@ typedef enum {
             ACTUATOR_FAULT=0x80, // Fault status
 
             // Low part of the status
-            ACTUATOR_INMOTION = 0x100,
+            ACTUATOR_INMOTION = 0x100, 
             ACTUATOR_POWER_SUPPLIED = 0x200,  // cambiare nome
             HOMING_IN_PROGRESS = 0x400,
             // Unknown status
@@ -142,14 +142,14 @@ typedef enum {
            @param version returning string
            @return 0 if success or an error code
         */
-            virtual int getSWVersion(std::string& version)=0;        
+            virtual int getSWVersion(int axisID, std::string& version)=0;        
 
         /**
         @brief returns the HW version of the actuator
         @param version returning string
         @return 0 if success or an error code
         */
-        virtual int getHWVersion(std::string& version)=0;         // ****Da implementare***
+        virtual int getHWVersion(int axisID, std::string& version)=0;         // ****Da implementare***
 
 /**
 @brief returns a string containing the dataset attributes from driver which responds to SetParameter method
@@ -163,21 +163,21 @@ typedef enum {
 
         @return 0 if success or an error code
         */
-            virtual int stopMotion(int axisID)=0;    // (2)                          
+        virtual int stopMotion(int axisID)=0;    // (2)                          
 
-            typedef enum{
-                defaultHoming,
-                homing2,
-                nativeHoming15
-            } homingType;
+        typedef enum{   // Importante non cambiare l'ordine di tali elementi
+            defaultHoming,
+            homing2,
+            nativeHoming15
+        } homingType;
 
-            virtual int homing(int axisID,homingType mode)=0;                        // (2) 
-            virtual int getState(int axisID,int* state, std::string& desc)=0;        // (2) 
-            virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
-            virtual int resetAlarms(int axisID,uint64_t alrm)=0;                                // (2)
-            virtual int poweron(int axisID,int on)=0;
-            virtual uint64_t getFeatures()=0;
-            virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
+        virtual int homing(int axisID,homingType mode)=0;                        // (2) 
+        virtual int getState(int axisID,int* state, std::string& desc)=0;        // (2) 
+        virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
+        virtual int resetAlarms(int axisID,uint64_t alrm)=0;                     // (2)
+        virtual int poweron(int axisID,int on)=0;
+        virtual uint64_t getFeatures()=0;
+        virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
     };
 }
 }
