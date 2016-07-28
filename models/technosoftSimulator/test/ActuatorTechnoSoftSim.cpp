@@ -890,7 +890,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         ERR("Reading state error: %s",descStr.c_str());
         return -4;
     }
-
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
