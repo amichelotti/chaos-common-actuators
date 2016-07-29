@@ -857,6 +857,9 @@ int ActuatorTechnoSoft::homing(int axisID,homingType mode){
 
 
 int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
+    
+    // ******************** NOTA:  le funzioni getState e getAlarms devono essere eseguite in modalita' SEQUENZIALE,
+    // e non indipendentemente l'una dall'altra in thread differenti, perche' accedono agli stessi dati *********************
 
     DPRINT("Getting state of the actuator. ");
 
@@ -879,17 +882,25 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     if((i->second)->selectAxis()<0){
         return -2;
     }
-
+    
+    (i->second)->stateInfoRequest = true; // Comunico al motore che sto richiedendo info riguardanti gli allarmi
+    
+    
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
+    (i->second)->regSRHrequest = true;
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
         return -3;
     }
+    (i->second)->regSRHrequest = false;
+    
     indexReg = 3; // see constant REG_SRL in TML_lib.h
+    (i->second)->regSRLrequest = true;
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
         return -4;
     }
+    (i->second)->regSRLrequest = false;
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
@@ -931,7 +942,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= HOMING_IN_PROGRESS;
         descStr += "Homing in progress.";
     }
-    
+    (i->second)->stateInfoRequest = false;
     *state = stCode;
     return 0;
 }
@@ -960,18 +971,24 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         return -2;
     }
     
+    (i->second)->alarmsInfoRequest = true; // Comunico al motore che sto richiedendo info riguardanti gli allarmi
+    
     short indexRegMER = 5; // see constant REG_MER in TML_lib.h
+    (i->second)->regMERrequest = true;
     if((i->second)->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
         return -3;
     }
-
+    (i->second)->regMERrequest = false;
+    
     short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
+    (i->second)->regSRHrequest = true;
     if((i->second)->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
         return -4;
     }
-
+    (i->second)->regSRHrequest = false;
+    
     for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
         if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
             if(i==0){
@@ -1052,8 +1069,9 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         stCode|=ACTUATOR_I2T_WARNING_DRIVE;
         descStr+="Drive I2T protection warning";
     }
-
     *alrm = stCode;
+    (i->second)->alarmsInfoRequest = false; // Comunico al motore che ho terminato di richiedere info riguardanti gli allarmi
+    
     return 0;
 }
      
@@ -1185,7 +1203,7 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
      }
      if((i->second)->selectAxis()<0){
         return -2;
-     }
+     } 
     version=" Technosoft IDM 240 stepper open loop mode";
     return 0; 
 }

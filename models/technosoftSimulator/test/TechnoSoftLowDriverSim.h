@@ -92,9 +92,6 @@ namespace common{
            };
            
            struct containerIncrementPosition{
-               bool powerIsOff;
-               bool motionIsOff;
-               long position;
                long deltaPosition;
                pthread_mutex_t mu;
            };
@@ -157,17 +154,31 @@ namespace common{
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
+                bool powerIsOff;
+                bool motionIsOff;
+                long position;
+                long cap_position;
                 
-//                double position;
-//                double positionCounter;
-//                double positionEncoder;
+                double epsylon;
                 
+                containerIncrementPosition cIP;
                 
                 void* incrDecrPosition(void*arg);
                 
             public:
+                bool alarmsInfoRequest;
+                bool regMERrequest;
+                WORD contentRegMER; // Fault driver register
+                bool regSRHrequest;
+                WORD contentRegSRH;
+                
+                bool stateInfoRequest;
+                bool regSRLrequest;
+                WORD contentRegSRL;
+                
+                //WORD contentRegSRL; non acceduto da getAlarms
+                
                 bool actuatorIDInMotion;
-                containerIncrementPosition cIP;
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 
@@ -275,7 +286,6 @@ namespace common{
                 int setEncoderLines(double& _encoderLines);
                 
                 //Encoder lines
-
                 int moveAbsoluteSteps(const long& position) const;
                 int moveAbsoluteStepsHoming(const long& position) const;
                 
@@ -318,6 +328,8 @@ namespace common{
                 int selectAxis();
                 void* incrDecrPositionHoming(void* arg);
                 void* incrDecrPosition(void* arg);
+                void* moveConstantVelocity(void* arg);
+                void* moveAbsolutePosition(void* arg);
            };
 	}// chiude namespace technosoft
 
