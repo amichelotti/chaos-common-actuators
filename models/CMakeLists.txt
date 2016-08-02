@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project(actuators_models)
 IF("${CMAKE_C_COMPILER}" MATCHES "i686-nptl-linux-gnu-gcc") 
   MESSAGE(STATUS "Enabling compilation of technosoft")

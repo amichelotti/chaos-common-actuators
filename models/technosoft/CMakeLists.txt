@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project(common_actuators_technosoft)
 LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/lib)
-ADD_DEFINITIONS(-DDEBUG -g3 -O0 -fpic)
+ADD_DEFINITIONS(-DDEBUG -fpic)
 
 FILE(GLOB src *.cpp)    
 IF(BUILD_FORCE_STATIC)
