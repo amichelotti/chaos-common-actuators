@@ -8,7 +8,6 @@
 #include <cmath>
 #include <limits.h>
 #include <string.h>
-#include <cstdlib.h>
 #include <pthread.h>
 #include <math.h>       /* fabs */
 
@@ -46,15 +45,20 @@
 #define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
-#define SPEED_DEFAULT 400.0 // 30.0  [mm/s] 
+//#define SPEED_DEFAULT 400.0 // 30.0  [mm/s]
+#define SPEED_DEFAULT 0.4 //  [microstep/ms]
+
 #define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]     
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS) 
 #define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
 
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
+//#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
+#define HIGH_SPEED_HOMING_DEFAULT 0.01 // [microstep/ms]
+
 #define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS)
-#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
+//#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
+#define LOW_SPEED_HOMING_DEFAULT 0.001 // [microstep/ms]
 #define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)
 #define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
 #define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
@@ -93,6 +97,7 @@ namespace common{
            
            struct containerIncrementPosition{
                long deltaPosition;
+               long absolutePosition;
                pthread_mutex_t mu;
            };
            
@@ -154,9 +159,9 @@ namespace common{
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
-                bool powerIsOff;
-                bool motionIsOff;
-                long position;
+                bool powerOffCommand;
+                bool stopMotionCommand;
+                long position; // expressed in microsteps
                 long cap_position;
                 
                 double epsylon;
@@ -328,7 +333,7 @@ namespace common{
                 int selectAxis();
                 void* incrDecrPositionHoming(void* arg);
                 void* incrDecrPosition(void* arg);
-                void* moveConstantVelocity(void* arg);
+                void* moveConstantVelocityHoming(void* arg);
                 void* moveAbsolutePosition(void* arg);
            };
 	}// chiude namespace technosoft
