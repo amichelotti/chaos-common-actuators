@@ -837,8 +837,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
          // In questo caso il motore axisID non e' stato configurato
          return -1;
      }
-     
-  
+
      int err = 0;
      if((i->second)->selectAxis()<0){
         return -2;
@@ -871,6 +870,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
  }
  
  int ActuatorTechnoSoft::getSWVersion(int axisID, std::string& version){
+     
      std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
      if(i==motors.end()){ 
@@ -927,7 +927,7 @@ int ActuatorTechnoSoft::poweron(int axisID,int on){
 }
 
 int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
-    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
      if(i==motors.end()){ 
          // In questo caso il motore axisID non e' stato configurato

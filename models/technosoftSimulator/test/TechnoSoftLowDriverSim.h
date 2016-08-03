@@ -163,8 +163,10 @@ namespace common{
                 bool stopMotionCommand;
                 long position; // expressed in microsteps
                 long cap_position;
+                bool LNStransition;
                 
                 double epsylon;
+                double p;
                 
                 containerIncrementPosition cIP;
                 
