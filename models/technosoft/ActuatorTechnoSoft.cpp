@@ -1,30 +1,38 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 //
 //  ActuatorTechnoSoft.cpp
-//  
+//
 //
 //  Created by MacBookProINFN on 29/01/16.
 //
 //
 
 #include <stdio.h>
-#include "ActuatorTechnoSoft.h"
+#include "ActuatorTechnoSoftSim.h"
 #include <boost/regex.hpp>
 #include <common/debug/core/debug.h>
+//#include <cstdlib.h>
+
 //#include <boost/algorithm/string/trim.hpp>
 //#include <boost/algorithm/string/case_conv.hpp>
 
-#include <boost/algorithm/string.hpp>  
+#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <algorithm> 
-#include <functional> 
+#include <algorithm>
+#include <functional>
 #include <cctype>
 #include <locale>         // std::locale, std::toupper
 
 using namespace boost;
 using namespace ::common::actuators::models;
-        
+
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
-      
+
 
 static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
@@ -41,63 +49,67 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    // show content:                       
+    // show content:
     DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        deinit(it->first); 
+        deinit(it->first);
         //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
-    } 
+    }
     // Remove all the element from the map container
     motors.clear();
-    
+
     DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
-    
+
     // close the communication channel
     if(channel!=NULL){
-        delete channel; 
+        delete channel;
         channel = NULL;
     }
-    DPRINT("Object Actuator Technosoft is deleted");   
+    DPRINT("Object Actuator Technosoft is deleted");
 }
 
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
-// quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale 
+// quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale
 // apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
-    
+
     if(initChannelAlreadyDone){
         DPRINT("This object has already a communication channel correctly initialized");
         return -1;
     }
-    
+
     std::string params;
     params.assign((const char*)initialization_string);
     boost::smatch match;
-    
+
     DPRINT("Initialization string %s", params.c_str());
-    
+
     if(regex_match(params, match, driver_match1, boost::match_extra)){
-        
-        std::string strHostID = match[1]; 
+
+        std::string strHostID = match[1];
         hostID = atoi(strHostID.c_str());
         std::string strbtType = match[2];
         btType = atoi(strbtType.c_str());
-        std::string strbaudrate = match[3]; 
+        std::string strbaudrate = match[3];
         baudrate = atoi(strbaudrate.c_str());
-        dev_name=match[4]; 
-        
+        dev_name=match[4];
+
         DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
-        
+
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
         channel = new (std::nothrow) SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
         if(channel==NULL){
             return -2;
         }
+        // Tentativo apertura canale di comunicazione, simulato
         if(channel->open()<0){
             return -3;
         }
-       
+        std::srand(std::time(0));
+        int random_variable = std::rand();
+        if(random_variable<(RAND_MAX/20))
+            return -3;
         initChannelAlreadyDone = true;
         return 0;
     }
@@ -112,22 +124,22 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
     boost::smatch match;
 
     DPRINT("Configuration string %s", params.c_str());
-    
+
     if(regex_match(params, match, driver_match2, boost::match_extra)){
 
         std::string conf_path=match[2];
         std::string straxid=match[1];
         int axid = atoi(straxid.c_str());
-        
+
         // Controllo mappa motori
         std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axid); // iteratore alla mappa statica
-        
-        if(i==motors.end()){ // Il motore con il corrente axis id non e' stato configurato. 
+
+        if(i==motors.end()){ // Il motore con il corrente axis id non e' stato configurato.
                              // In questo caso creero' un nuovo oggetto motore.
-            TechnoSoftLowDriver* driver = new (std::nothrow) TechnoSoftLowDriver(); 
+            TechnoSoftLowDriver* driver = new (std::nothrow) TechnoSoftLowDriver();
             if(driver==NULL){
                 return -1;
-            }  
+            }
             int val;
             if((val=driver->init(conf_path,axid))<0){
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
@@ -138,42 +150,42 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
             DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
-            return 0;     
-        } 
+            return 0;
+        }
         DPRINT("Axis id %d è stato già configurato correttamente.", axid);
         return -3;
-        //HOMING procedure parameters 
+        //HOMING procedure parameters
         //**********************************************************************
         //**********************************************************************
-        //Le seguenti tre variabili sono relative a ciascun oggetto TechnoSoftLowDriver  
+        //Le seguenti tre variabili sono relative a ciascun oggetto TechnoSoftLowDriver
         //**********************************************************************
         //**********************************************************************
 //        internalHomingStateDefault=0;
-//        internalHomingStateHoming2=0; 
+//        internalHomingStateHoming2=0;
         // ***********************GESTIONE_READY_STATE*************************
-	//return 0;
+//return 0;
     }
     ERR("error parsing initialization string:\"%s\" ",params.c_str());
     return -4;
 }
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ // OVERLOADING COSTRUTTORE DI COPIA
-    
+
     dev_name = objActuator.dev_name;
     initChannelAlreadyDone = objActuator.initChannelAlreadyDone;
     delectingActuator = objActuator.delectingActuator;
-    
+
     btType = objActuator.btType;
     baudrate = objActuator.baudrate;
     hostID = objActuator.hostID;
-    
+
     //readyState = objActuator.readyState;
 //    internalHomingStateDefault = objActuator.internalHomingStateDefault;
 //    internalHomingStateHoming2 = objActuator.internalHomingStateHoming2;
-    
+
     // GESTIONE OGGETTO SerialCommChannelTechnosoft
     channel = new SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
-    
+
 //    driver = new TechnoSoftLowDriver();
     // Inizializzazione membri dell' oggetto SerialCommChannelTechnosoft
     channel->pszDevName = (objActuator.channel)->pszDevName;
@@ -181,78 +193,95 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     channel->baudrate = (objActuator.channel)->baudrate;
     channel->hostID = (objActuator.channel)->hostID;
     channel->fd = (objActuator.channel)->fd;
-    
+
     DPRINT("Costruttore di copia eseguito");
 }
 
 ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objActuator){ // Overloading operatori di assegnamento
-    
+
     if(this==& objActuator){
         return *this;
-    } 
- 
+    }
+
     dev_name = objActuator.dev_name;
     initChannelAlreadyDone = objActuator.initChannelAlreadyDone;
     delectingActuator = objActuator.delectingActuator;
-    
+
     btType = objActuator.btType;
     baudrate = objActuator.baudrate;
     hostID = objActuator.hostID;
-    
-    if(channel!=NULL){ //Prima distruggiamo il vecchio oggetto tec   technosoftLowdriver, per evitare un 
+
+    if(channel!=NULL){ //Prima distruggiamo il vecchio oggetto tec   technosoftLowdriver, per evitare un
                       // un errore di memori leak. Infatti la copia viene eseguita su un oggetto gia' ESISTENTE!
         delete channel;
         channel = new SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
     }
-    
+
     // copia valori membri oggetto TechnoSoftLowDriver a destra dell'uguale
     channel->pszDevName = (objActuator.channel)->pszDevName;
     channel->btType = (objActuator.channel)->btType;
     channel->baudrate = (objActuator.channel)->baudrate;
     channel->hostID = (objActuator.channel)->hostID;
     channel->fd = (objActuator.channel)->fd;
-    
+
     DPRINT("Operatore di assegnamento eseguito");
     return *this;
 }
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
-    
+
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato, non c'e' quindi alcun motore da inizializzare
         return -1;
     }
     // Invio comando stop di movimentazione al motore
-    if((i->second)->selectAxis()<0)
+//    if((i->second)->selectAxis()<0)
+//        return -2;
+    // ************* Simula INVIO comando selectAxis ****************
+    int random_variable = std::rand();
+    if(random_variable<(RAND_MAX/40))
         return -2;
-    if((i->second)->stopMotion()<0)
+// ************* Simula INVIO comando stopMotion() ****************
+//    if((i->second)->stopMotion()<0)
+//        return -3;
+    random_variable = std::rand();
+    if(random_variable<(RAND_MAX/40))
         return -3;
-    if((i->second)->stopPower()<0)
+
+    if(((i->second)->actuatorInMotion)==true)
+        // ............... GESTIRE LO STOP VIRTUALE DEL MOTORE ATTRAVERSO IL LOCK ...............
+
+    // Stoppiamo effettivamente il motion e la corrente
+
+//    if((i->second)->stopPower()<0)
+//        return -4;
+    random_variable = std::rand();
+    if(random_variable<(RAND_MAX/40))
         return -4;
-    
+
     // Invio comando apertura circuito alimentazione motore
     if(i->second!=NULL){
         delete (i->second);
         i->second = NULL;
     }
-    
+
     if(!delectingActuator){
         motors.erase(axisID);
         if(motors.size()==0){
             if(channel!=NULL){
-                delete channel; 
+                delete channel;
                 channel = NULL;
             }
-        }  
+        }
     }
-    
+
     DPRINT("Object technosoftlowdriver with axisID = %d is deinitialized",axisID);
     // Controllo lista vuota. Se e' vuota bisogna chiudere il canale!!!!!
-    return 0; 
+    return 0;
 }
 
 void trim2(std::string& str){
@@ -260,7 +289,7 @@ void trim2(std::string& str){
   if(pos != std::string::npos) {
     str.erase(pos + 1);
     pos = str.find_first_not_of(' ');
-    if(pos != std::string::npos){ 
+    if(pos != std::string::npos){
         str.erase(0, pos);
         }
   }
@@ -272,7 +301,7 @@ void setUpperCase(const std::string& str,std::string& strResult){
     strResult.assign("");
     for (std::string::size_type i=0; i<str.length(); ++i){
         strResult += std::toupper(str[i],loc);
-    }     
+    }
 }
 
 bool to_bool(const std::string & s) {
@@ -280,17 +309,17 @@ bool to_bool(const std::string & s) {
 }
 
 int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string valueOfparName){
-    
+
+    //git addaaaaaaaaaaaaaa
+
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-    
-    DPRINT("setParameter execution");
-    
+
     // trim
     trim2(parName);
     trim2(valueOfparName);
@@ -299,25 +328,21 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     std::string strResultparvalue;
     setUpperCase(parName,strResultparName);
     setUpperCase(valueOfparName,strResultparvalue);
-    
+
     double doubleValue;
     int intValue;
     bool boolValue;
-    
-    DPRINT("Stringa elaborata %s",strResultparName.c_str());
-    
-    if(strResultparName.compare("SPEED")==0){ 
+
+    if(strResultparName.compare("SPEED")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSpeed(doubleValue)<0){
-            DPRINT("setParameter execution error");
             return -2;
         }
-        
         return 0;
-    }   
+    }
     else if(strResultparName.compare("ACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setAcceleration(doubleValue)<0){ 
+        if((i->second)->setAcceleration(doubleValue)<0){
             return -3;
         }
         return 0;
@@ -326,105 +351,105 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         // Conversion from string to bool
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setAdditive(intValue)<0){ 
+        if((i->second)->setAdditive(intValue)<0){
             return -4;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENT")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setMovement((short)intValue)<0){ 
+        if((i->second)->setMovement((short)intValue)<0){
             return -5;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASE")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setReferenceBase((short)intValue)<0){ 
+        if((i->second)->setReferenceBase((short)intValue)<0){
             return -6;
         }
-        return 0;   
+        return 0;
     }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->sethighSpeedHoming(doubleValue)<0){ 
+        if((i->second)->sethighSpeedHoming(doubleValue)<0){
             return -7;
         }
-        return 0;       
+        return 0;
     }
 
     else if(strResultparName.compare("LOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setlowSpeedHoming(doubleValue)<0){ 
+        if((i->second)->setlowSpeedHoming(doubleValue)<0){
             return -8;
         }
-        return 0;   
+        return 0;
     }
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setaccelerationHoming(doubleValue)<0){ 
+        if((i->second)->setaccelerationHoming(doubleValue)<0){
             return -9;
         }
-        return 0;   
+        return 0;
     }
     else if(strResultparName.compare("ISADDITIVEHOMING")==0){
         // Conversion from string to bool
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setAdditiveHoming(intValue)<0){ 
+        if((i->second)->setAdditiveHoming(intValue)<0){
             return -10;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENTHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setMovementHoming((short)intValue)<0){ 
+        if((i->second)->setMovementHoming((short)intValue)<0){
             return -11;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setReferenceBaseHoming((short)intValue)<0){ 
+        if((i->second)->setReferenceBaseHoming((short)intValue)<0){
             return -12;
         }
-        return 0;   
+        return 0;
     }//_________________________________________________________________________
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setEncoderLines(doubleValue)<0){ 
+        if((i->second)->setEncoderLines(doubleValue)<0){
             return -13;
         }
-        return 0;   
+        return 0;
     }
     else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setConst_mult_technsoft(doubleValue)<0){ 
+        if((i->second)->setConst_mult_technsoft(doubleValue)<0){
             return -14;
         }
-        return 0;   
-    } 
+        return 0;
+    }
     else if(strResultparName.compare("STEPSPERROUND")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setSteps_per_rounds(doubleValue)<0){ 
+        if((i->second)->setSteps_per_rounds(doubleValue)<0){
             return -15;
         }
-        return 0;   
-    } 
+        return 0;
+    }
     else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setN_rounds(doubleValue)<0){ 
+        if((i->second)->setN_rounds(doubleValue)<0){
             return -16;
         }
-        return 0;   
-    } 
+        return 0;
+    }
     else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){ 
+        if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){
             return -17;
         }
-        return 0;   
-    } 
+        return 0;
+    }
     else{
         return -18;
     }
@@ -432,26 +457,27 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
 
 int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimeters){
     DPRINT("moving relative %f mm",deltaMillimeters);
-    
+
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-    
+
     // Calcolo argomento funzione moveRelativeSteps
     //double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double deltaMicroSteps=(i->second)->getdeltaMicroSteps(deltaMillimeters);
     DPRINT("deltaMicroSteps = %f mm",deltaMicroSteps);
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
-    }    
-    
+    }
+
     if((i->second)->selectAxis()<0){
         return -3;
-    } 
+    }
+
     //long deltaMicroStepsL = deltaMicroSteps;
     if((i->second)->moveRelativeSteps((long)deltaMicroSteps)<0){
         return -4;
@@ -459,214 +485,22 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimete
     return 0;
 }
 
-//int ActuatorTechnoSoft::moveRelativeMillimetersHoming(double deltaMillimeters){
-//    
-//    DPRINT("moving relative %f mm",deltaMillimeters);
-//    
-//    // Calcolo argomento funzione moveRelativeSteps
-//    double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-//    
-//    if(deltaMicroSteps<LONG_MIN || deltaMicroSteps>LONG_MAX){ 
-//        printf("Out of range\n");
-//        return -1;
-//    }
-//    if(driver->selectAxis()<0){
-//        return -2;
-//    }
-//
-//    //long deltaMicroStepsL = deltaMicroSteps;
-//    if(driver->moveRelativeStepsHoming((long)deltaMicroSteps)<0){
-//        return -3;
-//    }
-//    
-//    return 0;
-//}
-
-//int ActuatorTechnoSoft::setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase){
-//    
-//    if(driver->setSpeed(speed)<0){
-//        return -1;
-//    }
-//    if(driver->setAcceleration(acceleration)<0){
-//        return -2;
-//    }
-//    if(driver->setAdditive(isAdditive)<0){
-//        return -3;
-//    }
-//    if(driver->setMovement(movement)<0){
-//        return -4;
-//    }
-//    if(driver->setReferenceBase(referenceBase)<0){
-//        return -5;
-//    }
-//    return 0;
-//}
-
-//int ActuatorTechnoSoft::setSpeed(double speed){
-//    if(driver->setSpeed(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxSpeed(double speed){
-//    if(driver->setMaxSpeed(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setAcceleration(double acceleration){
-//    if(driver->setAcceleration(acceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxAcceleration(double maxAcceleration){
-//    if(driver->setMaxAcceleration(maxAcceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//
-//int ActuatorTechnoSoft::setAdditive(bool isAdditive){
-//    if(driver->setAdditive((int)isAdditive)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMovement(int32_t movement){
-//    if(driver->setMovement((short)movement)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setReferenceBase(int32_t referenceBase){
-//    if(driver->setReferenceBase((short)referenceBase)<0){
-//        return -1;
-//    }                
-//    return 0;
-//}
-//
-//// Set homing parameters
-//int ActuatorTechnoSoft::sethighSpeedHoming(double speed){
-//    if(driver->sethighSpeedHoming(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxhighSpeedHoming(double maxHighSpeed){
-//    if(driver->setMaxhighSpeedHoming(maxHighSpeed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setlowSpeedHoming(double speed){
-//    if(driver->setlowSpeedHoming(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxlowSpeedHoming(double speed){
-//    if(driver->setMaxlowSpeedHoming(speed)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setAccelerationHoming(double acceleration){
-//    if(driver-> setaccelerationHoming(acceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMaxAccelerationHoming(double maxacceleration){
-//    if(driver-> setMaxAccelerationHoming(maxacceleration)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setAdditiveHoming(bool isAdditive){
-//    if(driver->setAdditiveHoming((int)isAdditive)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setMovementHoming(int32_t movement){
-//    if(driver->setMovementHoming((short)movement)<0){
-//        return -1;
-//    }
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setReferenceBaseHoming(int32_t referenceBase){
-//    if(driver->setReferenceBaseHoming((short)referenceBase)<0){
-//        return -1;
-//    }                
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setEncoderLines(double _encoderLines){
-//    if(driver->setEncoderLines(_encoderLines)<0){
-//        return -1;
-//    }   
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setConst_mult_technsoft(double _const_mult_technsoft){
-//    if(driver->setConst_mult_technsoft(_const_mult_technsoft)<0){
-//        return -1;
-//    }    
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setSteps_per_rounds(double _steps_per_rounds){
-//    if(driver->setSteps_per_rounds(_steps_per_rounds)<0){
-//        return -1;
-//    }    
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setN_rounds(double _n_rounds){
-//    if(driver->setN_rounds(_n_rounds)<0){
-//        return -1;
-//    }   
-//    return 0;
-//}
-//
-//int ActuatorTechnoSoft::setLinear_movement_per_n_rounds(double _linear_movement_per_n_rounds){
-//    if(driver->setLinear_movement_per_n_rounds(_linear_movement_per_n_rounds)<0){
-//        return -1;
-//    }   
-//    return 0;
-//}
-           
 // Move absolute homing
-int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){ 
-    
+int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
+
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-    
+
     // Calcolo argomento funzione moveAbsoluteSteps
     //double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double nMicroSteps = (i->second)->getdeltaMicroSteps(millimeters);
     DPRINT("nMicroSteps=%f\n",nMicroSteps);
-    
+
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
     }
@@ -674,14 +508,14 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
         return -3;
     }
 
-    if((i->second)->moveAbsoluteSteps((long)nMicroSteps)<0){     
+    if((i->second)->moveAbsoluteSteps((long)nMicroSteps)<0){
         return -4;
     }
     return 0;
 }
 
-//int ActuatorTechnoSoft::moveAbsoluteMillimetersHoming(double millimeters){ 
-//    
+//int ActuatorTechnoSoft::moveAbsoluteMillimetersHoming(double millimeters){
+//
 //
 //    // Calcolo argomento funzione moveAbsoluteSteps
 //    double nMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
@@ -689,13 +523,13 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
 //    if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
 //        return -1;
 //    }
-//    
+//
 //    if(driver->selectAxis()<0){
 //        return -2;
 //    }
-//    
+//
 //    //long nMicroStepsL = nMicroSteps;
-//    if(driver->moveAbsoluteStepsHoming((long)nMicroSteps)<0){    
+//    if(driver->moveAbsoluteStepsHoming((long)nMicroSteps)<0){
 //        return -3;
 //    }
 //    return 0;
@@ -703,15 +537,15 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
 
 int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
     DPRINT("Position reading, axisID %d",axisID);
-    
+
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-   
+
     if((i->second)->selectAxis()<0){
         return -2;
     }
@@ -741,322 +575,64 @@ int ActuatorTechnoSoft::homing(int axisID,homingType mode){
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-   
+
     if((i->second)->selectAxis()<0){
         return -2;
     }
-    return ((i->second)->homing(mode));     
+    return ((i->second)->homing(mode));
 }
 
-//int ActuatorTechnoSoft::homing(int axisID,homingType mode){
-//    // Attenzione: la variabile mode non viene utilizzata
-//    if(mode==defaultHoming){
-//        
-//        int risp;
-//        int switchTransited=0;
-//        int motionCompleted = 0;
-//        std::string cappos = "CAPPOS";
-//        long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
-//        int absoluteMotionCompleted = 0;
-//    
-//        switch (internalHomingStateDefault) {
-//            case 0:
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -1;
-//                    break;
-//                }
-//                if(driver->moveVelocityHoming()<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                        risp = -2;
-//                        break;
-//                    }
-//                    risp = -3;
-//                    break;
-//                }
-//                DPRINT(" STATE 0: move velocity activated ");
-//                if(driver->setEventOnLimitSwitch()<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                        risp = -4;
-//                        break;
-//                    }
-//                    risp = -5;
-//                    break;
-//                }
-//                DPRINT("STATE 0: event on limit switch activated ");
-//                internalHomingStateDefault = 1;
-//                risp = 1;
-//                break; 
-//            case 1:
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -6;
-//                    break;
-//                }
-//                if(driver->checkEvent(switchTransited)<0){
-//                    internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
-//                    if(driver->stopMotion()<0){
-//                        risp = -7;
-//                        break;
-//                    }    
-//                    risp = -8;
-//                    break;
-//                } 
-//                DPRINT(" STATE 1: possible limit switch transition just checked ");
-//                if(switchTransited){
-//                    if(driver->setEventOnMotionComplete()<0){ 
-//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
-//                        if(driver->stopMotion()<0){
-//                            risp= -9;
-//                            break;
-//                        }
-//                        risp =-10;
-//                        break;
-//                    }  
-//                    //eventOnMotionCompleteSet = true;
-//                    internalHomingStateDefault=2;
-//                    DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
-//                }
-//                // **************DA IMPLEMENTARE:*****************
-//                // RESET ON Limit Switch Transition Event
-//                risp = 1;
-//                break; 
-//            case 2:
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -11;
-//                    break;
-//                }
-//                if(driver->checkEvent(motionCompleted)<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                        risp = -12;
-//                        break;
-//                    }
-//                    risp= -13;
-//                    break;
-//                }
-//                DPRINT("************** STATE 2: possible event on motion completed checked **************");
-//                if(motionCompleted){
-//                    DPRINT("************** STATE 2: Motion completed after transition **************");
-//                    internalHomingStateDefault = 3;
-//                }
-//                risp= 1;
-//                break;
-//            case 3:
-//                // The motor is not in motion
-//                DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -13;
-//                    break;
-//                }
-//                if(driver->getLVariable(cappos, cap_position)<0){ 
-//    //                if(driver->stopMotion()<0){
-//    //                    return -13;
-//    //                }
-//                    internalHomingStateDefault=0;
-//                    risp = -14;
-//                    break;
-//                }
-//                DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
-//        
-//            /*	Command an absolute positioning on the captured position */
-//                if(driver->moveAbsoluteStepsHoming(cap_position)<0){  
-//                    internalHomingStateDefault=0;
-//                    risp = -15;
-//                    break;
-//                }
-//                DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
-//                internalHomingStateDefault = 4;
-//                risp= 1;
-//                break;
-//            case 4:
-//                DPRINT("************** STATE 4: wait for positioning to end **************");
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -16;
-//                    break;
-//                }
-////        if(!eventOnMotionCompleteSet){
-////            if(driver->setEventOnMotionComplete()<0){
-////                if(driver->stopMotion()<0){
-////                    eventOnMotionCompleteSet = false;
-////                    internalHomingStateDefault = 0;
-////                    return -12;
-////                }
-////                eventOnMotionCompleteSet = false;
-////                internalHomingStateDefault = 0;
-////                return -13;
-////            } 
-////        }
-//                if(driver->checkEvent(absoluteMotionCompleted)<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                    //eventOnMotionCompleteSet = false;
-//                        risp= -17;
-//                        break;
-//                    }
-//                //eventOnMotionCompleteSet = false;
-//                    risp= -18;
-//                    break;
-//                }
-//                if(absoluteMotionCompleted){
-//                    internalHomingStateDefault = 5;
-//                    DPRINT("************** STATE 4: motor positioned to end **************");
-//                }
-//            // **************DA IMPLEMENTARE:*****************
-//            // RESET ON Event On Motion Complete
-//                risp= 1;
-//                break;
-//            case 5:
-//                // The motor is positioned to end
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -19;
-//                    break;
-//                }
-//        
-//                if(driver->resetEncoder()<0){
-//                    internalHomingStateDefault = 0;
-//                    //if(driver->stopMotion()<0){
-//                    //return -23;
-//                    //}
-//                    risp= -20;
-//                    break;
-//                }
-//                if(driver->resetCounter()<0){
-//                    internalHomingStateDefault = 0;
-//                    //if(driver->stopMotion()<0){
-//                    //return -25;
-//                    //}
-//                    risp= -21;
-//                    break;
-//                }
-//                DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
-//                internalHomingStateDefault = 0;
-//                risp= 0;
-//                break;
-//            default:
-//                internalHomingStateDefault = 0;
-//                risp= -22;
-//                break; 
-//        } 
-//        return risp;
-//    }
-//    else if(mode==homing2){
-//        int risp;
-//        uint16_t contentReg;
-//        std::string descStr = "";
-//        short homingDone = 0;
-//        switch (internalHomingStateHoming2) {
-//            case 0:
-//                DPRINT("************** Homing procedure Homing2. STATE 0. **************");
-//                if(driver->moveVelocityHoming()<0){
-//                    internalHomingStateHoming2=0;
-//                    risp= -1;
-//                    break;
-//                }
-//                internalHomingStateHoming2=1;
-//                risp= 1;
-//                break;
-//            case 1:
-//                DPRINT("************** Homing procedure Homing2. STATE 1. **************");
-//                if((driver->getStatusOrErrorReg(5, contentReg, descStr))<0){
-//                    //ERR("Reading state error: %s",descStr.c_str());
-//                    internalHomingStateHoming2=0;
-//                    if(driver->stopMotion()<0){
-//                        risp= -2;
-//                        break;
-//                    }
-//                    risp= -3;
-//                    break;
-//                }
-//                // lettura bit di interesse
-//                homingDone=((contentReg & ((uint16_t)1)<<7) != 0 ? 1 : 0);
-//                if(homingDone){
-//                   internalHomingStateHoming2=2;
-//                }
-//                risp= 1;
-//                break;
-//            case 2:
-//                DPRINT("************** Homing procedure Homing2. STATE 2. **************");
-//                DPRINT("************** Reset encoder e counter **************");
-//                if(driver->resetEncoder()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(driver->stopMotion()<0){
-//                        risp= -4;
-//                        break;
-//                    }
-//                    risp= -5;
-//                    break;
-//                }
-//                if(driver->resetCounter()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(driver->stopMotion()<0){
-//                        risp= -6;
-//                        break;
-//                    }
-//                    risp= -7;
-//                    break;
-//                }
-//                internalHomingStateHoming2=0;
-//                risp=0;
-//                break;
-//            default:
-//                internalHomingStateHoming2 = 0;
-//                risp=-22;
-//                break;
-//        }
-//        return risp;
-//    }
-//    else{
-//        return -100;
-//    }
-//}
 
 
 int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
+
+    // ******************** NOTA:  le funzioni getState e getAlarms devono essere eseguite in modalita' SEQUENZIALE,
+    // e non indipendentemente l'una dall'altra in thread differenti, perche' accedono agli stessi dati *********************
 
     DPRINT("Getting state of the actuator. ");
 
     *state  = ACTUATOR_UNKNOWN_STATUS;
     descStr.assign("");
-    
+
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-    
+
     int stCode=0;
 
     uint16_t contentRegSRH; // remember typedef uint16_t WORD;
     uint16_t contentRegSRL;
-    
+
     if((i->second)->selectAxis()<0){
         return -2;
     }
 
+    (i->second)->stateInfoRequest = true; // Comunico al motore che sto richiedendo info riguardanti gli allarmi
+
+
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
+    (i->second)->regSRHrequest = true;
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
         return -3;
     }
+    (i->second)->regSRHrequest = false;
+
     indexReg = 3; // see constant REG_SRL in TML_lib.h
+    (i->second)->regSRLrequest = true;
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
         return -4;
     }
-
+    (i->second)->regSRLrequest = false;
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
@@ -1092,13 +668,13 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         descStr += "Electrical power supplied.";
     }
-     
+
     // Homing in progress state
     if((i->second)->internalHomingStateDefault>0 || (i->second)->internalHomingStateHoming2>0){
         stCode |= HOMING_IN_PROGRESS;
         descStr += "Homing in progress.";
     }
-    
+    (i->second)->stateInfoRequest = false;
     *state = stCode;
     return 0;
 }
@@ -1106,38 +682,44 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descStr){
 
     DPRINT("Getting alarms of the actuator");
-    
+
     * alrm = ACTUATOR_NO_ALARMS_DETECTED;
     descStr.assign("");
-    
+
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-    
+
     int stCode=0;
 
     uint16_t contentRegMER; // remember typedef uint16_t WORD;
     uint16_t contentRegSRH;
-    
+
     if((i->second)->selectAxis()<0){
         return -2;
     }
-    
+
+    (i->second)->alarmsInfoRequest = true; // Comunico al motore che sto richiedendo info riguardanti gli allarmi
+
     short indexRegMER = 5; // see constant REG_MER in TML_lib.h
+    (i->second)->regMERrequest = true;
     if((i->second)->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
         return -3;
     }
+    (i->second)->regMERrequest = false;
 
     short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
+    (i->second)->regSRHrequest = true;
     if((i->second)->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
         return -4;
     }
+    (i->second)->regSRHrequest = false;
 
     for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
         if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
@@ -1219,21 +801,22 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         stCode|=ACTUATOR_I2T_WARNING_DRIVE;
         descStr+="Drive I2T protection warning";
     }
-
     *alrm = stCode;
+    (i->second)->alarmsInfoRequest = false; // Comunico al motore che ho terminato di richiedere info riguardanti gli allarmi
+
     return 0;
 }
-     
+
 int ActuatorTechnoSoft::stopMotion(int axisID){
-     
+
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){ 
+    if(i==motors.end()){
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-     
+
      if((i->second)->selectAxis()<0){
         return -2;
      }
@@ -1244,18 +827,17 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
  }
 
  int ActuatorTechnoSoft::resetAlarms(int axisID,uint64_t mode){
-     
+
      // In the fault status the power stage is disabled, the MER register signals
      // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
      // ************************** Operazione di selezione axisID ***************************
      std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
-     if(i==motors.end()){ 
+     if(i==motors.end()){
          // In questo caso il motore axisID non e' stato configurato
          return -1;
      }
-     
-  
+
      int err = 0;
      if((i->second)->selectAxis()<0){
         return -2;
@@ -1286,11 +868,12 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
      }
      return err;
  }
- 
+
  int ActuatorTechnoSoft::getSWVersion(int axisID, std::string& version){
+
      std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
-     if(i==motors.end()){ 
+     if(i==motors.end()){
          // In questo caso il motore axisID non e' stato configurato
          return -1;
      }
@@ -1305,20 +888,20 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
      version.assign(firmVers);
      return 0;
  }
- 
- 
+
+
 int ActuatorTechnoSoft::poweron(int axisID,int on){
-    
+
      // In the fault status the power stage is disabled, the MER register signals
      // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
      // ************************** Operazione di selezione axisID ***************************
      std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
-     if(i==motors.end()){ 
+     if(i==motors.end()){
          // In questo caso il motore axisID non e' stato configurato
          return -1;
      }
-     
+
      if((i->second)->selectAxis()<0){
          return -2;
      }
@@ -1327,9 +910,9 @@ int ActuatorTechnoSoft::poweron(int axisID,int on){
          case 0:
              if((i->second)->stopPower()<0){
                  resp=-3;
-             } 
+             }
              resp=0;
-             break;       
+             break;
          case 1:
              if((i->second)->providePower()<0){
                  resp=-4;
@@ -1340,13 +923,13 @@ int ActuatorTechnoSoft::poweron(int axisID,int on){
              resp=-5;
              break;
      }
-     return resp;                              
+     return resp;
 }
 
 int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
-    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
-     if(i==motors.end()){ 
+     if(i==motors.end()){
          // In questo caso il motore axisID non e' stato configurato
          return -1;
      }
@@ -1354,7 +937,7 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
         return -2;
      }
     version=" Technosoft IDM 240 stepper open loop mode";
-    return 0; 
+    return 0;
 }
 
 int ActuatorTechnoSoft::sendDataset(std::string& dataset){
@@ -1377,6 +960,6 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"},";
    dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"}";
    dataset+="]}";
-   
-   return 0; 
+
+   return 0;
 }
