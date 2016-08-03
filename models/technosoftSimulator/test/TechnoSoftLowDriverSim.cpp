@@ -230,7 +230,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
 //        return -24;
 //    }
-    std::srand(std::time(0)); // Inizializza generatore numeri pseudo-casuali
+    std::srand(std::time(NULL)); // Inizializza generatore numeri pseudo-casuali
     
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)) 
