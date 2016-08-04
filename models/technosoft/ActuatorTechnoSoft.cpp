@@ -13,7 +13,7 @@
 //
 
 #include <stdio.h>
-#include "ActuatorTechnoSoftSim.h"
+#include "ActuatorTechnoSoft.h"
 #include <boost/regex.hpp>
 #include <common/debug/core/debug.h>
 //#include <cstdlib.h>
@@ -252,7 +252,7 @@ int ActuatorTechnoSoft::deinit(int axisID){
     if(random_variable<(RAND_MAX/40))
         return -3;
 
-    if(((i->second)->actuatorInMotion)==true)
+    if(((i->second)->actuatorIDInMotion)==true)
         // ............... GESTIRE LO STOP VIRTUALE DEL MOTORE ATTRAVERSO IL LOCK ...............
 
     // Stoppiamo effettivamente il motion e la corrente

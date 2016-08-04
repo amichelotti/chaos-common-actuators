@@ -101,7 +101,7 @@ namespace common{
                pthread_mutex_t mu;
            };
 
-    //Channel class
+            //Channel class
             class SerialCommChannelTechnosoft{
 
                 public:
@@ -127,7 +127,7 @@ namespace common{
             //TechnoSoftLowDriver class
             class TechnoSoftLowDriver {
 
-    private:
+                private:
 
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
@@ -170,7 +170,7 @@ namespace common{
 
                 containerIncrementPosition cIP;
 
-                void* incrDecrPosition(void*arg);
+                //void* incrDecrPosition(void* arg);
 
             public:
                 bool alarmsInfoRequest;
@@ -214,8 +214,8 @@ namespace common{
                 //bool alreadyopenedChannel;  // Canale di comunicazione aperto
                 //bool poweron; // alimentazione al drive motor erogata
                 //bool channelJustOpened;
-
-                // Transition parameters
+                
+                //void* incrDecrPosition(void* arg);
 
             public:
                 // Costruttore device channel and device name
@@ -294,7 +294,7 @@ namespace common{
 
                 //Encoder lines
                 int moveAbsoluteSteps(const long& position) const;
-                int moveAbsoluteStepsHoming(const long& position) const;
+                int moveAbsoluteStepsHoming(const long& position);
 
                 // get methods for variables
                 //channel_psh getMyChannel();
@@ -333,11 +333,17 @@ namespace common{
                 int getFirmwareVers(char* firmwareVers);
 
                 int selectAxis();
-                void* incrDecrPositionHoming(void* arg);
-                void* incrDecrPosition(void* arg);
-                void* moveConstantVelocityHoming(void* arg);
-                void* moveAbsolutePosition(void* arg);
+                int incrDecrPosition();
+                int incrDecrPositionHoming();
+                int moveConstantVelocityHoming();
+                int moveAbsolutePosition();
+                
+                static void* staticIncrDecrPositionFunctionForThread(void*);
+                static void* staticIncrDecrPositionHomingFunctionForThread(void*);
+                static void* staticMoveConstantVelocityHomingFunctionForThread(void*);
+                static void* staticMoveAbsolutePositionFunctionForThread(void*);
            };
+         
 }// chiude namespace technosoft
 
     }
