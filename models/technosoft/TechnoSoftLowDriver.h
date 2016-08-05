@@ -115,10 +115,10 @@ namespace common{
                     SerialCommChannelTechnosoft(int hostID, const std::string& pszDevName,BYTE btType=CHANNEL_TYPE,DWORD baudrate=BAUDRATE);
                     int init(int hostID, const std::string& pszDevName,const BYTE& btType,const DWORD& baudrate);
                     int getFD();
-	    std::string  getDevName();
-	    int getbtType();
-	    int getbaudrate();
-	    void PrintChannel();
+                    std::string  getDevName();
+                    int getbtType();
+                    int getbaudrate();
+                    void PrintChannel();
                     ~SerialCommChannelTechnosoft();
                     int open();
                     void close();
@@ -162,6 +162,9 @@ namespace common{
                 bool powerOffCommand;
                 bool stopMotionCommand;
                 long position; // expressed in microsteps
+                long positionCounter;
+                long positionEncoder;
+                
                 long cap_position;
                 bool LNStransition;
 
@@ -303,11 +306,16 @@ namespace common{
                 // resetting methos
                 int resetCounter();// reset TPOS_register();
                 int resetEncoder();// reset APOS_register();
+                static void* staticResetCounterForThread(void*);
+                static void* staticResetEncoderForThread(void*);
+                
+                
                 int resetFault();
                 int resetSetup();
                 int getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
                 //int getRegister()**********************;
                 int stopMotion();
+                static void* staticStopMotionForThread(void* objPointer);
                 int deinit();
                 int setDecelerationParam(double deceleration);
                 int setFixedVariable(LPCSTR pszName, double value);
@@ -334,14 +342,16 @@ namespace common{
 
                 int selectAxis();
                 int incrDecrPosition();
-                int incrDecrPositionHoming();
+                //int incrDecrPositionHoming();
                 int moveConstantVelocityHoming();
                 int moveAbsolutePosition();
                 
                 static void* staticIncrDecrPositionFunctionForThread(void*);
-                static void* staticIncrDecrPositionHomingFunctionForThread(void*);
+                //static void* staticIncrDecrPositionHomingFunctionForThread(void*);
                 static void* staticMoveConstantVelocityHomingFunctionForThread(void*);
-                static void* staticMoveAbsolutePositionFunctionForThread(void*);
+                static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
+                
+                int moveAbsolutePositionHoming();
            };
          
 }// chiude namespace technosoft

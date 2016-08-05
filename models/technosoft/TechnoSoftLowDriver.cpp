@@ -289,6 +289,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     // Motion parameters
     position = 0;
+    positionCounter=0;
+    positionEncoder=0;
     actuatorIDInMotion = false;
     LNStransition = false;
     stopMotionCommand = false;
@@ -296,13 +298,18 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     // Getting information parameters
     alarmsInfoRequest = false;
+    
     regMERrequest = false;
     contentRegMER =0; // Fault driver register
+    
     regSRHrequest = false;
     contentRegSRH =0; // Partial Fault and state driver register
+    
+    regSRLrequest = false;
+    contentRegSRL = 0;
 
     // Constants
-    epsylon = 0.001;
+    epsylon = 0.01;
     p = 0.0;
 
     return 0;
@@ -329,20 +336,26 @@ int TechnoSoftLowDriver::homing(int mode){
                 }
                 if(moveVelocityHoming()<0){
                     internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -2;
-                        break;
-                    }
+//                    if(stopMotion()<0){
+//                        risp = -2;
+//                        break;
+//                    }
+                    pthread_t th;
+                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+                    pthread_join(th,NULL);
                     risp = -3;
                     break;
                 }
                 DPRINT(" STATE 0: move velocity activated ");
                 if(setEventOnLimitSwitch()<0){
                     internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -4;
-                        break;
-                    }
+//                    if(stopMotion()<0){
+//                        risp = -4;
+//                        break;
+//                    }
+                    pthread_t th;
+                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+                    pthread_join(th,NULL);
                     risp = -5;
                     break;
                 }
@@ -358,10 +371,13 @@ int TechnoSoftLowDriver::homing(int mode){
                 }
                 if(checkEvent(switchTransited)<0){
                     internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing
-                    if(stopMotion()<0){
-                        risp = -7;
-                        break;
-                    }
+//                    if(stopMotion()<0){
+//                        risp = -7;
+//                        break;
+//                    }
+                    pthread_t th;
+                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+                    pthread_join(th,NULL);
                     risp = -8;
                     break;
                 }
@@ -369,10 +385,13 @@ int TechnoSoftLowDriver::homing(int mode){
                 if(switchTransited){
                     if(setEventOnMotionComplete()<0){
                         internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
-                        if(stopMotion()<0){
-                            risp= -9;
-                            break;
-                        }
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+                        pthread_t th;
+                        pthread_create(&th, NULL,staticStopMotionForThread,this);
+                        pthread_join(th,NULL);
                         risp =-10;
                         break;
                     }
@@ -399,7 +418,8 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -13;
 //                    break;
 //                }
-
+//                if(position<=-epsylon) 
+//                    motionCompleted = true;
                 DPRINT("************** STATE 2: possible event on motion completed checked **************");
 //                if(motionCompleted){
 //                    DPRINT("************** STATE 2: Motion completed after transition **************");
@@ -423,6 +443,9 @@ int TechnoSoftLowDriver::homing(int mode){
     //                if(stopMotion()<0){
     //                    return -13;
     //                }
+                    pthread_t th;
+                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+                    pthread_join(th,NULL);
                     internalHomingStateDefault=0;
                     risp = -14;
                     break;
@@ -457,7 +480,7 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -18;
 //                    break;
 //                }
-                if(actuatorIDInMotion){
+                if(!actuatorIDInMotion){
                     internalHomingStateDefault = 5;
                     DPRINT("************** STATE 4: motor positioned to end **************");
                 }
@@ -473,22 +496,36 @@ int TechnoSoftLowDriver::homing(int mode){
                     break;
                 }
 
-                if(resetEncoder()<0){
-                    internalHomingStateDefault = 0;
-                    //if(stopMotion()<0){
-                    //return -23;
-                    //}
-                    risp= -20;
-                    break;
-                }
-                if(resetCounter()<0){
-                    internalHomingStateDefault = 0;
-                    //if(stopMotion()<0){
-                    //return -25;
-                    //}
-                    risp= -21;
-                    break;
-                }
+//                if(resetEncoder()<0){
+//                    internalHomingStateDefault = 0;
+//                    //if(stopMotion()<0){
+//                    //return -23;
+//                    //}
+//                    pthread_t th;
+//                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+//                    pthread_join(th,NULL);
+//                    risp= -20;
+//                    break;
+//                }
+                pthread_t th1;
+                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
+                pthread_join(th1,NULL);
+                
+                
+//                if(resetCounter()<0){
+//                    internalHomingStateDefault = 0;
+//                    //if(stopMotion()<0){
+//                    //return -25;
+//                    //}
+//                    pthread_t th;
+//                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+//                    pthread_join(th,NULL);
+//                    risp= -21;
+//                    break;
+//                }
+                pthread_t th2;
+                pthread_create(&th2, NULL,staticResetCounterForThread,this);
+                pthread_join(th2,NULL);
                 DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
                 internalHomingStateDefault = 0;
                 risp= 0;
@@ -550,24 +587,30 @@ int TechnoSoftLowDriver::homing(int mode){
             case 2:
                 DPRINT("************** Homing procedure Homing2. STATE 2. **************");
                 DPRINT("************** Reset encoder e counter **************");
-                if(resetEncoder()<0){
-                    internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -4;
-                        break;
-                    }
-                    risp= -5;
-                    break;
-                }
-                if(resetCounter()<0){
-                    internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -6;
-                        break;
-                    }
-                    risp= -7;
-                    break;
-                }
+//                if(resetEncoder()<0){
+//                    internalHomingStateHoming2=0;
+//                    if(stopMotion()<0){
+//                        risp= -4;
+//                        break;
+//                    }
+//                    risp= -5;
+//                    break;
+//                }
+                pthread_t th1;
+                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
+                pthread_join(th1,NULL);
+//                if(resetCounter()<0){
+//                    internalHomingStateHoming2=0;
+//                    if(stopMotion()<0){
+//                        risp= -6;
+//                        break;
+//                    }
+//                    risp= -7;
+//                    break;
+//                }
+                pthread_t th2;
+                pthread_create(&th2, NULL,staticResetCounterForThread,this);
+                pthread_join(th2,NULL);
                 internalHomingStateHoming2=0;
                 risp=0;
                 break;
@@ -586,27 +629,24 @@ int TechnoSoftLowDriver::homing(int mode){
 int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 
     // L'incremento deve avvenire ad una determinata velocita'
-
-    if(position<=0){
+    if(position<=0 || LNStransition){
         DPRINT("La posizione in steps e' gia' <= 0. Non occorre spostarsi ancora indietro per effettuare di nuovo l'homing");
-        pthread_exit(NULL);
+        return -1;
     }
-
+    
     if(pthread_mutex_lock(&(cIP.mu))!=0){
 
     }
-
+    
     stopMotionCommand = false;
     actuatorIDInMotion = true;
-
+    
     if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
     }
-
 //    bool goahead = false;
 //    if(highSpeedHoming_mm_s>=0)
 //        goahead = true;
-
     while(!stopMotionCommand && !powerOffCommand && !LNStransition){
 
 //            if(goahead){
@@ -618,6 +658,9 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
         }
 
         position-=highSpeedHoming_mm_s;
+        positionCounter-=highSpeedHoming_mm_s;
+        positionEncoder-=highSpeedHoming_mm_s;
+        
 //            }
         if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
@@ -628,11 +671,16 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 //        deltaT += (deltaT*tol/100)
         usleep(1000); // Sleep for 1 milli second
     }
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+    }
     actuatorIDInMotion = false;
     stopMotionCommand = false;
-    LNStransition = false;
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
-    pthread_exit(NULL);
+    }
+    //LNStransition = false;
+    return 0;
 }
 
 int TechnoSoftLowDriver::incrDecrPosition(){
@@ -676,18 +724,36 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     }
     stopMotionCommand = false;
     actuatorIDInMotion = true; //deltaPosition>=0
-    long currentPosition = position;
-    while((fabs(currentPosition-position)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand)){
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
+    }
+    
+    long initPosition = position;
+    while((fabs(position-initPosition)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand)){
+        
+        if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+        }
         if(cIP.deltaPosition>=0){
-            currentPosition+=speed_ms_s;
+            position+=speed_ms_s;
+            positionCounter+=speed_ms_s;
+            positionEncoder+=speed_ms_s;
         }
         else{
-            currentPosition-=speed_ms_s;
+            position-=speed_ms_s;
+            positionCounter-=speed_ms_s;
+            positionEncoder-=speed_ms_s;
+        }
+        if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
         }
         usleep(1000); // Sleep for 1 milli second
     }
-    position = currentPosition;
+    //position = currentPosition;
+    
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+    }
     actuatorIDInMotion = false;
     stopMotionCommand = false;
 
@@ -699,67 +765,67 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     return 0;
 }
 
-int TechnoSoftLowDriver::incrDecrPositionHoming(){
-
-    // Stima grossolana tempo necessario per la movimentazione
-//    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-//    double tol = 30;
-//    deltaT += (deltaT*tol/100);
+//int TechnoSoftLowDriver::incrDecrPositionHoming(){
 //
-//    double totalTimeInterval = 0;   // solo per far partire il ciclo while
-//    struct timeval startTime,endTime;
-//    gettimeofday(&startTime,NULL);
-
-//    while(totalTimeInterval<=deltaT && !stopMotionCommand && !powerOffCommand){
-//        actuatorIDInMotion = true;
-//        // L'incremento deve avvenire ad una determinata velocita'
-//        if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//    // Stima grossolana tempo necessario per la movimentazione
+////    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+////    double tol = 30;
+////    deltaT += (deltaT*tol/100);
+////
+////    double totalTimeInterval = 0;   // solo per far partire il ciclo while
+////    struct timeval startTime,endTime;
+////    gettimeofday(&startTime,NULL);
 //
-//        }
-//            if(((containerIncrementPosition*)arg)->deltaPosition>=0){
-//                position+=speed_ms_s;
-//            }
-//            else{
-//                position-=speed_ms_s;
-//            }
-//        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+////    while(totalTimeInterval<=deltaT && !stopMotionCommand && !powerOffCommand){
+////        actuatorIDInMotion = true;
+////        // L'incremento deve avvenire ad una determinata velocita'
+////        if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
+////
+////        }
+////            if(((containerIncrementPosition*)arg)->deltaPosition>=0){
+////                position+=speed_ms_s;
+////            }
+////            else{
+////                position-=speed_ms_s;
+////            }
+////        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+////
+////        }
+////        // Aggiornamento deltaT, stopMotion, stopPower
+////        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+////        deltaT += (deltaT*tol/100);
+////
+////        gettimeofday(&endTime,NULL);
+////        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
+////        sleep(1); // Sleep for 1 second
+////    }
 //
-//        }
-//        // Aggiornamento deltaT, stopMotion, stopPower
-//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-//        deltaT += (deltaT*tol/100);
+//    // L'incremento deve avvenire ad una determinata velocita'
+//    if(pthread_mutex_lock(&(cIP.mu))!=0){
 //
-//        gettimeofday(&endTime,NULL);
-//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
-//        sleep(1); // Sleep for 1 second
 //    }
-
-    // L'incremento deve avvenire ad una determinata velocita'
-    if(pthread_mutex_lock(&(cIP.mu))!=0){
-
-    }
-    stopMotionCommand = false;
-    actuatorIDInMotion = true; //deltaPosition>=0
-    long currentPosition = position;
-    while((fabs(currentPosition-position)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand)){
-
-        if(cIP.deltaPosition>=0){
-            currentPosition+=speed_ms_s;
-        }
-        else{
-            currentPosition-=speed_ms_s;
-        }
-        usleep(1000); // Sleep for 1 milli second
-    }
-    position = currentPosition;
-    actuatorIDInMotion = false;
-    stopMotionCommand = false;
-
-    if(pthread_mutex_unlock(&(cIP.mu))!=0){
-
-    }
-    pthread_exit(NULL);
-}
+//    stopMotionCommand = false;
+//    actuatorIDInMotion = true; //deltaPosition>=0
+//    long currentPosition = position;
+//    while((fabs(currentPosition-position)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand)){
+//
+//        if(cIP.deltaPosition>=0){
+//            currentPosition+=speed_ms_s;
+//        }
+//        else{
+//            currentPosition-=speed_ms_s;
+//        }
+//        usleep(1000); // Sleep for 1 milli second
+//    }
+//    position = currentPosition;
+//    actuatorIDInMotion = false;
+//    stopMotionCommand = false;
+//
+//    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+//
+//    }
+//    pthread_exit(NULL);
+//}
 
 int TechnoSoftLowDriver::moveAbsolutePosition(){
 
@@ -781,7 +847,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 //        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //        }
-        pthread_exit(NULL);
+        return 0;
     }
 
     long initPosition = position;
@@ -802,9 +868,13 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
         if(goahead){
             position+=lowSpeedHoming_mm_s;
+            positionCounter+=lowSpeedHoming_mm_s;
+            positionEncoder+=lowSpeedHoming_mm_s;
         }
         else{
             position-=lowSpeedHoming_mm_s;
+            positionCounter-=lowSpeedHoming_mm_s;
+            positionEncoder-=lowSpeedHoming_mm_s;
         }
         if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
@@ -821,6 +891,90 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     actuatorIDInMotion = false;
     stopMotionCommand = false;
 
+//    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//
+//    }
+    pthread_exit(NULL);
+}
+
+int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
+
+    // Stima grossolana tempo necessario per la movimentazione
+//    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+//    double tol = 30;
+//    deltaT += (deltaT*tol/100);
+//
+//    double totalTimeInterval = 0;   // solo per far partire il ciclo while
+//    struct timeval startTime,endTime;
+//
+//    gettimeofday(&startTime,NULL);
+
+//    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//
+//    }
+
+    if(position==(cap_position)){
+//        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//
+//        }
+        return 0;
+    }
+
+    long initPosition = position;
+
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+    
+    }
+    
+    stopMotionCommand = false;
+    actuatorIDInMotion = true;
+    
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+    
+    }
+
+    bool goahead = false;
+    if(cap_position>initPosition)
+        goahead = true;
+
+    // L'incremento deve avvenire ad una determinata velocita'
+    while((fabs(position-cap_position))>0 && !stopMotionCommand && !powerOffCommand){
+
+        if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+        }
+
+        if(goahead){
+            position+=lowSpeedHoming_mm_s;
+            positionCounter+=lowSpeedHoming_mm_s;
+            positionEncoder+=lowSpeedHoming_mm_s;
+        }
+        else{
+            position-=lowSpeedHoming_mm_s;
+            positionCounter-=lowSpeedHoming_mm_s;
+            positionEncoder-=lowSpeedHoming_mm_s;
+        }
+        if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+        }
+        // Aggiornamento deltaT, stopMotion, stopPower
+//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+//        deltaT += (deltaT*tol/100);
+//
+//        gettimeofday(&endTime,NULL);
+//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
+        usleep(1000); // Sleep for 1 milli second
+    }
+    //position=currentPosition;
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+    }
+    actuatorIDInMotion = false;
+    stopMotionCommand = false;
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+    }
+    
 //    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //    }
@@ -864,13 +1018,13 @@ double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
 }
 
-void* TechnoSoftLowDriver::staticIncrDecrPositionHomingFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
-    
-    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
-    ((TechnoSoftLowDriver*)objPointer)->incrDecrPositionHoming();
-    
-    return 0;
-}
+//void* TechnoSoftLowDriver::staticIncrDecrPositionHomingFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
+//    
+//    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
+//    ((TechnoSoftLowDriver*)objPointer)->incrDecrPositionHoming();
+//    
+//    return 0;
+//}
 
 void* TechnoSoftLowDriver::staticMoveConstantVelocityHomingFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
     
@@ -880,43 +1034,37 @@ void* TechnoSoftLowDriver::staticMoveConstantVelocityHomingFunctionForThread(voi
     return 0;
 }
 
-void* TechnoSoftLowDriver::staticMoveAbsolutePositionFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
-    
-    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
-    ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePosition();
-    
-    return 0;
-}
-int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
-    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
 
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
+//int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
+//    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
+//
+////    if(!TS_SelectAxis(axisID)){
+////        DERR("failed to select axis %d",axisID);
+////        return -1;
+////    }
+////    if(!TS_MoveRelative(deltaPosition, highSpeedHoming_mm_s, accelerationHoming_mm_s2, isAdditiveHoming, movementHoming, referenceBaseHoming)){
+////        DERR("error relative moving homing");
+////        return -2;
+////    }
+//    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
+////    if(!TS_SelectAxis(axisID)){
+////        DERR("failed to select axis %d",axisID);
+////        return -1;
+////    }
+////    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
+////        DERR("error relative moving");
+////        return -2;
+////    }
+//    int random_variable = std::rand();
+//    if(random_variable<p*(RAND_MAX/20))
 //        return -1;
-//    }
-//    if(!TS_MoveRelative(deltaPosition, highSpeedHoming_mm_s, accelerationHoming_mm_s2, isAdditiveHoming, movementHoming, referenceBaseHoming)){
-//        DERR("error relative moving homing");
-//        return -2;
-//    }
-    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
-//        DERR("error relative moving");
-//        return -2;
-//    }
-    int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/20))
-        return -1;
-
-    cIP.deltaPosition = deltaPosition;
-    pthread_t th;
-    pthread_create(&th, NULL,staticIncrDecrPositionHomingFunctionForThread,this);
-
-    return 0;
-}
+//
+//    cIP.deltaPosition = deltaPosition;
+//    pthread_t th;
+//    pthread_create(&th, NULL,staticIncrDecrPositionHomingFunctionForThread,this);
+//
+//    return 0;
+//}
 
 // Set trapezoidal parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
@@ -1214,8 +1362,16 @@ int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition){
         return -1;
 
     pthread_t th;
-    pthread_create(&th, NULL,staticMoveAbsolutePositionFunctionForThread,this);
+    pthread_create(&th, NULL,staticMoveAbsolutePositionHomingFunctionForThread,this);
 
+    return 0;
+}
+
+void* TechnoSoftLowDriver::staticMoveAbsolutePositionHomingFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
+    
+    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
+    ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePositionHoming();
+    
     return 0;
 }
 
@@ -1236,12 +1392,27 @@ int TechnoSoftLowDriver::stopMotion(){
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
         return -1;
+    
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+    }
 
     stopMotionCommand = true;
+    
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+    }
 
 //    DPRINT("Motor with axis = %d is stopped, %s",axisID, TS_GetLastErrorText());
-    DPRINT("Motor with axis = %d is stopped");
+    DPRINT("Motor with axis = %d is stopped", axisID);
     return 0;
+}
+
+void* TechnoSoftLowDriver::staticStopMotionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
+    
+    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
+    ((TechnoSoftLowDriver*)objPointer)->stopMotion();
+    
 }
 
 int TechnoSoftLowDriver::providePower(){
@@ -1331,13 +1502,16 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
 
     random_variable = std::rand()/RAND_MAX; // Normalizzazione variabile random_variable
-    if(random_variable>0.5)
-        position+=random_variable;
-    else
-        position-=random_variable;
+    long pos;
+    if(random_variable>0.5){
+        pos=positionCounter+random_variable;
+    }    
+    else{
+        pos=positionCounter-random_variable;
+    }
 
 //    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
-    *deltaPosition_mm = (position*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+    *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
 
     return 0;
 }
@@ -1356,13 +1530,16 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
         return -1;
 
     random_variable = std::rand()/RAND_MAX; // Normalizzazione variabile random_variable
-    if(random_variable>0.5)
-        position+=random_variable;
-    else
-        position-=random_variable;
+    long pos;
+    if(random_variable>0.5){
+        pos=positionEncoder+random_variable;
+    }
+    else{
+        pos=positionEncoder-random_variable;
+    }
 
 //    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
-    *deltaPosition_mm = (position*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
+    *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
     return 0;
 }
 
@@ -1397,10 +1574,21 @@ int TechnoSoftLowDriver::resetCounter(){
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
         return -1;
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
 
-    position = 0;
+    }
+    positionCounter = 0;
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+    }
     return 0;
 }
+void* TechnoSoftLowDriver::staticResetCounterForThread(void* objPointer){
+    
+    ((TechnoSoftLowDriver*)objPointer)->resetCounter();
+    return 0;
+}
+
 
 int TechnoSoftLowDriver::resetEncoder(){
 //    if(!TS_SelectAxis(axisID)){
@@ -1414,10 +1602,24 @@ int TechnoSoftLowDriver::resetEncoder(){
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
         return -1;
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
 
-    position = 0;
+    }
+    positionEncoder = 0;
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+    }
+    
     return 0;
 }
+
+void* TechnoSoftLowDriver::staticResetEncoderForThread(void* objPointer){
+    
+    ((TechnoSoftLowDriver*)objPointer)->resetEncoder();
+    return 0;
+}
+
+
 
 int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
 //    if(!TS_SelectAxis(axisID)){
