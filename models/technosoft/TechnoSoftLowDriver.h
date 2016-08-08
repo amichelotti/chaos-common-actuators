@@ -170,6 +170,9 @@ namespace common{
 
                 double epsylon;
                 double p;
+                
+                // Stato esecuzione thread
+                bool threadMoveRelativeOn;
 
                 containerIncrementPosition cIP;
 
@@ -350,6 +353,9 @@ namespace common{
                 //static void* staticIncrDecrPositionHomingFunctionForThread(void*);
                 static void* staticMoveConstantVelocityHomingFunctionForThread(void*);
                 static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
+                
+    
+                static void* staticMoveAbsolutePositionForThread(void*);
                 
                 int moveAbsolutePositionHoming();
            };

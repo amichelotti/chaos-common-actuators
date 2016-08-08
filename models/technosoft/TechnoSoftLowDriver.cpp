@@ -311,6 +311,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     // Constants
     epsylon = 0.01;
     p = 0.0;
+    
+    // State of possible threads
+    threadMoveRelativeOn = false;
 
     return 0;
 }
@@ -722,6 +725,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     if(pthread_mutex_lock(&(cIP.mu))!=0){
 
     }
+    threadMoveRelativeOn = true;
     stopMotionCommand = false;
     actuatorIDInMotion = true; //deltaPosition>=0
     if(pthread_mutex_unlock(&(cIP.mu))!=0){
@@ -729,7 +733,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     }
     
     long initPosition = position;
-    while((fabs(position-initPosition)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand)){
+    while(fabs(position-initPosition)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand && threadMoveRelativeOn){
         
         if(pthread_mutex_lock(&(cIP.mu))!=0){
 
@@ -762,6 +766,41 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     }
     pthread_exit(NULL);
     
+    return 0;
+}
+
+void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
+    
+    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
+    ((TechnoSoftLowDriver*)objPointer)->incrDecrPosition();
+    
+    return 0;
+}
+
+int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
+
+    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+//    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
+//        DERR("error relative moving");
+//        return -2;
+//    }
+    
+    threadMoveRelativeOn=false; // Spegnamo il thread correntemente in esecuzione
+    
+    int random_variable = std::rand();
+    if(random_variable<p*(RAND_MAX/20))
+        return -1;
+
+    cIP.deltaPosition = deltaPosition;
+    //cIP.ptr = this;
+    
+    pthread_t th;
+    pthread_create(&th, NULL,TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread,this);
+
     return 0;
 }
 
@@ -867,14 +906,14 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         }
 
         if(goahead){
-            position+=lowSpeedHoming_mm_s;
-            positionCounter+=lowSpeedHoming_mm_s;
-            positionEncoder+=lowSpeedHoming_mm_s;
+            position+=speed_ms_s;
+            positionCounter+=speed_ms_s;
+            positionEncoder+=speed_ms_s;
         }
         else{
-            position-=lowSpeedHoming_mm_s;
-            positionCounter-=lowSpeedHoming_mm_s;
-            positionEncoder-=lowSpeedHoming_mm_s;
+            position-=speed_ms_s;
+            positionCounter-=speed_ms_s;
+            positionEncoder-=speed_ms_s;
         }
         if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
@@ -979,38 +1018,6 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 //
 //    }
     pthread_exit(NULL);
-}
-
-void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
-    
-    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
-    ((TechnoSoftLowDriver*)objPointer)->incrDecrPosition();
-    
-    return 0;
-}
-
-int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
-
-    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
-//        DERR("error relative moving");
-//        return -2;
-//    }
-    int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/20))
-        return -1;
-
-    cIP.deltaPosition = deltaPosition;
-    //cIP.ptr = this;
-    
-    pthread_t th;
-    pthread_create(&th, NULL,TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread,this);
-
-    return 0;
 }
 
 double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
@@ -1270,6 +1277,14 @@ int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movemen
     return 0;
 }
 
+
+void* TechnoSoftLowDriver::staticMoveAbsolutePositionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
+    
+    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
+    ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePosition();
+    
+    return 0;
+}
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 
 //    if(!TS_SelectAxis(axisID)){
@@ -1307,9 +1322,10 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/20))
         return -1;
-
-
-
+    
+    pthread_t th;
+    pthread_create(&th, NULL,staticMoveAbsolutePositionForThread,this);
+    
     return 0;
 }
 
