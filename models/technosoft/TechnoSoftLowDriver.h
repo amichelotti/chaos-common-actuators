@@ -173,10 +173,13 @@ namespace common{
                 
                 // Stato esecuzione thread
                 bool threadMoveRelativeOn;
+                bool threadMoveAbsoluteOn;
 
                 containerIncrementPosition cIP;
 
-                //void* incrDecrPosition(void* arg);
+                
+                int moveAbsolutePosition();
+                int incrDecrPosition();
 
             public:
                 bool alarmsInfoRequest;
@@ -299,7 +302,7 @@ namespace common{
                 int setEncoderLines(double& _encoderLines);
 
                 //Encoder lines
-                int moveAbsoluteSteps(const long& position) const;
+                int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position);
 
                 // get methods for variables
@@ -344,17 +347,17 @@ namespace common{
                 int getFirmwareVers(char* firmwareVers);
 
                 int selectAxis();
-                int incrDecrPosition();
+                
                 //int incrDecrPositionHoming();
                 int moveConstantVelocityHoming();
-                int moveAbsolutePosition();
+                
                 
                 static void* staticIncrDecrPositionFunctionForThread(void*);
                 //static void* staticIncrDecrPositionHomingFunctionForThread(void*);
                 static void* staticMoveConstantVelocityHomingFunctionForThread(void*);
                 static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
                 
-    
+                
                 static void* staticMoveAbsolutePositionForThread(void*);
                 
                 int moveAbsolutePositionHoming();

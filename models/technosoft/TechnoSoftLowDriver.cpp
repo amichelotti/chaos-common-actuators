@@ -314,7 +314,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     // State of possible threads
     threadMoveRelativeOn = false;
-
+    threadMoveAbsoluteOn = false;
+            
     return 0;
 }
 
@@ -774,7 +775,7 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->incrDecrPosition();
     
-    return 0;
+    pthread_exit(NULL);
 }
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
@@ -866,75 +867,6 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 //    pthread_exit(NULL);
 //}
 
-int TechnoSoftLowDriver::moveAbsolutePosition(){
-
-    // Stima grossolana tempo necessario per la movimentazione
-//    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-//    double tol = 30;
-//    deltaT += (deltaT*tol/100);
-//
-//    double totalTimeInterval = 0;   // solo per far partire il ciclo while
-//    struct timeval startTime,endTime;
-//
-//    gettimeofday(&startTime,NULL);
-
-//    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//    }
-
-    if(position==(cIP.absolutePosition)){
-//        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//        }
-        return 0;
-    }
-
-    long initPosition = position;
-
-    stopMotionCommand = false;
-    actuatorIDInMotion = true;
-
-    bool goahead = false;
-    if(cIP.absolutePosition>initPosition)
-        goahead = true;
-
-    // L'incremento deve avvenire ad una determinata velocita'
-    while((fabs(position-cIP.absolutePosition))>0 && !stopMotionCommand && !powerOffCommand){
-
-        if(pthread_mutex_lock(&(cIP.mu))!=0){
-
-        }
-
-        if(goahead){
-            position+=speed_ms_s;
-            positionCounter+=speed_ms_s;
-            positionEncoder+=speed_ms_s;
-        }
-        else{
-            position-=speed_ms_s;
-            positionCounter-=speed_ms_s;
-            positionEncoder-=speed_ms_s;
-        }
-        if(pthread_mutex_unlock(&(cIP.mu))!=0){
-
-        }
-        // Aggiornamento deltaT, stopMotion, stopPower
-//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-//        deltaT += (deltaT*tol/100);
-//
-//        gettimeofday(&endTime,NULL);
-//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
-        usleep(1000); // Sleep for 1 milli second
-    }
-    //position=currentPosition;
-    actuatorIDInMotion = false;
-    stopMotionCommand = false;
-
-//    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//    }
-    pthread_exit(NULL);
-}
 
 int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 
@@ -1038,7 +970,7 @@ void* TechnoSoftLowDriver::staticMoveConstantVelocityHomingFunctionForThread(voi
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->moveConstantVelocityHoming();
     
-    return 0;
+    pthread_exit(NULL);
 }
 
 
@@ -1277,15 +1209,93 @@ int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movemen
     return 0;
 }
 
+int TechnoSoftLowDriver::moveAbsolutePosition(){
+
+    // Stima grossolana tempo necessario per la movimentazione
+//    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+//    double tol = 30;
+//    deltaT += (deltaT*tol/100);
+//
+//    double totalTimeInterval = 0;   // solo per far partire il ciclo while
+//    struct timeval startTime,endTime;
+//
+//    gettimeofday(&startTime,NULL);
+
+//    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//
+//    }
+
+    if(position==(cIP.absolutePosition)){
+//        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//
+//        }
+        return 0;
+    }
+
+    long initPosition = position;
+
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+        }
+    stopMotionCommand = false;
+    actuatorIDInMotion = true;
+    threadMoveAbsoluteOn = true;
+            
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+        }
+            
+    bool goahead = false;
+    if(cIP.absolutePosition>initPosition)
+        goahead = true;
+
+    // L'incremento deve avvenire ad una determinata velocita'
+    while((fabs(position-cIP.absolutePosition))>0 && !stopMotionCommand && !powerOffCommand && threadMoveAbsoluteOn){
+
+        if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+        }
+
+        if(goahead){
+            position+=speed_ms_s;
+            positionCounter+=speed_ms_s;
+            positionEncoder+=speed_ms_s;
+        }
+        else{
+            position-=speed_ms_s;
+            positionCounter-=speed_ms_s;
+            positionEncoder-=speed_ms_s;
+        }
+        if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+        }
+        // Aggiornamento deltaT, stopMotion, stopPower
+//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
+//        deltaT += (deltaT*tol/100);
+//
+//        gettimeofday(&endTime,NULL);
+//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
+        usleep(1000); // Sleep for 1 milli second
+    }
+    //position=currentPosition;
+    actuatorIDInMotion = false;
+    stopMotionCommand = false;
+
+//    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
+//
+//    }
+    return 0;
+}
 
 void* TechnoSoftLowDriver::staticMoveAbsolutePositionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
     
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePosition();
     
-    return 0;
+    pthread_exit(NULL); // Perche' e' la funzione chiamata direttamente dal thread
 }
-int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
+
+int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
 
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("error selecting axis");
@@ -1319,12 +1329,15 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
 //        DERR("error absolute step moving");
 //        return -2;
 //    }
+    
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/20))
         return -1;
     
+    threadMoveAbsoluteOn = false;
+    
     pthread_t th;
-    pthread_create(&th, NULL,staticMoveAbsolutePositionForThread,this);
+    pthread_create(&th, NULL,staticMoveAbsolutePositionForThread,(void*)this);
     
     return 0;
 }
@@ -1388,7 +1401,7 @@ void* TechnoSoftLowDriver::staticMoveAbsolutePositionHomingFunctionForThread(voi
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePositionHoming();
     
-    return 0;
+    pthread_exit(NULL);
 }
 
 int TechnoSoftLowDriver::stopMotion(){
@@ -1429,6 +1442,7 @@ void* TechnoSoftLowDriver::staticStopMotionForThread(void* objPointer){ // Metod
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->stopMotion();
     
+    pthread_exit(NULL);
 }
 
 int TechnoSoftLowDriver::providePower(){
@@ -1602,7 +1616,7 @@ int TechnoSoftLowDriver::resetCounter(){
 void* TechnoSoftLowDriver::staticResetCounterForThread(void* objPointer){
     
     ((TechnoSoftLowDriver*)objPointer)->resetCounter();
-    return 0;
+    pthread_exit(NULL);
 }
 
 
@@ -1632,10 +1646,8 @@ int TechnoSoftLowDriver::resetEncoder(){
 void* TechnoSoftLowDriver::staticResetEncoderForThread(void* objPointer){
     
     ((TechnoSoftLowDriver*)objPointer)->resetEncoder();
-    return 0;
+    pthread_exit(NULL);
 }
-
-
 
 int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
 //    if(!TS_SelectAxis(axisID)){
