@@ -174,12 +174,22 @@ namespace common{
                 // Stato esecuzione thread
                 bool threadMoveRelativeOn;
                 bool threadMoveAbsoluteOn;
+                
+                int motionscalled;
 
                 containerIncrementPosition cIP;
-
+                long absolutePosition;
                 
                 int moveAbsolutePosition();
                 int incrDecrPosition();
+                int moveConstantVelocityHoming();
+                
+                static void* staticIncrDecrPositionFunctionForThread(void*);
+                //static void* staticIncrDecrPositionHomingFunctionForThread(void*);
+                static void* staticMoveConstantVelocityHomingFunctionForThread(void*);
+                static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
+                static void* staticMoveAbsolutePositionForThread(void*);
+                int moveAbsolutePositionHoming();
 
             public:
                 bool alarmsInfoRequest;
@@ -349,18 +359,7 @@ namespace common{
                 int selectAxis();
                 
                 //int incrDecrPositionHoming();
-                int moveConstantVelocityHoming();
                 
-                
-                static void* staticIncrDecrPositionFunctionForThread(void*);
-                //static void* staticIncrDecrPositionHomingFunctionForThread(void*);
-                static void* staticMoveConstantVelocityHomingFunctionForThread(void*);
-                static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
-                
-                
-                static void* staticMoveAbsolutePositionForThread(void*);
-                
-                int moveAbsolutePositionHoming();
            };
          
 }// chiude namespace technosoft

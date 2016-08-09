@@ -315,6 +315,10 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     // State of possible threads
     threadMoveRelativeOn = false;
     threadMoveAbsoluteOn = false;
+    
+    motionscalled=0;
+    
+    absolutePosition=0;
             
     return 0;
 }
@@ -1225,32 +1229,31 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 //
 //    }
 
-    if(position==(cIP.absolutePosition)){
+    if(position==(absolutePosition)){ //position: current position
 //        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //        }
         return 0;
     }
 
-    long initPosition = position;
+    long initPosition = position; // mi prendo la posizione corrente del motore
 
     if(pthread_mutex_lock(&(cIP.mu))!=0){
 
-        }
-    stopMotionCommand = false;
+    }
     actuatorIDInMotion = true;
-    threadMoveAbsoluteOn = true;
+    //threadMoveAbsoluteOn = true;
             
     if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
-        }
-            
+    }  
+    
     bool goahead = false;
     if(cIP.absolutePosition>initPosition)
         goahead = true;
-
+    
     // L'incremento deve avvenire ad una determinata velocita'
-    while((fabs(position-cIP.absolutePosition))>0 && !stopMotionCommand && !powerOffCommand && threadMoveAbsoluteOn){
+    while((fabs(position-cIP.absolutePosition))>0 && !stopMotionCommand && !powerOffCommand){
 
         if(pthread_mutex_lock(&(cIP.mu))!=0){
 
@@ -1278,8 +1281,17 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         usleep(1000); // Sleep for 1 milli second
     }
     //position=currentPosition;
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+    }
+    
     actuatorIDInMotion = false;
     stopMotionCommand = false;
+    motionscalled--;
+    
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+    }  
 
 //    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
@@ -1329,16 +1341,31 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
 //        DERR("error absolute step moving");
 //        return -2;
 //    }
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
+
+    }
+    motionscalled++;
+    if(pthread_mutex_unlock(&(cIP.mu))!=0){
+
+    }
+    
+    if(motionscalled>1){
+        stopMotion(); 
+        usleep(100000); // Attendi che la corrente movimentazione si fermi
+    }
     
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/20))
         return -1;
     
-    threadMoveAbsoluteOn = false;
-    
+//    if(pthread_mutex_lock(&(cIP.mu))!=0){
+//
+//    }
     pthread_t th;
-    pthread_create(&th, NULL,staticMoveAbsolutePositionForThread,(void*)this);
+    absolutePosition=absPosition;
     
+    pthread_create(&th, NULL,staticMoveAbsolutePositionForThread,(void*)this);
+
     return 0;
 }
 
