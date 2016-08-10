@@ -97,7 +97,7 @@ namespace common{
 
            struct containerIncrementPosition{
                long deltaPosition;
-               long absolutePosition;
+               //long absolutePosition;
                pthread_mutex_t mu;
            };
 
@@ -172,8 +172,11 @@ namespace common{
                 double p;
                 
                 // Stato esecuzione thread
-                bool threadMoveRelativeOn;
-                bool threadMoveAbsoluteOn;
+//                bool threadMoveRelativeOn;
+//                bool threadMoveAbsoluteOn;
+                
+                bool LSNactive;
+                bool LSPactive;
                 
                 int motionscalled;
 

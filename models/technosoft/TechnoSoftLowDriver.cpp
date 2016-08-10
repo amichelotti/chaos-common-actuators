@@ -312,9 +312,12 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     epsylon = 0.01;
     p = 0.0;
     
-    // State of possible threads
-    threadMoveRelativeOn = false;
-    threadMoveAbsoluteOn = false;
+//    // State of possible threads
+//    threadMoveRelativeOn = false;
+//    threadMoveAbsoluteOn = false;
+    LSNactive=true; // ***************** IMPORTANTE: perche' position inizialmente e' uguale a 0 *********************
+    LSPactive=false;
+    
     
     motionscalled=0;
     
@@ -730,7 +733,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     if(pthread_mutex_lock(&(cIP.mu))!=0){
 
     }
-    threadMoveRelativeOn = true;
+    //threadMoveRelativeOn = true;
     stopMotionCommand = false;
     actuatorIDInMotion = true; //deltaPosition>=0
     if(pthread_mutex_unlock(&(cIP.mu))!=0){
@@ -738,7 +741,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     }
     
     long initPosition = position;
-    while(fabs(position-initPosition)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand && threadMoveRelativeOn){
+    while(fabs(position-initPosition)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand){
         
         if(pthread_mutex_lock(&(cIP.mu))!=0){
 
@@ -794,7 +797,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
 //        return -2;
 //    }
     
-    threadMoveRelativeOn=false; // Spegnamo il thread correntemente in esecuzione
+    //threadMoveRelativeOn=false; // Spegnamo il thread correntemente in esecuzione
     
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/20))
@@ -1228,32 +1231,38 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 //    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //    }
+    bool goahead;
+    if(pthread_mutex_lock(&(cIP.mu))!=0){
 
+    }
     if(position==(absolutePosition)){ //position: current position
 //        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //        }
         return 0;
     }
+    
+    if(absolutePosition<0){
+        if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
-    long initPosition = position; // mi prendo la posizione corrente del motore
-
-    if(pthread_mutex_lock(&(cIP.mu))!=0){
-
+        }
+        return -1;
     }
+    // Quindi absolutePosition>=0 && absolutePosition <= LONG_MAX (perche' e' rappresentabile)
+    // La slitta dunque si muovera' nella posizione [0,LONG_MAX]
+    
+    long initPosition = position; // mi prendo la posizione corrente del motorE
     actuatorIDInMotion = true;
-    //threadMoveAbsoluteOn = true;
-            
+    
+    if(absolutePosition>initPosition)
+        goahead = true;
+    
     if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
     }  
     
-    bool goahead = false;
-    if(cIP.absolutePosition>initPosition)
-        goahead = true;
-    
-    // L'incremento deve avvenire ad una determinata velocita'
-    while((fabs(position-cIP.absolutePosition))>0 && !stopMotionCommand && !powerOffCommand){
+    bool resetLimitSwicth=true;
+    while( abs(position-absolutePosition)>0 && !stopMotionCommand && !powerOffCommand){// L'incremento dovra' avvenire ad una determinata velocita'
 
         if(pthread_mutex_lock(&(cIP.mu))!=0){
 
@@ -1269,6 +1278,17 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
             positionCounter-=speed_ms_s;
             positionEncoder-=speed_ms_s;
         }
+        
+        if(resetLimitSwicth){
+            if (position > 0){
+                LSNactive=false;
+            }
+            if (position<LONG_MAX){
+                LSPactive=false; 
+            }
+            resetLimitSwicth=false;
+        }
+            
         if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
         }
@@ -1289,13 +1309,17 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     stopMotionCommand = false;
     motionscalled--;
     
+    if(position==0){ // nel qual caso absolutePosition dato in input ==0
+        LSNactive = true;
+    }
+    if(position== LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX 
+        LSPactive = true;
+    }
+    
     if(pthread_mutex_unlock(&(cIP.mu))!=0){
 
     }  
 
-//    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//    }
     return 0;
 }
 
@@ -1358,9 +1382,6 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
     if(random_variable<p*(RAND_MAX/20))
         return -1;
     
-//    if(pthread_mutex_lock(&(cIP.mu))!=0){
-//
-//    }
     pthread_t th;
     absolutePosition=absPosition;
     
