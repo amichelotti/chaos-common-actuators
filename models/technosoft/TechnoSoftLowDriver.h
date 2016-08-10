@@ -180,8 +180,10 @@ namespace common{
                 
                 int motionscalled;
 
-                containerIncrementPosition cIP;
+                //containerIncrementPosition cIP;
                 long absolutePosition;
+                long deltaPosition;
+                pthread_mutex_t mu;
                 
                 int moveAbsolutePosition();
                 int incrDecrPosition();
