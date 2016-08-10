@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include <common/debug/core/debug.h>
 #include <common/actuators/core/AbstractActuator.h>
-#include "ActuatorTechnoSoft.h"
+#include <common/actuators/models/technosoft/ActuatorTechnoSoft.h>
 #include <pthread.h>
 
 
