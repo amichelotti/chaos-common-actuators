@@ -67,6 +67,9 @@ void* function1(void* str){
             DPRINT("************** Alarms: %s **************",descAlarms.c_str());
             if(alarms!=0){
                 DPRINT("************** Attenzione! E' stato rilevato un allarme! %s **************",descAlarms.c_str());
+                if((state & ((uint16_t)1<<15))!=0){
+                    DPRINT("************** Fault status!**************");
+                }
                 sleep(600);
             }
             usleep(10000);
