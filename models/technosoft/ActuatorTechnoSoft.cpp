@@ -1070,7 +1070,12 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
         descStr+="Limit switch positive event/interrupt. ";
     }
-
+    
+    if(contentRegSRH & ((uint16_t)1<<7)){
+        stCode |= ACTUATOR_LSN_LIMIT_ACTIVE;
+        descStr+="Limit switch negative event/interrupt. ";
+    }
+    
     if(contentRegSRH & ((uint16_t)1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         descStr+="Gear ratio in electronic gearing mode. ";
