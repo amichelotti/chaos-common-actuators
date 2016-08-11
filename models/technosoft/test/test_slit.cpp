@@ -28,13 +28,13 @@ void* function1(void* str){
     if((ret=OBJ->configAxis((void*)strConfig14.c_str()))!=0){
         DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
     } 
-    std::string strConfig15 = "15,../common/actuators/models/technosoft/conf/1setup001.t.zip";
-    if((ret=OBJ->configAxis((void*)strConfig15.c_str()))!=0){
-        DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
-    }
+//    std::string strConfig15 = "15,../common/actuators/models/technosoft/conf/1setup001.t.zip";
+//    if((ret=OBJ->configAxis((void*)strConfig15.c_str()))!=0){
+//        DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
+//    }
     else{ // FORMA invio comandi ai motori  
     
-        int axisID = 0;
+        int axisID = 14;
         
         // MOVIMENTAZIONE ASSE 14
         if(OBJ->poweron(axisID,1)<0){
@@ -43,18 +43,36 @@ void* function1(void* str){
         }
         DPRINT("************** Movimentazione asse 14 **************");
         int resp;
-        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
+        if((resp=OBJ->moveRelativeMillimeters(axisID,-100))<0){
             DERR("************** Error returned by movement operatio, code error %d **************",resp);
             //* errPtr = -5;
         }
         int state;
+        uint64_t alarms;
         std::string descStr;
-        if((resp=OBJ->getState(axisID,&state, descStr))<0){
+        std::string descAlarms;
+        DPRINT("************** Movimentazione asse 14 partita.**************"); 
+        
+        while(1){
+            if((resp=OBJ->getState(axisID,&state, descStr))<0){
             DERR("************** Error returned by movement operatio, code error %d **************",resp);
             //* errPtr = -5;
+            }
+            DPRINT("************** State: %s **************",descStr.c_str());
+            
+            if((resp=OBJ->getAlarms(axisID,&alarms, descAlarms))<0){
+            DERR("************** Error returned by movement operatio, code error %d **************",resp);
+            //* errPtr = -5;
+            }
+            DPRINT("************** Alarms: %s **************",descAlarms.c_str());
+            if(alarms!=0){
+                DPRINT("************** Attenzione! E' stato rilevato un allarme! %s **************",descAlarms.c_str());
+                sleep(600);
+            }
+            usleep(10000);
         }
-        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
-        sleep(30);
+         
+//        sleep(180);
         
 //        // MOVIMENTAZIONE ASSE 15
 //        axisID = 15;
