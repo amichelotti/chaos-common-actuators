@@ -159,7 +159,7 @@ namespace common{
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
-                bool powerOffCommand;
+                
                 bool stopMotionCommand;
                 long position; // expressed in microsteps
                 long positionCounter;
@@ -210,6 +210,7 @@ namespace common{
                 //WORD contentRegSRL; non acceduto da getAlarms
 
                 bool actuatorIDInMotion;
+                bool powerOffCommand;
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
 

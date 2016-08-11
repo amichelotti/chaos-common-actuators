@@ -660,15 +660,22 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         descStr+="Fault status. ";
     }
     //  Analysis of the register content SRL
-    if(!(contentRegSRL & ((uint16_t)1<<10))){
+//    if(!(contentRegSRL & ((uint16_t)1<<10))){
+//        stCode |= ACTUATOR_INMOTION;
+//        descStr+="Actuator in motion.";
+//    }
+    if(actuatorIDInMotion){
         stCode |= ACTUATOR_INMOTION;
         descStr+="Actuator in motion.";
     }
-    if(contentRegSRL & ((uint16_t)1<<15)){
+//    if(contentRegSRL & ((uint16_t)1<<15)){
+//        stCode |= ACTUATOR_POWER_SUPPLIED;
+//        descStr += "Electrical power supplied.";
+//    }
+    if(powerOffCommand){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         descStr += "Electrical power supplied.";
     }
-
     // Homing in progress state
     if((i->second)->internalHomingStateDefault>0 || (i->second)->internalHomingStateHoming2>0){
         stCode |= HOMING_IN_PROGRESS;
