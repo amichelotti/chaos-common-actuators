@@ -626,13 +626,14 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     }
     (i->second)->regSRHrequest = false;
 
-    indexReg = 3; // see constant REG_SRL in TML_lib.h
-    (i->second)->regSRLrequest = true;
-    if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
-        ERR("Reading state error: %s",descStr.c_str());
-        return -4;
-    }
-    (i->second)->regSRLrequest = false;
+//    indexReg = 3; // see constant REG_SRL in TML_lib.h
+//    (i->second)->regSRLrequest = true;
+//    if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
+//        ERR("Reading state error: %s",descStr.c_str());
+//        return -4;
+//    }
+//    (i->second)->regSRLrequest = false;
+    
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
@@ -648,7 +649,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     }
     
     if(contentRegSRH & ((uint16_t)1<<7)){
-        stCode |= ACTUATOR_LSN_EVENT_INTERRUPUT;
+        stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
         descStr+="Limit switch negative event/interrupt. ";
     }
 
@@ -660,7 +661,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_IN_CAM;
         descStr+="Reference position in absolute electronic camming mode. ";
     }
-    if(contentRegSRH & ((uint16_t)1<<15)){
+    if(contentRegSRH & ((uint16_t)1<<15)){ // **************** Per adesso lasciamolo cosi il fault status *********************
         stCode |= ACTUATOR_FAULT;
         descStr+="Fault status. ";
     }
@@ -668,9 +669,8 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 //    if(!(contentRegSRL & ((uint16_t)1<<10))){
 //        stCode |= ACTUATOR_INMOTION;
 //        descStr+="Actuator in motion.";
-//    }
-    
-    if(actuatorIDInMotion){
+//    }                                                                  
+    if((i->second)->actuatorIDInMotion){
         stCode |= ACTUATOR_INMOTION;
         descStr+="Actuator in motion.";
     }
@@ -678,7 +678,8 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 //        stCode |= ACTUATOR_POWER_SUPPLIED;
 //        descStr += "Electrical power supplied.";
 //    }
-    if(powerOffCommand){
+    
+    if((i->second)->powerOffCommand){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         descStr += "Electrical power supplied.";
     }
@@ -687,6 +688,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= HOMING_IN_PROGRESS;
         descStr += "Homing in progress.";
     }
+    
     (i->second)->stateInfoRequest = false;
     *state = stCode;
     return 0;
@@ -766,14 +768,14 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
                 stCode|=ACTUATOR_HALL_SENSOR_MISSING;
                 descStr+= "Hall sensor missing / Resolver error / BiSS error / Position wrap around error. ";
             }
-            else if(i==6){
-                stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
-                descStr+="Positive limit switch active. ";
-            }
-            else if(i==7){
-                stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
-                descStr+="Negative limit switch active. ";
-            }
+//            else if(i==6){
+//                stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
+//                descStr+="Positive limit switch active. ";
+//            }
+//            else if(i==7){
+//                stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
+//                descStr+="Negative limit switch active. ";
+//            }
             else if(i==8){
                 stCode|=ACTUATOR_OVER_CURRENT;
                 descStr+="Over current error. ";
@@ -804,6 +806,17 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
             }
         }// chiudo if(contentRegMER & ((WORD)(base2^i)))
     } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
+
+    
+    // STATO LIMIT SWITCHES
+    if((i->second)->LSPactive){
+        stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
+        descStr+="Positive limit switch active. ";
+    }
+    if((i->second)->LNSactive){
+        stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
+        descStr+="Negative limit switch active. ";
+    }
 
     // Analysis of the register content REG_SRH
     if(contentRegSRH & ((uint16_t)1<<10)){

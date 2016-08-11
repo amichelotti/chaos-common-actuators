@@ -292,36 +292,41 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     positionCounter=0;
     positionEncoder=0;
     actuatorIDInMotion = false;
-    LNStransition = false;
     stopMotionCommand = false;
     powerOffCommand = false;
+    absolutePosition=0;
+    deltaPosition=0;
+    cap_position=0; 
 
-    // Getting information parameters
+    // ********* Info/Alarms request *********
+    stateInfoRequest = false;
     alarmsInfoRequest = false;
-    
+    //-----
     regMERrequest = false;
     contentRegMER =0; // Fault driver register
-    
+    //-----
     regSRHrequest = false;
     contentRegSRH =0; // Partial Fault and state driver register
-    
+    //-----
     regSRLrequest = false;
     contentRegSRL = 0;
 
-    // Constants
+    // *********** Constants ************
     epsylon = 0.01;
     p = 0.0;
     
 //    // State of possible threads
 //    threadMoveRelativeOn = false;
 //    threadMoveAbsoluteOn = false;
-    LSNactive=true; // ***************** IMPORTANTE: perche' position inizialmente e' uguale a 0 *********************
-    LSPactive=false;
-    motionscalled=0;
     
-    absolutePosition=0;
-    deltaPosition=0;
-            
+    // ************ Limit transitions *************
+    LNStransition = false;
+    LSNactive=true; // BIT DI STATO
+    LSPactive=false; // BIT DI STATO
+    
+    // ************ Thread manager *************
+    motionscalled=0;
+        
     return 0;
 }
 
@@ -1359,7 +1364,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
     }
     
     // L'incremento deve avvenire ad una determinata velocita'
-    if(position<=0 || LNStransition){
+    if(position<=0 || LSNactive){
         DPRINT("La posizione in steps e' gia' <= 0. Non occorre spostarsi ancora indietro per effettuare di nuovo l'homing");
         if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -1966,6 +1971,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 //        return -2;
 //    }
     // Simulazione dialogo con il drive motor
+    
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)) {
         descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
@@ -1974,15 +1980,15 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 
     // Inizializzazione "casuale" codici allarmi:
     if(alarmsInfoRequest && regMERrequest){
-        for(uint16_t i=0; i<sizeof(contentRegMER)*8; i++){
+        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
             random_variable = std::rand();
             if(random_variable<p*(RAND_MAX/100))
-                contentRegMER |= ((WORD)1<<i);
+                contentRegister |= ((WORD)1<<i);
         }
-        contentRegister = contentRegMER;
+        //contentRegister = contentRegMER;
         return 0;
     }
-    if(alarmsInfoRequest && regSRHrequest){
+    else if(alarmsInfoRequest && regSRHrequest){
         for(uint16_t i=10; i<12; i++){
             random_variable = std::rand();
             if(random_variable<p*((RAND_MAX)/100))
@@ -1992,9 +1998,9 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         return 0;
     }
     // Inizializzazione "casuale" codici stati:
-    if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
+    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
         for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
-            if(i==5 || i==6 || i==12 || i==14 || i==15){
+            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
                 random_variable = std::rand();
                 if(random_variable<p*(RAND_MAX/100))
                     contentRegSRH |= ((WORD)1<<i);
@@ -2003,7 +2009,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         contentRegister = contentRegSRH;
         return 0;
     }
-    if(stateInfoRequest && regSRLrequest){
+    else if(stateInfoRequest && regSRLrequest){
         random_variable = std::rand();
         if(random_variable<p*(RAND_MAX/100)){
             contentRegSRL |= ((WORD)1<<10);
@@ -2017,6 +2023,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
     }
     return -2;
 }
+
 
 int TechnoSoftLowDriver::resetFault(){
 
