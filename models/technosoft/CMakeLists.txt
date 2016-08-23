@@ -4,7 +4,7 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 ADD_DEFINITIONS(-DDEBUG -fpic)
 
 FILE(GLOB src *.cpp)    
-ADD_LIBRARY(${PROJECT_NAME} STATIC ${src} )
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${src} )
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug TML_lib tmlcomm)
 ADD_EXECUTABLE(test_technosoft_slit test/test_slit.cpp)
