@@ -31,9 +31,7 @@
 
 namespace common {
     namespace actuators {
-        namespace simul{
-
-        
+  
 typedef enum {
             // High part of the status
             //ACTUATOR_END_INIT = 0x1, // Bit per la gestione della lettura degli altri bit di stato
@@ -182,5 +180,4 @@ typedef enum {
     };
 }
 }
-    }
 #endif

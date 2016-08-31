@@ -30,7 +30,7 @@
 
 using namespace boost;
 using namespace ::common::actuators::models::simul;
-using namespace ::common::actuators::simul;
+using namespace ::common::actuators;
 
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
 

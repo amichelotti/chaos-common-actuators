@@ -16,7 +16,7 @@ void* function1(void* str){
     int ret;
     char* strInit =(char*)str;
 
-    common::actuators::simul::AbstractActuator *OBJ = new ActuatorTechnoSoft();
+    common::actuators::AbstractActuator *OBJ = new ActuatorTechnoSoft();
    
     // INIZIALIZZAZIONE CANALE
     if((ret=OBJ->init((void*)strInit))!=0){
@@ -152,14 +152,14 @@ void* function1(void* str){
 //            }
 //            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());  
             
-            if((resp=OBJ->getPosition(axisID,common::actuators::simul::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
                 DERR("************** Error returned by getPosition operation, code error %d **************",resp);
                 sleep(10);
                 //* errPtr = -5;
             }
             
             //usleep(5000);
-            if((resp=OBJ->getPosition(axisID,common::actuators::simul::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
                 DERR("************** Error returned by getPosition operation, code error %d **************",resp);
                 sleep(10);
                 //* errPtr = -5;

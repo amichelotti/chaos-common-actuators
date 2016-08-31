@@ -20,7 +20,7 @@ namespace common{
         namespace models{
             namespace simul{
 
-          class ActuatorTechnoSoft:public ::common::actuators::simul::AbstractActuator{
+          class ActuatorTechnoSoft:public ::common::actuators::AbstractActuator{
 
                 private:
                     //TechnoSoftLowDriver *driver;
