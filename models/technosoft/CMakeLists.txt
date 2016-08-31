@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(common_actuators_technosoft)
+FILE(GLOB model_lib ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)    
+FILE(COPY ${model_lib} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+MESG(STATUS "libraries ${model_lib}")
 LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 ADD_DEFINITIONS(-DDEBUG -fpic)
 
@@ -15,8 +18,8 @@ FILE(GLOB model_src *.h)
  
 
 INSTALL(FILES ${model_src} DESTINATION include/common/actuators/models/technosoft ) 
-FILE(GLOB model_lib lib/*)    
-INSTALL(FILES ${model_lib} DESTINATION lib/)
+
+#INSTALL(FILES ${model_lib} DESTINATION lib/)
 INSTALL_TARGETS(/lib ${PROJECT_NAME})
 INSTALL_TARGETS(/bin test_technosoft_slit)
 
