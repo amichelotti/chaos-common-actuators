@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 //
 //  ActuatorTechnoSoft.h
 //  prova
@@ -25,7 +20,7 @@ namespace common{
         namespace models{
             namespace simul{
 
-          class ActuatorTechnoSoft:public ::common::actuators::simul::AbstractActuator{
+          class ActuatorTechnoSoft:public ::common::actuators::AbstractActuator{
 
                 private:
                     //TechnoSoftLowDriver *driver;
