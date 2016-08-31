@@ -29,7 +29,8 @@
 #include <locale>         // std::locale, std::toupper
 
 using namespace boost;
-using namespace ::common::actuators::models;
+using namespace ::common::actuators::models::simul;
+using namespace ::common::actuators::simul;
 
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
 
@@ -813,7 +814,7 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
         descStr+="Positive limit switch active. ";
     }
-    if((i->second)->LNSactive){
+    if((i->second)->LSNactive){
         stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
         descStr+="Negative limit switch active. ";
     }

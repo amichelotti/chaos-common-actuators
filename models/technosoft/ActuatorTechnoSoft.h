@@ -17,9 +17,10 @@ namespace common{
 
     namespace actuators{
 
-namespace models{
+        namespace models{
+            namespace simul{
 
-          class ActuatorTechnoSoft:public ::common::actuators::AbstractActuator{
+          class ActuatorTechnoSoft:public ::common::actuators::simul::AbstractActuator{
 
                 private:
                     //TechnoSoftLowDriver *driver;
@@ -125,7 +126,9 @@ int getSWVersion(int axisID, std::string& version);
 
 int sendDataset(std::string& dataset);
         };
-}
+        
+        }
+        }
     }
 }
 #endif /* ActuatorTechnoSoft_h */

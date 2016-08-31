@@ -31,6 +31,7 @@
 
 namespace common {
     namespace actuators {
+        namespace simul{
 
         
 typedef enum {
@@ -175,10 +176,11 @@ typedef enum {
         virtual int getState(int axisID,int* state, std::string& desc)=0;        // (2) 
         virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
         virtual int resetAlarms(int axisID,uint64_t alrm)=0;                     // (2)
-        virtual int poweron(int axisID,int on)=0;
+        virtual int poweron(int axisID,int on)=0;                                           //******** OK *********
         virtual uint64_t getFeatures()=0;
         virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
     };
 }
 }
+    }
 #endif

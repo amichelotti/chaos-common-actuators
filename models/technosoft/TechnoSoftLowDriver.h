@@ -9,7 +9,11 @@
 #include <limits.h>
 #include <string.h>
 #include <pthread.h>
-#include <math.h>       /* fabs */
+#include <math.h>       /* fabs */  
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/variate_generator.hpp>
+
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
@@ -46,7 +50,7 @@
 
 // Features of trapezoidal speed profile
 //#define SPEED_DEFAULT 400.0 // 30.0  [mm/s]
-#define SPEED_DEFAULT 0.4 //  [microstep/ms]
+#define SPEED_DEFAULT 50 //  [microstep/ms]
 
 #define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS)
@@ -76,6 +80,7 @@ namespace common{
 
     namespace actuators{
        namespace models {
+           namespace simul {
 
            class ElectricPowerException{
                 public:
@@ -175,10 +180,9 @@ namespace common{
 //                bool threadMoveRelativeOn;
 //                bool threadMoveAbsoluteOn;
                 
-                bool LSNactive;
-                bool LSPactive;
-                
                 int motionscalled;
+                
+                //std::default_random_engine generator;
 
                 //containerIncrementPosition cIP;
                 long absolutePosition;
@@ -215,6 +219,9 @@ namespace common{
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
 
                 bool readyState;
+                
+                bool LSNactive;
+                bool LSPactive;
 
                 // Additional parameters for s-curve profile
                 //long jerkTime;
@@ -369,6 +376,6 @@ namespace common{
            };
          
 }// chiude namespace technosoft
-
+    }
     }
 }

@@ -2,7 +2,7 @@
 #include <common/debug/core/debug.h>
 #include <iostream>
 
-using namespace common::actuators::models;
+using namespace common::actuators::models::simul;
 
 //--------------------------------------------
 void ElectricPowerException::badElectricPowerInfo(){
@@ -288,9 +288,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     // Inizializzazione parametri caratterizzanti la movimentazione
 
     // Motion parameters
-    position = 0;
-    positionCounter=0;
-    positionEncoder=0;
+    position = 10;
+    positionCounter=10;
+    positionEncoder=10;
     actuatorIDInMotion = false;
     stopMotionCommand = false;
     powerOffCommand = false;
@@ -735,6 +735,9 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 //    pthread_exit(NULL);
 //    
 //    return 0;
+    
+    DPRINT("Thread di movimentazione partito!!!!!!!!!");
+    
     bool goahead=false;
     if(pthread_mutex_lock(&(mu))!=0){
 
@@ -742,8 +745,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     
     if(deltaPosition==0){
         if(pthread_mutex_unlock(&(mu))!=0){
-
-    } 
+        } 
         return -1;
     }
     // In quale posizione mi devo spostare?
@@ -758,7 +760,27 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     
     long initPosition = position;
     bool resetLimitSwicth=true;
-    while(position>0 && position<LONG_MAX && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
+    
+    DPRINT("%ld",position);
+    
+    if(!(position>=0)){
+        DPRINT("!(position>=0)");
+    }
+    
+    if(!(position<LONG_MAX)){
+        DPRINT("!(position<LONG_MAX)");
+    }
+    
+    if(!(abs(position-initPosition)<=abs(deltaPosition)))
+        DPRINT("!(abs(position-initPosition)<=abs(deltaPosition))");
+    
+    if(stopMotionCommand)
+        DPRINT("stopMotionCommand");
+    
+    if(powerOffCommand)
+        DPRINT("powerOffCommand");
+
+    while(position>=0 && position<LONG_MAX && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
          
         if(pthread_mutex_lock(&(mu))!=0){
 
@@ -775,6 +797,10 @@ int TechnoSoftLowDriver::incrDecrPosition(){
             positionEncoder-=speed_ms_s;
         }
         
+        DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
+        DPRINT("Posizione encoder dopo l'incremento effettuato: %ld", positionEncoder);
+        DPRINT("Posizione counter dopo l'incremento effettuato: %ld", positionCounter);
+        
         if(resetLimitSwicth){
             if (position > 0){
                 LSNactive=false;
@@ -787,24 +813,48 @@ int TechnoSoftLowDriver::incrDecrPosition(){
         
         if(pthread_mutex_unlock(&(mu))!=0){
 
-        }  
-        usleep(1000); // Sleep for 1 milli second
+        }
+        //DPRINT("Posizione incrementata!!!!!");
+        usleep(5000); // Sleep for 1 milli second
     }
+    
+    if(position<0){
+        position=0;
+        positionCounter=0;
+        positionEncoder=0;
+    }
+
+    // DEBUG
+    if(!(position>=0)){
+        DPRINT("!(position>=0)");
+    }
+    
+    if(!(position<LONG_MAX)){
+        DPRINT("!(position<LONG_MAX)");
+    }
+    
+    if(!(abs(position-initPosition)<=abs(deltaPosition)))
+        DPRINT("!(abs(position-initPosition)<=abs(deltaPosition))");
+    
+    if(stopMotionCommand)
+        DPRINT("stopMotionCommand");
+    
+    if(powerOffCommand)
+        DPRINT("powerOffCommand");
     
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
+        actuatorIDInMotion = false;
+        stopMotionCommand = false;
+        motionscalled--;
     
-    actuatorIDInMotion = false;
-    stopMotionCommand = false;
-    motionscalled--;
-    
-    if(position==0){ // nel qual caso absolutePosition dato in input ==0
-        LSNactive = true;
-    }
-    if(position== LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX 
-        LSPactive = true;
-    }
+        if(position==0){ // nel qual caso absolutePosition dato in input ==0
+            LSNactive = true;
+        }
+        if(position== LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX 
+            LSPactive = true;
+        }
     
     if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -818,12 +868,13 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->incrDecrPosition();
     
+    DPRINT("Uscita dal thread di movimentazione");
     pthread_exit(NULL);
 }
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 
-    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
+    DPRINT("Relative Moving axis: %d, deltaMicroSteps %l, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
@@ -1181,7 +1232,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 //    double tol = 30;
 //    deltaT += (deltaT*tol/100);
 //
-//    double totalTimeInterval = 0;   // solo per far partire il ciclo while
+//    double otalTimeInterval = 0;   // solo per far partire il ciclo while
 //    struct timeval startTime,endTime;
 //
 //    gettimeofday(&startTime,NULL);
@@ -1189,7 +1240,11 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 //    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //    }
-    bool goahead;
+    
+    DPRINT("moveAbsolutePosition: Thread partito");
+    
+    
+    bool goahead = false;
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
@@ -1219,44 +1274,57 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     }  
     
-    bool resetLimitSwicth=true;
-    while( abs(position-absolutePosition)>0 && !stopMotionCommand && !powerOffCommand){// L'incremento dovra' avvenire ad una determinata velocita'
+    bool resetLimitSwicth = true;
+    
+    DPRINT("moveAbsolutePosition: appena prima del ciclo while");
+    
+    long tol = 150;
+    
+    while(std::labs(position-absolutePosition)>tol && !stopMotionCommand && !powerOffCommand){// L'incremento dovra' avvenire ad una determinata velocita'
 
+        //DPRINT("moveAbsolutePosition: dentro il ciclo while: inizio prima del lock!!!");
         if(pthread_mutex_lock(&(mu))!=0){
 
         }
 
-        if(goahead){
-            position+=speed_ms_s;
-            positionCounter+=speed_ms_s;
-            positionEncoder+=speed_ms_s;
-        }
-        else{
-            position-=speed_ms_s;
-            positionCounter-=speed_ms_s;
-            positionEncoder-=speed_ms_s;
-        }
+            if(goahead){
+                position+=speed_ms_s;
+                positionCounter+=speed_ms_s;
+                positionEncoder+=speed_ms_s;
+            }
+            else{
+                position-=speed_ms_s;
+                positionCounter-=speed_ms_s;
+                positionEncoder-=speed_ms_s;
+            }
         
-        if(resetLimitSwicth){
-            if (position > 0){
-                LSNactive=false;
+//            DPRINT("moveAbsolutePosition: position %ld",position);
+//            DPRINT("moveAbsolutePosition: positionCounter %ld",positionCounter);
+//            DPRINT("moveAbsolutePosition: positionEncoder %ld",positionEncoder);
+//            
+//            DPRINT("moveAbsolutePosition: labs(position-absolutePosition) %ld",labs(position-absolutePosition));
+        
+            if(resetLimitSwicth){
+                if (position > 0){
+                    LSNactive=false;
+                }
+                if (position<LONG_MAX){
+                    LSPactive=false; 
+                }
+                resetLimitSwicth=false;
             }
-            if (position<LONG_MAX){
-                LSPactive=false; 
-            }
-            resetLimitSwicth=false;
-        }
             
-        if(pthread_mutex_unlock(&(mu))!=0){
+            if(pthread_mutex_unlock(&(mu))!=0){
 
-        }
+            }
+        //DPRINT("moveAbsolutePosition: dentro il ciclo while: appena fuori il blocco del lock!!!");
         // Aggiornamento deltaT, stopMotion, stopPower
 //        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
 //        deltaT += (deltaT*tol/100);
 //
 //        gettimeofday(&endTime,NULL);
 //        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
-        usleep(1000); // Sleep for 1 milli second
+            usleep(5000); // Sleep for 5 milli second
     }
     //position=currentPosition;
     if(pthread_mutex_lock(&(mu))!=0){
@@ -1739,19 +1807,29 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     if(random_variable<p*(RAND_MAX/100))
         return -1;
 
-//    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+    //*deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+//    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
+    
+//    if(random_variable>0.0005){
+//        pos=positionCounter+random_variable;
+//    }    
+//    else{
+//        pos=positionCounter-random_variable;
+//    }
+    
+    // This is the underlying integer random number generator
+    boost::mt19937 igen;
+    long pos = positionCounter;
+    // The second template parameter is the actual floating point
+    // distribution that the user wants
+    double stdv = abs(pos+pos*0.1);
+    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
+        gen(igen, boost::normal_distribution<>(pos,stdv));
+    
+    DPRINT("Real position counter %f, position counter with noise %ld",pos,gen());
 
-    random_variable = std::rand()/RAND_MAX; // Normalizzazione variabile random_variable
-    long pos;
-    if(random_variable>0.5){
-        pos=positionCounter+random_variable;
-    }    
-    else{
-        pos=positionCounter-random_variable;
-    }
-
 //    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
-    *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+    *deltaPosition_mm = ((long)gen()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
 
     return 0;
 }
@@ -1769,17 +1847,34 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     if(random_variable<p*(RAND_MAX/100))
         return -1;
 
-    random_variable = std::rand()/RAND_MAX; // Normalizzazione variabile random_variable
-    long pos;
-    if(random_variable>0.5){
-        pos=positionEncoder+random_variable;
-    }
-    else{
-        pos=positionEncoder-random_variable;
-    }
-
+    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
+    
+    //Rumore gaussiano: e' necessario lo standard C++ 2011
+//    double stdv = abs(pos+pos*0.001);
+//    std::normal_distribution<double> distribution(pos,stdv);
+//    pos = (long)(distribution(generator));
+    
+//    if(random_variable>0.0005){
+//        pos=positionEncoder+random_variable;
+//    }
+//    else{
+//        pos=positionEncoder-random_variable;
+//    }
+    
+    // This is the underlying integer random number generator
+    boost::mt19937 igen;
+    long pos= positionEncoder;
+    // The second template parameter is the actual floating point
+    // distribution that the user wants
+    double stdv = abs(pos+pos*0.1);
+    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
+        gen(igen, boost::normal_distribution<>(pos,stdv));
+    
+    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,gen());
 //    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
-    *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
+    *deltaPosition_mm = ((long)gen()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    
+    
     return 0;
 }
 

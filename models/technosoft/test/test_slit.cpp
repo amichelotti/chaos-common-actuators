@@ -6,7 +6,7 @@
 #include <pthread.h>
 
 
-using namespace common::actuators::models;
+using namespace common::actuators::models::simul;
 #define USAGE \
   printf("**************Usage is:%s <dev/tty> <technosoft configuration> <axis> <move position in mm>*************\n",argv[0]);
 
@@ -16,14 +16,15 @@ void* function1(void* str){
     int ret;
     char* strInit =(char*)str;
 
-    common::actuators::AbstractActuator *OBJ = new ActuatorTechnoSoft();
+    common::actuators::simul::AbstractActuator *OBJ = new ActuatorTechnoSoft();
    
     // INIZIALIZZAZIONE CANALE
     if((ret=OBJ->init((void*)strInit))!=0){
         DERR("*************Cannot init channel. In fact the value returned is %d****************",ret);
   
     }
-    // CONFIGURAZIONE MOTORI, SEMPRE SULLO STESSO OGGETTO !!!
+    //PROCEDURA DI CONFIGURAZIONE MOTORI, SEMPRE SULLO STESSO OGGETTO !!!
+    
     std::string strConfig14 = "14,../common/actuators/models/technosoft/conf/1setup001.t.zip";
     if((ret=OBJ->configAxis((void*)strConfig14.c_str()))!=0){
         DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
@@ -32,29 +33,150 @@ void* function1(void* str){
     if((ret=OBJ->configAxis((void*)strConfig15.c_str()))!=0){
         DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
     }
-    else{ // FORMA invio comandi ai motori  
+    else{ // Invio comandi ai motori (axisID = 14)  
     
-        int axisID = 0;
+        int axisID = 14;
         
         // MOVIMENTAZIONE ASSE 14
         if(OBJ->poweron(axisID,1)<0){
-            DERR("**************Error returned by stop motion operation **************");
+            DERR("**************Error returned by poweron operation **************");
+            sleep(10);
             //* errPtr = -5;
         }
-        DPRINT("************** Movimentazione asse 14 **************");
+        DPRINT("************** Prima movimentazione asse 14 **************");
         int resp;
-        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
-            DERR("************** Error returned by movement operatio, code error %d **************",resp);
-            //* errPtr = -5;
-        }
+        
+//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,1))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+
+        //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
+        
+//        if((resp=OBJ->stopMotion(axisID))<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//        }
+//        
+//        sleep(10);
+//        
+//        DPRINT("togliamo corrente");
+//        if(OBJ->poweron(axisID,0)<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//        }
+//        
+//        sleep(10);
+//        
+//        DPRINT("************** Seconda movimentazione asse 14 **************");
+//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,3))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        
+//        sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
+
         int state;
         std::string descStr;
-        if((resp=OBJ->getState(axisID,&state, descStr))<0){
-            DERR("************** Error returned by movement operatio, code error %d **************",resp);
-            //* errPtr = -5;
+        
+        struct timeval startTimeForMotor1,endTimeForMotor1;
+        
+        double total_time_interval=0;
+        double duration = 180;
+        double position_mm_encoder;
+        double position_mm_counter;
+        
+//        DPRINT("Stopping displacement");
+//        if((resp=OBJ->stopMotion(axisID))<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//        }
+//        
+//        sleep(10); 
+//        
+//        DPRINT("Togliamo corrente");
+//        if(OBJ->poweron(axisID,0)<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//        }
+//        
+//        sleep(10);
+//        
+//        DPRINT("Riinseriamo corrente");
+//        if(OBJ->poweron(axisID,1)<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//        }
+//        
+//        sleep(10);
+//        
+//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,7))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        sleep(10); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
+        
+//        if((resp=OBJ->stopMotion(axisID))<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//        }
+        
+//        DPRINT("Position Reading");
+//        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &deltaPosition_mm))<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//                //* errPtr = -5;
+//        }
+//        
+//        DPRINT("************** Position ENCODER of axisID 14: %f mm **************",deltaPosition_mm);
+//        
+//        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//            sleep(10);
+//                //* errPtr = -5;
+//        }
+        
+        //DPRINT("************** Position COUNTER of axisID 14: %f mm **************",position_mm);
+        
+        while(total_time_interval<=duration){
+            
+            gettimeofday(&startTimeForMotor1,NULL);
+            
+//            if((resp=OBJ->getState(axisID,&state, descStr))<0){
+//                DERR("************** Error returned by getState operation, code error %d **************",resp);
+//                sleep(10);
+//                //* errPtr = -5;
+//            }
+//            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());  
+            
+            if((resp=OBJ->getPosition(axisID,common::actuators::simul::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
+            
+            //usleep(5000);
+            if((resp=OBJ->getPosition(axisID,common::actuators::simul::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
+            
+            DPRINT("************** Position encoder of axisID 14: %4.15f **************",position_mm_encoder);
+            DPRINT("************** Position counter of axisID 14: %4.15f  **************",position_mm_counter);
+            
+            gettimeofday(&endTimeForMotor1,NULL);
+            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+            
+            usleep(1000000); // lettura ogni millisecondo..
+//        
         }
-        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
-        sleep(30);
+        
+//        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");    
+//        sleep(30);
         
 //        // MOVIMENTAZIONE ASSE 15
 //        axisID = 15;
