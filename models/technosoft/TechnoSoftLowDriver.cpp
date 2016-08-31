@@ -1834,6 +1834,29 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     return 0;
 }
 
+double getRandomDoubleUsingNormalDistribution(double mean, double sigma)
+{
+ //typedef normal_distribution<> NormalDistribution;
+ typedef boost::mt19937 RandomGenerator;
+ typedef boost::variate_generator GaussianGenerator;
+
+  /** Initiate Random Number generator with current time */
+  static RandomGenerator rng(static_cast (time(0)));
+
+  /* Choose Normal Distribution */
+  typedef normal_distribution<> gaussian_dist(mean, sigma);
+ 
+  /* Create a Gaussian Random Number generator
+   *  by binding with previously defined
+   *  normal distribution object
+   */
+  GaussianGenerator generator(rng, gaussian_dist);
+ 
+  // sample from the distribution
+  return generator();
+}
+
+
 int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 
     DPRINT("Reading ENCODER position");
@@ -1867,13 +1890,12 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     // The second template parameter is the actual floating point
     // distribution that the user wants
     double stdv = abs(pos+pos*0.1);
-    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
-        gen(igen, boost::normal_distribution<>(pos,stdv));
-    
-    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,gen());
+//    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
+//        generator(boost::mt19937(time(0)), boost::normal_distribution<>(pos,stdv));
+  
+    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,getRandomDoubleUsingNormalDistribution(pos,stdv));
 //    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
-    *deltaPosition_mm = ((long)gen()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-    
+    *deltaPosition_mm = ((long)getRandomDoubleUsingNormalDistribution(pos,stdv)*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
     
     return 0;
 }

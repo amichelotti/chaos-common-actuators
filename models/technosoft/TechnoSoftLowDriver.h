@@ -14,6 +14,8 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
 
+#include <boost/math/distributions/normal.hpp>
+
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
