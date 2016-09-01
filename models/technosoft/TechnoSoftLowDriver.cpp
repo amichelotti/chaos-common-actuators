@@ -229,7 +229,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
 //        return -24;
 //    }
-    std::srand(std::time(NULL)); // Inizializza generatore numeri pseudo-casuali
+    std::srand(std::time(0)); // Inizializza generatore numeri pseudo-casuali
+    p = 0.0;
 
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
@@ -288,9 +289,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     // Inizializzazione parametri caratterizzanti la movimentazione
 
     // Motion parameters
-    position = 10;
-    positionCounter=10;
-    positionEncoder=10;
+    position = 10000;
+    positionCounter=10000;
+    positionEncoder=10000;
     actuatorIDInMotion = false;
     stopMotionCommand = false;
     powerOffCommand = false;
@@ -313,7 +314,6 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     // *********** Constants ************
     epsylon = 0.01;
-    p = 0.0;
     
 //    // State of possible threads
 //    threadMoveRelativeOn = false;
@@ -326,6 +326,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     // ************ Thread manager *************
     motionscalled=0;
+    
+    deltaNoise = 1000; // Number of microsteps. Used for noise
         
     return 0;
 }
@@ -1817,44 +1819,51 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //        pos=positionCounter-random_variable;
 //    }
     
-    // This is the underlying integer random number generator
-    boost::mt19937 igen;
-    long pos = positionCounter;
-    // The second template parameter is the actual floating point
-    // distribution that the user wants
-    double stdv = abs(pos+pos*0.1);
-    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
-        gen(igen, boost::normal_distribution<>(pos,stdv));
+//    // This is the underlying integer random number generator
+//    boost::mt19937 igen;
+//    long pos = positionCounter;
+//    // The second template parameter is the actual floating point
+//    // distribution that the user wants
+//    double stdv = abs(pos+pos*0.1);
+//    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
+//        gen(igen, boost::normal_distribution<>(pos,stdv));
+//    
+//    DPRINT("Real position counter %f, position counter with noise %ld",pos,gen());
     
-    DPRINT("Real position counter %f, position counter with noise %ld",pos,gen());
-
+    long pos = positionCounter;
+    long min = pos-(long)deltaNoise;
+    long max = pos+(long)deltaNoise;
+    
+    std::srand(std::time(0));
+    DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
+    
 //    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
-    *deltaPosition_mm = ((long)gen()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    *deltaPosition_mm = ((long)(min+(max-min)*std::rand()/RAND_MAX)*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
 
     return 0;
 }
 
-double getRandomDoubleUsingNormalDistribution(double mean, double sigma)
-{
- //typedef normal_distribution<> NormalDistribution;
- typedef boost::mt19937 RandomGenerator;
- typedef boost::variate_generator GaussianGenerator;
-
-  /** Initiate Random Number generator with current time */
-  static RandomGenerator rng(static_cast (time(0)));
-
-  /* Choose Normal Distribution */
-  typedef normal_distribution<> gaussian_dist(mean, sigma);
- 
-  /* Create a Gaussian Random Number generator
-   *  by binding with previously defined
-   *  normal distribution object
-   */
-  GaussianGenerator generator(rng, gaussian_dist);
- 
-  // sample from the distribution
-  return generator();
-}
+//double getRandomDoubleUsingNormalDistribution(double mean, double sigma)
+//{
+// //typedef normal_distribution<> NormalDistribution;
+// typedef boost::mt19937 RandomGenerator;
+// typedef boost::variate_generator GaussianGenerator;
+//
+//  /** Initiate Random Number generator with current time */
+//  static RandomGenerator rng(static_cast (time(0)));
+//
+//  /* Choose Normal Distribution */
+//  typedef normal_distribution<> gaussian_dist(mean, sigma);
+// 
+//  /* Create a Gaussian Random Number generator
+//   *  by binding with previously defined
+//   *  normal distribution object
+//   */
+//  GaussianGenerator generator(rng, gaussian_dist);
+// 
+//  // sample from the distribution
+//  return generator();
+//}
 
 
 int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
@@ -1870,8 +1879,14 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     if(random_variable<p*(RAND_MAX/100))
         return -1;
 
-    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
+//    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
     
+    std::srand(std::time(0));
+    
+    long pos = positionEncoder;
+    long min = pos-(long)deltaNoise;
+    long max = pos+(long)deltaNoise;
+   
     //Rumore gaussiano: e' necessario lo standard C++ 2011
 //    double stdv = abs(pos+pos*0.001);
 //    std::normal_distribution<double> distribution(pos,stdv);
@@ -1885,17 +1900,20 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 //    }
     
     // This is the underlying integer random number generator
-    boost::mt19937 igen;
-    long pos= positionEncoder;
-    // The second template parameter is the actual floating point
-    // distribution that the user wants
-    double stdv = abs(pos+pos*0.1);
-//    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
-//        generator(boost::mt19937(time(0)), boost::normal_distribution<>(pos,stdv));
-  
-    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,getRandomDoubleUsingNormalDistribution(pos,stdv));
-//    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
-    *deltaPosition_mm = ((long)getRandomDoubleUsingNormalDistribution(pos,stdv)*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+//    boost::mt19937 igen;
+//    long pos= positionEncoder;
+//    // The second template parameter is the actual floating point
+//    // distribution that the user wants
+//    double stdv = abs(pos+pos*0.1);
+////    boost::variate_generator<boost::mt19937, boost::normal_distribution<> > 
+////        generator(boost::mt19937(time(0)), boost::normal_distribution<>(pos,stdv));
+//  
+//    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,getRandomDoubleUsingNormalDistribution(pos,stdv));
+////    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
+    
+    DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
+    
+    *deltaPosition_mm = ((long)(min+(max-min)*std::rand()/RAND_MAX)*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
     
     return 0;
 }
