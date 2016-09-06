@@ -289,15 +289,17 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     // Inizializzazione parametri caratterizzanti la movimentazione
 
     // Motion parameters
-    position = 10000;
-    positionCounter=10000;
-    positionEncoder=10000;
+    position = 0;
+    positionCounter=0;
+    positionEncoder=0;
     actuatorIDInMotion = false;
     stopMotionCommand = false;
     powerOffCommand = false;
     absolutePosition=0;
     deltaPosition=0;
     cap_position=0; 
+    
+    generator.seed(std::time(0)); // seed with the current time
 
     // ********* Info/Alarms request *********
     stateInfoRequest = false;
@@ -327,7 +329,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     // ************ Thread manager *************
     motionscalled=0;
     
-    deltaNoise = 1000; // Number of microsteps. Used for noise
+    percNoise = 0.0;
+    //deltaNoise = 100; // Number of microsteps. Used for noise
         
     return 0;
 }
@@ -1032,6 +1035,17 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
         return -1;
     }
     speed_ms_s = _speed_mm_s;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setRatiOfNoise(const double& _ratiOfNoise){
+    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
+    DPRINT("Chiamata setRatiOfNoise");
+    if(_ratiOfNoise<0 || _ratiOfNoise>1){
+        DERR("Ratio specified for noise = %f",_ratiOfNoise);
+        return -1;
+    }
+    percNoise = _ratiOfNoise;
     return 0;
 }
 
@@ -1830,16 +1844,31 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //    
 //    DPRINT("Real position counter %f, position counter with noise %ld",pos,gen());
     
-    long pos = positionCounter;
-    long min = pos-(long)deltaNoise;
-    long max = pos+(long)deltaNoise;
+    double pos = positionCounter;
+    //DPRINT("pos = %ld",pos);
+//    long min = pos-(long)deltaNoise;
+//    long max = pos+(long)deltaNoise;
+    //long deltaNoise = (long)(pos*percNoise);
+    //DPRINT("Delta noise = %ld",deltaNoise);
     
-    std::srand(std::time(0));
-    DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
+//    const long rangeMin = pos-deltaNoise; 
+//    const long rangeMax = pos+deltaNoise; 
+//    
+//    NumberDistribution distribution(rangeMin, rangeMax); 
+//    Generator numberGenerator(generator, distribution);
+    
+    //std::srand(std::time(0));
+    //DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
     
 //    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
-    *deltaPosition_mm = ((long)(min+(max-min)*std::rand()/RAND_MAX)*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-
+    double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    double deltaNoise = (pos_mm*percNoise);
+    const double rangeMin = pos_mm-deltaNoise;
+    const double rangeMax = pos_mm+deltaNoise;
+    NumberDistribution distribution(rangeMin, rangeMax);
+    Generator numberGenerator(generator, distribution);
+    *deltaPosition_mm = numberGenerator();
+    
     return 0;
 }
 
@@ -1881,11 +1910,11 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 
 //    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
     
-    std::srand(std::time(0));
-    
-    long pos = positionEncoder;
-    long min = pos-(long)deltaNoise;
-    long max = pos+(long)deltaNoise;
+//    std::srand(std::time(0));
+//    
+//    long pos = positionEncoder;
+//    long min = pos-(long)deltaNoise;
+//    long max = pos+(long)deltaNoise;
    
     //Rumore gaussiano: e' necessario lo standard C++ 2011
 //    double stdv = abs(pos+pos*0.001);
@@ -1911,10 +1940,34 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 //    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,getRandomDoubleUsingNormalDistribution(pos,stdv));
 ////    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
     
-    DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
+    //std::srand(std::time(0));
     
-    *deltaPosition_mm = ((long)(min+(max-min)*std::rand()/RAND_MAX)*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    double pos = positionEncoder;
+//    long min = pos-(long)deltaNoise;
+//    long max = pos+(long)deltaNoise;
+//    long deltaNoise = (long)(pos*percNoise);
+//    
+//    const long rangeMin = pos-deltaNoise; 
+//    const long rangeMax = pos+deltaNoise; 
+//    
+//    NumberDistribution distribution(rangeMin, rangeMax); 
+//    Generator numberGenerator(generator, distribution);  
+     
+//    for(int i=0;i<10;i++){ 
+//    std::cout << numberGenerator() << std::endl; 
+//    } 
     
+    //DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
+    
+    //*deltaPosition_mm = (numberGenerator()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    
+    double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    double deltaNoise = (pos_mm*percNoise);
+    const double rangeMin = pos_mm-deltaNoise;
+    const double rangeMax = pos_mm+deltaNoise;
+    NumberDistribution distribution(rangeMin, rangeMax);
+    Generator numberGenerator(generator, distribution);
+    *deltaPosition_mm = numberGenerator();
     return 0;
 }
 

@@ -10,11 +10,11 @@
 #include <string.h>
 #include <pthread.h>
 #include <math.h>       /* fabs */  
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/variate_generator.hpp>
-
-#include <boost/math/distributions/normal.hpp>
+#include <boost/random.hpp> 
+//#include <boost/random/normal_distribution.hpp>
+//#include <boost/random/mersenne_twister.hpp>
+//#include <boost/random/variate_generator.
+//#include <boost/math/distributions/normal.hpp>
 
 
 #if defined(WINDOWS) || defined(WIN32)
@@ -52,7 +52,7 @@
 
 // Features of trapezoidal speed profile
 //#define SPEED_DEFAULT 400.0 // 30.0  [mm/s]
-#define SPEED_DEFAULT 50 //  [microstep/ms]
+#define SPEED_DEFAULT 400 //  [microstep/ms]
 
 #define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS)
@@ -135,7 +135,13 @@ namespace common{
             class TechnoSoftLowDriver {
 
                 private:
-
+                    
+                typedef boost::uniform_real<> NumberDistribution;
+                typedef boost::mt19937 RandomNumberGenerator;
+                typedef boost::variate_generator<RandomNumberGenerator&, NumberDistribution> Generator; 
+                
+                RandomNumberGenerator generator;
+                
                 int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
                 int axisRef;// handler
 
@@ -202,7 +208,8 @@ namespace common{
                 static void* staticMoveAbsolutePositionForThread(void*);
                 int moveAbsolutePositionHoming();
                 
-                long deltaNoise;
+                //long deltaNoise;
+                double percNoise;
 
             public:
                 bool alarmsInfoRequest;
@@ -300,6 +307,7 @@ namespace common{
 
                 // Set trapezoidal profile parameters
                 int setSpeed(const double& speed);
+                int setRatiOfNoise(const double& _ratiOfNoise);
                 int setMaxSpeed(const double& maxspeed);
                 int setAcceleration(const double& acceleration);
                 int setMaxAcceleration(const double& maxAcceleration);

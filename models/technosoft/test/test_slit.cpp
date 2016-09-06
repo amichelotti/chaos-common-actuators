@@ -165,8 +165,8 @@ void* function1(void* str){
                 //* errPtr = -5;
             }
             
-//            DPRINT("************** Position encoder of axisID 14: %4.15f **************",position_mm_encoder);
-//            DPRINT("************** Position counter of axisID 14: %4.15f  **************",position_mm_counter);
+            DPRINT("************** Position encoder of axisID 14: %4.15f **************",position_mm_encoder);
+            DPRINT("************** Position counter of axisID 14: %4.15f  **************",position_mm_counter);
             
             gettimeofday(&endTimeForMotor1,NULL);
             total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
