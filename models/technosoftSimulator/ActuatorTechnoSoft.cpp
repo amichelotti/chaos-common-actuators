@@ -1,12 +1,28 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+//
+//  ActuatorTechnoSoft.cpp
+//
+//
+//  Created by MacBookProINFN on 29/01/16.
+//
+//
+
+#include <stdio.h>
+#include "ActuatorTechnoSoft.h"
+#include <boost/regex.hpp>
+#include <common/debug/core/debug.h>
+//#include <cstdlib.h>
+
 //#include <boost/algorithm/string/trim.hpp>
 //#include <boost/algorithm/string/case_conv.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <stdio.h>
-#include "ActuatorTechnoSoft.h"
-#include <boost/regex.hpp>
-#include <common/debug/core/debug.h>
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -331,34 +347,40 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
             return -3;
         }
         return 0;
+    }else if(strResultparName.compare("RATIOFNOISE")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setRatiOfNoise(doubleValue)<0){
+            return -4;
+        }
+        return 0;
     }
     else if(strResultparName.compare("ISADDITIVE")==0){
         // Conversion from string to bool
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setAdditive(intValue)<0){
-            return -4;
+            return -5;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENT")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setMovement((short)intValue)<0){
-            return -5;
+            return -6;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASE")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setReferenceBase((short)intValue)<0){
-            return -6;
+            return -7;
         }
         return 0;
     }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->sethighSpeedHoming(doubleValue)<0){
-            return -7;
+            return -8;
         }
         return 0;
     }
@@ -366,14 +388,14 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     else if(strResultparName.compare("LOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setlowSpeedHoming(doubleValue)<0){
-            return -8;
+            return -9;
         }
         return 0;
     }
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setaccelerationHoming(doubleValue)<0){
-            return -9;
+            return -10;
         }
         return 0;
     }
@@ -382,61 +404,61 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setAdditiveHoming(intValue)<0){
-            return -10;
+            return -11;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENTHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setMovementHoming((short)intValue)<0){
-            return -11;
+            return -12;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setReferenceBaseHoming((short)intValue)<0){
-            return -12;
+            return -13;
         }
         return 0;
     }//_________________________________________________________________________
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setEncoderLines(doubleValue)<0){
-            return -13;
+            return -14;
         }
         return 0;
     }
     else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setConst_mult_technsoft(doubleValue)<0){
-            return -14;
+            return -15;
         }
         return 0;
     }
     else if(strResultparName.compare("STEPSPERROUND")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSteps_per_rounds(doubleValue)<0){
-            return -15;
+            return -16;
         }
         return 0;
     }
     else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setN_rounds(doubleValue)<0){
-            return -16;
+            return -17;
         }
         return 0;
     }
     else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){
-            return -17;
+            return -18;
         }
         return 0;
     }
     else{
-        return -18;
+        return -19;
     }
 }
 
@@ -970,6 +992,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"},";
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"},";
    dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"}";
+   dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
    dataset+="]}";
 
    return 0;
