@@ -2162,7 +2162,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)) {
-        descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
+        //descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
         return -1;
     }
 
