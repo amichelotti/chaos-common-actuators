@@ -1844,7 +1844,7 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //
 //    DPRINT("Real position counter %f, position counter with noise %ld",pos,gen());
 
-    double pos = positionCounter;
+    //double pos = positionCounter;
     //DPRINT("pos = %ld",pos);
 //    long min = pos-(long)deltaNoise;
 //    long max = pos+(long)deltaNoise;
@@ -1868,7 +1868,7 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //    NumberDistribution distribution(rangeMin, rangeMax);
 //    Generator numberGenerator(generator, distribution);
 //    *deltaPosition_mm = numberGenerator();
-      *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+      *deltaPosition_mm = (positionCounter*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
 
     return 0;
 }
@@ -1963,18 +1963,17 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     //*deltaPosition_mm = (numberGenerator()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
     
     if(percNoise>0){
-    double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-    double deltaNoise = (pos_mm*percNoise);
-    const double rangeMin = pos_mm-deltaNoise;
-    const double rangeMax = pos_mm+deltaNoise;
-    NumberDistribution distribution(rangeMin, rangeMax);
-    Generator numberGenerator(generator, distribution);
-    *deltaPosition_mm = numberGenerator();
+        double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+        double deltaNoise = (pos_mm*percNoise);
+        const double rangeMin = pos_mm-deltaNoise;
+        const double rangeMax = pos_mm+deltaNoise;
+        NumberDistribution distribution(rangeMin, rangeMax);
+        Generator numberGenerator(generator, distribution);
+        *deltaPosition_mm = numberGenerator();
     }
     else
         *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-        
-    
+       
     return 0;
 }
 
