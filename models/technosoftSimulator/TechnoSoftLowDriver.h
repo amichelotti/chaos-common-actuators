@@ -69,6 +69,7 @@
 // Features of trapezoidal speed profile
 //#define SPEED_DEFAULT 400.0 // 30.0  [mm/s]
 #define SPEED_DEFAULT 400 //  [microstep/ms]
+#define PERCNOISE_DEFAULT 0.0
 
 #define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS)
@@ -304,7 +305,8 @@ namespace common{
                         const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT,
                         const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,
                         const double _n_rounds=N_ROUNDS_DEFAULT,
-                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
+                        const double _percOfNoise=PERCNOISE_DEFAULT);
 
 
                 int homing(int mode);

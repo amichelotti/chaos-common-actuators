@@ -102,7 +102,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _const_mult_technsoft,
                         const double _steps_per_rounds,
                         const double _n_rounds,
-                        const double _linear_movement_per_n_rounds){
+                        const double _linear_movement_per_n_rounds,
+                        const double _percOfNoise){
 
     DPRINT("Inizializzazione parametri");
 
@@ -223,6 +224,11 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
 
     axisID = _axisID;
+    
+    if(_percOfNoise<0 || _percOfNoise>1){
+        return -23;
+    }
+    percNoise = _percOfNoise;
 
 //    axisRef = TS_LoadSetup(setupFilePath.c_str());
 //    if(axisRef < 0){
