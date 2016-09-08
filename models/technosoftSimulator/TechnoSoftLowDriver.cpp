@@ -233,7 +233,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(_percOfNoise<0 || _percOfNoise>1){
         return -23;
     }
-    percNoise = 0.01;
+    percNoise = _percOfNoise;
 
 //    axisRef = TS_LoadSetup(setupFilePath.c_str());
 //    if(axisRef < 0){
