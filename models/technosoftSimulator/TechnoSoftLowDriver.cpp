@@ -830,7 +830,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 
         }
         //DPRINT("Posizione incrementata!!!!!");
-        usleep(5000); // Sleep for 1 milli second
+        usleep(3000); // Sleep for 1 milli second
     }
 
     if(position<0){
@@ -870,11 +870,10 @@ int TechnoSoftLowDriver::incrDecrPosition(){
         if(position== LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
             LSPactive = true;
         }
-
+    
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
-
     return 0;
 }
 
