@@ -64,6 +64,11 @@ int SerialCommChannelTechnosoft::open(){
 //    }
 //    this->fd = resp;
 //    DPRINT("Openchannel file descriptor=%d",resp);
+//    std::srand(std::time(0));
+//    random_variable = std::rand();
+//    if(random_variable<p*(RAND_MAX/100))
+//        return -1;
+    
     DPRINT("Channel is opened");
     return 0;
 }
@@ -228,7 +233,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(_percOfNoise<0 || _percOfNoise>1){
         return -23;
     }
-    percNoise = _percOfNoise;
+    percNoise = 0.01;
 
 //    axisRef = TS_LoadSetup(setupFilePath.c_str());
 //    if(axisRef < 0){
@@ -334,8 +339,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     // ************ Thread manager *************
     motionscalled=0;
-
-    percNoise = 0.0;
+    
     //deltaNoise = 100; // Number of microsteps. Used for noise
 
     return 0;
@@ -747,7 +751,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 //
 //    return 0;
 
-    DPRINT("Thread di movimentazione partito!!!!!!!!!");
+    //DPRINT("Thread di movimentazione partito!!!!!!!!!");
 
     bool goahead=false;
     if(pthread_mutex_lock(&(mu))!=0){
@@ -772,7 +776,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     long initPosition = position;
     bool resetLimitSwicth=true;
 
-    DPRINT("%ld",position);
+    //DPRINT("%ld",position);
 
     if(!(position>=0)){
         DPRINT("!(position>=0)");
@@ -808,9 +812,9 @@ int TechnoSoftLowDriver::incrDecrPosition(){
             positionEncoder-=speed_ms_s;
         }
 
-        DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
-        DPRINT("Posizione encoder dopo l'incremento effettuato: %ld", positionEncoder);
-        DPRINT("Posizione counter dopo l'incremento effettuato: %ld", positionCounter);
+        //DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
+        //DPRINT("Posizione encoder dopo l'incremento effettuato: %ld", positionEncoder);
+        //DPRINT("Posizione counter dopo l'incremento effettuato: %ld", positionCounter);
 
         if(resetLimitSwicth){
             if (position > 0){
@@ -1814,7 +1818,7 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
 
 int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 
-    DPRINT("Reading COUNTER position");
+    //DPRINT("Reading COUNTER position");
     //long tposition;
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
@@ -1874,8 +1878,9 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //    NumberDistribution distribution(rangeMin, rangeMax);
 //    Generator numberGenerator(generator, distribution);
 //    *deltaPosition_mm = numberGenerator();
-      *deltaPosition_mm = (positionCounter*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-
+    double pos = positionCounter;
+    *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    
     return 0;
 }
 
@@ -1904,12 +1909,12 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 
 int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 
-    DPRINT("Reading ENCODER position");
+    //DPRINT("Reading ENCODER position");
 //    long aposition;
 //    if(!TS_GetLongVariable("APOS", aposition)){
 //        return -1;
 //    }
-
+    //DPRINT("E' questo il getEncoder???????????????");
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
@@ -1970,16 +1975,27 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     
     if(percNoise>0){
         double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+        if(pos_mm==0){
+            pos_mm=0.000001;
+        }
         double deltaNoise = (pos_mm*percNoise);
+        //DPRINT("pos_mm=%f",pos_mm);
+        //DPRINT("deltaNoise=%f",deltaNoise);
         const double rangeMin = pos_mm-deltaNoise;
         const double rangeMax = pos_mm+deltaNoise;
+        //DPRINT("rangeMin=%f",rangeMin);
+        //DPRINT("rangeMax=%f", rangeMax);
         NumberDistribution distribution(rangeMin, rangeMax);
         Generator numberGenerator(generator, distribution);
         *deltaPosition_mm = numberGenerator();
+        //DPRINT("************** Position encoder of axisID 14: %4.13f **************",*deltaPosition_mm);
+        //sleep(1);
     }
     else
         *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-       
+    
+    //DPRINT("Real position encoder %f millimeter", *deltaPosition_mm);
+   
     return 0;
 }
 
@@ -2179,22 +2195,30 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
     }
 
     // Inizializzazione "casuale" codici allarmi:
+//    if(alarmsInfoRequest && regMERrequest){
+//        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
+//            random_variable = std::rand();
+//            if(random_variable<p*(RAND_MAX/100))
+//                contentRegister |= ((WORD)1<<i);
+//        }
+//        //contentRegister = contentRegMER;
+//        return 0;
+//    }
     if(alarmsInfoRequest && regMERrequest){
-        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
-            random_variable = std::rand();
-            if(random_variable<p*(RAND_MAX/100))
-                contentRegister |= ((WORD)1<<i);
-        }
-        //contentRegister = contentRegMER;
+        contentRegister=0;
         return 0;
     }
+//    else if(alarmsInfoRequest && regSRHrequest){
+//        for(uint16_t i=10; i<12; i++){
+//            random_variable = std::rand();
+//            if(random_variable<p*((RAND_MAX)/100))
+//                contentRegSRH |= ((WORD)1<<i);
+//        }
+//        contentRegister = contentRegSRH;
+//        return 0;
+//    }
     else if(alarmsInfoRequest && regSRHrequest){
-        for(uint16_t i=10; i<12; i++){
-            random_variable = std::rand();
-            if(random_variable<p*((RAND_MAX)/100))
-                contentRegSRH |= ((WORD)1<<i);
-        }
-        contentRegister = contentRegSRH;
+        contentRegister=0;
         return 0;
     }
     // Inizializzazione "casuale" codici stati:

@@ -43,8 +43,9 @@ void* function1(void* str){
             sleep(10);
             //* errPtr = -5;
         }
-        DPRINT("************** Prima movimentazione asse 14 **************");
+        DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
         int resp;
+        sleep(5);
 
 //        if((resp=OBJ->moveAbsoluteMillimeters(axisID,1))<0){
 //            DERR("************** Error returned by movement operation, code error %d **************",resp);
@@ -110,13 +111,20 @@ void* function1(void* str){
 //            sleep(10);
 //        }
 //
-//        sleep(10);
+        sleep(10);
+        DPRINT("************** Fra dieci secondi partirà la movimentazione **************");
 //
-//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,7))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
+//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
 //            sleep(10);
-//            //* errPtr = -5;
-//        }
+
+        if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
+            DERR("************** Error returned by movement operation, code error %d **************",resp);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        uint64_t alarms;
+        std::string desc2;
 //        sleep(10); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
 //        if((resp=OBJ->stopMotion(axisID))<0){
@@ -164,14 +172,19 @@ void* function1(void* str){
                 sleep(10);
                 //* errPtr = -5;
             }
+            
+            if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
+                DERR("************** Error reading alarms ***************");
+            }
 
-            DPRINT("************** Position encoder of axisID 14: %4.15f **************",position_mm_encoder);
-            DPRINT("************** Position counter of axisID 14: %4.15f  **************",position_mm_counter);
-
+            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
+            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
+            DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
+            
             gettimeofday(&endTimeForMotor1,NULL);
             total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
-            usleep(1000000); // lettura ogni millisecondo..
+            usleep(5000); // lettura ogni millisecondo..
 //
         }
 

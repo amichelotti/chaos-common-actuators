@@ -109,10 +109,6 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         if(channel->open()<0){
             return -3;
         }
-        std::srand(std::time(0));
-        int random_variable = std::rand();
-        if(random_variable<(RAND_MAX/20))
-            return -3;
         initChannelAlreadyDone = true;
         return 0;
     }
@@ -545,7 +541,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
 //}
 
 int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
-    DPRINT("Position reading, axisID %d",axisID);
+    //DPRINT("Position reading, axisID %d",axisID);
 
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
