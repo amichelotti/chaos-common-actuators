@@ -830,7 +830,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 
         }
         //DPRINT("Posizione incrementata!!!!!");
-        usleep(3000); // Sleep for 1 milli second
+        usleep(2000); // Sleep for 1 milli second
     }
 
     if(position<0){
