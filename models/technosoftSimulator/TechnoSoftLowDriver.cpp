@@ -1450,8 +1450,6 @@ int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
 
 int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 
-
-
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
