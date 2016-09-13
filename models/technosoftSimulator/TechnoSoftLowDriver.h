@@ -77,9 +77,9 @@
 
 // Features of homing procedure
 //#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
-#define HIGH_SPEED_HOMING_DEFAULT 0.01 // [microstep/ms]
+#define HIGH_SPEED_HOMING_DEFAULT 400.0 // [microstep/ms]
 
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS)
+#define MAX_HIGHSPEED_HOMING_DEFAULT 600.0 // [mm/s]       (da MDS)
 //#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
 #define LOW_SPEED_HOMING_DEFAULT 0.001 // [microstep/ms]
 #define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)
@@ -198,7 +198,7 @@ namespace common{
                 long cap_position;
                 bool LNStransition;
 
-                double epsylon;
+                long epsylon;
                 double p;
 
                 // Stato esecuzione thread

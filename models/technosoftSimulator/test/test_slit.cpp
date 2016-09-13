@@ -43,9 +43,9 @@ void* function1(void* str){
             sleep(10);
             //* errPtr = -5;
         }
-        DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
+        //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
         int resp;
-        sleep(5);
+        //sleep(5);
 
 //        if((resp=OBJ->moveAbsoluteMillimeters(axisID,1))<0){
 //            DERR("************** Error returned by movement operation, code error %d **************",resp);
@@ -85,9 +85,11 @@ void* function1(void* str){
         struct timeval startTimeForMotor1,endTimeForMotor1;
 
         double total_time_interval=0;
-        double duration = 180;
+        double duration = 15;
         double position_mm_encoder;
         double position_mm_counter;
+        
+        
 
 //        DPRINT("Stopping displacement");
 //        if((resp=OBJ->stopMotion(axisID))<0){
@@ -111,20 +113,66 @@ void* function1(void* str){
 //            sleep(10);
 //        }
 //
-        sleep(10);
-        DPRINT("************** Fra dieci secondi partirà la movimentazione **************");
+        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa **************");
+        sleep(5);
+        
+        
 //
 //        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
 //            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
 //            sleep(10);
 
-        if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
+        if((resp=OBJ->moveRelativeMillimeters(axisID,3))<0){
             DERR("************** Error returned by movement operation, code error %d **************",resp);
             sleep(10);
             //* errPtr = -5;
         }
+        
+        DPRINT("************ Procedura di homing terminata con successo. Segue la lettura dei dati ***************");
         uint64_t alarms;
         std::string desc2;
+        
+        gettimeofday(&startTimeForMotor1,NULL);
+        
+        while(total_time_interval<=duration){
+            
+//            if((resp=OBJ->getState(axisID,&state, descStr))<0){
+//                DERR("************** Error returned by getState operation, code error %d **************",resp);
+//                sleep(10);
+//                //* errPtr = -5;
+//            }
+//            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());
+
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
+
+            //usleep(5000);
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
+            
+            if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
+                DERR("************** Error reading alarms ***************");
+            }
+            
+            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
+            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
+            DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
+            
+            gettimeofday(&endTimeForMotor1,NULL);
+            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+
+            DPRINT("total_time_interval: %f",total_time_interval);
+            
+            usleep(1000000); // lettura ogni secondo...
+//
+        }
+        
 //        sleep(10); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
 //        if((resp=OBJ->stopMotion(axisID))<0){
@@ -149,9 +197,31 @@ void* function1(void* str){
 
         //DPRINT("************** Position COUNTER of axisID 14: %f mm **************",position_mm);
 
+        // HOMING OPERATION
+        int respHoming=1; // Operazione di homing non conclusa
+        int numHoming = 1;
+        
+        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
+        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+            // con successo o insuccesso
+            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
+            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
+                usleep(1000); // FREQUENZA DI 100 ms
+                if(respHoming<0){
+                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
+                    break;
+                }
+            }
+            if(respHoming==0){
+                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+            }
+            respHoming = 1;
+            usleep(5000000);
+        }
+        
+        gettimeofday(&startTimeForMotor1,NULL);
         while(total_time_interval<=duration){
-
-            gettimeofday(&startTimeForMotor1,NULL);
 
 //            if((resp=OBJ->getState(axisID,&state, descStr))<0){
 //                DERR("************** Error returned by getState operation, code error %d **************",resp);
@@ -184,9 +254,10 @@ void* function1(void* str){
             gettimeofday(&endTimeForMotor1,NULL);
             total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
-            usleep(5000); // lettura ogni millisecondo..
+            usleep(1000000); // lettura ogni millisecondo..
 //
         }
+        
 
 //        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
 //        sleep(30);
