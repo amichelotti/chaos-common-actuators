@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(common_actuators_technosoftSimulator)
-FILE(GLOB model_lib ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)    
-FILE(COPY ${model_lib} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 MESG(STATUS "libraries ${model_lib}")
-LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 ADD_DEFINITIONS(-DDEBUG -fpic)
 
 FILE(GLOB src *.cpp)    
