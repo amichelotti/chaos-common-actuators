@@ -206,7 +206,7 @@ void* function1(void* str){
             // con successo o insuccesso
             DPRINT("*************Procedura di homing n. %d iniziata*************",i);
             while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
+                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
                 usleep(1000); // FREQUENZA DI 100 ms
                 if(respHoming<0){
                     DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);

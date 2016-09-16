@@ -547,8 +547,6 @@ int TechnoSoftLowDriver::homing(int mode){
 //                pthread_t th1;
 //                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
 //                pthread_join(th1,NULL);
-
-
                 if(resetCounter()<0){
                     internalHomingStateDefault = 0;
                     if(stopMotion()<0){
@@ -613,10 +611,17 @@ int TechnoSoftLowDriver::homing(int mode){
 //                        risp= -2;
 //                        break;
 //                    }
-                    pthread_t th;
-                    pthread_create(&th, NULL,staticStopMotionForThread,this);
-                    pthread_join(th,NULL);
-                    risp= -3;
+//                    pthread_t th;
+//                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+//                    pthread_join(th,NULL);
+                    if(stopMotion()<0){
+                        risp= -1;
+                        break;
+                    }
+//                    pthread_t th;
+//                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+//                    pthread_join(th,NULL);
+                    risp = -2;
                     break;
                 }
                 // lettura bit di interesse
@@ -629,26 +634,64 @@ int TechnoSoftLowDriver::homing(int mode){
             case 2:
                 DPRINT("************** Homing procedure Homing2. STATE 2. **************");
                 DPRINT("************** Reset encoder e counter **************");
-//                if(resetEncoder()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(stopMotion()<0){
-//                        risp= -4;
-//                        break;
-//                    }
-//                    risp= -5;
-//                    break;
-//                }
-
-                // Attendiamo che il motore si fermi prima di fare il reset:
-
+                
                 while(actuatorIDInMotion){
                     usleep(1000);
                 }
+                
+                if(resetEncoder()<0){
+                    internalHomingStateHoming2=0;
+                    if(stopMotion()<0){
+                        risp= -1;
+                        break;
+                    }
+                    risp= -2;
+                    break;
+                }
+                
+                if(resetCounter()<0){
+                    internalHomingStateHoming2=0;
+                    if(stopMotion()<0){
+                        risp= -3;
+                        break;
+                    }
+                    risp= -4;
+                    break;
+                }
+
+                // Attendiamo che il motore si fermi prima di fare il reset:
+
+//                while(actuatorIDInMotion){
+//                    usleep(1000);
+//                }
 
                 // Il motore e' fermo. Possiamo fare il reset
-                pthread_t th1;
-                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
-                pthread_join(th1,NULL);
+//                pthread_t th1;
+//                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
+//                pthread_join(th1,NULL);
+                
+//                if(resetCounter()<0){
+//                    internalHomingStateHoming2=0;
+//                    if(stopMotion()<0){
+//                        risp= -1;
+//                        break;
+//                    }
+//                    risp= -2;
+//                    break;
+//                }
+                
+//                if(resetEncoder()<0){
+//                    internalHomingStateHoming2=0;
+//                    if(stopMotion()<0){
+//                        risp= -3;
+//                        break;
+//                    }
+//                    risp= -4;
+//                    break;
+//                }
+//                pthread_t th2;
+//                pthread_create(&th2, NULL,staticResetCounterForThread,this);
+//                pthread_join(th2,NULL);
 //                if(resetCounter()<0){
 //                    internalHomingStateHoming2=0;
 //                    if(stopMotion()<0){
@@ -658,23 +701,11 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -7;
 //                    break;
 //                }
-//                pthread_t th2;
-//                pthread_create(&th2, NULL,staticResetCounterForThread,this);
-//                pthread_join(th2,NULL);
-                if(resetCounter()<0){
-                    internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -6;
-                        break;
-                    }
-                    risp= -7;
-                    break;
-                }
                 internalHomingStateHoming2=0;
                 risp=0;
                 break;
             default:
-                internalHomingStateHoming2 = 0;
+                internalHomingStateHoming2=0;
                 risp=-22;
                 break;
         }
@@ -1586,7 +1617,7 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 //    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //    }
-    bool goahead = false;
+    //bool goahead = false;
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
@@ -1613,8 +1644,9 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
     long initPosition = position; // mi prendo la posizione corrente del motorE
     actuatorIDInMotion = true;
 
-    if(absolutePosition>initPosition)
-        goahead = true;
+//    if(absolutePosition>initPosition){
+//        goahead = true;
+//    }
 
     if(pthread_mutex_unlock(&(mu))!=0){ //Sblocchiamo il mutex
 
@@ -1622,7 +1654,6 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
     
     DPRINT("Posizione corrente dal quale partire: %ld",position);
     DPRINT("Absolute position da raggiungere: %ld",absolutePosition);
-    sleep(30);
 
     bool resetLimitSwicth=true;
     while( abs(position-absolutePosition)>0 && !stopMotionCommand && !powerOffCommand){// L'incremento dovra' avvenire ad una determinata velocita'
@@ -1632,16 +1663,18 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 
         }
 
-        if(goahead){
-            position-=lowSpeedHoming_mm_s;
-            positionCounter-=lowSpeedHoming_mm_s;
-            positionEncoder-=lowSpeedHoming_mm_s;
-        }
-        else{
-            position+=lowSpeedHoming_mm_s;
-            positionCounter+=lowSpeedHoming_mm_s;
-            positionEncoder+=lowSpeedHoming_mm_s;
-        }
+       
+        DPRINT("Go ahead = true");
+        position+=lowSpeedHoming_mm_s;
+        positionCounter+=lowSpeedHoming_mm_s;
+        positionEncoder+=lowSpeedHoming_mm_s;
+        
+//        else{
+//            DPRINT("Go ahead = false");
+//            position-=lowSpeedHoming_mm_s;
+//            positionCounter-=lowSpeedHoming_mm_s;
+//            positionEncoder-=lowSpeedHoming_mm_s;
+//        }
 
         if(resetLimitSwicth){
             if (position > 0){
@@ -1854,8 +1887,9 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX/100)){
         return -1;
+    }
 
     //*deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
 //    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
@@ -1904,7 +1938,6 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //    *deltaPosition_mm = numberGenerator();
     double pos = positionCounter;
     *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-    
     return 0;
 }
 
@@ -1941,8 +1974,9 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     //DPRINT("E' questo il getEncoder???????????????");
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX/100)){
         return -1;
+    }
 
 //    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
 
@@ -2059,7 +2093,7 @@ int TechnoSoftLowDriver::resetCounter(){
 
     }
         positionCounter = 0;
-        position = 0;
+        //position = 0;
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
@@ -2083,8 +2117,9 @@ int TechnoSoftLowDriver::resetEncoder(){
 //    }
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX/100)){
         return -1;
+    }
 
     if(pthread_mutex_lock(&(mu))!=0){
 
@@ -2200,7 +2235,7 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
     }
     if(pthread_mutex_unlock(&(mu))!=0){
 
-        }
+    }
     
 //    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //

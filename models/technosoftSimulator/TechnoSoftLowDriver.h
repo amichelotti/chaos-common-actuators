@@ -77,12 +77,12 @@
 
 // Features of homing procedure
 //#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
-#define HIGH_SPEED_HOMING_DEFAULT 400.0 // [microstep/ms]
+#define HIGH_SPEED_HOMING_DEFAULT 425.0 // [microstep/ms]
 
 #define MAX_HIGHSPEED_HOMING_DEFAULT 600.0 // [mm/s]       (da MDS)
 //#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
-#define LOW_SPEED_HOMING_DEFAULT 0.001 // [microstep/ms]
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)
+#define LOW_SPEED_HOMING_DEFAULT 50.0 // [microstep/ms]
+#define MAXLOW_SPEED_HOMING_DEFAULT 150.0 // [mm/s]         (da MDS)
 #define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
 #define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
 
