@@ -522,7 +522,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 }
             // **************DA IMPLEMENTARE:*****************
             // RESET ON Event On Motion Complete
-                //sleep(5);
+                //sleep(5)
                 risp= 1;
                 break;
             case 5:
@@ -800,7 +800,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 
     //DPRINT("Thread di movimentazione partito!!!!!!!!!");
 
-    bool goahead=false;
+    bool goahead=false; // Per default vai indietro
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
@@ -808,7 +808,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     if(deltaPosition==0){
         if(pthread_mutex_unlock(&(mu))!=0){
         }
-        return -1;
+        return 0;
     }
     // In quale posizione mi devo spostare?
     if(deltaPosition>=0){
@@ -842,18 +842,18 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 //    if(powerOffCommand)
 //        DPRINT("powerOffCommand");
 
-    while(position>=(-50*SPEED_DEFAULT) && position<=LONG_MAX && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
+    while(position>=(-10*SPEED_DEFAULT) && position<=LONG_MAX && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
 
         if(pthread_mutex_lock(&(mu))!=0){
 
         }
 
-        if(goahead){
+        if(goahead){ // vai avanti
             position+=speed_ms_s;
             positionCounter+=speed_ms_s;
             positionEncoder+=speed_ms_s;
         }
-        else{
+        else{ // vai indietro
             position-=speed_ms_s;
             positionCounter-=speed_ms_s;
             positionEncoder-=speed_ms_s;
@@ -910,14 +910,16 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 //            LSNactive = true;
 //        }
     if(position<0){
-        LSNactive=true;                            
+        LSNactive=true;                              
 //        position=0;
 //        positionCounter=0;
 //        positionEncoder=0;
+        position=0;   
     }
     
     if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
         LSPactive=true;
+        position = LONG_MAX;
     }
     
     if(pthread_mutex_unlock(&(mu))!=0){
@@ -1317,7 +1319,6 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     DPRINT("moveAbsolutePosition: Thread partito");
 
-
     bool goahead = false;
     if(pthread_mutex_lock(&(mu))!=0){
 
@@ -1342,7 +1343,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     actuatorIDInMotion = true;
 
     if(absolutePosition>initPosition)
-        goahead = true;
+        goahead = true; // Vai avanti
 
     if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -1361,7 +1362,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
         }
 
-            if(goahead){
+            if(goahead){ // vai avanti
                 position+=speed_ms_s;
                 positionCounter+=speed_ms_s;
                 positionEncoder+=speed_ms_s;
@@ -1411,9 +1412,11 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     if(position<0){ // nel qual caso absolutePosition dato in input ==0
         LSNactive = true;
+        position = 0;
     }
     if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
         LSPactive = true;
+        position = LONG_MAX;
     }
     
     if(pthread_mutex_unlock(&(mu))!=0){
@@ -1503,7 +1506,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
     }
 
     // L'incremento deve avvenire ad una determinata velocita'
-    if(position<=0 || LSNactive){
+    if(position<=0){
         DPRINT("La posizione in steps e' gia' <= 0. Non occorre spostarsi ancora indietro per effettuare di nuovo l'homing");
         if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -1560,11 +1563,15 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
     }
         actuatorIDInMotion = false;
         stopMotionCommand = false;
+        if(LNStransition){
+            LSNactive = true;
+        }
+              
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
     DPRINT("Posizione raggiunta dopo la rilevazione della transizione dello switch %ld",position);
-    sleep(30);
+    //sleep(30);
     //LNStransition = false;
     return 0;
 }
@@ -1596,7 +1603,7 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
     if(random_variable<p*(RAND_MAX/100)){
         return -1;
     }
-
+    
     pthread_t th;
     pthread_create(&th, NULL,staticMoveConstantVelocityHomingFunctionForThread,this);
 
@@ -1654,7 +1661,7 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
     }
     
     DPRINT("Posizione corrente dal quale partire: %ld",position);
-    DPRINT("Absolute position da raggiungere: %ld",absolutePosition);
+    DPRINT("Absolute position da raggiungere: %ld",absolutePosition); // In realtà absolutePosition è sempre zero
 
     long tol = 150;
     bool resetLimitSwicth=true;
@@ -1665,7 +1672,6 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 
         }
 
-       
         DPRINT("Go ahead = true");
         position+=lowSpeedHoming_mm_s;
         positionCounter+=lowSpeedHoming_mm_s;
@@ -1680,14 +1686,15 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 
         if(resetLimitSwicth){
             if (position >= 0){
+                LNStransition = false;
                 LSNactive=false;
             }
-            if (position=<LONG_MAX){
+            if (position<=LONG_MAX){
                 LSPactive=false;
             }
             resetLimitSwicth=false;
         }
-
+        
         if(pthread_mutex_unlock(&(mu))!=0){
 
         }
@@ -2294,27 +2301,35 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         return 0;
     }
     // Inizializzazione "casuale" codici stati:
-    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
-        for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
-            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
-                random_variable = std::rand();
-                if(random_variable<p*(RAND_MAX/100))
-                    contentRegSRH |= ((WORD)1<<i);
-            }
-        }
-        contentRegister = contentRegSRH;
+//    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
+//        for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
+//            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
+//                random_variable = std::rand();
+//                if(random_variable<p*(RAND_MAX/100))
+//                    contentRegSRH |= ((WORD)1<<i);
+//            }
+//        }
+//        contentRegister = contentRegSRH;
+//        return 0;
+//    }
+    else if(stateInfoRequest && regSRHrequest){
+        contentRegister=0;
         return 0;
     }
+//    else if(stateInfoRequest && regSRLrequest){
+//        random_variable = std::rand();
+//        if(random_variable<p*(RAND_MAX/100)){
+//            contentRegSRL |= ((WORD)1<<10);
+//        }
+//        random_variable = std::rand();
+//        if(random_variable<p*(RAND_MAX/100)){
+//            contentRegSRL |= ((WORD)1<<15);
+//        }
+//        contentRegister = contentRegSRL;
+//        return 0;
+//    }
     else if(stateInfoRequest && regSRLrequest){
-        random_variable = std::rand();
-        if(random_variable<p*(RAND_MAX/100)){
-            contentRegSRL |= ((WORD)1<<10);
-        }
-        random_variable = std::rand();
-        if(random_variable<p*(RAND_MAX/100)){
-            contentRegSRL |= ((WORD)1<<15);
-        }
-        contentRegister = contentRegSRL;
+        contentRegister=0;
         return 0;
     }
     return -2;
