@@ -227,6 +227,8 @@ namespace common{
 
                 //long deltaNoise;
                 double percNoise;
+                
+                bool controlledPositionHoming;
 
             public:
                 bool alarmsInfoRequest;

@@ -591,8 +591,6 @@ int ActuatorTechnoSoft::homing(int axisID,homingType mode){
     return ((i->second)->homing(mode));
 }
 
-
-
 int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
     // ******************** NOTA:  le funzioni getState e getAlarms devono essere eseguite in modalita' SEQUENZIALE,
@@ -684,7 +682,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 //        descStr += "Electrical power supplied.";
 //    }
 
-    if((i->second)->powerOffCommand){
+    if(!((i->second)->powerOffCommand)){
         stCode |= ACTUATOR_POWER_SUPPLIED;
         descStr += "Electrical power supplied.";
     }

@@ -341,13 +341,20 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     motionscalled=0;
     
     //deltaNoise = 100; // Number of microsteps. Used for noise
+    controlledPositionHoming = false;
 
     return 0;
 }
 
 int TechnoSoftLowDriver::homing(int mode){
     // Attenzione: la variabile mode non viene utilizzata
-
+//    if(!controlledPositionHoming){
+//        if(LSNactive){
+//            return 0;
+//            
+//        }
+//    }
+       
     if(mode==0){
 
         int risp;
