@@ -625,6 +625,8 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     (i->second)->regSRHrequest = true;
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
         ERR("Reading state error: %s",descStr.c_str());
+        stCode|=ACTUATOR_UNKNOWN_STATUS;
+        descStr=descStr+"Unknown status. ";
         return -3;
     }
     (i->second)->regSRHrequest = false;
@@ -641,6 +643,13 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
     }
+    
+    // Gestione over position trigger state trascurato
+    if((contentRegSRH & ((uint16_t)1<<1)) || (contentRegSRH & ((uint16_t)1<<2)) || (contentRegSRH & ((uint16_t)1<<3)) || (contentRegSRH & ((uint16_t)1<<4))){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
+        stCode|=ACTUATOR_OVER_POSITION_TRIGGER;
+        descStr=descStr+"Over Position Trigger. ";
+    }
+    
     // con il contenuto corrente **************
     if(contentRegSRH & ((uint16_t)1<<5)){
         stCode |= ACTUATOR_AUTORUN_ENABLED;
@@ -727,6 +736,8 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     (i->second)->regMERrequest = true;
     if((i->second)->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
+        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+        descStr+= "Reading alarms error. ";
         return -3;
     }
     (i->second)->regMERrequest = false;
@@ -735,6 +746,8 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     (i->second)->regSRHrequest = true;
     if((i->second)->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
+        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+        descStr+= "Alarms reading error. ";
         return -4;
     }
     (i->second)->regSRHrequest = false;
@@ -830,6 +843,9 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         stCode|=ACTUATOR_I2T_WARNING_DRIVE;
         descStr+="Drive I2T protection warning";
     }
+    
+    // No alarms detected
+
     *alrm = stCode;
     (i->second)->alarmsInfoRequest = false; // Comunico al motore che ho terminato di richiedere info riguardanti gli allarmi
 
