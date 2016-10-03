@@ -525,6 +525,8 @@ int TechnoSoftLowDriver::homing(int mode){
 //                }
                 if(!actuatorIDInMotion){ // riposizionamento terminato, passa al prossimo stato
                     internalHomingStateDefault = 5;
+//                    LNStransition = false;
+//                    LSNactive=false;
                     DPRINT("************** STATE 4: motor positioned to end **************");
                 }
             // **************DA IMPLEMENTARE:*****************
@@ -859,6 +861,8 @@ int TechnoSoftLowDriver::incrDecrPosition(){
             position+=speed_ms_s;
             positionCounter+=speed_ms_s;
             positionEncoder+=speed_ms_s;
+            LNStransition = false;
+            LSNactive = false;
         }
         else{ // vai indietro
             position-=speed_ms_s;
@@ -1396,6 +1400,8 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
                 position+=speed_ms_s;
                 positionCounter+=speed_ms_s;
                 positionEncoder+=speed_ms_s;
+                LNStransition = false;
+                LSNactive = false;
             }
             else{
                 position-=speed_ms_s;
@@ -1606,6 +1612,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 //        deltaT += (deltaT*tol/100)
         usleep(1000); // Sleep for 1 milli second
     }
+    
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
