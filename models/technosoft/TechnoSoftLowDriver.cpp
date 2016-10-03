@@ -314,6 +314,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     internalHomingStateDefault=0;
     internalHomingStateHoming2=0;
     
+    //controlledInitialPositionHoming = false;
+    //epsylon = 0.000000000;
+    
     return 0;
 }
 
@@ -324,6 +327,16 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
 int TechnoSoftLowDriver::homing(int mode){
     // Attenzione: la variabile mode non viene utilizzata
+    
+//    if(!controlledInitialPositionHoming){
+//        // lettura posizione:
+//        double* position;
+//        if(getCounter(position)<0)
+//            return -1;
+//        if(position==0 || ){ // position in millimeters
+//            return 0;
+//        }   
+//    }
     
     if(mode==0){
         

@@ -54,7 +54,7 @@ typedef enum {
             ACTUATOR_POWER_SUPPLIED = 0x200,  // cambiare nome
             HOMING_IN_PROGRESS = 0x400,
             // Unknown status
-            ACTUATOR_UNKNOWN_STATUS // Unknown state of the actuator
+            ACTUATOR_UNKNOWN_STATUS = 0x800  // Unknown state of the actuator
         } actuatorStatus;
 
         typedef enum {
@@ -77,7 +77,8 @@ typedef enum {
             //ACTUATOR_ENABLE_INPUT_ACTIVE // Enable status of drive/motor
             ACTUATOR_I2T_WARNING_MOTOR = 0x8000, // Motor I2T protection warning
             ACTUATOR_I2T_WARNING_DRIVE = 0x10000, // Drive I2T protection warning
-            ACTUATOR_NO_ALARMS_DETECTED
+            ACTUATOR_NO_ALARMS_DETECTED = 0x20000,
+            ACTUATOR_ALARMS_READING_ERROR = 0x40000,    
         } actuatorAlarms;
 
     class AbstractActuator {

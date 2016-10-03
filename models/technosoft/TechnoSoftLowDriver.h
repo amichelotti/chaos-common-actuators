@@ -148,6 +148,9 @@ namespace common{
                 short movementHoming;
                 short referenceBaseHoming;
                 
+                //bool controlledInitialPositionHoming; 
+                //double epsylon;
+                
             public:
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
                 int internalHomingStateHoming2; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico

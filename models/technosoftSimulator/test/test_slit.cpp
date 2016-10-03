@@ -43,6 +43,15 @@ void* function1(void* str){
             sleep(10);
             //* errPtr = -5;
         }
+        
+        if(OBJ->setParameter(axisID,"speed","200")<0){
+            DERR("************** Error setparameter **************");
+            sleep(10);
+            //* errPtr = -5;
+        }
+        DPRINT("SETPPARAMETER OK");
+        sleep(35);
+        
         //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
         int resp;
         //sleep(5);

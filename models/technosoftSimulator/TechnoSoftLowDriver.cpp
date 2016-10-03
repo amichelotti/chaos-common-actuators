@@ -873,11 +873,12 @@ int TechnoSoftLowDriver::incrDecrPosition(){
         if(resetLimitSwicth){
             if (position >= 0){
                 LSNactive=false;
+                resetLimitSwicth=false;
             }
             if (position<=LONG_MAX){
                 LSPactive=false;
+                resetLimitSwicth=false;
             }
-            resetLimitSwicth=false;
         }
 
         if(pthread_mutex_unlock(&(mu))!=0){
@@ -921,6 +922,8 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 //        position=0;
 //        positionCounter=0;
 //        positionEncoder=0;
+        positionCounter=0;
+        positionEncoder=0;
         position=0;   
     }
     
@@ -1330,27 +1333,47 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
-    if(position==(absolutePosition)){ //position: current position
-//        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//        }
-        return 0;
+    
+    if(position<0){
+       position=0; 
     }
     
+    bool turnLNS = false;
+    bool turnLPS = false;
     if(absolutePosition<0){
+//        if(pthread_mutex_unlock(&(mu))!=0){
+//
+//        }
+        absolutePosition=0;
+        turnLNS = true;
+        //turnLNS = true;
+        //return -1;
+    }
+    else if(absolutePosition>LONG_MAX){
+        absolutePosition=LONG_MAX;
+        turnLPS=true;
+    }
+    
+    if(position==(absolutePosition)){ //position: current position
         if(pthread_mutex_unlock(&(mu))!=0){
 
         }
-        return -1;
+        return 0;
     }
+    
+    
+    
+    
+    
     // Quindi absolutePosition>=0 && absolutePosition <= LONG_MAX (perche' e' rappresentabile)
     // La slitta dunque si muovera' nella posizione [0,LONG_MAX]
 
     long initPosition = position; // mi prendo la posizione corrente del motorE
     actuatorIDInMotion = true;
 
-    if(absolutePosition>initPosition)
+    if(absolutePosition>initPosition){
         goahead = true; // Vai avanti
+    }
 
     if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -1360,7 +1383,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     DPRINT("moveAbsolutePosition: appena prima del ciclo while");
 
-    long tol = 150;
+    long tol = speed_ms_s;
 
     while(std::labs(position-absolutePosition)>tol && !stopMotionCommand && !powerOffCommand){// L'incremento dovra' avvenire ad una determinata velocita'
 
@@ -1389,11 +1412,12 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
             if(resetLimitSwicth){
                 if (position >= 0){
                     LSNactive=false;
+                    resetLimitSwicth=false;
                 }
                 if (position<=LONG_MAX){
                     LSPactive=false;
+                    resetLimitSwicth=false;
                 }
-                resetLimitSwicth=false;
             }
 
             if(pthread_mutex_unlock(&(mu))!=0){
@@ -1412,19 +1436,36 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
-
+ 
     actuatorIDInMotion = false;
     stopMotionCommand = false;
     motionscalled--;
 
-    if(position<0){ // nel qual caso absolutePosition dato in input ==0
+//    if(position<0){ // nel qual caso absolutePosition dato in input ==0
+//        LSNactive = true;
+//        position = 0;
+//    }
+    if(turnLNS && std::labs(position-absolutePosition)<=tol){ // nel qual caso absolutePosition dato in input ==0
+        position =0;
+        positionCounter=0;
+        positionEncoder=0;
         LSNactive = true;
-        position = 0;
     }
-    if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
+    else if(turnLPS && std::labs(position-absolutePosition)<=tol){ // nel qual caso absolutePosition dato in input ==0
+        position = LONG_MAX; // non e' possibile assegnargli un valore piu grande :(
+        positionCounter=LONG_MAX;
+        positionEncoder=LONG_MAX;
         LSPactive = true;
-        position = LONG_MAX;
     }
+     
+//    if(turnLPS){ // nel qual caso absolutePosition dato in input ==0
+//        position -= LONG_MAX+; // non si pu
+//    }
+    
+//    if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
+//        LSPactive = true;
+//        position = LONG_MAX;
+//    }
     
     if(pthread_mutex_unlock(&(mu))!=0){
 

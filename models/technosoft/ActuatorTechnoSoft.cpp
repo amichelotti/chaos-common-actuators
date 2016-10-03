@@ -1048,19 +1048,30 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
+        stCode|=ACTUATOR_UNKNOWN_STATUS;
+        descStr=descStr+"Unknown status. ";
         ERR("Reading state error: %s",descStr.c_str());
         return -3;
     }
     indexReg = 3; // see constant REG_SRL in TML_lib.h
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRL, descStr))<0){
+        stCode|=ACTUATOR_UNKNOWN_STATUS;
+        descStr=descStr+"Unknown status. ";
         ERR("Reading state error: %s",descStr.c_str());
         return -4;
     }
-
+    
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
     }
+    
+    
+    if((contentRegSRH & ((uint16_t)1<<1)) || (contentRegSRH & ((uint16_t)1<<2)) || (contentRegSRH & ((uint16_t)1<<3)) || (contentRegSRH & ((uint16_t)1<<4))){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
+        stCode|=ACTUATOR_OVER_POSITION_TRIGGER;
+        descStr=descStr+"Over Position Trigger. ";
+    } 
+    
     // con il contenuto corrente **************
     if(contentRegSRH & ((uint16_t)1<<5)){
         stCode |= ACTUATOR_AUTORUN_ENABLED;
@@ -1134,6 +1145,8 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     
     short indexRegMER = 5; // see constant REG_MER in TML_lib.h
     if((i->second)->getStatusOrErrorReg(indexRegMER, contentRegMER, descStr)<0){
+        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+        descStr+= "Alarms reading error. ";
         DERR("Reading alarms error: %s",descStr.c_str());
         return -3;
     }
@@ -1141,6 +1154,8 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     short indexRegSRH = 4; // see constant REG_SRH in TML_lib.h
     if((i->second)->getStatusOrErrorReg(indexRegSRH, contentRegSRH, descStr)<0){
         DERR("Reading alarms error: %s",descStr.c_str());
+        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+        descStr+= "Alarms reading error. ";
         return -4;
     }
 
@@ -1224,8 +1239,15 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         stCode|=ACTUATOR_I2T_WARNING_DRIVE;
         descStr+="Drive I2T protection warning";
     }
-
+    
+    // No alarms detected
+    if(stCode==0){
+        stCode|=ACTUATOR_NO_ALARMS_DETECTED;
+        descStr+="No alarms detected";
+    }
+    
     *alrm = stCode;
+    
     return 0;
 }
      
