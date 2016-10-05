@@ -356,13 +356,13 @@ int TechnoSoftLowDriver::homing(int mode){
 //    }
        
     if(mode==0){
-
+        //homingType = 0;
         int risp;
         int switchTransited=0;
-        int motionCompleted = 0;
-        std::string cappos = "CAPPOS";
+        //int motionCompleted = 0;
+        //std::string cappos = "CAPPOS";
         cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
-        int absoluteMotionCompleted = 0;
+        //int absoluteMotionCompleted = 0;
 
         switch (internalHomingStateDefault) {
             case 0:
@@ -398,7 +398,12 @@ int TechnoSoftLowDriver::homing(int mode){
                     break;
                 }
                 DPRINT("STATE 0: event on limit switch activated ");
-                internalHomingStateDefault = 1;
+                if(position>0){
+                    internalHomingStateDefault = 1;
+                }
+                else{ // Andiamo direttamente a resettare encoder e counter
+                    internalHomingStateDefault = 5;
+                }
                 risp = 1;
                 break;
             case 1:
@@ -541,7 +546,6 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -19;
                     break;
                 }
-
                 if(resetEncoder()<0){
                     internalHomingStateDefault = 0;
                     if(stopMotion()<0){
@@ -584,11 +588,12 @@ int TechnoSoftLowDriver::homing(int mode){
         return risp;
     }
     else if(mode==1){
+        //homingType = 1;
         int switchTransited=0;
         int risp;
-        uint16_t contentReg;
-        std::string descStr = "";
-        short homingDone = 0;
+        //uint16_t contentReg;
+        //std::string descStr = "";
+        //short homingDone = 0;
 
         switch (internalHomingStateHoming2) {
             case 0:
@@ -598,7 +603,12 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp= -1;
                     break;
                 }
-                internalHomingStateHoming2=1;
+                if(position>0){
+                    internalHomingStateHoming2=1;
+                }
+                else{
+                    internalHomingStateHoming2=2; // Andiamo direttamente a resettare
+                }     
                 risp= 1;
                 break;
             case 1:
@@ -1365,10 +1375,6 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         return 0;
     }
     
-    
-    
-    
-    
     // Quindi absolutePosition>=0 && absolutePosition <= LONG_MAX (perche' e' rappresentabile)
     // La slitta dunque si muovera' nella posizione [0,LONG_MAX]
 
@@ -1560,11 +1566,14 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
     }
 
     // L'incremento deve avvenire ad una determinata velocita'
-    if(position<=0){
+    if(position<=0){ // In questo caso posso gia' far finire con successo la procedura di homing
         DPRINT("La posizione in steps e' gia' <= 0. Non occorre spostarsi ancora indietro per effettuare di nuovo l'homing");
         if(pthread_mutex_unlock(&(mu))!=0){
 
         }
+//        if(!homingType){
+//            internalHomingStateDefault = 5;
+//        }
         return -1;
     }
 

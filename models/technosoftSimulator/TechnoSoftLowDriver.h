@@ -224,6 +224,8 @@ namespace common{
                 static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
                 static void* staticMoveAbsolutePositionForThread(void*);
                 int moveAbsolutePositionHoming();
+                
+                //int homingType;
 
                 //long deltaNoise;
                 double percNoise;
