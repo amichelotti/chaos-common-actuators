@@ -876,6 +876,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
      // In the fault status the power stage is disabled, the MER register signals
      // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
      // ************************** Operazione di selezione axisID ***************************
+     DPRINT("FUNZIONE DI RESET ALARMS ESEGUITA");
      std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
      if(i==motors.end()){
@@ -885,17 +886,19 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
 
      int err = 0;
      if((i->second)->selectAxis()<0){
+        DPRINT("Funzione reset alarms, errore nella selezione dell'axis id %d",err);
         return -2;
      }
      mode =0;
      switch(mode){
          case 0:
+            DPRINT("Prima di chiamare resetFault");
             if((i->second)->resetFault()<0){
                 err = -3;
                 // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
                 // errors when the function is executed)
             }
-            DPRINT("FUNZIONE DI RESET ALARMS ESEGUITA");
+            DPRINT("Dopo aver chiamato resetFault");
             break;
          case 1:
 //            if(driver->resetSetup()<0){
@@ -911,6 +914,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
              err = -5;
              break;
      }
+     DPRINT("Codice ritornato funzione reset alarms %d",err);
      return err;
  }
 
@@ -981,7 +985,7 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
      if((i->second)->selectAxis()<0){
         return -2;
      }
-    version=" Technosoft IDM 240 stepper open loop mode";
+    version=" Technosoft IDM 240 stepper open loop mode simulated";
     return 0;
 }
 

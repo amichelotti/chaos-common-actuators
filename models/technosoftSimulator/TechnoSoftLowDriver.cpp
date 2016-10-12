@@ -342,7 +342,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     //deltaNoise = 100; // Number of microsteps. Used for noise
     controlledPositionHoming = false;
-
+    homingStopped = false;
+    
     return 0;
 }
 
@@ -366,11 +367,12 @@ int TechnoSoftLowDriver::homing(int mode){
 
         switch (internalHomingStateDefault) {
             case 0:
-                if(selectAxis()<0){
-                    internalHomingStateDefault = 0;
-                    risp = -1;
-                    break;
-                }
+                if(!homingStopped){
+                    if(selectAxis()<0){
+                        internalHomingStateDefault = 0;
+                        risp = -1;
+                        break;
+                    }
 //                if(moveVelocityHoming()<0){ // Nota: questo thread DOVRA ESSERE POI STOPPATO NEGLI STATI SUCCESSIVI DELLA FUNZIONE HOMING
 //                    internalHomingStateDefault = 0;
 ////                    if(stopMotion()<0){
@@ -383,49 +385,57 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp = -3;
 //                    break;
 //                }
-                moveVelocityHoming(); // Nota: questo thread DOVRA ESSERE POI STOPPATO NEGLI STATI SUCCESSIVI DELLA FUNZIONE HOMING
-                DPRINT(" STATE 0: move velocity activated ");
-                if(setEventOnLimitSwitch()<0){ // In pratica il setEventOnLimitSwitch non fa niente dal punto di vista funzionale nel caso virtuale
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -4;
-                        break;
-                    }
+                    moveVelocityHoming(); // Nota: questo thread DOVRA ESSERE POI STOPPATO NEGLI STATI SUCCESSIVI DELLA FUNZIONE HOMING
+                    DPRINT(" STATE 0: move velocity activated ");
+                    if(setEventOnLimitSwitch()<0){ // In pratica il setEventOnLimitSwitch non fa niente dal punto di vista funzionale nel caso virtuale
+                        internalHomingStateDefault = 0;
+                        if(stopMotion()<0){
+                            risp = -4;
+                            break;
+                        }
 //                    pthread_t th;
 //                    pthread_create(&th, NULL,staticStopMotionForThread,this);
 //                    pthread_join(th,NULL);
-                    risp = -5;
+                        risp = -5;
+                        break;
+                    }
+                    DPRINT("STATE 0: event on limit switch activated ");
+                    if(position>0){
+                        internalHomingStateDefault = 1;
+                    }
+                    else{ // Andiamo direttamente a resettare encoder e counter
+                        internalHomingStateDefault = 5;
+                    }
+                    risp = 1;
                     break;
                 }
-                DPRINT("STATE 0: event on limit switch activated ");
-                if(position>0){
-                    internalHomingStateDefault = 1;
-                }
-                else{ // Andiamo direttamente a resettare encoder e counter
-                    internalHomingStateDefault = 5;
-                }
-                risp = 1;
-                break;
+                else{
+                    internalHomingStateDefault=6;
+                    risp = 1;
+                    break;
+                } 
             case 1:
-                if(selectAxis()<0){
-                    internalHomingStateDefault = 0;
-                    risp = -6;
-                    break;
-                }
-                if(checkEvent(switchTransited)<0){ // Se lo switch e' transitato si fermera' il motore (simulazione hardware)
-                    internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing
-                    if(stopMotion()<0){
-                        risp = -7;
+                if(!homingStopped){
+                    if(selectAxis()<0){
+                        internalHomingStateDefault = 0;
+                        risp = -6;
                         break;
                     }
+                    usleep(2500);
+                    if(checkEvent(switchTransited)<0){ // Se lo switch e' transitato si fermera' il motore (simulazione hardware)
+                        internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing
+                        if(stopMotion()<0){
+                            risp = -7;
+                            break;
+                        }
 //                    pthread_t th;
 //                    pthread_create(&th, NULL,staticStopMotionForThread,this);
 //                    pthread_join(th,NULL);
-                    risp = -8;
-                    break;
-                }
-                DPRINT(" STATE 1: possible limit switch transition just checked ");
-                if(switchTransited){  // Lo switch e' transitato. La cap_position e' stata salvata. Il motore si sta per fermare
+                        risp = -8;
+                        break;
+                    }   
+                    DPRINT(" STATE 1: possible limit switch transition just checked ");
+                    if(switchTransited){  // Lo switch e' transitato. La cap_position e' stata salvata. Il motore si sta per fermare
 //                    if(setEventOnMotionComplete()<0){
 //                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
 ////                        if(stopMotion()<0){
@@ -439,21 +449,28 @@ int TechnoSoftLowDriver::homing(int mode){
 //                        break;
 //                    }
                     //eventOnMotionCompleteSet = true;
-                    internalHomingStateDefault=2;
-                    DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
-                    DPRINT("Captured position: %ld",cap_position);
-                }
+                        internalHomingStateDefault=2;
+                        DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
+                        DPRINT("Captured position: %ld",cap_position);
+                    }
                 //sleep(5);
                 // **************DA IMPLEMENTARE:*****************
                 // RESET ON Limit Switch Transition Event
-                risp = 1;
-                break;
+                    risp = 1;
+                    break;
+                }
+                else{
+                    internalHomingStateDefault=6;
+                    risp = 1;
+                    break;
+                }
             case 2:
-                if(selectAxis()<0){
+                if(!homingStopped){
+                    if(selectAxis()<0){
                     internalHomingStateDefault = 0;
                     risp = -11;
                     break;
-                }
+                    }
 //                if(checkEvent(motionCompleted)<0){
 //                    internalHomingStateDefault = 0;
 //                    if(stopMotion()<0){
@@ -465,27 +482,34 @@ int TechnoSoftLowDriver::homing(int mode){
 //                }
 //                if(position<=-epsylon)
 //                    motionCompleted = true;
-                DPRINT("************** STATE 2: possible event on motion completed checked **************");
+                    DPRINT("************** STATE 2: possible event on motion completed checked **************");
 //                if(motionCompleted){
 //                    DPRINT("************** STATE 2: Motion completed after transition **************");
 //                    internalHomingStateDefault = 3;
 //                }
-                if(!actuatorIDInMotion){
-                    // Il motore si e' fermato dopo che lo switch e' transitato
-                    DPRINT("************** STATE 2: Motion completed after transition **************");
-                    internalHomingStateDefault = 3;
-                }
-                risp= 1;
-                //sleep(5);
-                break;
-            case 3:
-                // The motor is not in motion
-                //DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
-                if(selectAxis()<0){
-                    internalHomingStateDefault = 0;
-                    risp = -13;
+                    if(!actuatorIDInMotion){
+                        // Il motore si e' fermato dopo che lo switch e' transitato
+                        DPRINT("************** STATE 2: Motion completed after transition **************");
+                        internalHomingStateDefault = 3;
+                    }
+                    risp= 1;
+                    //sleep(5);
                     break;
                 }
+                else{
+                    internalHomingStateDefault=6;
+                    risp = 1;
+                    break;
+                }
+            case 3:
+                if(!homingStopped){
+                    // The motor is not in motion
+                    //DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
+                    if(selectAxis()<0){
+                        internalHomingStateDefault = 0;
+                        risp = -13;
+                        break;
+                    }
 //                if(getLVariable(cappos, cap_position)<0){
 //    //                if(stopMotion()<0){
 //    //                    return -13;
@@ -497,26 +521,34 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp = -14;
 //                    break;
 //                }
-                DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
+                    DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
 
-            /*	Command an absolute positioning on the captured position */
-                if(moveAbsoluteStepsHoming(cap_position)<0){ // ******************* motion per il recupero *********************
-                    internalHomingStateDefault=0;
-                    risp = -15;
+                /*	Command an absolute positioning on the captured position */
+                    if(moveAbsoluteStepsHoming(cap_position)<0){ // ******************* motion per il recupero *********************
+                        internalHomingStateDefault=0;
+                        risp = -15;
+                        break;
+                    }
+                    DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
+                    internalHomingStateDefault = 4;
+                    risp= 1;
+                    //sleep(5);
                     break;
                 }
-                DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
-                internalHomingStateDefault = 4;
-                risp= 1;
-                //sleep(5);
-                break;
+                else{
+                    internalHomingStateDefault=6;
+                    risp = 1;
+                    break;
+                }
             case 4:
-                //DPRINT("************** STATE 4: wait for positioning to end **************");
-                if(selectAxis()<0){
-                    internalHomingStateDefault = 0;
-                    risp = -16;
-                    break;
-                }
+                if(!homingStopped){
+                
+                    //DPRINT("************** STATE 4: wait for positioning to end **************");
+                    if(selectAxis()<0){
+                        internalHomingStateDefault = 0;
+                        risp = -16;
+                        break;
+                    }
 //                if(checkEvent(absoluteMotionCompleted)<0){
 //                    internalHomingStateDefault = 0;
 //                    if(stopMotion()<0){
@@ -528,56 +560,79 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -18;
 //                    break;
 //                }
-                if(!actuatorIDInMotion){ // riposizionamento terminato, passa al prossimo stato
+                    if(!actuatorIDInMotion){ // riposizionamento terminato, passa al prossimo stato
                     internalHomingStateDefault = 5;
 //                    LNStransition = false;
 //                    LSNactive=false;
-                    DPRINT("************** STATE 4: motor positioned to end **************");
-                }
+                        DPRINT("************** STATE 4: motor positioned to end **************");
+                    }
             // **************DA IMPLEMENTARE:*****************
             // RESET ON Event On Motion Complete
                 //sleep(5)
-                risp= 1;
-                break;
+                    risp= 1;
+                    break;  
+                }
+                else{
+                    internalHomingStateDefault=6;
+                    risp = 1;
+                    break;
+                }
             case 5:
-                // The motor is positioned to end
-                if(selectAxis()<0){
-                    internalHomingStateDefault = 0;
-                    risp = -19;
-                    break;
-                }
-                if(resetEncoder()<0){
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -20; 
+                if(!homingStopped){
+                    // The motor is positioned to end
+                    if(selectAxis()<0){
+                        internalHomingStateDefault = 0;
+                        risp = -19;
+                        break;
                     }
-//                    pthread_t th;
-//                    pthread_create(&th, NULL,staticStopMotionForThread,this);
-//                    pthread_join(th,NULL);
-                    risp= -21;
-                    break;
-                }
+//                if(resetEncoder()<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                        risp = -20; 
+//                    }
+////                    pthread_t th;
+////                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+////                    pthread_join(th,NULL);
+//                    risp= -21;
+//                    break;
+//                }
+                pthread_t th1;
+                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
+                pthread_join(th1,NULL);
+                
 //                pthread_t th1;
 //                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
 //                pthread_join(th1,NULL);
-                if(resetCounter()<0){
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                    risp= -22;
-                    }
-//                    pthread_t th;
-//                    pthread_create(&th, NULL,staticStopMotionForThread,this);
-//                    pthread_join(th,NULL);
-                    risp= -23;
-                    break;
-                }
-//                pthread_t th2;
-//                pthread_create(&th2, NULL,staticResetCounterForThread,this);
-//                pthread_join(th2,NULL);
+//                if(resetCounter()<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                    risp= -22;
+//                    }
+////                    pthread_t th;
+////                    pthread_create(&th, NULL,staticStopMotionForThread,this);
+////                    pthread_join(th,NULL);
+//                    risp= -23;
+//                    break;
+//                }
+                pthread_t th2;
+                pthread_create(&th2, NULL,staticResetCounterForThread,this);
+                pthread_join(th2,NULL);
+                
                 DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
                 internalHomingStateDefault = 0;
                 risp= 0;
                 //sleep(5);
+                break;
+            }
+            else{
+                internalHomingStateDefault=6;
+                risp = 1;
+                break;
+            }
+            case 6:
+                internalHomingStateDefault=0;
+                homingStopped = false;
+                risp = 0;
                 break;
             default:
                 internalHomingStateDefault = 0;
@@ -658,26 +713,32 @@ int TechnoSoftLowDriver::homing(int mode){
                     usleep(1000);
                 }
                 
-                if(resetEncoder()<0){
-                    internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -1;
-                        break;
-                    }
-                    risp= -2;
-                    break;
-                }
+//                if(resetEncoder()<0){
+//                    internalHomingStateHoming2=0;
+//                    if(stopMotion()<0){
+//                        risp= -1;
+//                        break;
+//                    }
+//                    risp= -2;
+//                    break;
+//                }
+                pthread_t th1;
+                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
+                pthread_join(th1,NULL);
                 
-                if(resetCounter()<0){
-                    internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -3;
-                        break;
-                    }
-                    risp= -4;
-                    break;
-                }
-
+//                if(resetCounter()<0){
+//                    internalHomingStateHoming2=0;
+//                    if(stopMotion()<0){
+//                        risp= -3;
+//                        break;
+//                    }
+//                    risp= -4;
+//                    break;
+//                }
+                pthread_t th2;
+                pthread_create(&th2, NULL,staticResetCounterForThread,this);
+                pthread_join(th2,NULL);
+                
                 // Attendiamo che il motore si fermi prima di fare il reset:
 
 //                while(actuatorIDInMotion){
@@ -949,6 +1010,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
+    
     return 0;
 }
 
@@ -1585,7 +1647,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 //    bool goahead = false;
 //    if(highSpeedHoming_mm_s>=0)
 //        goahead = true;
-
+    stopMotionCommand = false;
     while(!stopMotionCommand && !powerOffCommand && !LNStransition){
 
 //            if(goahead){
@@ -1600,7 +1662,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
         positionCounter+=highSpeedHoming_mm_s;
         positionEncoder+=highSpeedHoming_mm_s;
         
-        DPRINT("Movimentazione all'indietro: posizione corrente in steps: %ld",position);
+        //DPRINT("Movimentazione all'indietro: posizione corrente in steps: %ld",position);
 //            }
         if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -1619,14 +1681,19 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
         // Aggiornamento deltaT, stopMotion, stopPower
 //        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
 //        deltaT += (deltaT*tol/100)
-        usleep(1000); // Sleep for 1 milli second
+        usleep(1800); // Sleep for 1 milli second
     }
     
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
         actuatorIDInMotion = false;
-        stopMotionCommand = false;
+        if(stopMotionCommand){
+            DPRINT("Movimentazione all'indietro della procedura di homing bloccata: %ld",position);
+            homingStopped=true;
+            stopMotionCommand = false;
+            //sleep(50); 
+        }
         if(LNStransition){
             LSNactive = true;
         }
@@ -2149,67 +2216,130 @@ int TechnoSoftLowDriver::getLVariable(std::string& nameVar, long& var) {
     return 0;
 }
 
-int TechnoSoftLowDriver::resetCounter(){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
+int TechnoSoftLowDriver::resetCounterHoming(){
+
+//    int random_variable = std::rand();
+//    if(random_variable<p*(RAND_MAX/100)){
 //        return -1;
 //    }
-//    if(!TS_Execute("SAP 0")){
-//        return -1;
-//    }
-    // Simulazione dialogo con il drive/motor
-    int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
-        return -1;
-    }
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
-        positionCounter = 0;
+    positionCounter = 0;
         //position = 0;
     if(pthread_mutex_unlock(&(mu))!=0){
 
-    }
+    }    
     return 0;
 }
 
 void* TechnoSoftLowDriver::staticResetCounterForThread(void* objPointer){
 
-    ((TechnoSoftLowDriver*)objPointer)->resetCounter();
+    ((TechnoSoftLowDriver*)objPointer)->resetCounterHoming();
     pthread_exit(NULL);
 }
 
 
-int TechnoSoftLowDriver::resetEncoder(){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_Execute("APOS=0")){
-//        return -1;
-//    }
-    // Simulazione dialogo con il drive/motor
-    int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
-        return -1;
-    }
+//int resetCounter(){ //Deve essere chiamato dal metodo statico, quest'ultimo eseguito dal thread
+////    if(!TS_SelectAxis(axisID)){
+////        DERR("failed to select axis %d",axisID);
+////        return -1;
+////    }
+////    if(!TS_Execute("SAP 0")){
+////        return -1;
+////    }
+//    // Simulazione dialogo con il drive/motor
+////    int random_variable = std::rand();
+////    if(random_variable<p*(RAND_MAX/100)){
+////        return -1;
+////    }
+////    if(pthread_mutex_lock(&(mu))!=0){
+////
+////    }
+////        positionCounter = 0;
+////        //position = 0;
+////    if(pthread_mutex_unlock(&(mu))!=0){
+////
+////    }
+////    int random_variable = std::rand();
+////    if(random_variable<p*(RAND_MAX/100)){
+////        return -1;
+////    }
+//    pthread_t th;
+//    pthread_create(&th, NULL,staticResetCounterForThread,this);
+//    return 0;
+//}
 
+int TechnoSoftLowDriver::resetEncoderHoming(){
+    
+    //double highSpeedHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*highSpeedHoming_mm_s)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+    //double accelerationHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*accelerationHoming_mm_s2/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+//    DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
+//////    if(!TS_SelectAxis(axisID)){
+//////        DERR("failed to select axis %d",axisID);
+//////        return -1;
+//////    }
+////    if(!TS_MoveVelocity(highSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
+////        DERR("(homing) Error moving velocity ");
+////        return -2;
+////    }
+//    
+//    // Simulazione dialogo con il drive/motor
+//    int random_variable = std::rand();
+//    if(random_variable<p*(RAND_MAX/100)){
+//        return -1;
+//    }
+//    
+//    pthread_t th;
+//    pthread_create(&th, NULL,staticResetEncoderForThread,this);
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
     positionEncoder = 0;
+        //position = 0;
     if(pthread_mutex_unlock(&(mu))!=0){
 
-    }
-
+    }    
     return 0;
+
 }
 
 void* TechnoSoftLowDriver::staticResetEncoderForThread(void* objPointer){
 
-    ((TechnoSoftLowDriver*)objPointer)->resetEncoder();
+    ((TechnoSoftLowDriver*)objPointer)->resetEncoderHoming();
     pthread_exit(NULL);
 }
+
+//int TechnoSoftLowDriver::resetEncoder(){
+////    if(!TS_SelectAxis(axisID)){
+////        DERR("failed to select axis %d",axisID);
+////        return -1;
+////    }
+////    if(!TS_Execute("APOS=0")){
+////        return -1;
+////    }
+//    // Simulazione dialogo con il drive/motor
+//    int random_variable = std::rand();
+//    if(random_variable<p*(RAND_MAX/100)){
+//        return -1;
+//    }
+//
+//    if(pthread_mutex_lock(&(mu))!=0){
+//
+//    }
+//    positionEncoder = 0;
+//    if(pthread_mutex_unlock(&(mu))!=0){
+//
+//    }
+//
+//    return 0;
+//}
+
+//void* TechnoSoftLowDriver::staticResetEncoderForThread(void* objPointer){
+//
+//    ((TechnoSoftLowDriver*)objPointer)->resetEncoder();
+//    pthread_exit(NULL);
+//}
 
 int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
 //    if(!TS_SelectAxis(axisID)){
@@ -2285,27 +2415,27 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
     if(random_variable<p*(RAND_MAX/100)) {
         return -1;
     }
-
+    
 //    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //    }
     if(pthread_mutex_lock(&(mu))!=0){
 
-        }
-    if(position <= -epsylon){
-        DPRINT("Rilevata posizione <= 0: %ld", position);
-        LNStransition = true;// Occorre "bloccare" il motion, ovvero terminare il thread che si sta occupando del motion
-        cap_position = position;
-        event = true;        // comunichiamo alla funzione homing l'avvenuta transizione del LSN
+    }
+        if(position <= -epsylon){
+            DPRINT("Rilevata posizione <= 0: %ld", position);
+            LNStransition = true;// Occorre "bloccare" il motion, ovvero terminare il thread che si sta occupando del motion
+            cap_position = position;
+            event = true;        // comunichiamo alla funzione homing l'avvenuta transizione del LSN
         //sleep(30);              
         //stopMotionCommand=true; //Serve a far terminare la movimentazione  
-    }
-    else{
-        DPRINT("Posizione riscontrata durante il checking: %ld", position);
-        LNStransition = false;
-        event = false;
+        }
+        else{
+            //DPRINT("Posizione riscontrata durante il checking: %ld", position);
+            LNStransition = false;
+            event = false;
         //sleep(30);
-    }
+        }
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
@@ -2313,7 +2443,6 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
 //    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
 //
 //    }
-
     return 0;
 }
 
@@ -2400,6 +2529,38 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 }
 
 
+int TechnoSoftLowDriver::resetFaultAlarms(){
+    
+    //Simulazione dialogo con il drive motor
+//    int random_variable = std::rand();
+//    if(random_variable<p*(RAND_MAX/100)){
+//        return -1;
+//    }
+    DPRINT("LSNactive resettato prima del lock");
+    if(pthread_mutex_lock(  &(mu))!=0){
+
+    }
+        contentRegMER = 0;
+        // ma nn solo...
+        LSPactive = false;
+        LSNactive = false;
+    
+        DPRINT("LSNactive resettato dentro il lock");
+    if(pthread_mutex_unlock(&(mu))!=0){
+
+    }
+       
+    return 0;
+}
+
+
+void* TechnoSoftLowDriver::staticResetFaultFunctionForThread(void* objPointer){
+
+    ((TechnoSoftLowDriver*)objPointer)->resetFaultAlarms();
+    pthread_exit(NULL);
+}
+
+
 int TechnoSoftLowDriver::resetFault(){
 
 //    if(!TS_ResetFault()){
@@ -2408,19 +2569,31 @@ int TechnoSoftLowDriver::resetFault(){
 //         // errors when the function is executed)
 //    }
     // Simulazione dialogo con il drive motor
-    int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
-        return -1;
-
-    //************************************************** DA GESTIRE ************************************************************
-    //    if(!TS_ResetFault()){
-//         return -2;
-//         // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
-//         // errors when the function is executed)
+//    int random_variable = std::rand();
+//    if(random_variable<p*(RAND_MAX/100))
+//        return -1;
+//
+//    //************************************************** DA GESTIRE ************************************************************
+//    //    if(!TS_ResetFault()){
+////         return -2;
+////         // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
+////         // errors when the function is executed)
+////    }
+//    if(pthread_mutex_lock(&(mu))!=0){
+//
 //    }
-
-    contentRegMER = 0;
-
+//    contentRegMER = 0;
+//    // ma nn solo...
+//    LSPactive = false;
+//    LSNactive = false;
+//    if(pthread_mutex_unlock(&(mu))!=0){
+//
+//    }
+//
+//    return 0;
+    pthread_t th;
+    pthread_create(&th, NULL,staticResetFaultFunctionForThread,this);
+    pthread_join(th,NULL);
     return 0;
 }
 
@@ -2451,7 +2624,7 @@ int TechnoSoftLowDriver::getFirmwareVers(char* firmwareVers){
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
         return -1;
-    char msg[] = "firmware version is ...";
+    char msg[] = "Simulated firmware.";
     firmwareVers = msg;
 
     return 0;

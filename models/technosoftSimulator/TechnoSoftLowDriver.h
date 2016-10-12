@@ -229,6 +229,7 @@ namespace common{
 
                 //long deltaNoise;
                 double percNoise;
+                bool homingStopped;
                 
                 bool controlledPositionHoming;
 
@@ -367,13 +368,17 @@ namespace common{
                 int getCounter(double* deltaPosition_mm);
                 int getEncoder(double* deltaPosition_mm);
                 // resetting methos
-                int resetCounter();// reset TPOS_register();
-                int resetEncoder();// reset APOS_register();
+                //int resetCounter();// reset TPOS_register();
+                int resetCounterHoming();
+                int resetEncoderHoming();// reset APOS_register();
                 static void* staticResetCounterForThread(void*);
                 static void* staticResetEncoderForThread(void*);
 
 
                 int resetFault();
+                int resetFaultAlarms();
+                static void* staticResetFaultFunctionForThread(void* objPointer);
+                
                 int resetSetup();
                 int getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
                 //int getRegister()**********************;

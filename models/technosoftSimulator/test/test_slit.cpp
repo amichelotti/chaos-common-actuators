@@ -4,7 +4,8 @@
 #include <common/actuators/core/AbstractActuator.h>
 #include "../ActuatorTechnoSoft.h"
 #include <pthread.h>
-
+#include <fstream>
+#include <sstream>
 
 using namespace common::actuators::models::simul;
 #define USAGE \
@@ -19,7 +20,46 @@ using namespace common::actuators::models::simul;
 //        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
 //        sleep(10);
         
-void homingProcedures(int respHoming,int numHoming,common::actuators::AbstractActuator *OBJ,int axisID){ 
+//void homingProcedures(int respHoming,int numHoming,common::actuators::AbstractActuator *OBJ,int axisID){ 
+//    for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
+//            // con successo o insuccesso
+//        DPRINT("************* Procedura di homing n. %d iniziata *************",i);
+//        while(respHoming){ // Finche' la procedura di homing non e' completata con successo
+//            respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
+//            usleep(1000); // FREQUENZA DI 100 ms
+//            if(respHoming<0){
+//                DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
+//                break;
+//            }
+//        }
+//        if(respHoming==0){
+//            DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+//        }
+//        respHoming = 1;
+//        usleep(5000000);
+//    }
+//}
+struct homingData{
+    int a;
+    int b;
+    common::actuators::AbstractActuator *obj;
+    int c;
+};
+
+void* homingProcedures(void *p){ 
+    
+    homingData* pstruct=(homingData*) p;
+    int respHoming = pstruct->a;
+    int numHoming = pstruct->b;
+    common::actuators::AbstractActuator *OBJ = pstruct->obj;
+    int axisID=pstruct->c;
+   
+    struct timeval startTimeForMotor1,endTimeForMotor1;
+    double total_time_interval=0;
+    
+    
+    gettimeofday(&startTimeForMotor1,NULL);
+    
     for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
             // con successo o insuccesso
         DPRINT("************* Procedura di homing n. %d iniziata *************",i);
@@ -30,16 +70,48 @@ void homingProcedures(int respHoming,int numHoming,common::actuators::AbstractAc
                 DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
                 break;
             }
+            gettimeofday(&endTimeForMotor1,NULL);
+            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+            
+            //DPRINT("************Valore ritornato dalla funzione di homing %d ***************",respHoming);
+            //DPRINT("************Numero chiamata procedura di homing %d ***************",i);
         }
         if(respHoming==0){
-            DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
+            DPRINT("************ Procedura di homing n. %d terminata con successo ***************",i);
         }
         respHoming = 1;
-        usleep(5000000);
+        //usleep(5000000);
+    }
+    std::fstream myfile;
+    std::stringstream stream;
+    std::string filename = "//home/caschera/chaos_bundle/chaosframework/chaos-distrib-i686-linux26/fileProva.txt";
+    stream<<filename.c_str();
+    std::string newfilename = stream.str();
+    
+    myfile.open(newfilename.c_str(),std::ios::out);
+    if(myfile.is_open()){
+        // Descrizione testo effettuato
+        myfile<<"Intervallo di tempo impiegato dalla procedura di homing a fermarsi: "<<std::endl<<std::endl;
+        myfile<<total_time_interval<<std::endl;
+        myfile.close();
+    }
+    else{
+        std::cout<<"Errore nell'apertura del file"<<std::endl;
     }
 }
 
-void checkProcedures(int axisID, double duration,common::actuators::AbstractActuator *OBJ){
+struct checkData{
+    int axisID;
+    double duration;
+    common::actuators::AbstractActuator *obj;
+};
+
+void* checkProcedures(void* p){
+    
+    checkData* pstruct=(checkData*) p;
+    int axisID = pstruct->axisID;
+    double duration = pstruct->duration;
+    common::actuators::AbstractActuator *OBJ=pstruct->obj;
     
     struct timeval startTimeForMotor1,endTimeForMotor1;
 
@@ -87,17 +159,37 @@ void checkProcedures(int axisID, double duration,common::actuators::AbstractActu
             DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
             DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
             DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
+            DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
             
             gettimeofday(&endTimeForMotor1,NULL);
             total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
             DPRINT("total_time_interval: %f",total_time_interval);
             
-            usleep(1000000); // lettura ogni secondo...
-//
+            usleep(1000); // lettura ogni secondo...
         }
 }
 
+struct stopMotionStruct{
+    int axisID;
+    common::actuators::AbstractActuator *obj;
+};
+
+void* stopMotionProcedure(void* p){
+    
+    stopMotionStruct* ptr = (stopMotionStruct*)p;
+    int axisID=ptr->axisID;
+    common::actuators::AbstractActuator *OBJ=ptr->obj;
+    
+    int resp;
+    
+    if((resp=OBJ->stopMotion(axisID))<0){
+            DERR("************** Error returned by movement operation, code error %d **************",resp);
+            sleep(10);
+            //* errPtr = -5;
+    }
+    DPRINT("************** Comando di stop eseguito **************");
+}
 
 void* function1(void* str){
 
@@ -217,7 +309,7 @@ void* function1(void* str){
 //            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
 //            sleep(10);
 
-        if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
+        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
             DERR("************** Error returned by movement operation, code error %d **************",resp);
             sleep(10);
             //* errPtr = -5;
@@ -227,8 +319,18 @@ void* function1(void* str){
 //        uint64_t alarms;
 //        std::string desc2;
         
-        double durationChecking = 30; // secondi
-        checkProcedures(axisID, durationChecking,OBJ); // secondo parametro: durata intervallo di tempo dedicato al checking
+        double durationChecking = 60; // secondi
+        
+        pthread_t th1;
+        checkData hd2;
+        hd2.axisID=axisID;
+        hd2.duration=durationChecking;
+        hd2.obj=OBJ;
+        
+        pthread_create(&th1,NULL,checkProcedures,(void*)&hd2);
+        pthread_join(th1,NULL);
+        
+        //checkProcedures(axisID, durationChecking,OBJ); // secondo parametro: durata intervallo di tempo dedicato al checking
         
 //        gettimeofday(&startTimeForMotor1,NULL);
 //        
@@ -319,35 +421,84 @@ void* function1(void* str){
 //            respHoming = 1;
 //            usleep(5000000);
 //        }
-        DPRINT("************** Homing operation. ***************");
+       
+        DPRINT("************** Homing operation starting. ***************");
         sleep(5);
-        homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
-           
-        durationChecking=15;
-        checkProcedures(axisID, durationChecking,OBJ);
+        pthread_t th2;
+        homingData hd;
+        hd.a=1;
+        hd.b=1;
+        hd.obj=OBJ;
+        hd.c=axisID;
+        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
+        //homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
+          
+        DPRINT("************** Visione andamento procedura di homing per 30 secondi **************");
         
-        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa 2 **************");
-        sleep(5);
+        durationChecking=30;
+        pthread_t th3;
+        hd2.axisID=axisID;
+        hd2.duration = durationChecking;
+        hd2.obj=OBJ;
         
+        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
+        
+        //checkProcedures(axisID, durationChecking,OBJ);
+        
+//        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa 2 **************");
+//        sleep(5);
+        
+        DPRINT("************** Fra 2 secondi tentativo di stoppare la procedura di homing **************");
+        //sleep(10);
+    
+        pthread_t th4;
+        stopMotionStruct strct;
+        strct.axisID=axisID;
+        strct.obj=OBJ;
+        
+        sleep(15);
+        pthread_create(&th4,NULL,stopMotionProcedure,(void*)&strct);
+        pthread_join(th4,NULL);
+        pthread_join(th3,NULL);
+        
+        //sleep(60);
+  
+//        if((resp=OBJ->stopMotion(axisID))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+        
+        DPRINT("************** Continuiamo a fare il checking sulla procedura di homing  per 10 secondi**************");
+        sleep(2);
+        pthread_t th5;
+        hd2.duration=10;
+        pthread_create(&th5,NULL,checkProcedures,(void*)&hd2);
+        
+        pthread_join(th2,NULL);
+        pthread_join(th5,NULL);
+        //checkProcedures(axisID, durationChecking,OBJ);
+        
+ 
 //        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
 //            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
 //            sleep(10);
         
-        if((resp=OBJ->moveAbsoluteMillimeters(axisID,5))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        
-        durationChecking=30;
-        checkProcedures(axisID, durationChecking,OBJ);
-        
-        DPRINT("************** Homing operation 2. ***************");
-        sleep(5);
-        homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
-        
-        durationChecking=15;
-        checkProcedures(axisID, durationChecking,OBJ);
+//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,5))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        
+//        durationChecking=30;
+//        checkProcedures(axisID, durationChecking,OBJ);
+//        
+//        DPRINT("************** Homing operation 2. ***************");
+//        sleep(5);
+//        homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
+//        
+//        durationChecking=15;
+//        checkProcedures(axisID, durationChecking,OBJ);
         
 //        gettimeofday(&startTimeForMotor1,NULL);
 //        while(total_time_interval<=duration){
@@ -432,7 +583,8 @@ void* function1(void* str){
 //                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
 //                    break;
 //                }
-//            }
+//          
+                  
 //            if(respHoming==0){
 //                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
 //            }
@@ -489,9 +641,12 @@ void* function1(void* str){
 //        DPRINT("************** delete ActuatorTechnoSoft OBJ **************");
 //        delete OBJ;
 
+        
+
         return 0;
     }
 }
+
 
 //int funzioneProva(ActuatorTechnoSoft slit){
 //    DPRINT("************** Movement operation starting from function **************");
