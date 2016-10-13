@@ -889,7 +889,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
         DPRINT("Funzione reset alarms, errore nella selezione dell'axis id %d",err);
         return -2;
      }
-     mode =0;
+     mode = 0;
      switch(mode){
          case 0:
             DPRINT("Prima di chiamare resetFault");

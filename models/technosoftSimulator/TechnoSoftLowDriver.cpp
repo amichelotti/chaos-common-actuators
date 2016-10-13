@@ -386,7 +386,7 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    break;
 //                }
                     moveVelocityHoming(); // Nota: questo thread DOVRA ESSERE POI STOPPATO NEGLI STATI SUCCESSIVI DELLA FUNZIONE HOMING
-                    DPRINT(" STATE 0: move velocity activated ");
+                    //DPRINT(" STATE 0: move velocity activated ");
                     if(setEventOnLimitSwitch()<0){ // In pratica il setEventOnLimitSwitch non fa niente dal punto di vista funzionale nel caso virtuale
                         internalHomingStateDefault = 0;
                         if(stopMotion()<0){
@@ -399,7 +399,7 @@ int TechnoSoftLowDriver::homing(int mode){
                         risp = -5;
                         break;
                     }
-                    DPRINT("STATE 0: event on limit switch activated ");
+                    //DPRINT("STATE 0: event on limit switch activated ");
                     if(position>0){
                         internalHomingStateDefault = 1;
                     }
@@ -434,7 +434,7 @@ int TechnoSoftLowDriver::homing(int mode){
                         risp = -8;
                         break;
                     }   
-                    DPRINT(" STATE 1: possible limit switch transition just checked ");
+                    //DPRINT(" STATE 1: possible limit switch transition just checked ");
                     if(switchTransited){  // Lo switch e' transitato. La cap_position e' stata salvata. Il motore si sta per fermare
 //                    if(setEventOnMotionComplete()<0){
 //                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
@@ -450,8 +450,8 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    }
                     //eventOnMotionCompleteSet = true;
                         internalHomingStateDefault=2;
-                        DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
-                        DPRINT("Captured position: %ld",cap_position);
+                        //DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
+                        //DPRINT("Captured position: %ld",cap_position);
                     }
                 //sleep(5);
                 // **************DA IMPLEMENTARE:*****************
@@ -482,14 +482,14 @@ int TechnoSoftLowDriver::homing(int mode){
 //                }
 //                if(position<=-epsylon)
 //                    motionCompleted = true;
-                    DPRINT("************** STATE 2: possible event on motion completed checked **************");
+                    //DPRINT("************** STATE 2: possible event on motion completed checked **************");
 //                if(motionCompleted){
 //                    DPRINT("************** STATE 2: Motion completed after transition **************");
 //                    internalHomingStateDefault = 3;
 //                }
                     if(!actuatorIDInMotion){
                         // Il motore si e' fermato dopo che lo switch e' transitato
-                        DPRINT("************** STATE 2: Motion completed after transition **************");
+                        //DPRINT("************** STATE 2: Motion completed after transition **************");
                         internalHomingStateDefault = 3;
                     }
                     risp= 1;
@@ -521,7 +521,7 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp = -14;
 //                    break;
 //                }
-                    DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
+                    //DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
 
                 /*	Command an absolute positioning on the captured position */
                     if(moveAbsoluteStepsHoming(cap_position)<0){ // ******************* motion per il recupero *********************
@@ -529,7 +529,7 @@ int TechnoSoftLowDriver::homing(int mode){
                         risp = -15;
                         break;
                     }
-                    DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
+                    //DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
                     internalHomingStateDefault = 4;
                     risp= 1;
                     //sleep(5);
@@ -541,6 +541,7 @@ int TechnoSoftLowDriver::homing(int mode){
                     break;
                 }
             case 4:
+                //DPRINT("************** STATE 4:**************");
                 if(!homingStopped){
                 
                     //DPRINT("************** STATE 4: wait for positioning to end **************");
@@ -578,6 +579,7 @@ int TechnoSoftLowDriver::homing(int mode){
                     break;
                 }
             case 5:
+                //DPRINT("************** STATE 5:**************");
                 if(!homingStopped){
                     // The motor is positioned to end
                     if(selectAxis()<0){
@@ -600,6 +602,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 pthread_create(&th1, NULL,staticResetEncoderForThread,this);
                 pthread_join(th1,NULL);
                 
+                
 //                pthread_t th1;
 //                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
 //                pthread_join(th1,NULL);
@@ -618,7 +621,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 pthread_create(&th2, NULL,staticResetCounterForThread,this);
                 pthread_join(th2,NULL);
                 
-                DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
+                //DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
                 internalHomingStateDefault = 0;
                 risp= 0;
                 //sleep(5);
@@ -630,6 +633,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 break;
             }
             case 6:
+                //DPRINT("************** STATE 6:**************");
                 internalHomingStateDefault=0;
                 homingStopped = false;
                 risp = 0;
@@ -652,22 +656,29 @@ int TechnoSoftLowDriver::homing(int mode){
 
         switch (internalHomingStateHoming2) {
             case 0:
-                DPRINT("************** Homing procedure Homing2. STATE 0. **************");
-                if(moveVelocityHoming()<0){
-                    internalHomingStateHoming2=0;
-                    risp= -1;
+                if(!homingStopped){
+                    //DPRINT("************** Homing procedure Homing2. STATE 0. **************");
+                    if(moveVelocityHoming()<0){
+                        internalHomingStateHoming2=0;
+                        risp= -1;
+                        break;
+                    }
+                    if(position>0){
+                        internalHomingStateHoming2=1;
+                    }
+                    else{
+                        internalHomingStateHoming2=2; // Andiamo direttamente a resettare
+                    }     
+                    risp= 1;
                     break;
                 }
-                if(position>0){
-                    internalHomingStateHoming2=1;
-                }
                 else{
-                    internalHomingStateHoming2=2; // Andiamo direttamente a resettare
-                }     
-                risp= 1;
-                break;
+                    internalHomingStateHoming2=3;
+                    risp = 1;
+                    break;
+                }
             case 1:
-                DPRINT("************** Homing procedure Homing2. STATE 1. **************");
+                //DPRINT("************** Homing procedure Homing2. STATE 1. **************");
 //                if((getStatusOrErrorReg(5, contentReg, descStr))<0){
 //                    //ERR("Reading state error: %s",descStr.c_str());
 //                    internalHomingStateHoming2=0;
@@ -678,9 +689,11 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -3;
 //                    break;
 //                }
-                if(checkEvent(switchTransited)<0){
-                    //ERR("Reading state error: %s",descStr.c_str());
-                    internalHomingStateHoming2=0;
+                if(!homingStopped){
+                    usleep(2500);
+                    if(checkEvent(switchTransited)<0){
+                        //ERR("Reading state error: %s",descStr.c_str());
+                        internalHomingStateHoming2=0;
 //                    if(stopMotion()<0){
 //                        risp= -2;
 //                        break;
@@ -688,30 +701,37 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    pthread_t th;
 //                    pthread_create(&th, NULL,staticStopMotionForThread,this);
 //                    pthread_join(th,NULL);
-                    if(stopMotion()<0){
-                        risp= -1;
-                        break;
-                    }
+                        if(stopMotion()<0){
+                            risp= -1;
+                            break;
+                        }
 //                    pthread_t th;
 //                    pthread_create(&th, NULL,staticStopMotionForThread,this);
 //                    pthread_join(th,NULL);
-                    risp = -2;
+                        risp = -2;
+                        break;
+                    }
+                    // lettura bit di interesse
+                    //homingDone=((contentReg & ((uint16_t)1)<<7) != 0 ? 1 : 0);
+                    if(switchTransited){// Lo switch e' transitato. La cap_position e' stata salvata. Il motore si sta per fermare
+                        internalHomingStateHoming2=2;
+                    }
+                    risp= 1;
                     break;
                 }
-                // lettura bit di interesse
-                //homingDone=((contentReg & ((uint16_t)1)<<7) != 0 ? 1 : 0);
-                if(switchTransited){// Lo switch e' transitato. La cap_position e' stata salvata. Il motore si sta per fermare
-                   internalHomingStateHoming2=2;
+                else{
+                    internalHomingStateHoming2=3;
+                    risp = 1;
+                    break;
                 }
-                risp= 1;
-                break;
             case 2:
-                DPRINT("************** Homing procedure Homing2. STATE 2. **************");
-                DPRINT("************** Reset encoder e counter **************");
-                
-                while(actuatorIDInMotion){
-                    usleep(1000);
-                }
+                //DPRINT("************** Homing procedure Homing2. STATE 2. **************");
+                //DPRINT("************** Reset encoder e counter **************");
+                if(!homingStopped){
+                    
+                    while(actuatorIDInMotion){
+                        usleep(1000);
+                    }
                 
 //                if(resetEncoder()<0){
 //                    internalHomingStateHoming2=0;
@@ -722,9 +742,9 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -2;
 //                    break;
 //                }
-                pthread_t th1;
-                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
-                pthread_join(th1,NULL);
+                    pthread_t th1;
+                    pthread_create(&th1, NULL,staticResetEncoderForThread,this);
+                    pthread_join(th1,NULL);
                 
 //                if(resetCounter()<0){
 //                    internalHomingStateHoming2=0;
@@ -735,9 +755,9 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -4;
 //                    break;
 //                }
-                pthread_t th2;
-                pthread_create(&th2, NULL,staticResetCounterForThread,this);
-                pthread_join(th2,NULL);
+                    pthread_t th2;
+                    pthread_create(&th2, NULL,staticResetCounterForThread,this);
+                    pthread_join(th2,NULL);
                 
                 // Attendiamo che il motore si fermi prima di fare il reset:
 
@@ -781,8 +801,20 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -7;
 //                    break;
 //                }
+                    internalHomingStateHoming2=0;
+                    risp=0;
+                    break;
+                }
+                else{
+                    internalHomingStateHoming2=3;
+                    risp = 1;
+                    break;
+                }
+            case 3:
+                //DPRINT("************** STATE 6:**************");
                 internalHomingStateHoming2=0;
-                risp=0;
+                homingStopped = false;
+                risp = 0;
                 break;
             default:
                 internalHomingStateHoming2=0;
