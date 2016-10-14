@@ -421,7 +421,7 @@ int TechnoSoftLowDriver::homing(int mode){
                         risp = -6;
                         break;
                     }
-                    usleep(2500);
+                    usleep(3000);
                     if(checkEvent(switchTransited)<0){ // Se lo switch e' transitato si fermera' il motore (simulazione hardware)
                         internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing
                         if(stopMotion()<0){
@@ -1713,7 +1713,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
         // Aggiornamento deltaT, stopMotion, stopPower
 //        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
 //        deltaT += (deltaT*tol/100)
-        usleep(1800); // Sleep for 1 milli second
+        usleep(2300); // Sleep for 1 milli second
     }
     
     if(pthread_mutex_lock(&(mu))!=0){
@@ -2492,76 +2492,112 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 //    }
     // Simulazione dialogo con il drive motor
 
+    //usleep(1000);
+    
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)) {
+    if(random_variable<p*(RAND_MAX/1000)) {
         //descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
         return -1;
     }
-
+    
+    
+    double value =2;
+    double deltaNoise = 1;
+        //DPRINT("pos_mm=%f",pos_mm);
+        //DPRINT("deltaNoise=%f",deltaNoise);
+    double rangeMin = value-deltaNoise;
+    double rangeMax = value+deltaNoise;
+        //DPRINT("rangeMin=%f",rangeMin);
+        //DPRINT("rangeMax=%f", rangeMax);
+    
+    
+    double newvalue; // = numberGenerator();
+    //DPRINT("value=%f",newvalue);
+    
     // Inizializzazione "casuale" codici allarmi:
-//    if(alarmsInfoRequest && regMERrequest){
-//        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
-//            random_variable = std::rand();
-//            if(random_variable<p*(RAND_MAX/100))
-//                contentRegister |= ((WORD)1<<i);
-//        }
-//        //contentRegister = contentRegMER;
-//        return 0;
-//    }
     if(alarmsInfoRequest && regMERrequest){
-        contentRegister=0;
+        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
+            //random_variable = std::rand();
+            NumberDistribution distribution(rangeMin, rangeMax);
+            Generator numberGenerator1(generator, distribution);
+            newvalue = numberGenerator1();
+            //printf("valore generato: %f",newvalue);
+            if(newvalue<value)
+                contentRegister |= ((WORD)1<<i);
+        }
+        //contentRegister = contentRegMER;
         return 0;
     }
-//    else if(alarmsInfoRequest && regSRHrequest){
-//        for(uint16_t i=10; i<12; i++){
-//            random_variable = std::rand();
-//            if(random_variable<p*((RAND_MAX)/100))
-//                contentRegSRH |= ((WORD)1<<i);
-//        }
-//        contentRegister = contentRegSRH;
+//    if(alarmsInfoRequest && regMERrequest){
+//        contentRegister=0;
 //        return 0;
 //    }
     else if(alarmsInfoRequest && regSRHrequest){
-        contentRegister=0;
+        for(uint16_t i=10; i<12; i++){
+            //random_variable = std::rand();
+            NumberDistribution distribution(rangeMin, rangeMax);
+            Generator numberGenerator1(generator, distribution);
+            newvalue = numberGenerator1();
+            //printf("valore generato: %f",newvalue);
+            if(newvalue<value)
+                contentRegSRH |= ((WORD)1<<i);
+        }
+        contentRegister = contentRegSRH;
         return 0;
     }
-    // Inizializzazione "casuale" codici stati:
-//    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
-//        for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
-//            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
-//                random_variable = std::rand();
-//                if(random_variable<p*(RAND_MAX/100))
-//                    contentRegSRH |= ((WORD)1<<i);
-//            }
-//        }
-//        contentRegister = contentRegSRH;
+//    else if(alarmsInfoRequest && regSRHrequest){
+//        contentRegister=0;
 //        return 0;
 //    }
-    else if(stateInfoRequest && regSRHrequest){
-        contentRegister=0;
+    // Inizializzazione "casuale" codici stati:
+    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
+        for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
+            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
+                //random_variable = std::rand();
+                NumberDistribution distribution(rangeMin, rangeMax);
+                Generator numberGenerator1(generator, distribution);
+                newvalue = numberGenerator1();
+                //printf("valore generato: %f",newvalue);
+                if(newvalue<value)
+                    contentRegSRH |= ((WORD)1<<i);
+            }
+        }
+        contentRegister = contentRegSRH;
         return 0;
     }
-//    else if(stateInfoRequest && regSRLrequest){
-//        random_variable = std::rand();
-//        if(random_variable<p*(RAND_MAX/100)){
-//            contentRegSRL |= ((WORD)1<<10);
-//        }
-//        random_variable = std::rand();
-//        if(random_variable<p*(RAND_MAX/100)){
-//            contentRegSRL |= ((WORD)1<<15);
-//        }
-//        contentRegister = contentRegSRL;
+//    else if(stateInfoRequest && regSRHrequest){
+//        contentRegister=0;
 //        return 0;
 //    }
     else if(stateInfoRequest && regSRLrequest){
-        contentRegister=0;
+        //random_variable = std::rand();
+        NumberDistribution distribution1(rangeMin, rangeMax);
+        Generator numberGenerator1(generator, distribution1);
+        newvalue = numberGenerator1();
+        //printf("valore generato: %f",newvalue);
+        if(newvalue<value){
+            contentRegSRL |= ((WORD)1<<10);
+        }
+        //random_variable = std::rand();
+        NumberDistribution distribution2(rangeMin, rangeMax);
+        Generator numberGenerator2(generator, distribution2);
+        newvalue = numberGenerator2();
+        //printf("valore generato: %f",newvalue);
+        if(newvalue<value){
+            contentRegSRL |= ((WORD)1<<15);
+        }
+        contentRegister = contentRegSRL;
         return 0;
     }
+//    else if(stateInfoRequest && regSRLrequest){
+//        contentRegister=0;
+//        return 0;
+//    }
     return -2;
 }
 
 
-int TechnoSoftLowDriver::resetFaultAlarms(){
+int TechnoSoftLowDriver::resetFault(){
     
     //Simulazione dialogo con il drive motor
 //    int random_variable = std::rand();
@@ -2586,48 +2622,48 @@ int TechnoSoftLowDriver::resetFaultAlarms(){
 }
 
 
-void* TechnoSoftLowDriver::staticResetFaultFunctionForThread(void* objPointer){
-
-    ((TechnoSoftLowDriver*)objPointer)->resetFaultAlarms();
-    pthread_exit(NULL);
-}
-
-
-int TechnoSoftLowDriver::resetFault(){
-
-//    if(!TS_ResetFault()){
-//         return -2;
-//         // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
-//         // errors when the function is executed)
-//    }
-    // Simulazione dialogo con il drive motor
-//    int random_variable = std::rand();
-//    if(random_variable<p*(RAND_MAX/100))
-//        return -1;
+//void* TechnoSoftLowDriver::staticResetFaultFunctionForThread(void* objPointer){
 //
-//    //************************************************** DA GESTIRE ************************************************************
-//    //    if(!TS_ResetFault()){
+//    ((TechnoSoftLowDriver*)objPointer)->resetFaultAlarms();
+//    pthread_exit(NULL);
+//}
+
+
+//int TechnoSoftLowDriver::resetFault(){
+//
+////    if(!TS_ResetFault()){
 ////         return -2;
 ////         // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
 ////         // errors when the function is executed)
 ////    }
-//    if(pthread_mutex_lock(&(mu))!=0){
-//
-//    }
-//    contentRegMER = 0;
-//    // ma nn solo...
-//    LSPactive = false;
-//    LSNactive = false;
-//    if(pthread_mutex_unlock(&(mu))!=0){
-//
-//    }
-//
+//    // Simulazione dialogo con il drive motor
+////    int random_variable = std::rand();
+////    if(random_variable<p*(RAND_MAX/100))
+////        return -1;
+////
+////    //************************************************** DA GESTIRE ************************************************************
+////    //    if(!TS_ResetFault()){
+//////         return -2;
+//////         // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
+//////         // errors when the function is executed)
+//////    }
+////    if(pthread_mutex_lock(&(mu))!=0){
+////
+////    }
+////    contentRegMER = 0;
+////    // ma nn solo...
+////    LSPactive = false;
+////    LSNactive = false;
+////    if(pthread_mutex_unlock(&(mu))!=0){
+////
+////    }
+////
+////    return 0;
+//    pthread_t th;
+//    pthread_create(&th, NULL,staticResetFaultFunctionForThread,this);
+//    pthread_join(th,NULL);
 //    return 0;
-    pthread_t th;
-    pthread_create(&th, NULL,staticResetFaultFunctionForThread,this);
-    pthread_join(th,NULL);
-    return 0;
-}
+//}
 
 int TechnoSoftLowDriver::selectAxis(){
 

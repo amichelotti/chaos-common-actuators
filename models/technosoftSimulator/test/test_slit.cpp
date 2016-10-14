@@ -57,7 +57,6 @@ void* homingProcedures(void *p){
     struct timeval startTimeForMotor1,endTimeForMotor1;
     double total_time_interval=0;
     
-    
     gettimeofday(&startTimeForMotor1,NULL);
     
     for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
@@ -82,22 +81,22 @@ void* homingProcedures(void *p){
         respHoming = 1;
         //usleep(5000000);
     }
-    std::fstream myfile;
-    std::stringstream stream;
-    std::string filename = "//home/caschera/chaos_bundle/chaosframework/chaos-distrib-i686-linux26/fileProva.txt";
-    stream<<filename.c_str();
-    std::string newfilename = stream.str();
-    
-    myfile.open(newfilename.c_str(),std::ios::out);
-    if(myfile.is_open()){
-        // Descrizione testo effettuato
-        myfile<<"Intervallo di tempo impiegato dalla procedura di homing a fermarsi: "<<std::endl<<std::endl;
-        myfile<<total_time_interval<<std::endl;
-        myfile.close();
-    }
-    else{
-        std::cout<<"Errore nell'apertura del file"<<std::endl;
-    }
+//    std::fstream myfile;
+//    std::stringstream stream;
+//    std::string filename = "//home/caschera/chaos_bundle/chaosframework/chaos-distrib-i686-linux26/fileProva.txt";
+//    stream<<filename.c_str();
+//    std::string newfilename = stream.str();
+//    
+//    myfile.open(newfilename.c_str(),std::ios::out);
+//    if(myfile.is_open()){
+//        // Descrizione testo effettuato
+//        myfile<<"Intervallo di tempo impiegato dalla procedura di homing a fermarsi: "<<std::endl<<std::endl;
+//        myfile<<total_time_interval<<std::endl;
+//        myfile.close();
+//    }
+//    else{
+//        std::cout<<"Errore nell'apertura del file"<<std::endl;
+//    }
 }
 
 struct checkData{
@@ -151,13 +150,13 @@ void* checkProcedures(void* p){
             if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
                 DERR("************** Error reading alarms ***************");
             }
-            if((resp=OBJ->getState(axisID,&state,desc1))<0){
-                DERR("************** Error reading alarms ***************");
-            }
+//            if((resp=OBJ->getState(axisID,&state,desc1))<0){
+//                DERR("************** Error reading alarms ***************");
+//            }
             
             DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
             DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
-            DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
+            //DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
             DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
             DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
             
@@ -174,6 +173,51 @@ struct stopMotionStruct{
     int axisID;
     common::actuators::AbstractActuator *obj;
 };
+
+struct resetAlarmsStruct{
+    int axisID;
+    common::actuators::AbstractActuator *obj;
+};
+
+void* resetAlarmsProcedure(void* p){
+    
+    resetAlarmsStruct* ptr = (resetAlarmsStruct*)p;
+    int axisID=ptr->axisID;
+    common::actuators::AbstractActuator *OBJ=ptr->obj;
+    
+    struct timeval startTimeForMotor1,endTimeForMotor1;
+    double total_time_interval=0;
+    
+    gettimeofday(&startTimeForMotor1,NULL);
+    int resp;
+    if((resp=OBJ->resetAlarms(axisID,0))<0){
+            DERR("************** Error returned by movement operation, code error %d **************",resp);
+            sleep(10);
+            //* errPtr = -5;
+    }
+    DPRINT("************** Comando di reset alarms eseguito **************");
+    
+    gettimeofday(&endTimeForMotor1,NULL);
+    total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+    
+    // ********* Salvataggio su file dell'intervallo di tempo trascorso *********
+    std::fstream myfile;
+    std::stringstream stream;
+    std::string filename = "//home/caschera/chaos_bundle/chaosframework/chaos-distrib-i686-linux26/fileProva.txt";
+    stream<<filename.c_str();
+    std::string newfilename = stream.str();
+    
+    myfile.open(newfilename.c_str(),std::ios::out);
+    if(myfile.is_open()){
+        // Descrizione testo effettuato
+        myfile<<"Intervallo di tempo impiegato dalla procedura di homing a fermarsi: "<<std::endl<<std::endl;
+        myfile<<total_time_interval<<std::endl;
+        myfile.close();
+    }
+    else{
+        std::cout<<"Errore nell'apertura del file"<<std::endl;
+    }
+}
 
 void* stopMotionProcedure(void* p){
     
@@ -430,16 +474,28 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         DPRINT("************** Fra 2 secondi tentativo di stoppare la procedura di homing **************");
         //sleep(10);
     
-        pthread_t th4;
-        stopMotionStruct strct;
-        strct.axisID=axisID;
-        strct.obj=OBJ;
+//        pthread_t th4;
+//        stopMotionStruct strct;
+//        strct.axisID=axisID;
+//        strct.obj=OBJ;
+//        
+//        sleep(15);
+//        pthread_create(&th4,NULL,stopMotionProcedure,(void*)&strct);
+//        pthread_join(th4,NULL);
+//        pthread_join(th3,NULL);
+//        pthread_join(th2,NULL);
+        
+        pthread_t th7;
+        resetAlarmsStruct strct2;
+        strct2.axisID=axisID;
+        strct2.obj=OBJ;
         
         sleep(15);
-        pthread_create(&th4,NULL,stopMotionProcedure,(void*)&strct);
-        pthread_join(th4,NULL);
-        pthread_join(th3,NULL);
-        pthread_join(th2,NULL);
+        pthread_create(&th7,NULL,resetAlarmsProcedure,(void*)&strct2);
+        pthread_join(th7,NULL);
+        //pthread_join(th3,NULL);
+        //pthread_join(th2,NULL);
+        
 //        
         //sleep(60);
   
@@ -461,20 +517,21 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        DPRINT("************** Sequenza operazioni n. %d completata **************",numSeq);
 //        sleep(5);
 //        
-        DPRINT("************** lANCIO OPERAZIONI DI HOMING SENZA BLOCCO **************");
-        sleep(5);
         
-        hd.a=1;
-        hd.b=1;
-        hd.obj=OBJ;
-        hd.c=axisID;
-        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
-        
-        hd2.duration=180;
-        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
-        
-        pthread_join(th2,NULL);
-        pthread_join(th3,NULL);
+//        DPRINT("************** lANCIO OPERAZIONI DI HOMING SENZA BLOCCO **************");
+//        sleep(5);
+//        
+//        hd.a=1;
+//        hd.b=1;
+//        hd.obj=OBJ;
+//        hd.c=axisID;
+//        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
+//        
+//        hd2.duration=180;
+//        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
+//        
+//        pthread_join(th2,NULL);
+//        pthread_join(th3,NULL);
    
         return 0;
 }
@@ -503,7 +560,7 @@ void* function1(void* str){
 //    }
     else{ // Invio comandi ai motori (axisID = 14)
         
-        int numVolteProcedura=2;
+        int numVolteProcedura=1;
         for(int i=1;i<=numVolteProcedura;i++){
             procedura(OBJ,i);
         }
