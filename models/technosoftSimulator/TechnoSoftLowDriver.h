@@ -200,6 +200,9 @@ namespace common{
 
                 long epsylon;
                 double p;
+                
+                bool deallocateTimerAlarms;
+                bool deallocateTimerStates;
 
                 // Stato esecuzione thread
 //                bool threadMoveRelativeOn;
@@ -224,6 +227,14 @@ namespace common{
                 static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
                 static void* staticMoveAbsolutePositionForThread(void*);
                 int moveAbsolutePositionHoming();
+                
+                int resetFaultsTimer();
+                static void* staticResetFaultsTimerForThread(void* objPointer);
+                
+                int resetStatesTimer();
+                void* staticResetStatesTimerForThread(void* objPointer);
+                
+                WORD contentRegisterMER;
                 
                 //int homingType;
 
@@ -255,6 +266,7 @@ namespace common{
 
                 bool LSNactive;
                 bool LSPactive;
+               
 
                 // Additional parameters for s-curve profile
                 //long jerkTime;

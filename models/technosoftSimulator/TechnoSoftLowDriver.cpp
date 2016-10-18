@@ -83,6 +83,9 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(){
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
     //deinit();
     //DPRINT("Deallocazione oggetto TechnoSoftLowDriver");
+    deallocateTimerAlarms=true;
+    deallocateTimerStates=true;
+    usleep(10000);
 }
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
@@ -343,6 +346,15 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     //deltaNoise = 100; // Number of microsteps. Used for noise
     controlledPositionHoming = false;
     homingStopped = false;
+    
+    deallocateTimerAlarms = false;
+    deallocateTimerStates = false;
+    
+    pthread_t th1;
+    pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
+    
+    pthread_t th2;
+    pthread_create(&th2, NULL,staticResetFaultsTimerForThread,this);
     
     return 0;
 }
@@ -2501,101 +2513,239 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
     }
     
     
-    double value =2;
-    double deltaNoise = 1;
-        //DPRINT("pos_mm=%f",pos_mm);
-        //DPRINT("deltaNoise=%f",deltaNoise);
-    double rangeMin = value-deltaNoise;
-    double rangeMax = value+deltaNoise;
-        //DPRINT("rangeMin=%f",rangeMin);
-        //DPRINT("rangeMax=%f", rangeMax);
+//    double value =2;
+//    double deltaNoise = 1;
+//        //DPRINT("pos_mm=%f",pos_mm);
+//        //DPRINT("deltaNoise=%f",deltaNoise);
+//    double rangeMin = value-deltaNoise;
+//    double rangeMax = value+deltaNoise;
+//        //DPRINT("rangeMin=%f",rangeMin);
+//        //DPRINT("rangeMax=%f", rangeMax);
+//    
+//    
+//    double newvalue; // = numberGenerator();
+//    //DPRINT("value=%f",newvalue);
     
     
-    double newvalue; // = numberGenerator();
-    //DPRINT("value=%f",newvalue);
+    if(pthread_mutex_lock(&(mu))!=0){
+
+    }
     
     // Inizializzazione "casuale" codici allarmi:
+//    if(alarmsInfoRequest && regMERrequest){
+//        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
+//            //random_variable = std::rand();
+//            NumberDistribution distribution(rangeMin, rangeMax);
+//            Generator numberGenerator1(generator, distribution);
+//            newvalue = numberGenerator1();
+//            //printf("valore generato: %f",newvalue);
+//            if(newvalue<value)
+//                contentRegister |= ((WORD)1<<i);
+//        }
+//        //contentRegister = contentRegMER;
+//        return 0;
+//    }
     if(alarmsInfoRequest && regMERrequest){
-        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
-            //random_variable = std::rand();
-            NumberDistribution distribution(rangeMin, rangeMax);
-            Generator numberGenerator1(generator, distribution);
-            newvalue = numberGenerator1();
-            //printf("valore generato: %f",newvalue);
-            if(newvalue<value)
-                contentRegister |= ((WORD)1<<i);
-        }
-        //contentRegister = contentRegMER;
+        contentRegister=contentRegMER;
         return 0;
     }
-//    if(alarmsInfoRequest && regMERrequest){
-//        contentRegister=0;
+ 
+//    else if(alarmsInfoRequest && regSRHrequest){
+//        for(uint16_t i=10; i<12; i++){
+//            //random_variable = std::rand();
+//            NumberDistribution distribution(rangeMin, rangeMax);
+//            Generator numberGenerator1(generator, distribution);
+//            newvalue = numberGenerator1();
+//            //printf("valore generato: %f",newvalue);
+//            if(newvalue<value)
+//                contentRegSRH |= ((WORD)1<<i);
+//        }
+//        contentRegister = contentRegSRH;
 //        return 0;
 //    }
     else if(alarmsInfoRequest && regSRHrequest){
-        for(uint16_t i=10; i<12; i++){
-            //random_variable = std::rand();
-            NumberDistribution distribution(rangeMin, rangeMax);
-            Generator numberGenerator1(generator, distribution);
-            newvalue = numberGenerator1();
-            //printf("valore generato: %f",newvalue);
-            if(newvalue<value)
-                contentRegSRH |= ((WORD)1<<i);
-        }
-        contentRegister = contentRegSRH;
+        contentRegister=contentRegSRH;
         return 0;
     }
-//    else if(alarmsInfoRequest && regSRHrequest){
-//        contentRegister=0;
-//        return 0;
-//    }
     // Inizializzazione "casuale" codici stati:
-    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
-        for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
-            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
-                //random_variable = std::rand();
-                NumberDistribution distribution(rangeMin, rangeMax);
-                Generator numberGenerator1(generator, distribution);
-                newvalue = numberGenerator1();
-                //printf("valore generato: %f",newvalue);
-                if(newvalue<value)
-                    contentRegSRH |= ((WORD)1<<i);
-            }
-        }
-        contentRegister = contentRegSRH;
-        return 0;
-    }
-//    else if(stateInfoRequest && regSRHrequest){
-//        contentRegister=0;
+//    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
+//        for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
+//            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
+//                //random_variable = std::rand();
+//                NumberDistribution distribution(rangeMin, rangeMax);
+//                Generator numberGenerator1(generator, distribution);
+//                newvalue = numberGenerator1();
+//                //printf("valore generato: %f",newvalue);
+//                if(newvalue<value)
+//                    contentRegSRH |= ((WORD)1<<i);
+//            }
+//        }
+//        contentRegister = contentRegSRH;
 //        return 0;
 //    }
-    else if(stateInfoRequest && regSRLrequest){
-        //random_variable = std::rand();
-        NumberDistribution distribution1(rangeMin, rangeMax);
-        Generator numberGenerator1(generator, distribution1);
-        newvalue = numberGenerator1();
-        //printf("valore generato: %f",newvalue);
-        if(newvalue<value){
-            contentRegSRL |= ((WORD)1<<10);
-        }
-        //random_variable = std::rand();
-        NumberDistribution distribution2(rangeMin, rangeMax);
-        Generator numberGenerator2(generator, distribution2);
-        newvalue = numberGenerator2();
-        //printf("valore generato: %f",newvalue);
-        if(newvalue<value){
-            contentRegSRL |= ((WORD)1<<15);
-        }
-        contentRegister = contentRegSRL;
+    else if(stateInfoRequest && regSRHrequest){
+        contentRegister=0;
         return 0;
     }
 //    else if(stateInfoRequest && regSRLrequest){
-//        contentRegister=0;
+//        //random_variable = std::rand();
+//        NumberDistribution distribution1(rangeMin, rangeMax);
+//        Generator numberGenerator1(generator, distribution1);
+//        newvalue = numberGenerator1();
+//        //printf("valore generato: %f",newvalue);
+//        if(newvalue<value){
+//            contentRegSRL |= ((WORD)1<<10);
+//        }
+//        //random_variable = std::rand();
+//        NumberDistribution distribution2(rangeMin, rangeMax);
+//        Generator numberGenerator2(generator, distribution2);
+//        newvalue = numberGenerator2();
+//        //printf("valore generato: %f",newvalue);
+//        if(newvalue<value){
+//            contentRegSRL |= ((WORD)1<<15);
+//        }
+//        contentRegister = contentRegSRL;
 //        return 0;
 //    }
+    else if(stateInfoRequest && regSRLrequest){
+        contentRegister=0;
+        return 0;
+    }
+    
+    if(pthread_mutex_unlock(&(mu))!=0){
+
+    }
+    
     return -2;
 }
 
+int TechnoSoftLowDriver::resetFaultsTimer(){
+    
+    double duration = 60;
+    struct timeval startTimeForMotor1,endTimeForMotor1;
+    
+    double total_time_interval=0;
+    gettimeofday(&startTimeForMotor1,NULL);
+    int contatoreRegMer = 0;
+    int contatoreRegSRH = 10;
+    
+    while(1 && !deallocateTimerAlarms){
+ 
+        // Lettura ogni secondo...
+        if(total_time_interval>duration){
+            
+            if(pthread_mutex_lock(  &(mu))!=0){
+
+            }
+            
+            //1. Reset di tutti gli allarmi:
+            contentRegMER = 0;
+            contentRegSRH = 0;
+            // ma nn solo...
+            LSPactive = false;
+            LSNactive = false;
+            
+            if(contatoreRegMer<=15){
+                //2. Generazione di un solo fault alla volta:
+                contentRegMER |= ((WORD)1<<contatoreRegMer);
+                contatoreRegMer++;
+            }
+            else{
+                contentRegSRH |= ((WORD)1<<contatoreRegSRH);
+                contatoreRegSRH++;
+                if(contatoreRegSRH>=11){
+                    contatoreRegMer=0;
+                    contatoreRegSRH=10;
+                }
+            }
+
+            if(pthread_mutex_unlock(&(mu))!=0){
+
+            }
+
+            total_time_interval=0;
+        }
+        
+        gettimeofday(&endTimeForMotor1,NULL);
+        total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+
+        DPRINT("total_time_interval: %f",total_time_interval);
+        usleep(5000); 
+    }
+}
+
+void* TechnoSoftLowDriver::staticResetFaultsTimerForThread(void* objPointer){
+    
+    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
+    ((TechnoSoftLowDriver*)objPointer)->resetFaultsTimer();
+
+    DPRINT("Uscita dal thread resetFaultsTimer");
+    pthread_exit(NULL); 
+}
+
+//int TechnoSoftLowDriver::resetStatesTimer(){
+//    
+//    double duration = 60;
+//    struct timeval startTimeForMotor1,endTimeForMotor1;
+//    
+//    double total_time_interval=0;
+//    gettimeofday(&startTimeForMotor1,NULL);
+//
+//    int indiciRegSRH = {};
+//    
+//    while(1 && !deallocateTimerStates){
+// 
+//        // Lettura ogni secondo...
+//        if(total_time_interval>duration){
+//            
+//            if(pthread_mutex_lock(  &(mu))!=0){
+//
+//            }
+//            
+//            //1. Reset di tutti gli allarmi:
+//            contentRegMER = 0;
+//            contentRegSRH = 0;
+//            // ma nn solo...
+//            LSPactive = false;
+//            LSNactive = false;
+//            
+//            if(contatoreRegMer<=15){
+//                //2. Generazione di un solo fault alla volta:
+//                contentRegMER |= ((WORD)1<<contatoreRegMer);
+//                contatoreRegMer++;
+//            }
+//            else{
+//                contentRegSRH |= ((WORD)1<<contatoreRegSRH);
+//                contatoreRegSRH++;
+//                if(contatoreRegSRH>=11){
+//                    contatoreRegMer=0;
+//                    contatoreRegSRH=10;
+//                }
+//            }
+//
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//
+//            }
+//
+//            total_time_interval=0;
+//        }
+//        
+//        gettimeofday(&endTimeForMotor1,NULL);
+//        total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+//
+//        DPRINT("total_time_interval: %f",total_time_interval);
+//        usleep(5000); 
+//    }
+//}
+
+//void* TechnoSoftLowDriver::staticResetStatesTimerForThread(void* objPointer){
+//    
+//    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
+//    ((TechnoSoftLowDriver*)objPointer)->resetStatesTimer();
+//
+//    DPRINT("Uscita dal thread resetFaultsTimer");
+//    pthread_exit(NULL); 
+//}
 
 int TechnoSoftLowDriver::resetFault(){
     
