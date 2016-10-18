@@ -84,7 +84,7 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
     //deinit();
     //DPRINT("Deallocazione oggetto TechnoSoftLowDriver");
     deallocateTimerAlarms=true;
-    deallocateTimerStates=true;
+    //deallocateTimerStates=true;
     usleep(10000);
 }
 
@@ -353,8 +353,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     pthread_t th1;
     pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
     
-    pthread_t th2;
-    pthread_create(&th2, NULL,staticResetFaultsTimerForThread,this);
+//    pthread_t th2;
+//    pthread_create(&th2, NULL,staticResetFaultsTimerForThread,this);
     
     return 0;
 }
