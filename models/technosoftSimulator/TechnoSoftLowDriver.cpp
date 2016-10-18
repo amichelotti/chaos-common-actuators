@@ -2527,10 +2527,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 //    //DPRINT("value=%f",newvalue);
     
     
-    if(pthread_mutex_lock(&(mu))!=0){
-
-    }
-    
+    DPRINT("Get status or error register function chiamata");
     // Inizializzazione "casuale" codici allarmi:
 //    if(alarmsInfoRequest && regMERrequest){
 //        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
@@ -2545,6 +2542,11 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 //        //contentRegister = contentRegMER;
 //        return 0;
 //    }
+    
+//    if(pthread_mutex_lock(  &(mu))!=0){
+//
+//    }
+    
     if(alarmsInfoRequest && regMERrequest){
         contentRegister=contentRegMER;
         return 0;
@@ -2612,9 +2614,9 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         return 0;
     }
     
-    if(pthread_mutex_unlock(&(mu))!=0){
-
-    }
+//    if(pthread_mutex_unlock(&(mu))!=0){
+//
+//    }
     
     return -2;
 }
@@ -2626,8 +2628,8 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
     
     double total_time_interval=0;
     gettimeofday(&startTimeForMotor1,NULL);
-    int contatoreRegMer = 0;
-    int contatoreRegSRH = 10;
+    WORD contatoreRegMer = 0;
+    WORD contatoreRegSRH = 10;
     
     while(1 && !deallocateTimerAlarms){
  
@@ -2639,21 +2641,23 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
             }
             
             //1. Reset di tutti gli allarmi:
-            contentRegMER = 0;
-            contentRegSRH = 0;
+            //contentRegMER = 0;
+            //contentRegSRH = 0;
             // ma nn solo...
             LSPactive = false;
             LSNactive = false;
             
             if(contatoreRegMer<=15){
                 //2. Generazione di un solo fault alla volta:
+                contentRegMER=0;
                 contentRegMER |= ((WORD)1<<contatoreRegMer);
                 contatoreRegMer++;
             }
             else{
+                contentRegSRH =0;
                 contentRegSRH |= ((WORD)1<<contatoreRegSRH);
                 contatoreRegSRH++;
-                if(contatoreRegSRH>=11){
+                if(contatoreRegSRH>11){
                     contatoreRegMer=0;
                     contatoreRegSRH=10;
                 }
@@ -2662,15 +2666,14 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
             if(pthread_mutex_unlock(&(mu))!=0){
 
             }
-
-            total_time_interval=0;
+            gettimeofday(&startTimeForMotor1,NULL);
         }
         
         gettimeofday(&endTimeForMotor1,NULL);
         total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
-        DPRINT("total_time_interval: %f",total_time_interval);
-        usleep(5000); 
+        //DPRINT("total_time_interval: %f",total_time_interval);
+        usleep(1000000); 
     }
 }
 

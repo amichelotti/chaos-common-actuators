@@ -134,18 +134,18 @@ void* checkProcedures(void* p){
 //            }
 //            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());
 
-            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
-                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-                sleep(10);
-                //* errPtr = -5;
-            }
+//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
+//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//                sleep(10);
+//                //* errPtr = -5;
+//            }
 
-            //usleep(5000);
-            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
-                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-                sleep(10);
-                //* errPtr = -5;
-            }
+//            //usleep(5000);
+//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
+//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+//                sleep(10);
+//                //* errPtr = -5;
+//            }
             
             if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
                 DERR("************** Error reading alarms ***************");
@@ -154,8 +154,8 @@ void* checkProcedures(void* p){
 //                DERR("************** Error reading alarms ***************");
 //            }
             
-            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
-            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
+//            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
+//            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
             //DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
             DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
             DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
@@ -165,7 +165,7 @@ void* checkProcedures(void* p){
 
             DPRINT("total_time_interval: %f",total_time_interval);
             
-            usleep(1000); // lettura ogni secondo...
+            usleep(1000000); // lettura ogni secondo...
         }
 }
 
@@ -332,26 +332,26 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
 //            sleep(10);
 
-        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
+//        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
         
 //        DPRINT("************ Procedura di homing terminata con successo. Segue la lettura dei dati ***************");
 //        uint64_t alarms;
 //        std::string desc2;
         
-        double durationChecking = 60; // secondi
+        double durationChecking = 600; // secondi
         
         pthread_t th1;
         checkData hd2;
         hd2.axisID=axisID;
         hd2.duration=durationChecking;
         hd2.obj=OBJ;
-        
-        pthread_create(&th1,NULL,checkProcedures,(void*)&hd2);
-        pthread_join(th1,NULL);
+        checkProcedures((void*)&hd2);
+//        pthread_create(&th1,NULL,checkProcedures,(void*)&hd2);
+//        pthread_join(th1,NULL);
         
         //checkProcedures(axisID, durationChecking,OBJ); // secondo parametro: durata intervallo di tempo dedicato al checking
         
@@ -445,26 +445,26 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //            usleep(5000000);
 //        }
        
-        DPRINT("************** Homing operation starting. ***************");
-        sleep(5);
-        pthread_t th2;
-        homingData hd;
-        hd.a=1;
-        hd.b=1;
-        hd.obj=OBJ;
-        hd.c=axisID;
-        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
-        //homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
-          
-//        DPRINT("************** Visione andamento procedura di homing per 90 secondi **************");
+//        DPRINT("************** Homing operation starting. ***************");
 //        sleep(5);
-        durationChecking=120;
-        pthread_t th3;
-        hd2.axisID=axisID;
-        hd2.duration = durationChecking;
-        hd2.obj=OBJ;
-        
-        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
+//        pthread_t th2;
+//        homingData hd;
+//        hd.a=1;
+//        hd.b=1;
+//        hd.obj=OBJ;
+//        hd.c=axisID;
+//        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
+//        //homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
+//          
+////        DPRINT("************** Visione andamento procedura di homing per 90 secondi **************");
+////        sleep(5);
+//        durationChecking=120;
+//        pthread_t th3;
+//        hd2.axisID=axisID;
+//        hd2.duration = durationChecking;
+//        hd2.obj=OBJ;
+//        
+//        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
        
         //checkProcedures(axisID, durationChecking,OBJ);
         
@@ -485,14 +485,15 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        pthread_join(th3,NULL);
 //        pthread_join(th2,NULL);
         
-        pthread_t th7;
-        resetAlarmsStruct strct2;
-        strct2.axisID=axisID;
-        strct2.obj=OBJ;
+//        pthread_t th7;
+//        resetAlarmsStruct strct2;
+//        strct2.axisID=axisID;
+//        strct2.obj=OBJ;
+//        
+//        sleep(15);
+//        pthread_create(&th7,NULL,resetAlarmsProcedure,(void*)&strct2);
+//        pthread_join(th7,NULL);
         
-        sleep(15);
-        pthread_create(&th7,NULL,resetAlarmsProcedure,(void*)&strct2);
-        pthread_join(th7,NULL);
         //pthread_join(th3,NULL);
         //pthread_join(th2,NULL);
         
