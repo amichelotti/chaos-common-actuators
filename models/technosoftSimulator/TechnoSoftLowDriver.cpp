@@ -1319,8 +1319,11 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
 // Set homing parameters
 int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    //DPRINT("Chiamata sethighSpeedHoming");
-    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
+//    DPRINT("Chiamata sethighSpeedHoming");
+//    DPRINT("_highSpeedHoming_mm_s = %f", _highSpeedHoming_mm_s);
+//    DPRINT("maxHighSpeedHoming_mm_s = %f", maxHighSpeedHoming_mm_s);
+    
+    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>(-maxHighSpeedHoming_mm_s)){   // MODIFICA DA RIPORTAREEEEEEEEEEEEEEEEEEEEE
         return -1;
     }
     highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
@@ -1329,6 +1332,12 @@ int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s)
 
 int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming_mm_s){
 
+//    DPRINT("Chiamata setMaxhighSpeedHoming");
+//    DPRINT("_maxhighSpeedHoming_mm_s = %f", _maxhighSpeedHoming_mm_s);
+//    DPRINT("-highSpeedHoming_mm_s = %f", -highSpeedHoming_mm_s);
+//    DPRINT("maxLowSpeedHoming_mm_s = %f", maxLowSpeedHoming_mm_s);
+    
+    
      if(_maxhighSpeedHoming_mm_s<=0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
         return -1;
     }
@@ -1348,6 +1357,11 @@ int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
 
 int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_mm_s){
 
+//    DPRINT("Chiamata setMaxlowSpeedHoming");
+//    DPRINT("_maxlowSpeedHoming_mm_s %f",_maxlowSpeedHoming_mm_s);
+//    DPRINT("lowSpeedHoming_mm_s %f",lowSpeedHoming_mm_s);
+//    DPRINT("maxHighSpeedHoming_mm_s %f",maxHighSpeedHoming_mm_s);
+    
     if(_maxlowSpeedHoming_mm_s<=0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
         return -1;
     }
@@ -1358,6 +1372,10 @@ int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_m
 int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
     //DPRINT("Chiamata setaccelerationHoming");
+//    DPRINT("Chiamata setaccelerationHoming");
+//    DPRINT("_accelerationHoming_mm_s2 %f",_accelerationHoming_mm_s2);
+//    DPRINT("maxAccelerationHoming_mm_s2 %f",maxAccelerationHoming_mm_s2);
+    
     if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
         return -1;
     }

@@ -339,16 +339,31 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;
     }
-    else if(strResultparName.compare("ACCELERATION")==0){
+    else if(strResultparName.compare("MAXSPEED")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setAcceleration(doubleValue)<0){
+        if((i->second)->setMaxSpeed(doubleValue)<0){
             return -3;
         }
         return 0;
-    }else if(strResultparName.compare("RATIOFNOISE")==0){
+    }
+    else if(strResultparName.compare("ACCELERATION")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setAcceleration(doubleValue)<0){
+            return -4;
+        }
+        return 0;
+    }
+    else if(strResultparName.compare("MAXACCELERATION")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxAcceleration(doubleValue)<0){
+            return -5;
+        }
+        return 0;
+    }
+    else if(strResultparName.compare("RATIOFNOISE")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setRatiOfNoise(doubleValue)<0){
-            return -4;
+            return -6;
         }
         return 0;
     }
@@ -357,43 +372,63 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setAdditive(intValue)<0){
-            return -5;
+            return -7;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENT")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setMovement((short)intValue)<0){
-            return -6;
+            return -8;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASE")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setReferenceBase((short)intValue)<0){
-            return -7;
+            return -9;
         }
         return 0;
     }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->sethighSpeedHoming(doubleValue)<0){
-            return -8;
+            return -10;
         }
         return 0;
     }
-
+    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxhighSpeedHoming(doubleValue)<0){
+            return -11;
+        }
+        return 0;
+    }
     else if(strResultparName.compare("LOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setlowSpeedHoming(doubleValue)<0){
-            return -9;
+            return -12;
         }
         return 0;
     }
+    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxlowSpeedHoming(doubleValue)<0){
+            return -13;
+        }
+        return 0;
+    }             
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setaccelerationHoming(doubleValue)<0){
-            return -10;
+            return -14;
+        }
+        return 0;
+    }
+    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxAccelerationHoming(doubleValue)<0){
+            return -15;
         }
         return 0;
     }
@@ -402,61 +437,61 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setAdditiveHoming(intValue)<0){
-            return -11;
+            return -16;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENTHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setMovementHoming((short)intValue)<0){
-            return -12;
+            return -17;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setReferenceBaseHoming((short)intValue)<0){
-            return -13;
+            return -18;
         }
         return 0;
     }//_________________________________________________________________________
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setEncoderLines(doubleValue)<0){
-            return -14;
+            return -19;
         }
         return 0;
     }
     else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setConst_mult_technsoft(doubleValue)<0){
-            return -15;
+            return -20;
         }
         return 0;
     }
     else if(strResultparName.compare("STEPSPERROUND")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSteps_per_rounds(doubleValue)<0){
-            return -16;
+            return -21;
         }
         return 0;
     }
     else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setN_rounds(doubleValue)<0){
-            return -17;
+            return -22;
         }
         return 0;
     }
     else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){
-            return -18;
+            return -23;
         }
         return 0;
     }
     else{
-        return -19;
+        return -24;
     }
 }
 
@@ -993,13 +1028,18 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset.clear();
    dataset="{\"attributes\":[";
    dataset+="{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"500.0\",\"default\":\"400.0\"},";
+   dataset+="{\"name\":\"maxspeed\",\"description\":\"Maximum value for max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"1000.0\",\"default\":\"700.0\"},";
    dataset+="{\"name\":\"acceleration\",\"description\":\"Acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"2.0\",\"default\":\"0.6\"},";
+   dataset+="{\"name\":\"maxacceleration\",\"description\":\"Maximum value for acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"5.0\",\"default\":\"0.9\"},";
    dataset+="{\"name\":\"isadditive\",\"description\":\"Specifies how is computed the position to reach\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
    dataset+="{\"name\":\"movement\",\"description\":\"Defines the moment when the motion is started\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"highspeedhoming\",\"description\":\"Max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"15.0\",\"default\":\"10.0\"},";
+   dataset+="{\"name\":\"maxhighspeedhoming\",\"description\":\"Maximum value for max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"100.0\",\"default\":\"14.0\"},";
    dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"},";
+   dataset+="{\"name\":\"maxlowspeedhoming\",\"description\":\"Max value for speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"6.0\",\"default\":\"4.0\"},"; 
    dataset+="{\"name\":\"accelerationhoming\",\"description\":\"Acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"0.6\",\"default\":\"0.3\"},";
+   dataset+="{\"name\":\"maxaccelerationhoming\",\"description\":\"Max value for acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"1.0\",\"default\":\"0.8\"},";
    dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
    dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";

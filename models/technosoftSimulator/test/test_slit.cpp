@@ -247,28 +247,130 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
             //* errPtr = -5;
         }
         
-        if(OBJ->setParameter(axisID,"speed","200")<0){
-            DERR("************** Error setparameter **************");
+        if(OBJ->setParameter(axisID,"speed","100.0")<0){
+            DERR("************** Error setparameter speed**************");
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if(OBJ->setParameter(axisID,"MAXSPEED","300.0")<0){
+            DERR("************** Error setparameter MAXSPEED**************");
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if(OBJ->setParameter(axisID,"ACCELERATION","0.2")<0){
+            DERR("************** Error setparameter ACCELERATION**************");
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if(OBJ->setParameter(axisID,"MAXACCELERATION","0.8")<0){
+            DERR("************** Error setparameter MAXACCELERATION**************");
             sleep(10);
             //* errPtr = -5;
         }
         if(OBJ->setParameter(axisID,"RATIOFNOISE","0.1")<0){
-            DERR("************** Error setparameter **************");
+            DERR("************** Error setparameter RATIOFNOISE**************");
             sleep(10);
             //* errPtr = -5;
         }
+        if(OBJ->setParameter(axisID,"ISADDITIVE","0")<0){
+            DERR("************** Error setparameter ISADDITIVE**************");
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if(OBJ->setParameter(axisID,"MOVEMENT","1")<0){
+            DERR("************** Error setparameter MOVEMENT**************");
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if(OBJ->setParameter(axisID,"REFERENCEBASE","1")<0){
+            DERR("************** Error setparameter REFERENCEBASE**************");
+            sleep(10);
+            //* errPtr = -5;
+        }
+        int ret;
+        if((ret=OBJ->setParameter(axisID,"HIGHSPEEDHOMING","425"))<0){
+            DERR("************** Error setparameter HIGHSPEEDHOMING %d **************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"MAXHIGHSPEEDHOMING","600.0"))<0){
+            DERR("************** Error setparameter MAXHIGHSPEEDHOMING %d **************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"LOWSPEEDHOMING","50.0"))<0){
+            DERR("************** Error setparameter LOWSPEEDHOMING %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"MAXLOWSPEEDHOMING","150.0"))<0){
+            DERR("************** Error setparameter MAXLOWSPEEDHOMING %d **************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"ACCELERATIONHOMING","0.3"))<0){
+            DERR("************** Error setparameter ACCELERATIONHOMING %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"MAXACCELERATIONHOMING","0.6"))<0){
+            DERR("************** Error setparameter MAXACCELERATIONHOMING %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"ISADDITIVEHOMING","0"))<0){
+            DERR("************** Error setparameter ISADDITIVEHOMING %d **************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"MOVEMENTHOMING","1"))<0){
+            DERR("************** Error setparameter MOVEMENTHOMING %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"REFERENCEBASEHOMING","1"))<0){
+            DERR("************** Error setparameter REFERENCEBASEHOMING %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"NUMENCODERLINES","200"))<0){
+            DERR("************** Error setparameter NUMENCODERLINES %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"NUMMICROSTEPSPERSTEP","400"))<0){
+            DERR("************** Error setparameter NUMMICROSTEPSPERSTEP %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"STEPSPERROUND","25"))<0){
+            DERR("************** Error setparameter STEPSPERROUND %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"FIXEDNUMBEROFROUNDS","14"))<0){
+            DERR("************** Error setparameter FIXEDNUMBEROFROUNDS %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"LINEARDISPLACEMENT[MM]","1.5"))<0){
+            DERR("************** Error setparameter LINEARDISPLACEMENT[MM] %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+    
         DPRINT("SETPPARAMETER OK");
-        //sleep(35);
+        sleep(60);
 
         //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
         int resp;
         //sleep(5);
 
-        if((resp=OBJ->moveAbsoluteMillimeters(axisID,5))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
+//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,5))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
         
         //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
