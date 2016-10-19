@@ -134,11 +134,11 @@ void* checkProcedures(void* p){
 //            }
 //            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());
 
-//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
-//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//                sleep(10);
-//                //* errPtr = -5;
-//            }
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
 
 //            //usleep(5000);
 //            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
@@ -154,11 +154,11 @@ void* checkProcedures(void* p){
 //                DERR("************** Error reading alarms ***************");
 //            }
             
-//            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
+            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
 //            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
             //DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
             DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
-            DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
+//            DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
             
             gettimeofday(&endTimeForMotor1,NULL);
             total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
@@ -252,19 +252,24 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
             sleep(10);
             //* errPtr = -5;
         }
+        if(OBJ->setParameter(axisID,"RATIOFNOISE","0.1")<0){
+            DERR("************** Error setparameter **************");
+            sleep(10);
+            //* errPtr = -5;
+        }
         DPRINT("SETPPARAMETER OK");
         //sleep(35);
-        
+
         //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
         int resp;
         //sleep(5);
 
-//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,1))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-
+        if((resp=OBJ->moveAbsoluteMillimeters(axisID,5))<0){
+            DERR("************** Error returned by movement operation, code error %d **************",resp);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        
         //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
 //        if((resp=OBJ->stopMotion(axisID))<0){
