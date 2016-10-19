@@ -189,7 +189,7 @@ namespace common{
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
-
+                 
                 bool stopMotionCommand;
                 long position; // expressed in microsteps
                 long positionCounter;
@@ -197,6 +197,7 @@ namespace common{
 
                 long cap_position;
                 bool LNStransition;
+                bool LPStransition;
 
                 long epsylon;
                 double p;
@@ -243,6 +244,7 @@ namespace common{
                 bool homingStopped;
                 
                 bool controlledPositionHoming;
+                long positiveLimitPosition;
 
             public:
                 bool alarmsInfoRequest;

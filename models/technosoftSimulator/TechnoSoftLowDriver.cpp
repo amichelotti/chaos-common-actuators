@@ -337,6 +337,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     // ************ Limit transitions *************
     LNStransition = false;
+    LPStransition = false;
+    
     LSNactive=false; // BIT DI STATO
     LSPactive=false; // BIT DI STATO
 
@@ -349,6 +351,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
+    
+    positiveLimitPosition = 100000000;
     
     pthread_t th1;
     pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
@@ -965,8 +969,11 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 //
 //    if(powerOffCommand)
 //        DPRINT("powerOffCommand");
+    
+    // Gestione limit switch positivo
+    //long positiveLimitPosition = 1000000000;
 
-    while(position>=(-10*SPEED_DEFAULT) && position<=LONG_MAX && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
+    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT) && position<=LONG_MAX && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
 
         if(pthread_mutex_lock(&(mu))!=0){
 
@@ -983,6 +990,8 @@ int TechnoSoftLowDriver::incrDecrPosition(){
             position-=speed_ms_s;
             positionCounter-=speed_ms_s;
             positionEncoder-=speed_ms_s;
+            LPStransition = false;
+            LSPactive=false;
         }
 
         //DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
@@ -994,7 +1003,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
                 LSNactive=false;
                 resetLimitSwicth=false;
             }
-            if (position<=LONG_MAX){
+            if (position<=positiveLimitPosition){
                 LSPactive=false;
                 resetLimitSwicth=false;
             }
@@ -1046,10 +1055,17 @@ int TechnoSoftLowDriver::incrDecrPosition(){
         position=0;   
     }
     
-    if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
+    if(position>positiveLimitPosition){
         LSPactive=true;
-        position = LONG_MAX;
+        positionCounter=positiveLimitPosition;
+        positionEncoder=positiveLimitPosition;
+        position=positiveLimitPosition; 
     }
+    
+//    if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
+//        LSPactive=true;
+//        position = LONG_MAX;
+//    }
     
     if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -1457,6 +1473,9 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     if(position<0){
        position=0; 
     }
+    else if(position>positiveLimitPosition){
+       position=positiveLimitPosition;  
+    }
     
     bool turnLNS = false;
     bool turnLPS = false;
@@ -1469,8 +1488,8 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         //turnLNS = true;
         //return -1;
     }
-    else if(absolutePosition>LONG_MAX){
-        absolutePosition=LONG_MAX;
+    else if(absolutePosition>positiveLimitPosition){
+        absolutePosition=positiveLimitPosition;
         turnLPS=true;
     }
     
@@ -1519,6 +1538,8 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
                 position-=speed_ms_s;
                 positionCounter-=speed_ms_s;
                 positionEncoder-=speed_ms_s;
+                LPStransition = false;
+                LSPactive = false;
             }
 
 //            DPRINT("moveAbsolutePosition: position %ld",position);
@@ -1528,11 +1549,11 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 //            DPRINT("moveAbsolutePosition: labs(position-absolutePosition) %ld",labs(position-absolutePosition));
 
             if(resetLimitSwicth){
-                if (position >= 0){
+                if(position >= 0){
                     LSNactive=false;
                     resetLimitSwicth=false;
                 }
-                if (position<=LONG_MAX){
+                if(position<=positiveLimitPosition){
                     LSPactive=false;
                     resetLimitSwicth=false;
                 }
@@ -1570,9 +1591,9 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         LSNactive = true;
     }
     else if(turnLPS && std::labs(position-absolutePosition)<=tol){ // nel qual caso absolutePosition dato in input ==0
-        position = LONG_MAX; // non e' possibile assegnargli un valore piu grande :(
-        positionCounter=LONG_MAX;
-        positionEncoder=LONG_MAX;
+        position = positiveLimitPosition; // non e' possibile assegnargli un valore piu grande :(
+        positionCounter=positiveLimitPosition;
+        positionEncoder=positiveLimitPosition;
         LSPactive = true;
     }
      
@@ -1684,6 +1705,10 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
     }
 
     actuatorIDInMotion = true;
+    
+    // Mettiamoci al riparo anche in questo caso...
+    LPStransition=false;
+    LSPactive=false;
 
     if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -1858,13 +1883,13 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 //            positionCounter-=lowSpeedHoming_mm_s;
 //            positionEncoder-=lowSpeedHoming_mm_s;
 //        }
-
         if(resetLimitSwicth){
             if (position >= 0){
                 LNStransition = false;
                 LSNactive=false;
             }
-            if (position<=LONG_MAX){
+            if (position<=positiveLimitPosition){
+                LPStransition = false;
                 LSPactive=false;
             }
             resetLimitSwicth=false;
@@ -2644,8 +2669,8 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
             //contentRegMER = 0;
             //contentRegSRH = 0;
             // ma nn solo...
-            LSPactive = false;
-            LSNactive = false;
+            //LSPactive = false;
+            //LSNactive = false;
             
             if(contatoreRegMer<=15){
                 //2. Generazione di un solo fault alla volta:
