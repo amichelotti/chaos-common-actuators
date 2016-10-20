@@ -101,23 +101,23 @@ namespace common{
        namespace models {
            namespace simul {
 
-           class ElectricPowerException{
-                public:
-                    ElectricPowerException(){}
-                    void badElectricPowerInfo();
-           };
-
-           class StopMotionException{
-                public:
-                    StopMotionException(){}
-                    void badStopMotionInfo();
-           };
-
-           class OpeningChannelException{
-                public:
-                    OpeningChannelException(){}
-                    void badOpeningChannelInfo();
-           };
+//           class ElectricPowerException{
+//                public:
+//                    ElectricPowerException(){}
+//                    void badElectricPowerInfo();
+//           };
+//
+//           class StopMotionException{
+//                public:
+//                    StopMotionException(){}
+//                    void badStopMotionInfo();
+//           };
+//
+//           class OpeningChannelException{
+//                public:
+//                    OpeningChannelException(){}
+//                    void badOpeningChannelInfo();
+//           };
 
            struct containerIncrementPosition{
                long deltaPosition;

@@ -5,20 +5,20 @@
 using namespace common::actuators::models::simul;
 
 //--------------------------------------------
-void ElectricPowerException::badElectricPowerInfo(){
-
-    std::cerr<< "The electrical power has not been turned off." << std::endl;
-}
-
-void StopMotionException::badStopMotionInfo(){
-
-    std::cerr<< "The eventual motion can not be stopped" << std::endl;
-}
-
-void OpeningChannelException::badOpeningChannelInfo(){
-
-    std::cerr<< "Channel can not be opened. " << std::endl;
-}
+//void ElectricPowerException::badElectricPowerInfo(){
+//
+//    std::cerr<< "The electrical power has not been turned off." << std::endl;
+//}
+//
+//void StopMotionException::badStopMotionInfo(){
+//
+//    std::cerr<< "The eventual motion can not be stopped" << std::endl;
+//}
+//
+//void OpeningChannelException::badOpeningChannelInfo(){
+//
+//    std::cerr<< "Channel can not be opened. " << std::endl;
+//}
 
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(int hostID, const std::string& pszDevName,BYTE btType,DWORD baudrate){
     init(hostID, pszDevName,btType,baudrate); // La funzione init non ritorna mai un numero negativo per quello che fa, quindi
