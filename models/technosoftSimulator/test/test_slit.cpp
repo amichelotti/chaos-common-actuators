@@ -267,7 +267,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
             sleep(10);
             //* errPtr = -5;
         }
-        if(OBJ->setParameter(axisID,"RATIOFNOISE","0.1")<0){
+        if(OBJ->setParameter(axisID,"RATIOFNOISE","0.0")<0){
             DERR("************** Error setparameter RATIOFNOISE**************");
             sleep(10);
             //* errPtr = -5;
@@ -366,11 +366,11 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         int resp;
         //sleep(5);
 
-//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,5))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
+        if((resp=OBJ->moveRelativeMillimeters(axisID,800))<0){
+            DERR("************** Error returned by movement operation, code error %d **************",resp);
+            sleep(10);
+            //* errPtr = -5;
+        }
         
         //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
@@ -449,7 +449,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        uint64_t alarms;
 //        std::string desc2;
         
-        double durationChecking = 600; // secondi
+        double durationChecking = 900; // secondi
         
         pthread_t th1;
         checkData hd2;
@@ -457,6 +457,22 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         hd2.duration=durationChecking;
         hd2.obj=OBJ;
         checkProcedures((void*)&hd2);
+        
+        if((resp=OBJ->moveRelativeMillimeters(axisID,-800))<0){
+            DERR("************** Error returned by movement operation, code error %d **************",resp);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        
+        durationChecking = 1500; // secondi
+        
+        pthread_t th2;
+        //checkData hd2;
+        hd2.axisID=axisID;
+        hd2.duration=durationChecking;
+        hd2.obj=OBJ;
+        checkProcedures((void*)&hd2);
+
 //        pthread_create(&th1,NULL,checkProcedures,(void*)&hd2);
 //        pthread_join(th1,NULL);
         

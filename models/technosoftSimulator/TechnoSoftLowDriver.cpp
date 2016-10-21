@@ -352,10 +352,10 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
     
-    positiveLimitPosition = 100000000;
+    positiveLimitPosition = 60000000;
     
-    pthread_t th1;
-    pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
+      pthread_t th1;
+      pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
     
 //    pthread_t th2;
 //    pthread_create(&th2, NULL,staticResetFaultsTimerForThread,this);
@@ -973,7 +973,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     // Gestione limit switch positivo
     //long positiveLimitPosition = 1000000000;
 
-    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT) && position<=LONG_MAX && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
+    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
 
         if(pthread_mutex_lock(&(mu))!=0){
 
@@ -994,7 +994,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
             LSPactive=false;
         }
 
-        //DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
+        DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
         //DPRINT("Posizione encoder dopo l'incremento effettuato: %ld", positionEncoder);
         //DPRINT("Posizione counter dopo l'incremento effettuato: %ld", positionCounter);
 
@@ -1560,7 +1560,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
                 LSPactive = false;
             }
 
-//            DPRINT("moveAbsolutePosition: position %ld",position);
+            DPRINT("moveAbsolutePosition: position %ld",position);
 //            DPRINT("moveAbsolutePosition: positionCounter %ld",positionCounter);
 //            DPRINT("moveAbsolutePosition: positionEncoder %ld",positionEncoder);
 //
