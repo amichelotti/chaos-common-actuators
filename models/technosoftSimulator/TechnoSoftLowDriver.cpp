@@ -31,7 +31,7 @@ int SerialCommChannelTechnosoft::getbtType(){return this->btType;}
 int SerialCommChannelTechnosoft::getbaudrate(){return this->baudrate;}
 
 int SerialCommChannelTechnosoft::init(int _hostID, const std::string& _pszDevName,const BYTE& _btType,const DWORD& _baudrate){
-    DPRINT("initializing dev %s type %d baud %d",_pszDevName.c_str(),_btType,_baudrate);
+    //DPRINT("initializing dev %s type %d baud %d",_pszDevName.c_str(),_btType,_baudrate);
     pszDevName=_pszDevName;
     btType = _btType;
     baudrate = _baudrate;
@@ -45,12 +45,12 @@ void SerialCommChannelTechnosoft::close(){
 //    if(fd!=-1){
 //	TS_CloseChannel(fd); // chiusura canale di comunicazione
 //    }
-    DPRINT("Chiusura canale di comunicazione in fase di deallocazione delle risorse");
+    //DPRINT("Chiusura canale di comunicazione in fase di deallocazione delle risorse");
 }
 
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
     close();
-    DPRINT("Deallocazione oggetto SerialCommChannelTechnosoft. Invio comando di chiusura canale di comunicazione effettuato");
+    //DPRINT("Deallocazione oggetto SerialCommChannelTechnosoft. Invio comando di chiusura canale di comunicazione effettuato");
 }
 
 int SerialCommChannelTechnosoft::open(){
@@ -69,7 +69,7 @@ int SerialCommChannelTechnosoft::open(){
 //    if(random_variable<p*(RAND_MAX/100))
 //        return -1;
     
-    DPRINT("Channel is opened");
+    //DPRINT("Channel is opened");
     return 0;
 }
 
@@ -113,7 +113,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _linear_movement_per_n_rounds,
                         const double _percOfNoise){
 
-    DPRINT("Inizializzazione parametri");
+    //DPRINT("Inizializzazione parametri");
 
     if(_maxSpeed_mm_s<=0){
         return -1;
@@ -994,7 +994,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
             LSPactive=false;
         }
 
-        DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
+        //DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
         //DPRINT("Posizione encoder dopo l'incremento effettuato: %ld", positionEncoder);
         //DPRINT("Posizione counter dopo l'incremento effettuato: %ld", positionCounter);
 
@@ -1079,7 +1079,7 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->incrDecrPosition();
 
-    DPRINT("Uscita dal thread di movimentazione");
+    //DPRINT("Uscita dal thread di movimentazione");
     pthread_exit(NULL);
 }
 
@@ -1560,7 +1560,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
                 LSPactive = false;
             }
 
-            DPRINT("moveAbsolutePosition: position %ld",position);
+            //DPRINT("moveAbsolutePosition: position %ld",position);
 //            DPRINT("moveAbsolutePosition: positionCounter %ld",positionCounter);
 //            DPRINT("moveAbsolutePosition: positionEncoder %ld",positionEncoder);
 //

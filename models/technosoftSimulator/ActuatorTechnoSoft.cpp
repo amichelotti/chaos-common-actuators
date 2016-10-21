@@ -53,7 +53,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     // show content:
-    DPRINT("Deleting Actuator Technosoft");
+    //DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
         deinit(it->first);
@@ -62,14 +62,14 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     // Remove all the element from the map container
     motors.clear();
 
-    DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
+    //DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
 
     // close the communication channel
     if(channel!=NULL){
         delete channel;
         channel = NULL;
     }
-    DPRINT("Object Actuator Technosoft is deleted");
+    //DPRINT("Object Actuator Technosoft is deleted");
 }
 
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
@@ -78,7 +78,7 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 int ActuatorTechnoSoft::init(void*initialization_string){
 
     if(initChannelAlreadyDone){
-        DPRINT("This object has already a communication channel correctly initialized");
+        //DPRINT("This object has already a communication channel correctly initialized");
         return -1;
     }
 
@@ -86,7 +86,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
     params.assign((const char*)initialization_string);
     boost::smatch match;
 
-    DPRINT("Initialization string %s", params.c_str());
+    //DPRINT("Initialization string %s", params.c_str());
 
     if(regex_match(params, match, driver_match1, boost::match_extra)){
 
@@ -98,7 +98,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         baudrate = atoi(strbaudrate.c_str());
         dev_name=match[4];
 
-        DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
+        //DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
 
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
         channel = new (std::nothrow) SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
@@ -122,7 +122,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
     params.assign((const char*)initialization_string);
     boost::smatch match;
 
-    DPRINT("Configuration string %s", params.c_str());
+    //DPRINT("Configuration string %s", params.c_str());
 
     if(regex_match(params, match, driver_match2, boost::match_extra)){
 
@@ -146,12 +146,12 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 driver = NULL;
                 return -2;
             }
-            DPRINT("Axis id %d configurato correttamente.", axid);
+            //DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            //DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
             return 0;
         }
-        DPRINT("Axis id %d è stato già configurato correttamente.", axid);
+        //DPRINT("Axis id %d è stato già configurato correttamente.", axid);
         return -3;
         //HOMING procedure parameters
         //**********************************************************************
@@ -193,7 +193,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     channel->hostID = (objActuator.channel)->hostID;
     channel->fd = (objActuator.channel)->fd;
 
-    DPRINT("Costruttore di copia eseguito");
+    //DPRINT("Costruttore di copia eseguito");
 }
 
 ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objActuator){ // Overloading operatori di assegnamento
@@ -223,7 +223,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     channel->hostID = (objActuator.channel)->hostID;
     channel->fd = (objActuator.channel)->fd;
 
-    DPRINT("Operatore di assegnamento eseguito");
+    //DPRINT("Operatore di assegnamento eseguito");
     return *this;
 }
 
@@ -278,7 +278,7 @@ int ActuatorTechnoSoft::deinit(int axisID){
         }
     }
 
-    DPRINT("Object technosoftlowdriver with axisID = %d is deinitialized",axisID);
+    //DPRINT("Object technosoftlowdriver with axisID = %d is deinitialized",axisID);
     // Controllo lista vuota. Se e' vuota bisogna chiudere il canale!!!!!
     return 0;
 }
@@ -496,7 +496,7 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
 }
 
 int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimeters){
-    DPRINT("moving relative %f mm",deltaMillimeters);
+    //DPRINT("moving relative %f mm",deltaMillimeters);
 
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
@@ -509,7 +509,7 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimete
     // Calcolo argomento funzione moveRelativeSteps
     //double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double deltaMicroSteps=(i->second)->getdeltaMicroSteps(deltaMillimeters);
-    DPRINT("deltaMicroSteps = %f mm",deltaMicroSteps);
+    //DPRINT("deltaMicroSteps = %f mm",deltaMicroSteps);
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
     }
@@ -539,7 +539,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
     // Calcolo argomento funzione moveAbsoluteSteps
     //double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double nMicroSteps = (i->second)->getdeltaMicroSteps(millimeters);
-    DPRINT("nMicroSteps=%f\n",nMicroSteps);
+    //DPRINT("nMicroSteps=%f\n",nMicroSteps);
 
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
@@ -631,7 +631,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     // ******************** NOTA:  le funzioni getState e getAlarms devono essere eseguite in modalita' SEQUENZIALE,
     // e non indipendentemente l'una dall'altra in thread differenti, perche' accedono agli stessi dati *********************
 
-    DPRINT("Getting state of the actuator. ");
+    //DPRINT("Getting state of the actuator. ");
 
     *state  = ACTUATOR_UNKNOWN_STATUS;
     descStr.assign("");
@@ -743,7 +743,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
 int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descStr){
 
-    DPRINT("Getting alarms of the actuator");
+    //DPRINT("Getting alarms of the actuator");
 
     * alrm = ACTUATOR_NO_ALARMS_DETECTED;
     descStr.assign("");
@@ -911,7 +911,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
      // In the fault status the power stage is disabled, the MER register signals
      // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
      // ************************** Operazione di selezione axisID ***************************
-     DPRINT("FUNZIONE DI RESET ALARMS ESEGUITA");
+     //DPRINT("FUNZIONE DI RESET ALARMS ESEGUITA");
      std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
      if(i==motors.end()){
@@ -921,19 +921,19 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
 
      int err = 0;
      if((i->second)->selectAxis()<0){
-        DPRINT("Funzione reset alarms, errore nella selezione dell'axis id %d",err);
+        //DPRINT("Funzione reset alarms, errore nella selezione dell'axis id %d",err);
         return -2;
      }
      mode = 0;
      switch(mode){
          case 0:
-            DPRINT("Prima di chiamare resetFault");
+            //DPRINT("Prima di chiamare resetFault");
             if((i->second)->resetFault()<0){
                 err = -3;
                 // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
                 // errors when the function is executed)
             }
-            DPRINT("Dopo aver chiamato resetFault");
+            //DPRINT("Dopo aver chiamato resetFault");
             break;
          case 1:
 //            if(driver->resetSetup()<0){
@@ -949,7 +949,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
              err = -5;
              break;
      }
-     DPRINT("Codice ritornato funzione reset alarms %d",err);
+     //DPRINT("Codice ritornato funzione reset alarms %d",err);
      return err;
  }
 
