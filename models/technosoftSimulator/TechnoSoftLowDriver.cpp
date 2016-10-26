@@ -90,6 +90,9 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const int& _axisID,
+                        const long& _positiveLimitPosition,
+                        const double& _percNoise,
+                        const double& _durationAlarmsInterval,
                         const double _speed_mm_s,
                         const double _maxSpeed_mm_s,
                         const double _acceleration_mm_s2,
@@ -110,8 +113,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _const_mult_technsoft,
                         const double _steps_per_rounds,
                         const double _n_rounds,
-                        const double _linear_movement_per_n_rounds,
-                        const double _percOfNoise){
+                        const double _linear_movement_per_n_rounds){
 
     //DPRINT("Inizializzazione parametri");
 
@@ -233,11 +235,21 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     axisID = _axisID;
     
-    if(_percOfNoise<0 || _percOfNoise>1){
+    if(_percNoise<0 || _percNoise>1){
         return -23;
     }
-    percNoise = _percOfNoise;
-
+    percNoise = _percNoise;
+    
+    if(_positiveLimitPosition<0){
+        return -24;
+    }
+    positiveLimitPosition = _positiveLimitPosition;
+    
+    if(_durationAlarmsInterval<0){
+        return -25;
+    }
+    durationAlarmsInterval = _durationAlarmsInterval;
+    
 //    axisRef = TS_LoadSetup(setupFilePath.c_str());
 //    if(axisRef < 0){
 //        DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
@@ -248,7 +260,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -24;
+        return -26;
 
     /*	Setup the axis based on the setup data previously, for axisID*/
 //    if(!TS_SetupAxis(_axisID, axisRef)){
@@ -257,7 +269,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -25;
+        return -27;
 
 //    if(!TS_SelectAxis(_axisID)){
 //        DERR("failed to select axis %d, %s",_axisID,TS_GetLastErrorText());
@@ -265,7 +277,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -26;
+        return -28;
 
     /*	Execute the initialization of the drive (ENDINIT) */
 //    if(!TS_DriveInitialisation()){
@@ -274,7 +286,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -27;
+        return -29;
 
      // Settare il registro per la lettura dell'encoder
 //    if(!TS_Execute("SCR=0x4338")){
@@ -284,14 +296,14 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -28;
+        return -30;
 
 //    if(!TS_SetEventOnMotionComplete(0,0)){
 //	return -30;
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -29;
+        return -31;
 
     readyState = true;
     internalHomingStateDefault=0;
@@ -352,10 +364,11 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
     
-    positiveLimitPosition = 60000000;
+    //positiveLimitPosition = 60000000;
+    //durationAlarmsInterval = 60;
     
-      pthread_t th1;
-      pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
+    pthread_t th1;
+    pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
     
 //    pthread_t th2;
 //    pthread_create(&th2, NULL,staticResetFaultsTimerForThread,this);
@@ -2666,7 +2679,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
 
 int TechnoSoftLowDriver::resetFaultsTimer(){
     
-    double duration = 60;
+    //double durationAlarmsInterval = 60;
     struct timeval startTimeForMotor1,endTimeForMotor1;
     
     double total_time_interval=0;
@@ -2677,7 +2690,7 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
     while(1 && !deallocateTimerAlarms){
  
         // Lettura ogni secondo...
-        if(total_time_interval>duration){
+        if(total_time_interval>durationAlarmsInterval){
             
             if(pthread_mutex_lock(  &(mu))!=0){
 

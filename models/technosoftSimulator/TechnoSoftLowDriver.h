@@ -92,6 +92,10 @@
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
 
+#define POSITIVE_LIMIT_POSITION_DEFAULT 60000000
+#define PERC_NOISE_DEFAULT 0.0
+#define DURATION_ALARMS_INTERVAL_DEFAULT 60.0
+
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -245,6 +249,8 @@ namespace common{
                 
                 bool controlledPositionHoming;
                 long positiveLimitPosition;
+                
+                double durationAlarmsInterval;
 
             public:
                 bool alarmsInfoRequest;
@@ -304,6 +310,9 @@ namespace common{
                 // Inizializzazione singolo drive/motor
                 int init(const std::string& setupFilePath,
                         const int& axisID,
+                        const long& _positiveLimitPosition=POSITIVE_LIMIT_POSITION_DEFAULT,
+                        const double& _percNoise=PERC_NOISE_DEFAULT,
+                        const double& _durationAlarmsInterval=DURATION_ALARMS_INTERVAL_DEFAULT,
                         const double speed=SPEED_DEFAULT,
                         const double maxSpeed=MAX_SPEED_DEFAULT,
                         const double acceleration=ACCELERATION_DEFAULT,
@@ -324,8 +333,7 @@ namespace common{
                         const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT,
                         const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,
                         const double _n_rounds=N_ROUNDS_DEFAULT,
-                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
-                        const double _percOfNoise=PERCNOISE_DEFAULT);
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
 
 
                 int homing(int mode);

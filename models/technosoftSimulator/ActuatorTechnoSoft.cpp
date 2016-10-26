@@ -40,6 +40,8 @@ using namespace ::common::actuators;
 static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
 static const boost::regex driver_match2("(\\d+),(.+)");
+//(([1-9][0-9]*\\.?[0-9]*)|(\\.[0-9]+))([Ee][+-]?[0-9]+)? 
+
 
 std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
@@ -97,7 +99,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string strbaudrate = match[3];
         baudrate = atoi(strbaudrate.c_str());
         dev_name=match[4];
-
+ 
         //DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
 
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
@@ -129,6 +131,21 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         std::string conf_path=match[2];
         std::string straxid=match[1];
         int axid = atoi(straxid.c_str());
+        
+//        std::string strpositiveLimitPosition = match[2];
+//        long positiveLimitPosition = atol(strpositiveLimitPosition.c_str());
+//         
+//        std::string strpercNoise = match[3];
+//        double percNoise = atof(strpercNoise.c_str());
+//        
+//        std::string strdurationAlarmsInterval = match[4];
+//        double durationAlarmsInterval = atof(strdurationAlarmsInterval.c_str());
+//        
+//        DPRINT("positiveLimitPosition= %s",strpositiveLimitPosition.c_str());
+//        DPRINT("percNoise=%s",strpercNoise.c_str());
+//        DPRINT("durationAlarmsInterval=%s",strdurationAlarmsInterval.c_str());
+        
+        //sleep(120);
 
         // Controllo mappa motori
         std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axid); // iteratore alla mappa statica
@@ -1048,7 +1065,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"},";
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"},";
    dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"},";
-   dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
+   //dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
    dataset+="]}";
 
    return 0;

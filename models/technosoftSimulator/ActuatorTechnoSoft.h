@@ -40,8 +40,8 @@ namespace common{
 
                     static std::map<int,TechnoSoftLowDriver *> motors;
 
-                public:
-
+          public:
+                    
                     // costruttore
                     ActuatorTechnoSoft();
                     // Costruttore di copia

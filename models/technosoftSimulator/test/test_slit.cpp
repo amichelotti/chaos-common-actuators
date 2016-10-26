@@ -366,11 +366,11 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         int resp;
         //sleep(5);
 
-        if((resp=OBJ->moveRelativeMillimeters(axisID,800))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
+//        if((resp=OBJ->moveRelativeMillimeters(axisID,800))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
         
         //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
@@ -449,22 +449,22 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        uint64_t alarms;
 //        std::string desc2;
         
-        double durationChecking = 900; // secondi
-        
-        pthread_t th1;
+//        double durationChecking = 900; // secondi
+//        
+//        pthread_t th1;
         checkData hd2;
-        hd2.axisID=axisID;
-        hd2.duration=durationChecking;
-        hd2.obj=OBJ;
-        checkProcedures((void*)&hd2);
+//        hd2.axisID=axisID;
+//        hd2.duration=durationChecking;
+//        hd2.obj=OBJ;
+//        checkProcedures((void*)&hd2);
+//        
+//        if((resp=OBJ->moveRelativeMillimeters(axisID,-800))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
         
-        if((resp=OBJ->moveRelativeMillimeters(axisID,-800))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        
-        durationChecking = 1500; // secondi
+        double durationChecking = 1500; // secondi
         
         pthread_t th2;
         //checkData hd2;
@@ -677,6 +677,7 @@ void* function1(void* str){
     std::string strConfig14 = "14,../common/actuators/models/technosoft/conf/1setup001.t.zip";
     if((ret=OBJ->configAxis((void*)strConfig14.c_str()))!=0){
         DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
+        sleep(120);
     }
 //    std::string strConfig15 = "15,../common/actuators/models/technosoft/conf/1setup001.t.zip";
 //    if((ret=OBJ->configAxis((void*)strConfig15.c_str()))!=0){
