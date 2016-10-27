@@ -260,7 +260,7 @@ namespace common{
                 
                 //Encoder lines
 
-                int moveAbsoluteSteps(const long& position) const;
+                int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position) const;
                 
                 // get methods for variables
