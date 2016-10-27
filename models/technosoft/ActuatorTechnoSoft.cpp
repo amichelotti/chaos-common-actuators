@@ -315,10 +315,26 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         
         return 0;
     }   
+    else if(strResultparName.compare("MAXSPEED")==0){ 
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxSpeed(doubleValue)<0){
+            DPRINT("setParameter execution error");
+            return -3;
+        }
+        
+        return 0;
+    }  
     else if(strResultparName.compare("ACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setAcceleration(doubleValue)<0){ 
-            return -3;
+            return -4;
+        }
+        return 0;
+    }
+    else if(strResultparName.compare("MAXACCELERATION")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxAcceleration(doubleValue)<0){ 
+            return -5;
         }
         return 0;
     }
@@ -327,43 +343,63 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setAdditive(intValue)<0){ 
-            return -4;
+            return -5;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENT")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setMovement((short)intValue)<0){ 
-            return -5;
+            return -6;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASE")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setReferenceBase((short)intValue)<0){ 
-            return -6;
+            return -7;
         }
         return 0;   
     }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->sethighSpeedHoming(doubleValue)<0){ 
-            return -7;
+            return -8;
         }
         return 0;       
     }
-
+    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxhighSpeedHoming(doubleValue)<0){ 
+            return -9;
+        }
+        return 0;       
+    }
     else if(strResultparName.compare("LOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setlowSpeedHoming(doubleValue)<0){ 
-            return -8;
+            return -10;
+        }
+        return 0;   
+    }
+    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxlowSpeedHoming(doubleValue)<0){ 
+            return -11;
         }
         return 0;   
     }
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setaccelerationHoming(doubleValue)<0){ 
-            return -9;
+            return -12;
+        }
+        return 0;   
+    }
+    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxAccelerationHoming(doubleValue)<0){ 
+            return -13;
         }
         return 0;   
     }
@@ -372,61 +408,61 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setAdditiveHoming(intValue)<0){ 
-            return -10;
+            return -14;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENTHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setMovementHoming((short)intValue)<0){ 
-            return -11;
+            return -15;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setReferenceBaseHoming((short)intValue)<0){ 
-            return -12;
+            return -16;
         }
         return 0;   
     }//_________________________________________________________________________
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setEncoderLines(doubleValue)<0){ 
-            return -13;
+            return -17;
         }
         return 0;   
     }
     else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setConst_mult_technsoft(doubleValue)<0){ 
-            return -14;
+            return -18;
         }
         return 0;   
     } 
     else if(strResultparName.compare("STEPSPERROUND")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSteps_per_rounds(doubleValue)<0){ 
-            return -15;
+            return -19;
         }
         return 0;   
     } 
     else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setN_rounds(doubleValue)<0){ 
-            return -16;
+            return -20;
         }
         return 0;   
     } 
     else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){ 
-            return -17;
+            return -21;
         }
         return 0;   
     } 
     else{
-        return -18;
+        return -22;
     }
 }
 

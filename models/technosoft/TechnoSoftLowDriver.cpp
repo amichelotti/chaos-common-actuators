@@ -278,7 +278,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
  
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
-        DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
+        DERR("LoadSetup failed \"%s\", %s",setupFilePath.c_str(),TS_GetLastErrorText());
         return -24;
     }
     
@@ -638,10 +638,9 @@ int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
     return 0;
 }
 
-// Set trapezoidal parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    DPRINT("Chiamata setspeed");
+    //DPRINT("Chiamata setspeed");
     if(_speed_mm_s<=0 || _speed_mm_s>maxSpeed_mm_s){
         DERR("Speed = %f",_speed_mm_s);
         return -1;
@@ -650,19 +649,21 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
     return 0;
 }
 
+
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
-    
+
+    DPRINT("setMaxSpeed: _maxspeed_mm_s=%f,speed_mm_s=%f",_maxspeed_mm_s,speed_mm_s);
     if(_maxspeed_mm_s<=0 || _maxspeed_mm_s<speed_mm_s){
         DERR("Max speed = %f",_maxspeed_mm_s);
         return -1;
     }
     maxSpeed_mm_s = _maxspeed_mm_s;
-    return 0;  
+    return 0;
 }
 
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    DPRINT("Chiamata setAcceleration");
+    //DPRINT("Chiamata setAcceleration");
     if(_acceleration_mm_s2<=0 || _acceleration_mm_s2>maxAcceleration_mm_s2){
         DERR("Acceleration = %f",_acceleration_mm_s2);
         return -1;
@@ -672,50 +673,53 @@ int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
 }
 
 int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2){
-    
+
     if(_maxacceleration_mm_s2<=0 || _maxacceleration_mm_s2<acceleration_mm_s2){
         DERR("Max acceleration = %f",_maxacceleration_mm_s2);
         return -1;
     }
     maxAcceleration_mm_s2 = _maxacceleration_mm_s2;
-    return 0;  
+    return 0;
 }
 
 int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
-    DPRINT("Chiamata setAdditive");
+    //DPRINT("Chiamata setAdditive");
     if((_isAdditive!=TRUE) && (_isAdditive!=FALSE)){
         DERR("setAdditive= %d",_isAdditive);
         return -1;
-    }   
+    }
     isAdditive = _isAdditive;
     return 0;
 }
 
 int TechnoSoftLowDriver::setMovement(const short& _movement){
-    DPRINT("Chiamata setMovement");
+    //DPRINT("Chiamata setMovement");
     if((_movement!=UPDATE_NONE) && (_movement!=UPDATE_IMMEDIATE) && (_movement!=UPDATE_ON_EVENT)){
         DERR("setMovement = %d",_movement);
         return -1;
     }
-    movement = _movement;   
+    movement = _movement;
     return 0;
 }
 
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
-    DPRINT("Chiamata setReferenceBase");
+    //DPRINT("Chiamata setReferenceBase");
     if((_referenceBase!=FROM_MEASURE) && (_referenceBase!=FROM_REFERENCE)){
         DERR("_referenceBase = %d",_referenceBase);
         return -1;
     }
-    referenceBase=_referenceBase; 
+    referenceBase=_referenceBase;
     return 0;
 }
-  
+
 // Set homing parameters
 int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    DPRINT("Chiamata sethighSpeedHoming");
-    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
+//    DPRINT("Chiamata sethighSpeedHoming");
+//    DPRINT("_highSpeedHoming_mm_s = %f", _highSpeedHoming_mm_s);
+//    DPRINT("maxHighSpeedHoming_mm_s = %f", maxHighSpeedHoming_mm_s);
+    DPRINT("sethighSpeedHoming: _highSpeedHoming_mm_s=%f,-maxHighSpeedHoming_mm_s=%f",_highSpeedHoming_mm_s,-maxHighSpeedHoming_mm_s);
+    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>(-maxHighSpeedHoming_mm_s)){   // MODIFICA DA RIPORTAREEEEEEEEEEEEEEEEEEEEE
         return -1;
     }
     highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
@@ -723,6 +727,12 @@ int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s)
 }
 
 int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming_mm_s){
+
+//    DPRINT("Chiamata setMaxhighSpeedHoming");
+//    DPRINT("_maxhighSpeedHoming_mm_s = %f", _maxhighSpeedHoming_mm_s);
+//    DPRINT("-highSpeedHoming_mm_s = %f", -highSpeedHoming_mm_s);
+//    DPRINT("maxLowSpeedHoming_mm_s = %f", maxLowSpeedHoming_mm_s);
+    
     
      if(_maxhighSpeedHoming_mm_s<=0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
         return -1;
@@ -733,7 +743,7 @@ int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming
 
 int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    DPRINT("Chiamata setlowSpeedHoming");
+    //DPRINT("Chiamata setlowSpeedHoming");
     if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
         return -1;
     }
@@ -742,6 +752,11 @@ int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
 }
 
 int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_mm_s){
+
+//    DPRINT("Chiamata setMaxlowSpeedHoming");
+//    DPRINT("_maxlowSpeedHoming_mm_s %f",_maxlowSpeedHoming_mm_s);
+//    DPRINT("lowSpeedHoming_mm_s %f",lowSpeedHoming_mm_s);
+//    DPRINT("maxHighSpeedHoming_mm_s %f",maxHighSpeedHoming_mm_s);
     
     if(_maxlowSpeedHoming_mm_s<=0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
         return -1;
@@ -752,7 +767,11 @@ int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_m
 
 int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
     //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    DPRINT("Chiamata setaccelerationHoming");
+    //DPRINT("Chiamata setaccelerationHoming");
+//    DPRINT("Chiamata setaccelerationHoming");
+//    DPRINT("_accelerationHoming_mm_s2 %f",_accelerationHoming_mm_s2);
+//    DPRINT("maxAccelerationHoming_mm_s2 %f",maxAccelerationHoming_mm_s2);
+    
     if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
         return -1;
     }
@@ -770,77 +789,77 @@ int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAcceleratio
 }
 
 int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
-    DPRINT("Chiamata setAdditiveHoming");
+    //DPRINT("Chiamata setAdditiveHoming");
     if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
         return -1;
-    }   
+    }
     isAdditiveHoming = _isAdditiveHoming;
     return 0;
 }
 
 int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
-    DPRINT("Chiamata setMovementHoming");
+    //DPRINT("Chiamata setMovementHoming");
     if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
         return -1;
     }
-    movementHoming = _movementHoming;   
+    movementHoming = _movementHoming;
     return 0;
 }
 
 int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
-    DPRINT("Chiamata setReferenceBaseHoming");
+    //DPRINT("Chiamata setReferenceBaseHoming");
     if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
         return -1;
     }
-    referenceBaseHoming=_referenceBaseHoming; 
+    referenceBaseHoming=_referenceBaseHoming;
     return 0;
 }
 
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
-    DPRINT("Chiamata setEncoderLines");
+    //DPRINT("Chiamata setEncoderLines");
     if(_encoderLines<=0){
         return -1;
-    }   
+    }
     n_encoder_lines=_encoderLines;
     return 0;
 }
 
 int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
-    DPRINT("Chiamata setConst_mult_technsoft");
+    //DPRINT("Chiamata setConst_mult_technsoft");
     if(_const_mult_technsoft<=0){
         return -1;
-    }   
+    }
     const_mult_technsoft=_const_mult_technsoft;
     return 0;
 }
 
 int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
-    DPRINT("Chiamata setSteps_per_rounds");
+    //DPRINT("Chiamata setSteps_per_rounds");
     if(_steps_per_rounds<=0){
         return -1;
-    }   
+    }
     steps_per_rounds=_steps_per_rounds;
     return 0;
 }
 
 int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
-    DPRINT("Chiamata setN_rounds");
+    //DPRINT("Chiamata setN_rounds");
     if(_n_rounds<=0){
         return -1;
-    }   
+    }
     n_rounds=_n_rounds;
     return 0;
 }
-    
+
 int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
-    DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_linear_movement_per_n_rounds<=0){
         return -1;
-    }   
+    }
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
     return 0;
-}  
+}
 
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
     
