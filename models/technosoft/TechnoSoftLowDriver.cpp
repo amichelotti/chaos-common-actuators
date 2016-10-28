@@ -605,15 +605,20 @@ int TechnoSoftLowDriver::homing(int mode){
     }
 }
 
-int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
+int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso come comando
     
     DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_mm_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    internalHomingStateDefault = 0;
-    internalHomingStateHoming2 = 0;
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        if(!TS_Stop()){
+            return -1;
+        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+    }
     
     if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
@@ -866,7 +871,7 @@ int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movemen
     return 0;
 }
 
-int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
+int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso come comando
     
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("error selecting axis");
@@ -896,8 +901,13 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    internalHomingStateDefault = 0;
-    internalHomingStateHoming2 = 0;
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        if(!TS_Stop()){
+            return -1;
+        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+    }
     
     if(!TS_MoveAbsolute(absPosition, speed_mm_s, acceleration_mm_s2, movement, referenceBase)){
         DERR("error absolute step moving");
@@ -952,18 +962,20 @@ int TechnoSoftLowDriver::stopMotion(){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    internalHomingStateDefault = 0;
-    internalHomingStateHoming2 = 0;
-    
+
     if(!TS_Stop()){
         return -1;
     }
     
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+    }
     DPRINT("Motor with axis = %d is stopped, %s",axisID, TS_GetLastErrorText());
     return 0;
 }
 
-int TechnoSoftLowDriver::providePower(){
+int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando *********
     DPRINT("provide power to axis:%d",axisID);
 //      if(!TS_SelectAxis(axisID)){
 //        ERR("ALEDEBUG Error selecting axis");
@@ -973,8 +985,13 @@ int TechnoSoftLowDriver::providePower(){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    internalHomingStateDefault = 0;
-    internalHomingStateHoming2 = 0;
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        if(!TS_Stop()){
+            return -1;
+        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+    }
     
     if(!TS_Power(POWER_ON)){
         //ERR("ALEDEBUG Error selecting axis");
@@ -998,18 +1015,23 @@ int TechnoSoftLowDriver::providePower(){
     return 0;
 }
 
-int TechnoSoftLowDriver::stopPower(){
+int TechnoSoftLowDriver::stopPower(){ //******** Inteso come comando *********
     //DPRINT("stopping power to axis:%d",axisID);
 
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    internalHomingStateDefault = 0;
-    internalHomingStateHoming2 = 0;
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        if(!TS_Stop()){
+            return -1;
+        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+    }
     
     if(!TS_Power(POWER_OFF)){
-        return -1;
+        return -2;
     }
     DPRINT("Motor with axis id = %d is power off",axisID);
     
@@ -1051,7 +1073,6 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     return 0;
 }
 
-
 //int TechnoSoftLowDriver::getEncoder(long& aposition){
 //    
 //    DPRINT("Reading ENCODER position");
@@ -1064,8 +1085,6 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 //    }
 //    return 0;
 //}
-
-
 
 int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     
@@ -1275,10 +1294,15 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
     return 0;
 }
 
-int TechnoSoftLowDriver::resetFault(){
+int TechnoSoftLowDriver::resetFault(){ // Considerato come COMANDO
     
-    internalHomingStateDefault = 0;
-    internalHomingStateHoming2 = 0;
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        if(!TS_Stop()){
+            return -1;
+        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+    }
     
     if(!TS_ResetFault()){
          return -2;
