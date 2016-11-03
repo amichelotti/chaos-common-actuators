@@ -317,6 +317,15 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     //controlledInitialPositionHoming = false;
     //epsylon = 0.000000000;
     
+    stateHoming0=0;
+    stateHoming1=0;
+    stateHoming2=0;
+    stateHoming3=0;
+    stateHoming4=0;
+    stateHoming5=0;
+    
+    cap_position=0;
+    
     return 0;
 }
 
@@ -344,8 +353,11 @@ int TechnoSoftLowDriver::homing(int mode){
         int switchTransited=0;
         int motionCompleted = 0;
         std::string cappos = "CAPPOS";
-        long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
+        //long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
+        std::string descStr;
+        //descStr.assign("");
         int absoluteMotionCompleted = 0;
+        uint16_t contentRegSRL=0;
     
         switch (internalHomingStateDefault) {
             case 0:
@@ -354,6 +366,17 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -1;
                     break;
                 }
+//                if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                } 
+//                usleep(100000);
+                
                 if(moveVelocityHoming()<0){
                     internalHomingStateDefault = 0;
                     if(stopMotion()<0){
@@ -363,7 +386,7 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -3;
                     break;
                 }
-                DPRINT(" STATE 0: move velocity activated ");
+                usleep(5000);
                 if(setEventOnLimitSwitch()<0){
                     internalHomingStateDefault = 0;
                     if(stopMotion()<0){
@@ -373,9 +396,14 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -5;
                     break;
                 }
+                
                 DPRINT("STATE 0: event on limit switch activated ");
+                
+                DPRINT(" STATE 0: move velocity activated ");
+                
                 internalHomingStateDefault = 1;
                 risp = 1;
+                //stateHoming0++;
                 break; 
             case 1:
                 if(selectAxis()<0){
@@ -394,78 +422,173 @@ int TechnoSoftLowDriver::homing(int mode){
                 } 
                 DPRINT(" STATE 1: possible limit switch transition just checked ");
                 if(switchTransited){
-                    if(setEventOnMotionComplete()<0){ 
-                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
-                        if(stopMotion()<0){
-                            risp= -9;
-                            break;
-                        }
-                        risp =-10;
-                        break;
-                    }  
+//                    if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                    }  
+//                    if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                    } 
+//                    if(getLVariable(cappos, cap_position)<0){ 
+//    //                if(stopMotion()<0){
+//    //                    return -13;
+//    //                }
+//                        internalHomingStateDefault=0;
+//                        risp = -14;
+//                        break;
+//                    }
                     //eventOnMotionCompleteSet = true;
                     internalHomingStateDefault=2;
                     DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
+//                    double capturePositionHoming;
+//                    capturePositionHoming = (linear_movement_per_n_rounds*cap_position)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+                    //DPRINT("************** switch transitato. cap_position in mm: %f**************",capturePositionHoming);
+                    //cap_position=0; //  ********** lasciamolo cosi************
+                    //usleep(5000);
                 }
                 // **************DA IMPLEMENTARE:*****************
                 // RESET ON Limit Switch Transition Event
                 risp = 1;
+                //stateHoming1++;
                 break; 
             case 2:
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    risp = -9;
+                    break;
+                }
+                
+//                if(getLVariable(cappos, cap_position)<0){ 
+//    //                if(stopMotion()<0){
+//    //                    return -13;
+//    //                }
+//                        internalHomingStateDefault=0;
+//                        risp = -14;
+//                        break;
+//                }
+                
+//                if(checkEvent(motionCompleted)<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                        risp = -12;
+//                        break;
+//                    }
+//                    risp= -13;
+//                    break;
+//                }
+                if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
+//                    descStr=descStr+"Unknown status. ";
+//                    ERR("Reading state error: %s",descStr.c_str());
+                    return -10;
+                }
+                if((contentRegSRL & ((uint16_t)1<<10))){
+                    motionCompleted=true;
+                }
+                //contentRegSRL=0;
+                DPRINT("************** STATE 2: possible event on motion completed checked **************");
+                if(motionCompleted){
+                    DPRINT("************** STATE 2: Motion completed after transition **************");
+                    internalHomingStateDefault = 3;
+//                    double positionHoming;
+//                    getEncoder(&positionHoming);
+                    //DPRINT("************** STATE 2 position in mm after motion is completed: %f **************",positionHoming);
+                    //sleep(60);
+                }
+                risp= 1;
+                //stateHoming2++;
+                
+                break;
+            case 3:
+                //usleep(10000000); // Garantisce che il motore sia veramente fermo
+                
+                // The motor is not in motion
+                //DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
                     risp = -11;
                     break;
                 }
-                if(checkEvent(motionCompleted)<0){
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -12;
-                        break;
-                    }
-                    risp= -13;
-                    break;
-                }
-                DPRINT("************** STATE 2: possible event on motion completed checked **************");
-                if(motionCompleted){
-                    DPRINT("************** STATE 2: Motion completed after transition **************");
-                    internalHomingStateDefault = 3;
-                }
-                risp= 1;
-                break;
-            case 3:
-                // The motor is not in motion
-                DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
-                if(selectAxis()<0){
-                    internalHomingStateDefault = 0;
-                    risp = -13;
-                    break;
-                }
+                
                 if(getLVariable(cappos, cap_position)<0){ 
     //                if(stopMotion()<0){
     //                    return -13;
     //                }
-                    internalHomingStateDefault=0;
-                    risp = -14;
-                    break;
+                        internalHomingStateDefault=0;
+                        risp = -12;
+                        break;
                 }
-                DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
-        
+                
+
+//                while (1){
+//                double positionState3;
+//                getEncoder(&positionState3);
+                //DPRINT("************** STATE 3 position in mm prima del recupero: %f **************",positionState3);
+                //usleep(1000000);
+//                }
+                
+//                if(getLVariable(cappos, cap_position)<0){ 
+//    //                if(stopMotion()<0){
+//    //                    return -13;
+//    //                }
+//                    internalHomingStateDefault=0;
+//                    risp = -14;
+//                    break;
+//                }
+                //DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
+//                if(setEventOnLimitSwitch()<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                        risp = -4;
+//                        break;
+//                    }
+//                    risp = -5;
+//                    break;
+//                }
+//                usleep(5000);
+//                if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                    }  
+//                usleep(10000);
             /*	Command an absolute positioning on the captured position */
+                
+                
                 if(moveAbsoluteStepsHoming(cap_position)<0){  
                     internalHomingStateDefault=0;
-                    risp = -15;
+                    risp = -13;
                     break;
                 }
+                
+                //sleep(180);//**********************************************DA TOGLIERE*****************
                 DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
                 internalHomingStateDefault = 4;
                 risp= 1;
+                //stateHoming3++;
+                //sleep(20);
                 break;
             case 4:
+//                DPRINT("************** STATE 4: cap_position in mm: %f**************",cap_position);
+//                sleep(30);
                 DPRINT("************** STATE 4: wait for positioning to end **************");
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -16;
+                    risp = -14;
                     break;
                 }
 //        if(!eventOnMotionCompleteSet){
@@ -480,39 +603,66 @@ int TechnoSoftLowDriver::homing(int mode){
 //                return -13;
 //            } 
 //        }
-                if(checkEvent(absoluteMotionCompleted)<0){
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                    //eventOnMotionCompleteSet = false;
-                        risp= -17;
-                        break;
-                    }
-                //eventOnMotionCompleteSet = false;
-                    risp= -18;
-                    break;
+//                  
+                
+                if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
+//                    descStr=descStr+"Unknown status. ";
+//                    ERR("Reading state error: %s",descStr.c_str());
+                    return -15;
                 }
+                if((contentRegSRL & ((uint16_t)1<<10))){
+                    absoluteMotionCompleted=true;
+                }
+                
+//                if(checkEvent(absoluteMotionCompleted)<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                    //eventOnMotionCompleteSet = false;
+//                        risp= -17;
+//                        break;
+//                    }
+//                //eventOnMotionCompleteSet = false;
+//                    risp= -18;
+//                    break;
+//                }
+                
+                
+                
                 if(absoluteMotionCompleted){
                     internalHomingStateDefault = 5;
-                    DPRINT("************** STATE 4: motor positioned to end **************");
+//                    DPRINT("************** STATE 4: motor positioned to end **************");
+//                    double positionHoming;
+//                    getEncoder(&positionHoming);
+//                    DPRINT("************** STATE 4 current position in mm: %f **************",positionHoming);
                 }
             // **************DA IMPLEMENTARE:*****************
             // RESET ON Event On Motion Complete
                 risp= 1;
+                //stateHoming4++;
+                
                 break;
             case 5:
                 // The motor is positioned to end
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -19;
+                    risp = -16;
                     break;
                 }
-        
+//                double capturePositionHoming;
+//                capturePositionHoming = (linear_movement_per_n_rounds*cap_position)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+//                DPRINT("************** cap_position value: %ld **************",cap_position);
+//                cap_position=0; //  ********** lasciamolo cosi************
+                //DPRINT("************** Captured Position Homing in mm: %f **************",capturePositionHoming);
+//                double finalPositionAfterHoming;
+//                getEncoder(&finalPositionAfterHoming);
+//                DPRINT("************** finalPositionAfterHoming in mm: %f **************",finalPositionAfterHoming);
+                cap_position=0;
                 if(resetEncoder()<0){
                     internalHomingStateDefault = 0;
                     //if(stopMotion()<0){
                     //return -23;
                     //}
-                    risp= -20;
+                    risp= -17;
                     break;
                 }
                 if(resetCounter()<0){
@@ -520,16 +670,30 @@ int TechnoSoftLowDriver::homing(int mode){
                     //if(stopMotion()<0){
                     //return -25;
                     //}
-                    risp= -21;
+                    risp= -18;
                     break;
                 }
                 DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
                 internalHomingStateDefault = 0;
                 risp= 0;
+                //stateHoming5++;
+//                DPRINT("************** STATE homing 0: %d **************",stateHoming0);
+//        DPRINT("************** STATE homing 1: %d **************",stateHoming1);
+//        DPRINT("************** STATE homing 2: %d **************",stateHoming2);
+//        DPRINT("************** STATE homing 3: %d **************",stateHoming3);
+//        DPRINT("************** STATE homing 4: %d **************",stateHoming4);
+//        DPRINT("************** STATE homing 5: %d **************",stateHoming5);
+//        stateHoming0=0;
+//    stateHoming1=0;
+//    stateHoming2=0;
+//    stateHoming3=0;
+//    stateHoming4=0;
+//    stateHoming5=0;
+                
                 break;
             default:
                 internalHomingStateDefault = 0;
-                risp= -22;
+                risp= -19;
                 break; 
         } 
         return risp;
@@ -630,6 +794,10 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso
 double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
     
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
+    // Quindi:
+    //deltaMicroSteps=round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
+    //deltaMillimeters=(linear_movement_per_n_rounds*deltaMicroSteps)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    
 }
 
 //int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
@@ -1094,6 +1262,7 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     if(!TS_GetLongVariable("APOS", aposition)){
         return -1;
     }
+    DPRINT("Final APOS for homing %ld",aposition);
     *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
     return 0;
 }
@@ -1315,7 +1484,7 @@ int TechnoSoftLowDriver::resetFault(){ // Considerato come COMANDO
 int TechnoSoftLowDriver::selectAxis(){
      
     if(!TS_SelectAxis(axisID)){
-        DERR("failed to select axis %d",axisID);
+        DERR("failed to select axis %d %s",axisID, TS_GetLastErrorText());
         return -1;
     }
     return 0;

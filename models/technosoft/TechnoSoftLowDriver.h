@@ -50,12 +50,12 @@
 #define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
 
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS)
-#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)
-#define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
-#define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
+#define HIGH_SPEED_HOMING_DEFAULT 190.0 // [mm/s]           //10.0
+#define MAX_HIGHSPEED_HOMING_DEFAULT 500.0 // [mm/s]       (da MDS) //15.0 
+#define LOW_SPEED_HOMING_DEFAULT 100.0 // [mm/s]                     //1.0 
+#define MAXLOW_SPEED_HOMING_DEFAULT 150.0 // [mm/s]         (da MDS)  //3.0 
+#define ACCELERATION_HOMING_DEFAULT 0.1 //[mm/s^2]                  //0.3 
+#define MAX_ACCELERATION_HOMING_DEFAULT 3.0// [mm/s^2]   (da MDS)  // 0.6
 
 #define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
@@ -150,6 +150,13 @@ namespace common{
                 
                 //bool controlledInitialPositionHoming; 
                 //double epsylon;
+                int stateHoming0;
+                int stateHoming1;
+                int stateHoming2;
+                int stateHoming3;
+                int stateHoming4;
+                int stateHoming5;
+                long cap_position;
                 
             public:
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
