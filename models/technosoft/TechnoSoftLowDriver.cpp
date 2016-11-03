@@ -386,7 +386,7 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -3;
                     break;
                 }
-                usleep(5000);
+                
                 if(setEventOnLimitSwitch()<0){
                     internalHomingStateDefault = 0;
                     if(stopMotion()<0){
