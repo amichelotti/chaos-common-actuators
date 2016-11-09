@@ -154,7 +154,10 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _const_mult_technsoft, 
                         const double _steps_per_rounds,    
                         const double _n_rounds,            
-                        const double _linear_movement_per_n_rounds){
+                        const double _linear_movement_per_n_rounds,
+                        const double _voltage_LNS, //[V]
+                        const double _voltage_LPS, //[V]
+                        const double _range){
     
     DPRINT("Inizializzazione parametri");
     
@@ -275,39 +278,54 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
     
     axisID = _axisID;
- 
+    
+    if(_voltage_LNS<0){
+        return -23;
+    }
+    voltage_LNS = _voltage_LNS; 
+        
+    if(_voltage_LPS<0){
+        return -24;
+    }
+    voltage_LPS = _voltage_LPS;     
+        
+    if(_range<=0){
+        return -25;
+    }
+    range=_range;    
+        
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\", %s",setupFilePath.c_str(),TS_GetLastErrorText());
-        return -24;
+        return -26;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d, %s",axisID,TS_GetLastErrorText());
-        return -25;
+        return -27;
     }
    
     if(!TS_SelectAxis(_axisID)){
         DERR("failed to select axis %d, %s",_axisID,TS_GetLastErrorText());
-        return -26;
+        return -28;
     }
     
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
-        return -27;
+        return -29;
     }
     
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         DERR("Failed TS_Execute command");
-        return -28;
+        return -30;
     }
   
     if(!TS_SetEventOnMotionComplete(0,0)){ 
-	return -30;
+	return -31;
     }
     
     readyState = true;
@@ -317,12 +335,12 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     //controlledInitialPositionHoming = false;
     //epsylon = 0.000000000;
     
-    stateHoming0=0;
-    stateHoming1=0;
-    stateHoming2=0;
-    stateHoming3=0;
-    stateHoming4=0;
-    stateHoming5=0;
+//    stateHoming0=0;
+//    stateHoming1=0;
+//    stateHoming2=0;
+//    stateHoming3=0;
+//    stateHoming4=0;
+//    stateHoming5=0;
     
     cap_position=0;
     
@@ -1039,6 +1057,33 @@ int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movemen
     return 0;
 }
 
+int TechnoSoftLowDriver::setvoltage_LNS(double& _voltage_LNS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_voltage_LNS<0){
+        return -1;
+    }
+    voltage_LNS=_voltage_LNS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setvoltage_LPS(double& _voltage_LPS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_voltage_LPS<0){
+        return -1;
+    }
+    voltage_LPS=_voltage_LPS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setRange(double& _range){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_range<0){
+        return -1;
+    }
+    range=_range;
+    return 0;
+}
+
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso come comando
     
 //    if(!TS_SelectAxis(axisID)){
@@ -1240,6 +1285,34 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
     return 0;
 }
+
+int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
+    
+    DPRINT("Reading potentiometer");
+ 
+    //long tposition;
+//    if(!TS_SelectAxis(axisID)){
+//        DERR("failed to select axis %d",axisID);
+//        return -1;
+//    }
+    short valueAD5; // Tensione costante, 8 volt
+    short valueAd2;
+//    if(!TS_GetLongVariable("TPOS", tposition)){
+//        return -1;
+//    }
+//    TS_GetIntVariable("CPOS",valueAD5){
+//        return -1;
+//    }
+    if(TS_GetIntVariable("CSPD",valueAd2)<0){
+        return -1;
+    }
+    
+    double voltage=(valueAd2*CONST_POTENTIOMETER)-10; //[V]
+    * deltaPosition_mm=(((voltage-voltage_LNS)/(voltage_LPS-voltage_LNS))*RANGE)/1000; 
+
+    //*deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+    return 0;
+} 
 
 //int TechnoSoftLowDriver::getEncoder(long& aposition){
 //    

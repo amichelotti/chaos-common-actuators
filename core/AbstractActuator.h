@@ -120,7 +120,8 @@ typedef enum {
         */
         typedef enum
         {   READ_ENCODER,
-            READ_COUNTER
+            READ_COUNTER,
+            READ_POTENTIOMETER
         } readingTypes;
 
         virtual int getPosition(int axisID,readingTypes mode,double *deltaPosition_mm)=0;   //***OK***

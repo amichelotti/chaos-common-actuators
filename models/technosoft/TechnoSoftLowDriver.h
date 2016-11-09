@@ -63,6 +63,11 @@
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm] 
 
+#define CONST_POTENTIOMETER 0.00030518043
+#define V_LNS 7.7 //[V]
+#define V_LSP 0.3 //[V]
+#define RANGE 1 //[m]
+
 #include <map>
 //#include <boost/shared_ptr.hpp>
 
@@ -148,14 +153,18 @@ namespace common{
                 short movementHoming;
                 short referenceBaseHoming;
                 
+                double voltage_LNS; //[V]
+                double voltage_LPS; //[V]
+                double range;
+                
                 //bool controlledInitialPositionHoming; 
                 //double epsylon;
-                int stateHoming0;
-                int stateHoming1;
-                int stateHoming2;
-                int stateHoming3;
-                int stateHoming4;
-                int stateHoming5;
+//                int stateHoming0;
+//                int stateHoming1;
+//                int stateHoming2;
+//                int stateHoming3;
+//                int stateHoming4;
+//                int stateHoming5;
                 long cap_position;
                 
             public:
@@ -218,7 +227,11 @@ namespace common{
                         const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT, 
                         const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
                         const double _n_rounds=N_ROUNDS_DEFAULT,            
-                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
+                        const double voltage_LNS = V_LNS, //[V]
+                        const double voltage_LPS = V_LSP, //[V]
+                        const double range = RANGE  //[meter]
+                        );
                 
                 int homing(int mode);
                 
@@ -269,11 +282,15 @@ namespace common{
 
                 int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position) const;
+                int setvoltage_LNS(double& _voltage_LNS);
+                int setvoltage_LPS(double& _voltage_LPS);
+                int setRange(double& _range);
                 
                 // get methods for variables
                 //channel_psh getMyChannel();
                 int getCounter(double* deltaPosition_mm);
                 int getEncoder(double* deltaPosition_mm);
+                int getPotentiometer(double* voltage);
                 // resetting methos
                 int resetCounter();// reset TPOS_register();
                 int resetEncoder();// reset APOS_register();

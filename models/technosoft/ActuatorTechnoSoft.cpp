@@ -752,23 +752,50 @@ int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaP
         return -2;
     }
 
-    if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
-        //long tposition;
-        if((i->second)->getCounter(deltaPosition_mm)<0){
+//    if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
+//        //long tposition;
+//        if((i->second)->getCounter(deltaPosition_mm)<0){
+//            DERR("getting counter");
+//            return -3;
+//        }
+//        //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
+//        //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
+//    }
+//    else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
+//        //long aposition;
+//        if((i->second)->getEncoder(deltaPosition_mm)<0){
+//            return -4;
+//        }
+//        //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
+//        //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
+//    }
+//    else if(mode==READ_POTENTIOMETER){
+//        if((i->second)->getPotentiometer(deltaPosition_mm)<0){
+//            return -5;
+//        }
+//    }
+    switch(mode)
+    {
+    case (READ_COUNTER):
+         if((i->second)->getCounter(deltaPosition_mm)<0){
             DERR("getting counter");
             return -3;
         }
-        //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
-        //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
+        break;
+            case (READ_ENCODER):
+            if((i->second)->getEncoder(deltaPosition_mm)<0){
+                return -4;
+            }
+        break;
+            case (READ_POTENTIOMETER):
+            if((i->second)->getPotentiometer(deltaPosition_mm)<0){
+                return -5;
+            }
+            break;
+        default:   
+            break;
     }
-    else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
-        //long aposition;
-        if((i->second)->getEncoder(deltaPosition_mm)<0){
-            return -4;
-        }
-        //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
-        //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
-    }
+ 
     return 0;
 }
 
@@ -1436,9 +1463,11 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"nummicrostepsperstep\",\"description\":\"Number of micro steps per step\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"256\"},";
    dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"},";
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"},";
-   dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"}";
+   dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"},";
    //dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
+   dataset+="{\"name\":\"voltage_LNS\",\"description\":\"Voltage associated with LNS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"7.7\"},";
+   dataset+="{\"name\":\"voltage_LPS\",\"description\":\"Voltage associated with LPS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"0.3\"},";
+   dataset+="{\"name\":\"range_slit\",\"description\":\"Maximum linear displacement of the slit [m]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"7.7\"}";
    dataset+="]}";
-
    return 0;
 }
