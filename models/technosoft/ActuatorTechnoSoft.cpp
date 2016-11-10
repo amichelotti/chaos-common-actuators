@@ -403,29 +403,29 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;   
     }
-    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
-        // Conversion from string to bool
-        //boolValue = to_bool(valueOfparName);
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setAdditiveHoming(intValue)<0){ 
-            return -14;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("MOVEMENTHOMING")==0){
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setMovementHoming((short)intValue)<0){ 
-            return -15;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setReferenceBaseHoming((short)intValue)<0){ 
-            return -16;
-        }
-        return 0;   
-    }//_________________________________________________________________________
+//    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
+//        // Conversion from string to bool
+//        //boolValue = to_bool(valueOfparName);
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setAdditiveHoming(intValue)<0){ 
+//            return -14;
+//        }
+//        return 0;
+//    }
+//    else if(strResultparName.compare("MOVEMENTHOMING")==0){
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setMovementHoming((short)intValue)<0){ 
+//            return -15;
+//        }
+//        return 0;
+//    }
+//    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setReferenceBaseHoming((short)intValue)<0){ 
+//            return -16;
+//        }
+//        return 0;   
+//    }//_________________________________________________________________________
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setEncoderLines(doubleValue)<0){ 
@@ -461,8 +461,37 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;   
     } 
+    else if(strResultparName.compare("VOLTAGE_LNS[V]")==0){ 
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setvoltage_LNS(doubleValue)<0){ 
+            return -22;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("VOLTAGE_LPS[V]")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setvoltage_LPS(doubleValue)<0){ 
+            return -23;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("RANGE_SLIT[MM]")==0){  //range_slit[mm]
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setRange(doubleValue)<0){ 
+            return -24;
+        }
+        return 0;   
+    }
+    else if(strResultparName.compare("FULLSCALEPOT")==0){ //fullscalePot
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setFullscalePot(doubleValue)<0){ 
+            return -25;
+        }
+        return 0;   
+    }
+    
     else{
-        return -22;
+        return -26;
     }
 }
 
@@ -1456,18 +1485,19 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"maxlowspeedhoming\",\"description\":\"Max value for speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"6.0\",\"default\":\"4.0\"},"; 
    dataset+="{\"name\":\"accelerationhoming\",\"description\":\"Acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"0.6\",\"default\":\"0.3\"},";
    dataset+="{\"name\":\"maxaccelerationhoming\",\"description\":\"Max value for acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"1.0\",\"default\":\"0.8\"},";
-   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
-   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
+//   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
+//   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
+//   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"numencoderlines\",\"description\":\"Number of encoder lines\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"800\"},";
    dataset+="{\"name\":\"nummicrostepsperstep\",\"description\":\"Number of micro steps per step\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"256\"},";
    dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"},";
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"},";
    dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"},";
    //dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
-   dataset+="{\"name\":\"voltage_LNS\",\"description\":\"Voltage associated with LNS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"7.7\"},";
-   dataset+="{\"name\":\"voltage_LPS\",\"description\":\"Voltage associated with LPS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"0.3\"},";
-   dataset+="{\"name\":\"range_slit\",\"description\":\"Maximum linear displacement of the slit [m]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"7.7\"}";
+   dataset+="{\"name\":\"voltage_LNS[V]\",\"description\":\"Voltage associated with LNS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"7.7\"},";
+   dataset+="{\"name\":\"voltage_LPS[V]\",\"description\":\"Voltage associated with LPS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"0.3\"},";
+   dataset+="{\"name\":\"range_slit[mm]\",\"description\":\"Maximum linear displacement of the slit [m]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"10.0\"},";
+   dataset+="{\"name\":\"fullscalePot\",\"description\":\"Full scale of the potentiometer\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"20.0\"}";
    dataset+="]}";
    return 0;
 }

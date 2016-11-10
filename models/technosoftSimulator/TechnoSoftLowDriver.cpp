@@ -90,14 +90,11 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const int& _axisID,
-                        const long& _positiveLimitPosition,
-                        const double& _percNoise,
-                        const double& _durationAlarmsInterval,
                         const double _speed_mm_s,
-                        const double _maxSpeed_mm_s,
+                        const double _maxSpeed_mm_s, 
                         const double _acceleration_mm_s2,
                         const double _maxAcceleration_mm_s2,
-                        const BOOL _isAdditive,
+                        const BOOL _isAdditive, 
                         const short _moveMoment,
                         const short _referenceBase,
                         const double _highSpeedHoming_mm_s,
@@ -109,11 +106,16 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const BOOL _isAdditiveHoming,
                         const short _movementHoming,
                         const short _referenceBaseHoming,
-                        const double _n_encoder_lines,
-                        const double _const_mult_technsoft,
-                        const double _steps_per_rounds,
-                        const double _n_rounds,
-                        const double _linear_movement_per_n_rounds){
+                        const double _n_encoder_lines, 
+                        const double _const_mult_technsoft, 
+                        const double _steps_per_rounds,    
+                        const double _n_rounds,            
+                        const double _linear_movement_per_n_rounds,
+                        const double _voltage_LNS, //[V]
+                        const double _voltage_LPS, //[V]
+                        const double _range,  //[meter]
+                        const double _fullScalePot //[V] 
+                        ){
 
     //DPRINT("Inizializzazione parametri");
 
@@ -235,20 +237,41 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     axisID = _axisID;
     
-    if(_percNoise<0 || _percNoise>1){
+    if(_voltage_LNS<0){
         return -23;
     }
-    percNoise = _percNoise;
-    
-    if(_positiveLimitPosition<0){
+    voltage_LNS = _voltage_LNS; 
+        
+    if(_voltage_LPS<0){
         return -24;
     }
-    positiveLimitPosition = _positiveLimitPosition;
-    
-    if(_durationAlarmsInterval<0){
+    voltage_LPS = _voltage_LPS;     
+        
+    if(_range<=0){
         return -25;
     }
-    durationAlarmsInterval = _durationAlarmsInterval;
+    range=_range;  
+    
+    if(_fullScalePot<=0){
+        return -26;
+    }
+    fullScalePot=_fullScalePot;
+    constantPot=_fullScalePot/65535;
+    
+//    if(_percNoise<0 || _percNoise>1){
+//        return -23;
+//    }
+    percNoise = PERC_NOISE_DEFAULT;
+    
+//    if(_positiveLimitPosition<0){
+//        return -24;
+//    }
+    positiveLimitPosition = (long)(_range*100000);
+    
+//    if(_durationAlarmsInterval<0){
+//        return -25;
+//    }
+    durationAlarmsInterval = DURATION_ALARMS_INTERVAL_DEFAULT;
     
 //    axisRef = TS_LoadSetup(setupFilePath.c_str());
 //    if(axisRef < 0){
@@ -1405,32 +1428,32 @@ int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAcceleratio
     return 0;
 }
 
-int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
-    //DPRINT("Chiamata setAdditiveHoming");
-    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
-        return -1;
-    }
-    isAdditiveHoming = _isAdditiveHoming;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
-    //DPRINT("Chiamata setMovementHoming");
-    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
-        return -1;
-    }
-    movementHoming = _movementHoming;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
-    //DPRINT("Chiamata setReferenceBaseHoming");
-    if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
-        return -1;
-    }
-    referenceBaseHoming=_referenceBaseHoming;
-    return 0;
-}
+//int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
+//    //DPRINT("Chiamata setAdditiveHoming");
+//    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
+//        return -1;
+//    }
+//    isAdditiveHoming = _isAdditiveHoming;
+//    return 0;
+//}
+//
+//int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
+//    //DPRINT("Chiamata setMovementHoming");
+//    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
+//        return -1;
+//    }
+//    movementHoming = _movementHoming;
+//    return 0;
+//}
+//
+//int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
+//    //DPRINT("Chiamata setReferenceBaseHoming");
+//    if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
+//        return -1;
+//    }
+//    referenceBaseHoming=_referenceBaseHoming;
+//    return 0;
+//}
 
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
@@ -1475,6 +1498,43 @@ int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movemen
         return -1;
     }
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setvoltage_LNS(double& _voltage_LNS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_voltage_LNS<0){
+        return -1;
+    }
+    voltage_LNS=_voltage_LNS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setvoltage_LPS(double& _voltage_LPS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_voltage_LPS<0){
+        return -1;
+    }
+    voltage_LPS=_voltage_LPS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setRange(double& _range){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_range<0){
+        return -1;
+    }
+    range=_range;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setFullscalePot(double& _fullScale){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_fullScale<0){
+        return -1;
+    }
+    fullScalePot=_fullScale;
+    constantPot=_fullScale/65535;
     return 0;
 }
 
@@ -2296,6 +2356,99 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
    
     return 0;
 }
+
+int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
+    
+    //DPRINT("Reading ENCODER position");
+//    long aposition;
+//    if(!TS_GetLongVariable("APOS", aposition)){
+//        return -1;
+//    }
+    //DPRINT("E' questo il getEncoder???????????????");
+    // Simulazione dialogo con il drive/motor
+    int random_variable = std::rand();
+    if(random_variable<p*(RAND_MAX/100)){
+        return -1;
+    }
+
+//    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
+
+//    std::srand(std::time(0));
+//
+//    long pos = positionEncoder;
+//    long min = pos-(long)deltaNoise;
+//    long max = pos+(long)deltaNoise;
+
+    //Rumore gaussiano: e' necessario lo standard C++ 2011
+//    double stdv = abs(pos+pos*0.001);
+//    std::normal_distribution<double> distribution(pos,stdv);
+//    pos = (long)(distribution(generator));
+
+//    if(random_variable>0.0005){
+//        pos=positionEncoder+random_variable;
+//    }
+//    else{
+//        pos=positionEncoder-random_variable;
+//    }
+
+    // This is the underlying integer random number generator
+//    boost::mt19937 igen;
+//    long pos= positionEncoder;
+//    // The second template parameter is the actual floating point
+//    // distribution that the user wants
+//    double stdv = abs(pos+pos*0.1);
+////    boost::variate_generator<boost::mt19937, boost::normal_distribution<> >
+////        generator(boost::mt19937(time(0)), boost::normal_distribution<>(pos,stdv));
+//
+//    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,getRandomDoubleUsingNormalDistribution(pos,stdv));
+////    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
+
+    //std::srand(std::time(0));
+
+    double pos = positionEncoder;
+//    long min = pos-(long)deltaNoise;
+//    long max = pos+(long)deltaNoise;
+//    long deltaNoise = (long)(pos*percNoise);
+//
+//    const long rangeMin = pos-deltaNoise;
+//    const long rangeMax = pos+deltaNoise;
+//
+//    NumberDistribution distribution(rangeMin, rangeMax);
+//    Generator numberGenerator(generator, distribution);
+
+//    for(int i=0;i<10;i++){
+//    std::cout << numberGenerator() << std::endl;
+//    }
+
+    //DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
+
+    //*deltaPosition_mm = (numberGenerator()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    
+    if(percNoise>0){
+        double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+        if(pos_mm==0){
+            pos_mm=0.000001;
+        }
+        double deltaNoise = (pos_mm*percNoise);
+        //DPRINT("pos_mm=%f",pos_mm);
+        //DPRINT("deltaNoise=%f",deltaNoise);
+        const double rangeMin = pos_mm-deltaNoise;
+        const double rangeMax = pos_mm+deltaNoise;
+        //DPRINT("rangeMin=%f",rangeMin);
+        //DPRINT("rangeMax=%f", rangeMax);
+        NumberDistribution distribution(rangeMin, rangeMax);
+        Generator numberGenerator(generator, distribution);
+        *deltaPosition_mm = numberGenerator();
+        //DPRINT("************** Position encoder of axisID 14: %4.13f **************",*deltaPosition_mm);
+        //sleep(1);
+    }
+    else
+        *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    
+    //DPRINT("Real position encoder %f millimeter", *deltaPosition_mm);
+   
+    return 0;
+} 
 
 int TechnoSoftLowDriver::getLVariable(std::string& nameVar, long& var) {
 //    if(!TS_SelectAxis(axisID)){

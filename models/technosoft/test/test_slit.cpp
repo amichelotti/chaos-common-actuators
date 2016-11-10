@@ -63,6 +63,7 @@ void* checkProcedures(void* p){
     double total_time_interval=0;
     double position_mm_encoder;
     double position_mm_counter;
+    double position_mm_potentiometer;
     int resp;
     std::string desc1;
     std::string desc2;
@@ -85,6 +86,11 @@ void* checkProcedures(void* p){
                 sleep(10);
                 //* errPtr = -5;
             }
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_POTENTIOMETER, &position_mm_potentiometer))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
 
 //            //usleep(5000);
 //            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
@@ -101,6 +107,7 @@ void* checkProcedures(void* p){
 //            }
             DPRINT("************** State of axisID 14 partita: %s **************",desc1.c_str());
             DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
+            DPRINT("************** Position potentiometer of axisID 14: %4.13f **************",position_mm_potentiometer);
 //            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
             //DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
             DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
@@ -383,16 +390,40 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        DPRINT("SETPPARAMETER OK");
 //        sleep(60);
 
+        int ret;
+        if((ret=OBJ->setParameter(axisID,"voltage_LNS[V]","7.7"))<0){
+            DERR("************** Error setparameter voltage_LNS[V] %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"voltage_LPS[V]","0.3"))<0){
+            DERR("************** Error setparameter voltage_LPS[V] %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        if((ret=OBJ->setParameter(axisID,"range_slit[mm]","10.0"))<0){
+            DERR("************** Error setparameter range_slit[mm] %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+        
+        if((ret=OBJ->setParameter(axisID,"fullscalePot","20.0"))<0){
+            DERR("************** Error setparameter fullscalePot %d**************",ret);
+            sleep(10);
+            //* errPtr = -5;
+        }
+
+        sleep(30);
         //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
         //int resp;
         //sleep(5);
     
-        int resp;
-        if((resp=OBJ->moveRelativeMillimeters(axisID,100))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
+//        int resp;
+//        if((resp=OBJ->moveRelativeMillimeters(axisID,100))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
         
         //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
@@ -478,13 +509,13 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        hd2.obj=OBJ;
 //        checkProcedures((void*)&hd2);
 //        
-        
-        if((resp=OBJ->moveRelativeMillimeters(axisID,50))<0){
+        int resp;
+        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
             DERR("************** Error returned by movement operation, code error %d **************",resp);
             sleep(10);
             //* errPtr = -5;
         }
-        sleep(150);
+        sleep(60);
         //checkProcedures((void*)&hd2);
         
 //        sleep(90);
@@ -592,22 +623,22 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //            usleep(5000000);
 //        }
        
-        DPRINT("************** Homing operation starting. ***************");
-        sleep(5);
-        pthread_t th2;
-        homingData hd;
-        hd.a=1;
-        hd.b=5;
-        hd.obj=OBJ;
-        hd.c=axisID;
-        //pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
-        homingProcedures((void*)&hd); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
+//        DPRINT("************** Homing operation starting. ***************");
+//        sleep(5);
+//        pthread_t th2;
+//        homingData hd;
+//        hd.a=1;
+//        hd.b=5;
+//        hd.obj=OBJ;
+//        hd.c=axisID;
+//        //pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
+//        homingProcedures((void*)&hd); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
         
         
 //           
 ////        DPRINT("************** Visione andamento procedura di homing per 90 secondi **************");
 ////        sleep(5);
-//        durationChecking=120;
+          double durationChecking=120;
 //        pthread_t th3;
 //        hd2.axisID=axisID;
 //        hd2.duration = durationChecking;
@@ -615,7 +646,13 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        
 //        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
        
-        //checkProcedures(axisID, durationChecking,OBJ);
+          
+//        
+          checkData hd2;
+          hd2.axisID=axisID;
+          hd2.duration=durationChecking;
+          hd2.obj=OBJ;
+          checkProcedures((void*)&hd2);
         
 //        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa 2 **************");
 //        sleep(5);
@@ -711,7 +748,7 @@ void* function1(void* str){
 //    }
     else{ // Invio comandi ai motori (axisID = 14)
         
-        int numVolteProcedura=10;
+        int numVolteProcedura=1;
         for(int i=1;i<=numVolteProcedura;i++){
             procedura(OBJ,i);
         }

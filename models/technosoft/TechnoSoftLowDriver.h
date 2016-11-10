@@ -50,12 +50,12 @@
 #define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
 
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 190.0 // [mm/s]           //10.0
-#define MAX_HIGHSPEED_HOMING_DEFAULT 500.0 // [mm/s]       (da MDS) //15.0 
-#define LOW_SPEED_HOMING_DEFAULT 100.0 // [mm/s]                     //1.0 
-#define MAXLOW_SPEED_HOMING_DEFAULT 150.0 // [mm/s]         (da MDS)  //3.0 
-#define ACCELERATION_HOMING_DEFAULT 0.1 //[mm/s^2]                  //0.3 
-#define MAX_ACCELERATION_HOMING_DEFAULT 3.0// [mm/s^2]   (da MDS)  // 0.6
+#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]           //10.0
+#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS) //15.0 
+#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]                     //1.0 
+#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)  //3.0 
+#define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]                  //0.3 
+#define MAX_ACCELERATION_HOMING_DEFAULT 0.6// [mm/s^2]   (da MDS)  // 0.6
 
 #define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
@@ -63,7 +63,7 @@
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm] 
 
-#define CONST_POTENTIOMETER 0.00030518043
+#define FULLSCALE_POTENTIOMETER 20.0
 #define V_LNS 7.7 //[V]
 #define V_LSP 0.3 //[V]
 #define RANGE 1 //[m]
@@ -156,6 +156,9 @@ namespace common{
                 double voltage_LNS; //[V]
                 double voltage_LPS; //[V]
                 double range;
+                double fullScalePot;
+                double constantPot;
+                
                 
                 //bool controlledInitialPositionHoming; 
                 //double epsylon;
@@ -230,7 +233,8 @@ namespace common{
                         const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
                         const double voltage_LNS = V_LNS, //[V]
                         const double voltage_LPS = V_LSP, //[V]
-                        const double range = RANGE  //[meter]
+                        const double range = RANGE,  //[meter]
+                        const double fullScalePot = FULLSCALE_POTENTIOMETER //[V] 
                         );
                 
                 int homing(int mode);
@@ -268,15 +272,17 @@ namespace common{
                 int setMaxlowSpeedHoming(const double& speed);
                 int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
                 int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
-                int setAdditiveHoming(const BOOL& isAdditive);
-                int setMovementHoming(const short& movement);
-                int setReferenceBaseHoming(const short& referenceBase);
+//                int setAdditiveHoming(const BOOL& isAdditive);
+//                int setMovementHoming(const short& movement);
+//                int setReferenceBaseHoming(const short& referenceBase);
                 
                 int setConst_mult_technsoft(double& _const_mult_technsoft);
                 int setSteps_per_rounds(double& _steps_per_rounds);
                 int setN_rounds(double& _n_rounds);
                 int setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
                 int setEncoderLines(double& _encoderLines);
+                
+                int setFullscalePot(double& _fullScale);
                 
                 //Encoder lines
 

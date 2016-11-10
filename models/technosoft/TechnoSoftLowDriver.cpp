@@ -157,7 +157,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _linear_movement_per_n_rounds,
                         const double _voltage_LNS, //[V]
                         const double _voltage_LPS, //[V]
-                        const double _range){
+                        const double _range,
+                        const double _fullScalePot){
     
     DPRINT("Inizializzazione parametri");
     
@@ -292,40 +293,46 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(_range<=0){
         return -25;
     }
-    range=_range;    
-        
+    range=_range;  
+    
+    if(_fullScalePot<=0){
+        return -26;
+    }
+    fullScalePot=_fullScalePot;
+    constantPot=_fullScalePot/65535;
+    
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
         DERR("LoadSetup failed \"%s\", %s",setupFilePath.c_str(),TS_GetLastErrorText());
-        return -26;
+        return -27;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d, %s",axisID,TS_GetLastErrorText());
-        return -27;
+        return -28;
     }
    
     if(!TS_SelectAxis(_axisID)){
         DERR("failed to select axis %d, %s",_axisID,TS_GetLastErrorText());
-        return -28;
+        return -29;
     }
     
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
-        return -29;
+        return -30;
     }
     
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         DERR("Failed TS_Execute command");
-        return -30;
+        return -31;
     }
   
     if(!TS_SetEventOnMotionComplete(0,0)){ 
-	return -31;
+	return -32;
     }
     
     readyState = true;
@@ -984,32 +991,32 @@ int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAcceleratio
     return 0;
 }
 
-int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
-    //DPRINT("Chiamata setAdditiveHoming");
-    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
-        return -1;
-    }
-    isAdditiveHoming = _isAdditiveHoming;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
-    //DPRINT("Chiamata setMovementHoming");
-    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
-        return -1;
-    }
-    movementHoming = _movementHoming;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
-    //DPRINT("Chiamata setReferenceBaseHoming");
-    if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
-        return -1;
-    }
-    referenceBaseHoming=_referenceBaseHoming;
-    return 0;
-}
+//int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
+//    //DPRINT("Chiamata setAdditiveHoming");
+//    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
+//        return -1;
+//    }
+//    isAdditiveHoming = _isAdditiveHoming;
+//    return 0;
+//}
+//
+//int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
+//    //DPRINT("Chiamata setMovementHoming");
+//    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
+//        return -1;
+//    }
+//    movementHoming = _movementHoming;
+//    return 0;
+//}
+//
+//int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
+//    //DPRINT("Chiamata setReferenceBaseHoming");
+//    if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
+//        return -1;
+//    }
+//    referenceBaseHoming=_referenceBaseHoming;
+//    return 0;
+//}
 
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
@@ -1083,6 +1090,17 @@ int TechnoSoftLowDriver::setRange(double& _range){
     range=_range;
     return 0;
 }
+
+int TechnoSoftLowDriver::setFullscalePot(double& _fullScale){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_fullScale<0){
+        return -1;
+    }
+    fullScalePot=_fullScale;
+    constantPot=_fullScale/65535;
+    return 0;
+}
+
 
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso come comando
     
@@ -1289,13 +1307,13 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
 int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
     
     DPRINT("Reading potentiometer");
- 
+     
     //long tposition;
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    short valueAD5; // Tensione costante, 8 volt
+    //short valueAD5; // Tensione costante, 8 volt
     short valueAd2;
 //    if(!TS_GetLongVariable("TPOS", tposition)){
 //        return -1;
@@ -1307,9 +1325,9 @@ int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
         return -1;
     }
     
-    double voltage=(valueAd2*CONST_POTENTIOMETER)-10; //[V]
-    * deltaPosition_mm=(((voltage-voltage_LNS)/(voltage_LPS-voltage_LNS))*RANGE)/1000; 
-
+    double voltage=(valueAd2*constantPot)-10; //[V]
+    * deltaPosition_mm=(((voltage-voltage_LNS)/(voltage_LPS-voltage_LNS))*range); 
+    
     //*deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
     return 0;
 } 

@@ -96,6 +96,11 @@
 #define PERC_NOISE_DEFAULT 0.0
 #define DURATION_ALARMS_INTERVAL_DEFAULT 60.0
 
+#define FULLSCALE_POTENTIOMETER 20.0
+#define V_LNS 7.7 //[V]
+#define V_LSP 0.3 //[V]
+#define RANGE 1 //[m]
+
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -275,6 +280,11 @@ namespace common{
                 bool LSNactive;
                 bool LSPactive;
                
+                double voltage_LNS; //[V]
+                double voltage_LPS; //[V]
+                double range;
+                double fullScalePot;
+                double constantPot;
 
                 // Additional parameters for s-curve profile
                 //long jerkTime;
@@ -310,14 +320,11 @@ namespace common{
                 // Inizializzazione singolo drive/motor
                 int init(const std::string& setupFilePath,
                         const int& axisID,
-                        const long& _positiveLimitPosition=POSITIVE_LIMIT_POSITION_DEFAULT,
-                        const double& _percNoise=PERC_NOISE_DEFAULT,
-                        const double& _durationAlarmsInterval=DURATION_ALARMS_INTERVAL_DEFAULT,
                         const double speed=SPEED_DEFAULT,
-                        const double maxSpeed=MAX_SPEED_DEFAULT,
+                        const double maxSpeed=MAX_SPEED_DEFAULT, 
                         const double acceleration=ACCELERATION_DEFAULT,
                         const double maxAcceleration = MAX_ACCELERATION_DEFAULT,
-                        const BOOL isAdditive=FALSE,
+                        const BOOL isAdditive=FALSE, 
                         const short moveMoment =UPDATE_IMMEDIATE,
                         const short referenceBase=FROM_REFERENCE,
                         const double _highSpeedHoming=HIGH_SPEED_HOMING_DEFAULT,
@@ -329,11 +336,16 @@ namespace common{
                         const BOOL _isAdditiveHoming=FALSE,
                         const short _movementHoming=UPDATE_IMMEDIATE,
                         const short _referenceBaseHoming=FROM_REFERENCE,
-                        const double _n_encoder_lines=N_ENCODER_LINES_DEFAULT,
-                        const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT,
-                        const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,
-                        const double _n_rounds=N_ROUNDS_DEFAULT,
-                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+                        const double _n_encoder_lines=N_ENCODER_LINES_DEFAULT, 
+                        const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT, 
+                        const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
+                        const double _n_rounds=N_ROUNDS_DEFAULT,            
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
+                        const double voltage_LNS = V_LNS, //[V]
+                        const double voltage_LPS = V_LSP, //[V]
+                        const double range = RANGE,  //[meter]
+                        const double fullScalePot = FULLSCALE_POTENTIOMETER //[V] 
+                        );
 
 
                 int homing(int mode);
@@ -371,19 +383,27 @@ namespace common{
                 int setMaxlowSpeedHoming(const double& speed);
                 int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
                 int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
-                int setAdditiveHoming(const BOOL& isAdditive);
-                int setMovementHoming(const short& movement);
-                int setReferenceBaseHoming(const short& referenceBase);
+//                int setAdditiveHoming(const BOOL& isAdditive);
+//                int setMovementHoming(const short& movement);
+//                int setReferenceBaseHoming(const short& referenceBase);
 
                 int setConst_mult_technsoft(double& _const_mult_technsoft);
                 int setSteps_per_rounds(double& _steps_per_rounds);
                 int setN_rounds(double& _n_rounds);
                 int setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
                 int setEncoderLines(double& _encoderLines);
-
+                
+                int setvoltage_LNS(double& _voltage_LNS);
+                int setvoltage_LPS(double& _voltage_LPS);
+                int setRange(double& _range);
+                int setFullscalePot(double& _fullScale);
+                
+                
                 //Encoder lines
                 int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position);
+                
+                int getPotentiometer(double* deltaPosition_mm);
 
                 // get methods for variables
                 //channel_psh getMyChannel();

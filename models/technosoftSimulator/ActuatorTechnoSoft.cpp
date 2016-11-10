@@ -325,17 +325,17 @@ bool to_bool(const std::string & s) {
 }
 
 int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string valueOfparName){
-
-    //git addaaaaaaaaaaaaaa
-
+    
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){
+    if(i==motors.end()){ 
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-
+    
+    DPRINT("setParameter execution");
+    
     // trim
     trim2(parName);
     trim2(valueOfparName);
@@ -344,43 +344,42 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     std::string strResultparvalue;
     setUpperCase(parName,strResultparName);
     setUpperCase(valueOfparName,strResultparvalue);
-
+    
     double doubleValue;
     int intValue;
     bool boolValue;
-
-    if(strResultparName.compare("SPEED")==0){
+    
+    DPRINT("Stringa elaborata %s",strResultparName.c_str());
+    
+    if(strResultparName.compare("SPEED")==0){ 
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSpeed(doubleValue)<0){
+            DPRINT("setParameter execution error");
             return -2;
         }
+        
         return 0;
-    }
-    else if(strResultparName.compare("MAXSPEED")==0){
+    }   
+    else if(strResultparName.compare("MAXSPEED")==0){ 
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setMaxSpeed(doubleValue)<0){
+            DPRINT("setParameter execution error");
             return -3;
         }
+        
         return 0;
-    }
+    }  
     else if(strResultparName.compare("ACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setAcceleration(doubleValue)<0){
+        if((i->second)->setAcceleration(doubleValue)<0){ 
             return -4;
         }
         return 0;
     }
     else if(strResultparName.compare("MAXACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setMaxAcceleration(doubleValue)<0){
+        if((i->second)->setMaxAcceleration(doubleValue)<0){ 
             return -5;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("RATIOFNOISE")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setRatiOfNoise(doubleValue)<0){
-            return -6;
         }
         return 0;
     }
@@ -388,127 +387,156 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         // Conversion from string to bool
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setAdditive(intValue)<0){
-            return -7;
+        if((i->second)->setAdditive(intValue)<0){ 
+            return -5;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENT")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setMovement((short)intValue)<0){
-            return -8;
+        if((i->second)->setMovement((short)intValue)<0){ 
+            return -6;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASE")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setReferenceBase((short)intValue)<0){
-            return -9;
+        if((i->second)->setReferenceBase((short)intValue)<0){ 
+            return -7;
         }
-        return 0;
+        return 0;   
     }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->sethighSpeedHoming(doubleValue)<0){
-            return -10;
+        if((i->second)->sethighSpeedHoming(doubleValue)<0){ 
+            return -8;
         }
-        return 0;
+        return 0;       
     }
     else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setMaxhighSpeedHoming(doubleValue)<0){
-            return -11;
+        if((i->second)->setMaxhighSpeedHoming(doubleValue)<0){ 
+            return -9;
         }
-        return 0;
+        return 0;       
     }
     else if(strResultparName.compare("LOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setlowSpeedHoming(doubleValue)<0){
-            return -12;
+        if((i->second)->setlowSpeedHoming(doubleValue)<0){ 
+            return -10;
         }
-        return 0;
+        return 0;   
     }
     else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setMaxlowSpeedHoming(doubleValue)<0){
-            return -13;
+        if((i->second)->setMaxlowSpeedHoming(doubleValue)<0){ 
+            return -11;
         }
-        return 0;
-    }             
+        return 0;   
+    }
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setaccelerationHoming(doubleValue)<0){
-            return -14;
+        if((i->second)->setaccelerationHoming(doubleValue)<0){ 
+            return -12;
         }
-        return 0;
+        return 0;   
     }
     else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setMaxAccelerationHoming(doubleValue)<0){
-            return -15;
+        if((i->second)->setMaxAccelerationHoming(doubleValue)<0){ 
+            return -13;
         }
-        return 0;
+        return 0;   
     }
-    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
-        // Conversion from string to bool
-        //boolValue = to_bool(valueOfparName);
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setAdditiveHoming(intValue)<0){
-            return -16;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("MOVEMENTHOMING")==0){
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setMovementHoming((short)intValue)<0){
-            return -17;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setReferenceBaseHoming((short)intValue)<0){
-            return -18;
-        }
-        return 0;
-    }//_________________________________________________________________________
+//    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
+//        // Conversion from string to bool
+//        //boolValue = to_bool(valueOfparName);
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setAdditiveHoming(intValue)<0){ 
+//            return -14;
+//        }
+//        return 0;
+//    }
+//    else if(strResultparName.compare("MOVEMENTHOMING")==0){
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setMovementHoming((short)intValue)<0){ 
+//            return -15;
+//        }
+//        return 0;
+//    }
+//    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setReferenceBaseHoming((short)intValue)<0){ 
+//            return -16;
+//        }
+//        return 0;   
+//    }//_________________________________________________________________________
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setEncoderLines(doubleValue)<0){
-            return -19;
+        if((i->second)->setEncoderLines(doubleValue)<0){ 
+            return -17;
         }
-        return 0;
+        return 0;   
     }
     else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setConst_mult_technsoft(doubleValue)<0){
-            return -20;
+        if((i->second)->setConst_mult_technsoft(doubleValue)<0){ 
+            return -18;
         }
-        return 0;
-    }
+        return 0;   
+    } 
     else if(strResultparName.compare("STEPSPERROUND")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setSteps_per_rounds(doubleValue)<0){
-            return -21;
+        if((i->second)->setSteps_per_rounds(doubleValue)<0){ 
+            return -19;
         }
-        return 0;
-    }
+        return 0;   
+    } 
     else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setN_rounds(doubleValue)<0){
-            return -22;
+        if((i->second)->setN_rounds(doubleValue)<0){ 
+            return -20;
         }
-        return 0;
-    }
+        return 0;   
+    } 
     else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){
+        if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){ 
+            return -21;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("VOLTAGE_LNS[V]")==0){ 
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setvoltage_LNS(doubleValue)<0){ 
+            return -22;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("VOLTAGE_LPS[V]")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setvoltage_LPS(doubleValue)<0){ 
             return -23;
         }
-        return 0;
+        return 0;   
+    } 
+    else if(strResultparName.compare("RANGE_SLIT[MM]")==0){  //range_slit[mm]
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setRange(doubleValue)<0){ 
+            return -24;
+        }
+        return 0;   
     }
+    else if(strResultparName.compare("FULLSCALEPOT")==0){ //fullscalePot
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setFullscalePot(doubleValue)<0){ 
+            return -25;
+        }
+        return 0;   
+    }
+    
     else{
-        return -24;
+        return -26;
     }
 }
 
@@ -593,37 +621,64 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
 //}
 
 int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
-    //DPRINT("Position reading, axisID %d",axisID);
-
+    DPRINT("Position reading, axisID %d",axisID);
+    
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){
+    if(i==motors.end()){ 
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-
+   
     if((i->second)->selectAxis()<0){
         return -2;
     }
 
-    if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
-        //long tposition;
-        if((i->second)->getCounter(deltaPosition_mm)<0){
+//    if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
+//        //long tposition;
+//        if((i->second)->getCounter(deltaPosition_mm)<0){
+//            DERR("getting counter");
+//            return -3;
+//        }
+//        //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
+//        //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
+//    }
+//    else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
+//        //long aposition;
+//        if((i->second)->getEncoder(deltaPosition_mm)<0){
+//            return -4;
+//        }
+//        //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
+//        //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
+//    }
+//    else if(mode==READ_POTENTIOMETER){
+//        if((i->second)->getPotentiometer(deltaPosition_mm)<0){
+//            return -5;
+//        }
+//    }
+    switch(mode)
+    {
+    case (READ_COUNTER):
+         if((i->second)->getCounter(deltaPosition_mm)<0){
             DERR("getting counter");
             return -3;
         }
-        //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
-        //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
+        break;
+            case (READ_ENCODER):
+            if((i->second)->getEncoder(deltaPosition_mm)<0){
+                return -4;
+            }
+        break;
+            case (READ_POTENTIOMETER):
+            if((i->second)->getPotentiometer(deltaPosition_mm)<0){
+                return -5;
+            }
+            break;
+        default:   
+            break;
     }
-    else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
-        //long aposition;
-        if((i->second)->getEncoder(deltaPosition_mm)<0){
-            return -4;
-        }
-        //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
-        //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
-    }
+ 
     return 0;
 }
 
@@ -1057,16 +1112,19 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"maxlowspeedhoming\",\"description\":\"Max value for speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"6.0\",\"default\":\"4.0\"},"; 
    dataset+="{\"name\":\"accelerationhoming\",\"description\":\"Acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"0.6\",\"default\":\"0.3\"},";
    dataset+="{\"name\":\"maxaccelerationhoming\",\"description\":\"Max value for acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"1.0\",\"default\":\"0.8\"},";
-   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
-   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
+//   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
+//   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
+//   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"numencoderlines\",\"description\":\"Number of encoder lines\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"800\"},";
    dataset+="{\"name\":\"nummicrostepsperstep\",\"description\":\"Number of micro steps per step\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"256\"},";
    dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"},";
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"},";
-   dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"}";
+   dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"},";
    //dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
+   dataset+="{\"name\":\"voltage_LNS[V]\",\"description\":\"Voltage associated with LNS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"7.7\"},";
+   dataset+="{\"name\":\"voltage_LPS[V]\",\"description\":\"Voltage associated with LPS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"0.3\"},";
+   dataset+="{\"name\":\"range_slit[mm]\",\"description\":\"Maximum linear displacement of the slit [m]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"10.0\"},";
+   dataset+="{\"name\":\"fullscalePot\",\"description\":\"Full scale of the potentiometer\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"20.0\"}";
    dataset+="]}";
-
    return 0;
 }
