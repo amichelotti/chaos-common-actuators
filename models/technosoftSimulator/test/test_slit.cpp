@@ -70,9 +70,9 @@ void* checkProcedures(void* p){
     uint64_t alarms;
     int state;
     
-    //gettimeofday(&startTimeForMotor1,NULL);
+    gettimeofday(&startTimeForMotor1,NULL);
       
-        //while(total_time_interval<=duration){
+        while(total_time_interval<=duration){
             
             if((resp=OBJ->getState(axisID,&state, desc1))<0){
                 DERR("************** Error returned by getState operation, code error %d **************",resp);
@@ -111,15 +111,15 @@ void* checkProcedures(void* p){
 //            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
             //DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
             DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
-//            DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
+            DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
             
-            //gettimeofday(&endTimeForMotor1,NULL);
-            //total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+            gettimeofday(&endTimeForMotor1,NULL);
+            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
-            //DPRINT("total_time_interval: %f",total_time_interval);
+            DPRINT("total_time_interval: %f",total_time_interval);
             
-            //usleep(1000000); // lettura ogni secondo...
-        //}
+            //usleep(1000); // lettura ogni decimo di secondo...
+        }
 }
 
 
@@ -192,9 +192,6 @@ void* homingProcedures(void *p){
 //        std::cout<<"Errore nell'apertura del file"<<std::endl;
 //    }
 }
-
-
-
 
 
 struct stopMotionStruct{
@@ -390,30 +387,30 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        DPRINT("SETPPARAMETER OK");
 //        sleep(60);
 
-        int ret;
-        if((ret=OBJ->setParameter(axisID,"voltage_LNS[V]","7.7"))<0){
-            DERR("************** Error setparameter voltage_LNS[V] %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        if((ret=OBJ->setParameter(axisID,"voltage_LPS[V]","0.3"))<0){
-            DERR("************** Error setparameter voltage_LPS[V] %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        if((ret=OBJ->setParameter(axisID,"range_slit[mm]","10.0"))<0){
-            DERR("************** Error setparameter range_slit[mm] %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        
-        if((ret=OBJ->setParameter(axisID,"fullscalePot","20.0"))<0){
-            DERR("************** Error setparameter fullscalePot %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-
-        sleep(30);
+//        int ret;
+//        if((ret=OBJ->setParameter(axisID,"voltage_LNS[V]","7.7"))<0){
+//            DERR("************** Error setparameter voltage_LNS[V] %d**************",ret);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        if((ret=OBJ->setParameter(axisID,"voltage_LPS[V]","0.3"))<0){
+//            DERR("************** Error setparameter voltage_LPS[V] %d**************",ret);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        if((ret=OBJ->setParameter(axisID,"range_slit[mm]","10.0"))<0){
+//            DERR("************** Error setparameter range_slit[mm] %d**************",ret);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        
+//        if((ret=OBJ->setParameter(axisID,"fullscalePot","20.0"))<0){
+//            DERR("************** Error setparameter fullscalePot %d**************",ret);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//
+//        sleep(30);
         //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
         //int resp;
         //sleep(5);
@@ -509,13 +506,13 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        hd2.obj=OBJ;
 //        checkProcedures((void*)&hd2);
 //        
-        int resp;
-        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        sleep(60);
+//        int resp;
+//        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        sleep(60);
         //checkProcedures((void*)&hd2);
         
 //        sleep(90);
@@ -638,15 +635,14 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //           
 ////        DPRINT("************** Visione andamento procedura di homing per 90 secondi **************");
 ////        sleep(5);
-          double durationChecking=120;
+          double durationChecking=180;
 //        pthread_t th3;
 //        hd2.axisID=axisID;
 //        hd2.duration = durationChecking;
 //        hd2.obj=OBJ;
 //        
 //        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
-       
-          
+
 //        
           checkData hd2;
           hd2.axisID=axisID;

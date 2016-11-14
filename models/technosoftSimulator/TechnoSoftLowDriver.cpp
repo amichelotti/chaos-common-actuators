@@ -2845,7 +2845,7 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
         // Lettura ogni secondo...
         if(total_time_interval>durationAlarmsInterval){
             
-            if(pthread_mutex_lock(  &(mu))!=0){
+            if(pthread_mutex_lock(&(mu))!=0){
 
             }
             
@@ -2882,7 +2882,7 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
         total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
         //DPRINT("total_time_interval: %f",total_time_interval);
-        usleep(1000000); 
+        sleep(1); 
     }
 }
 
