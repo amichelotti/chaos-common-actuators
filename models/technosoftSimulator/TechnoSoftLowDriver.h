@@ -207,6 +207,8 @@ namespace common{
                 long cap_position;
                 bool LNStransition;
                 bool LPStransition;
+                
+                bool controlLNS;
 
                 long epsylon;
                 double p;
