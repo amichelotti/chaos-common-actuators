@@ -127,6 +127,8 @@ namespace common{
                 
                 std::string devName;
                 
+                bool controlLNS;
+                
                 double n_encoder_lines; 
                 double const_mult_technsoft; 
                 double steps_per_rounds;    

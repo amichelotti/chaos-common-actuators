@@ -350,6 +350,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    stateHoming5=0;
     
     cap_position=0;
+    controlLNS=true;
     
     return 0;
 }
@@ -372,8 +373,22 @@ int TechnoSoftLowDriver::homing(int mode){
 //        }   
 //    }
     
+    if(controlLNS){
+        std::string descStr="";
+        uint16_t contentRegMER=0;
+        if((getStatusOrErrorReg(5, contentRegMER, descStr))<0){
+            return -1;
+        }
+        if(contentRegMER & ((uint16_t)1<<7)){
+            // Il LNS e' attivo. Non c'e' bisogno di effettuare la procedura di homing.
+            return 0;
+        }
+        // IL LNS non e' attivo. La procedura di homing deve cominciare, senza piu' fare questo controllo. 
+        controlLNS=false;    
+    }
+    
     if(mode==0){
-        
+
         int risp;
         int switchTransited=0;
         int motionCompleted = 0;
@@ -388,7 +403,8 @@ int TechnoSoftLowDriver::homing(int mode){
             case 0:
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -1;
+                    controlLNS=true;
+                    risp = -2;
                     break;
                 }
 //                if(setEventOnMotionComplete()<0){ 
@@ -404,21 +420,23 @@ int TechnoSoftLowDriver::homing(int mode){
                 
                 if(moveVelocityHoming()<0){
                     internalHomingStateDefault = 0;
+                    controlLNS=true;
                     if(stopMotion()<0){
-                        risp = -2;
+                        risp = -3;
                         break;
                     }
-                    risp = -3;
+                    risp = -4;
                     break;
                 }
                 
                 if(setEventOnLimitSwitch()<0){
                     internalHomingStateDefault = 0;
+                    controlLNS=true;
                     if(stopMotion()<0){
-                        risp = -4;
+                        risp = -5;
                         break;
                     }
-                    risp = -5;
+                    risp = -6;
                     break;
                 }
                 
@@ -433,16 +451,18 @@ int TechnoSoftLowDriver::homing(int mode){
             case 1:
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -6;
+                    controlLNS=true;
+                    risp = -7;
                     break;
                 }
                 if(checkEvent(switchTransited)<0){
                     internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
+                    controlLNS=true; 
                     if(stopMotion()<0){
-                        risp = -7;
+                        risp = -8;
                         break;
                     }    
-                    risp = -8;
+                    risp = -9;
                     break;
                 } 
                 DPRINT(" STATE 1: possible limit switch transition just checked ");
@@ -490,7 +510,8 @@ int TechnoSoftLowDriver::homing(int mode){
             case 2:
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -9;
+                    controlLNS=true; 
+                    risp = -10;
                     break;
                 }
                 
@@ -513,9 +534,12 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    break;
 //                }
                 if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
+                    controlLNS=true; 
+                    internalHomingStateDefault = 0;
 //                    descStr=descStr+"Unknown status. ";
 //                    ERR("Reading state error: %s",descStr.c_str());
-                    return -10;
+                    risp= -11;
+                    break;
                 }
                 if((contentRegSRL & ((uint16_t)1<<10))){
                     motionCompleted=true;
@@ -523,7 +547,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 //contentRegSRL=0;
                 DPRINT("************** STATE 2: possible event on motion completed checked **************");
                 if(motionCompleted){
-                    DPRINT("************** STATE 2: Motion completed after transition **************");
+                    DPRINT("************** STATE 2: Motion completed after transition **************"); 
                     internalHomingStateDefault = 3;
 //                    double positionHoming;
 //                    getEncoder(&positionHoming);
@@ -532,7 +556,6 @@ int TechnoSoftLowDriver::homing(int mode){
                 }
                 risp= 1;
                 //stateHoming2++;
-                
                 break;
             case 3:
                 //usleep(10000000); // Garantisce che il motore sia veramente fermo
@@ -541,7 +564,8 @@ int TechnoSoftLowDriver::homing(int mode){
                 //DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -11;
+                    controlLNS=true; 
+                    risp = -12;
                     break;
                 }
                 
@@ -549,9 +573,10 @@ int TechnoSoftLowDriver::homing(int mode){
     //                if(stopMotion()<0){
     //                    return -13;
     //                }
-                        internalHomingStateDefault=0;
-                        risp = -12;
-                        break;
+                    internalHomingStateDefault=0;
+                    controlLNS=true; 
+                    risp = -13;
+                    break;
                 }
                 
 
@@ -596,7 +621,8 @@ int TechnoSoftLowDriver::homing(int mode){
                 
                 if(moveAbsoluteStepsHoming(cap_position)<0){  
                     internalHomingStateDefault=0;
-                    risp = -13;
+                    controlLNS=true; 
+                    risp = -14;
                     break;
                 }
                 
@@ -613,7 +639,8 @@ int TechnoSoftLowDriver::homing(int mode){
                 DPRINT("************** STATE 4: wait for positioning to end **************");
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -14;
+                    controlLNS=true; 
+                    risp = -15;
                     break;
                 }
 //        if(!eventOnMotionCompleteSet){
@@ -633,7 +660,10 @@ int TechnoSoftLowDriver::homing(int mode){
                 if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
 //                    descStr=descStr+"Unknown status. ";
 //                    ERR("Reading state error: %s",descStr.c_str());
-                    return -15;
+                    controlLNS=true; 
+                    internalHomingStateDefault = 0;
+                    risp= -16;
+                    break;
                 }
                 if((contentRegSRL & ((uint16_t)1<<10))){
                     absoluteMotionCompleted=true;
@@ -655,6 +685,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 
                 if(absoluteMotionCompleted){
                     internalHomingStateDefault = 5;
+                    
 //                    DPRINT("************** STATE 4: motor positioned to end **************");
 //                    double positionHoming;
 //                    getEncoder(&positionHoming);
@@ -670,7 +701,8 @@ int TechnoSoftLowDriver::homing(int mode){
                 // The motor is positioned to end
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -16;
+                    controlLNS=true; 
+                    risp = -17;
                     break;
                 }
 //                double capturePositionHoming;
@@ -684,18 +716,20 @@ int TechnoSoftLowDriver::homing(int mode){
                 cap_position=0;
                 if(resetEncoder()<0){
                     internalHomingStateDefault = 0;
+                    controlLNS=true; 
                     //if(stopMotion()<0){
                     //return -23;
                     //}
-                    risp= -17;
+                    risp= -18;
                     break;
                 }
                 if(resetCounter()<0){
                     internalHomingStateDefault = 0;
+                    controlLNS=true; 
                     //if(stopMotion()<0){
                     //return -25;
                     //}
-                    risp= -18;
+                    risp= -19;
                     break;
                 }
                 DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
@@ -714,11 +748,12 @@ int TechnoSoftLowDriver::homing(int mode){
 //    stateHoming3=0;
 //    stateHoming4=0;
 //    stateHoming5=0;
-                
+                controlLNS=true;
                 break;
             default:
                 internalHomingStateDefault = 0;
-                risp= -19;
+                controlLNS=true;
+                risp= -20;
                 break; 
         } 
         return risp;
@@ -733,7 +768,8 @@ int TechnoSoftLowDriver::homing(int mode){
                 DPRINT("************** Homing procedure Homing2. STATE 0. **************");
                 if(moveVelocityHoming()<0){
                     internalHomingStateHoming2=0;
-                    risp= -1;
+                    controlLNS=true;
+                    risp= -21;
                     break;
                 }
                 internalHomingStateHoming2=1;
@@ -744,11 +780,12 @@ int TechnoSoftLowDriver::homing(int mode){
                 if((getStatusOrErrorReg(5, contentReg, descStr))<0){
                     //ERR("Reading state error: %s",descStr.c_str());
                     internalHomingStateHoming2=0;
+                    controlLNS=true;
                     if(stopMotion()<0){
-                        risp= -2;
+                        risp= -22;
                         break;
                     }
-                    risp= -3;
+                    risp= -23;
                     break;
                 }
                 // lettura bit di interesse
@@ -763,28 +800,32 @@ int TechnoSoftLowDriver::homing(int mode){
                 DPRINT("************** Reset encoder e counter **************");
                 if(resetEncoder()<0){
                     internalHomingStateHoming2=0;
+                    controlLNS=true;
                     if(stopMotion()<0){
-                        risp= -4;
+                        risp= -24;
                         break;
                     }
-                    risp= -5;
+                    risp= -25;
                     break;
                 }
                 if(resetCounter()<0){
                     internalHomingStateHoming2=0;
+                    controlLNS=true;
                     if(stopMotion()<0){
-                        risp= -6;
+                        risp= -26;
                         break;
                     }
-                    risp= -7;
+                    risp= -27;
                     break;
                 }
                 internalHomingStateHoming2=0;
+                controlLNS=true;
                 risp=0;
                 break;
             default:
                 internalHomingStateHoming2 = 0;
-                risp=-22;
+                controlLNS=true;
+                risp=-28;
                 break;
         }
         return risp;

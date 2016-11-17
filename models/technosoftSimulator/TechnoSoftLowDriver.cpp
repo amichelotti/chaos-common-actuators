@@ -2858,12 +2858,14 @@ int TechnoSoftLowDriver::resetFaultsTimer(){
             
             if(contatoreRegMer<=15){
                 //2. Generazione di un solo fault alla volta:
+                contentRegSRH=0;
                 contentRegMER=0;
                 contentRegMER |= ((WORD)1<<contatoreRegMer);
                 contatoreRegMer++;
             }
             else{
                 contentRegSRH =0;
+                contentRegMER=0;
                 contentRegSRH |= ((WORD)1<<contatoreRegSRH);
                 contatoreRegSRH++;
                 if(contatoreRegSRH>11){
@@ -2971,6 +2973,7 @@ int TechnoSoftLowDriver::resetFault(){
 
     }
         contentRegMER = 0;
+        contentRegSRH =0;
         // ma nn solo...
         LSPactive = false;
         LSNactive = false;
