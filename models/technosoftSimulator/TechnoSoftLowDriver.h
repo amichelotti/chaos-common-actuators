@@ -99,7 +99,7 @@
 #define FULLSCALE_POTENTIOMETER 20.0
 #define V_LNS 7.7 //[V]
 #define V_LSP 0.3 //[V]
-#define RANGE 1 //[m]
+#define RANGE 500 //[mm]
 
 #include <map>
 #include <boost/shared_ptr.hpp>

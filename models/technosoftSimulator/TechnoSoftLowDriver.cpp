@@ -266,7 +266,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    if(_positiveLimitPosition<0){
 //        return -24;
 //    }
-    positiveLimitPosition = (long)(_range*100000);
+    positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
     
 //    if(_durationAlarmsInterval<0){
 //        return -25;
@@ -1504,6 +1504,7 @@ int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
         return -1;
     }
     const_mult_technsoft=_const_mult_technsoft;
+    positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
     return 0;
 }
 
@@ -1513,6 +1514,7 @@ int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
         return -1;
     }
     steps_per_rounds=_steps_per_rounds;
+    positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
     return 0;
 }
 
@@ -1522,6 +1524,7 @@ int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
         return -1;
     }
     n_rounds=_n_rounds;
+    positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
     return 0;
 }
 
@@ -1531,6 +1534,7 @@ int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movemen
         return -1;
     }
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
     return 0;
 }
 
@@ -1558,6 +1562,7 @@ int TechnoSoftLowDriver::setRange(double& _range){
         return -1;
     }
     range=_range;
+    positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
     return 0;
 }
 
