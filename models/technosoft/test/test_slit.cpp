@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 
+#define AXISID_TEST 14
+
 using namespace common::actuators::models;
 #define USAGE \
   printf("**************Usage is:%s <dev/tty> <technosoft configuration> <axis> <move position in mm>*************\n",argv[0]);
@@ -17,7 +19,7 @@ using namespace common::actuators::models;
         
         
         
-//        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
+//        DPRINT("************** Homing operation starting for axis AXISID_TEST. Total homing procedure = %d **************", numHoming);
 //        sleep(10);
         
 //void homingProcedures(int respHoming,int numHoming,common::actuators::AbstractActuator *OBJ,int axisID){ 
@@ -51,6 +53,7 @@ struct checkData{
     common::actuators::AbstractActuator *obj;
 };
 
+
 void* checkProcedures(void* p){
     
     checkData* pstruct=(checkData*) p;
@@ -70,9 +73,9 @@ void* checkProcedures(void* p){
     uint64_t alarms;
     int state;
     
-    //gettimeofday(&startTimeForMotor1,NULL);
+    gettimeofday(&startTimeForMotor1,NULL);
       
-        //while(total_time_interval<=duration){
+        while(total_time_interval<=duration){
             
             if((resp=OBJ->getState(axisID,&state, desc1))<0){
                 DERR("************** Error returned by getState operation, code error %d **************",resp);
@@ -105,21 +108,21 @@ void* checkProcedures(void* p){
 //            if((resp=OBJ->getState(axisID,&state,desc1))<0){
 //                DERR("************** Error reading alarms ***************");
 //            }
-            DPRINT("************** State of axisID 14 partita: %s **************",desc1.c_str());
-            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
-            DPRINT("************** Position potentiometer of axisID 14: %4.13f **************",position_mm_potentiometer);
-//            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
-            //DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
-            DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
-//            DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
+            DPRINT("************** State of axisID AXISID_TEST partita: %s **************",desc1.c_str());
+            DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
+            DPRINT("************** Position potentiometer of axisID AXISID_TEST: %4.13f **************",position_mm_potentiometer);
+//            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
+            //DPRINT("************** State of axisID AXISID_TEST: %s  **************",desc1.c_str());
+            DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
+//            DPRINT("************** Code Alarms of axisID AXISID_TEST: %u **************",alarms);
             
-            //gettimeofday(&endTimeForMotor1,NULL);
-            //total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+            gettimeofday(&endTimeForMotor1,NULL);
+            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
-            //DPRINT("total_time_interval: %f",total_time_interval);
+            DPRINT("total_time_interval: %f",total_time_interval);
             
-            //usleep(1000000); // lettura ogni secondo...
-        //}
+            usleep(1000000); // lettura ogni secondo...
+        }
 }
 
 
@@ -266,9 +269,9 @@ void* stopMotionProcedure(void* p){
 int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
     
     DPRINT("************** Procedura n. %d starting **************",numSeq);
-    int axisID = 14;
+    int axisID = AXISID_TEST;
 
-        // MOVIMENTAZIONE ASSE 14
+        // MOVIMENTAZIONE ASSE AXISID_TEST
         if(OBJ->poweron(axisID,1)<0){
             DERR("**************Error returned by poweron operation **************");
             sleep(10);
@@ -390,40 +393,42 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        DPRINT("SETPPARAMETER OK");
 //        sleep(60);
 
-        int ret;
-        if((ret=OBJ->setParameter(axisID,"voltage_LNS[V]","7.7"))<0){
-            DERR("************** Error setparameter voltage_LNS[V] %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        if((ret=OBJ->setParameter(axisID,"voltage_LPS[V]","0.3"))<0){
-            DERR("************** Error setparameter voltage_LPS[V] %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        if((ret=OBJ->setParameter(axisID,"range_slit[mm]","10.0"))<0){
-            DERR("************** Error setparameter range_slit[mm] %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        
-        if((ret=OBJ->setParameter(axisID,"fullscalePot","20.0"))<0){
-            DERR("************** Error setparameter fullscalePot %d**************",ret);
-            sleep(10);
-            //* errPtr = -5;
-        }
-
-        sleep(30);
-        //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
-        //int resp;
-        //sleep(5);
-    
-//        int resp;
-//        if((resp=OBJ->moveRelativeMillimeters(axisID,100))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//        int ret;
+//        if((ret=OBJ->setParameter(axisID,"voltage_LNS[V]","7.7"))<0){
+//            DERR("************** Error setparameter voltage_LNS[V] %d**************",ret);
 //            sleep(10);
 //            //* errPtr = -5;
 //        }
+//        if((ret=OBJ->setParameter(axisID,"voltage_LPS[V]","0.3"))<0){
+//            DERR("************** Error setparameter voltage_LPS[V] %d**************",ret);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        if((ret=OBJ->setParameter(axisID,"range_slit[mm]","10.0"))<0){
+//            DERR("************** Error setparameter range_slit[mm] %d**************",ret);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+//        
+//        if((ret=OBJ->setParameter(axisID,"fullscalePot","20.0"))<0){
+//            DERR("************** Error setparameter fullscalePot %d**************",ret);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+
+        //sleep(30);
+        DPRINT("************** Prima movimentazione relativa asse AXISID_TEST**************");
+        //int resp;
+        //sleep(5);
+    
+    
+        int resp;
+        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
+            DPRINT("************** Error returned by movement operation, code error %d **************",resp);
+            //sleep(10);
+            //* errPtr = -5;
+        }
+       // sleep(10);
         
         //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 
@@ -442,8 +447,9 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //
 //        sleep(10);
 //
-//        DPRINT("************** Seconda movimentazione asse 14 **************");
-//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,3))<0){
+//        DPRINT("************** Seconda movimentazione asse AXISID_TEST **************");
+//        int resp=0;
+//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,50))<0){
 //            DERR("************** Error returned by movement operation, code error %d **************",resp);
 //            sleep(10);
 //            //* errPtr = -5;
@@ -509,13 +515,13 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        hd2.obj=OBJ;
 //        checkProcedures((void*)&hd2);
 //        
-        int resp;
-        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
-            DERR("************** Error returned by movement operation, code error %d **************",resp);
-            sleep(10);
-            //* errPtr = -5;
-        }
-        sleep(60);
+        
+//        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
+        
         //checkProcedures((void*)&hd2);
         
 //        sleep(90);
@@ -542,7 +548,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 ////                sleep(10);
 ////                //* errPtr = -5;
 ////            }
-////            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());
+////            DPRINT("************** State of axisID AXISID_TEST partita: %s **************",descStr.c_str());
 //
 //            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
 //                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
@@ -561,9 +567,9 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //                DERR("************** Error reading alarms ***************");
 //            }
 //            
-//            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
-//            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
-//            DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
+//            DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
+//            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
+//            DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
 //            
 //            gettimeofday(&endTimeForMotor1,NULL);
 //            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
@@ -588,7 +594,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //                //* errPtr = -5;
 //        }
 //
-//        DPRINT("************** Position ENCODER of axisID 14: %f mm **************",deltaPosition_mm);
+//        DPRINT("************** Position ENCODER of axisID AXISID_TEST: %f mm **************",deltaPosition_mm);
 //
 //        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
 //            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
@@ -596,13 +602,13 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //                //* errPtr = -5;
 //        }
 
-        //DPRINT("************** Position COUNTER of axisID 14: %f mm **************",position_mm);
+        //DPRINT("************** Position COUNTER of axisID AXISID_TEST: %f mm **************",position_mm);
 
         // HOMING OPERATION
 //        int respHoming=1; // Operazione di homing non conclusa
 //        int numHoming = 1;
 //        
-//        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
+//        DPRINT("************** Homing operation starting for axis AXISID_TEST. Total homing procedure = %d **************", numHoming);
 //        sleep(10);
 //        
 //        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
@@ -638,7 +644,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //           
 ////        DPRINT("************** Visione andamento procedura di homing per 90 secondi **************");
 ////        sleep(5);
-          double durationChecking=120;
+          double durationChecking=10;
 //        pthread_t th3;
 //        hd2.axisID=axisID;
 //        hd2.duration = durationChecking;
@@ -719,6 +725,12 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
 //        
 //        pthread_join(th2,NULL);
 //        pthread_join(th3,NULL);
+          
+          if(OBJ->poweron(axisID,0)<0){
+            DERR("**************Error returned by poweron operation **************");
+            sleep(10);
+            //* errPtr = -5;
+        }
    
         return 0;
 }
@@ -732,28 +744,28 @@ void* function1(void* str){
 
     // INIZIALIZZAZIONE CANALE
     if((ret=OBJ->init((void*)strInit))!=0){
-        DERR("*************Cannot init channel. In fact the value returned is %d****************",ret);
+        DPRINT("*************Cannot init channel. In fact the value returned is %d****************",ret);
 
     }
     //PROCEDURA DI CONFIGURAZIONE MOTORI, SEMPRE SULLO STESSO OGGETTO !!!
 
-    std::string strConfig14 = "14,/home/caschera/chaos_bundle/common/actuators/models/technosoft/conf/1setup001.t.zip";
-    if((ret=OBJ->configAxis((void*)strConfig14.c_str()))!=0){
+    std::string strConfig = "14,/home/caschera/chaos_bundle/common/actuators/models/technosoft/conf/1setup001.t.zip";
+    if((ret=OBJ->configAxis((void*)strConfig.c_str()))!=0){
         DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
-        sleep(120);
+        sleep(10);
     }
 //    std::string strConfig15 = "15,../common/actuators/models/technosoft/conf/1setup001.t.zip";
 //    if((ret=OBJ->configAxis((void*)strConfig15.c_str()))!=0){
 //        DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
 //    }
-    else{ // Invio comandi ai motori (axisID = 14)
+    else{ // Invio comandi ai motori (axisID = AXISID_TEST)
         
-        int numVolteProcedura=1;
+        int numVolteProcedura=2;
         for(int i=1;i<=numVolteProcedura;i++){
             procedura(OBJ,i);
         }
         
-        //int axisID=14;
+        //int axisID=AXISID_TEST;
         
 //        DPRINT("************** lANCIO OPERAZIONI DI HOMING SENZA BLOCCO **************");
 //        sleep(5);
@@ -781,9 +793,9 @@ void* function1(void* str){
 //        pthread_join(th2,NULL);
 //        pthread_join(th3,NULL);
         
-//        int axisID = 14;
+//        int axisID = AXISID_TEST;
 //
-//        // MOVIMENTAZIONE ASSE 14
+//        // MOVIMENTAZIONE ASSE AXISID_TEST
 //        if(OBJ->poweron(axisID,1)<0){
 //            DERR("**************Error returned by poweron operation **************");
 //            sleep(10);
@@ -798,15 +810,17 @@ void* function1(void* str){
 //        DPRINT("SETPPARAMETER OK");
 //        //sleep(35);
 //        
-//        //DPRINT("************** Prima movimentazione asse 14, 8 settembre 2014 **************");
+//        //DPRINT("************** Prima movimentazione asse AXISID_TEST, 8 settembre 2014 **************");
 //        int resp;
 //        //sleep(5);
 //
-////        if((resp=OBJ->moveAbsoluteMillimeters(axisID,1))<0){
-////            DERR("************** Error returned by movement operation, code error %d **************",resp);
-////            sleep(10);
-////            //* errPtr = -5;
-////        }
+//        int resp;
+//        int axisID=AXISID_TEST;
+//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,1))<0){
+//            DERR("************** Error returned by movement operation, code error %d **************",resp);
+//            sleep(10);
+//            //* errPtr = -5;
+//        }
 //
 //        //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
 //
@@ -825,7 +839,7 @@ void* function1(void* str){
 ////
 ////        sleep(10);
 ////
-////        DPRINT("************** Seconda movimentazione asse 14 **************");
+////        DPRINT("************** Seconda movimentazione asse AXISID_TEST **************");
 ////        if((resp=OBJ->moveAbsoluteMillimeters(axisID,3))<0){
 ////            DERR("************** Error returned by movement operation, code error %d **************",resp);
 ////            sleep(10);
@@ -907,7 +921,7 @@ void* function1(void* str){
 //////                sleep(10);
 //////                //* errPtr = -5;
 //////            }
-//////            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());
+//////            DPRINT("************** State of axisID AXISID_TEST partita: %s **************",descStr.c_str());
 ////
 ////            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
 ////                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
@@ -926,9 +940,9 @@ void* function1(void* str){
 ////                DERR("************** Error reading alarms ***************");
 ////            }
 ////            
-////            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
-////            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
-////            DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
+////            DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
+////            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
+////            DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
 ////            
 ////            gettimeofday(&endTimeForMotor1,NULL);
 ////            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
@@ -953,7 +967,7 @@ void* function1(void* str){
 ////                //* errPtr = -5;
 ////        }
 ////
-////        DPRINT("************** Position ENCODER of axisID 14: %f mm **************",deltaPosition_mm);
+////        DPRINT("************** Position ENCODER of axisID AXISID_TEST: %f mm **************",deltaPosition_mm);
 ////
 ////        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
 ////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
@@ -961,13 +975,13 @@ void* function1(void* str){
 ////                //* errPtr = -5;
 ////        }
 //
-//        //DPRINT("************** Position COUNTER of axisID 14: %f mm **************",position_mm);
+//        //DPRINT("************** Position COUNTER of axisID AXISID_TEST: %f mm **************",position_mm);
 //
 //        // HOMING OPERATION
 ////        int respHoming=1; // Operazione di homing non conclusa
 ////        int numHoming = 1;
 ////        
-////        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
+////        DPRINT("************** Homing operation starting for axis AXISID_TEST. Total homing procedure = %d **************", numHoming);
 ////        sleep(10);
 ////        
 ////        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
@@ -1082,7 +1096,7 @@ void* function1(void* str){
 ////                sleep(10);
 ////                //* errPtr = -5;
 ////            }
-////            DPRINT("************** State of axisID 14 partita: %s **************",descStr.c_str());
+////            DPRINT("************** State of axisID AXISID_TEST partita: %s **************",descStr.c_str());
 //
 //            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
 //                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
@@ -1101,9 +1115,9 @@ void* function1(void* str){
 //                DERR("************** Error reading alarms ***************");
 //            }
 //
-//            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
-//            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
-//            DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
+//            DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
+//            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
+//            DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
 //            
 //            gettimeofday(&endTimeForMotor1,NULL);
 //            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
@@ -1113,7 +1127,7 @@ void* function1(void* str){
 //        }
         
 
-//        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
+//        DPRINT("************** Movimentazione asse AXISID_TEST partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
 //        sleep(30);
 
 //        // MOVIMENTAZIONE ASSE 15
@@ -1131,22 +1145,22 @@ void* function1(void* str){
 //        DPRINT("************** Movimentazione asse 15 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
 //        sleep(30);
 //
-//        // MOVIMENTAZIONE ASSE 14
-//        axisID = 14;
+//        // MOVIMENTAZIONE ASSE AXISID_TEST
+//        axisID = AXISID_TEST;
 //
-//        DPRINT("************** Movimentazione asse 14 **************");
+//        DPRINT("************** Movimentazione asse AXISID_TEST **************");
 //        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
 //            DERR("************** Error returned by movement operation **************");
 //            //* errPtr = -5;
 //        }
-//        DPRINT("************** Movimentazione asse 14 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
+//        DPRINT("************** Movimentazione asse AXISID_TEST partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
 //        sleep(30);
 //
 //     // HOMING OPERATION
 //        int respHoming=1; // Operazione di homing non conclusa
 //        int numHoming = 3;
 //
-//        DPRINT("************** Homing operation starting for axis 14. Total homing procedure = %d **************", numHoming);
+//        DPRINT("************** Homing operation starting for axis AXISID_TEST. Total homing procedure = %d **************", numHoming);
 //        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
 //            // con successo o insuccesso
 //            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
@@ -1195,7 +1209,7 @@ void* function1(void* str){
 //        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
 //        sleep(10);
 //
-//        axisID = 14;
+//        axisID = AXISID_TEST;
 //        if(OBJ->poweron(axisID,0)<0){
 //            DERR("**************Error returned by stop motion operation **************");
 //            //* errPtr = -5;
@@ -1206,8 +1220,8 @@ void* function1(void* str){
 //            //* errPtr = -5;
 //        }
 //
-//        DPRINT("************** deinit Asse 14 **************");
-//        OBJ->deinit(14);
+//        DPRINT("************** deinit Asse AXISID_TEST **************");
+//        OBJ->deinit(AXISID_TEST);
 //
 //        DPRINT("************** deinit Asse 15 **************");
 //        OBJ->deinit(15);

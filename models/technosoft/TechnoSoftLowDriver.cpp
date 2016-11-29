@@ -1273,6 +1273,7 @@ int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando ********
     /*	Wait for power stage to be enabled */
     WORD sAxiOn_flag = 0;
     while(sAxiOn_flag == 0){
+        DPRINT("CHECKING POWER ON COMPLETED");
         /* Check the status of the power stage */
         if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
 	    

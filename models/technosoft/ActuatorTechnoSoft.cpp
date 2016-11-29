@@ -92,9 +92,11 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
         channel = new (std::nothrow) SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
         if(channel==NULL){
+            ERR("Cannot possible init channel because value of channel is NULL");
             return -2;
         }
         if(channel->open()<0){
+            ERR("Cannot possible open channel");
             return -3;
         }
        
