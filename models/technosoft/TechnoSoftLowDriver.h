@@ -76,23 +76,23 @@ namespace common{
     namespace actuators{
        namespace models {
            
-           class ElectricPowerException{
-                public:
-                    ElectricPowerException(){}
-                    void badElectricPowerInfo();
-           };
-           
-           class StopMotionException{
-                public:
-                    StopMotionException(){}
-                    void badStopMotionInfo();
-           };
-           
-           class OpeningChannelException{
-                public:
-                    OpeningChannelException(){}
-                    void badOpeningChannelInfo();
-           };
+//           class ElectricPowerException{
+//                public:
+//                    ElectricPowerException(){}
+//                    void badElectricPowerInfo();
+//           };
+//           
+//           class StopMotionException{
+//                public:
+//                    StopMotionException(){}
+//                    void badStopMotionInfo();
+//           };
+//           
+//           class OpeningChannelException{
+//                public:
+//                    OpeningChannelException(){}
+//                    void badOpeningChannelInfo();
+//           };
            
 	    //Channel class
             class SerialCommChannelTechnosoft{
