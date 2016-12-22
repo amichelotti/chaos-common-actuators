@@ -95,26 +95,22 @@ void* checkProcedures(void* p){
                 //* errPtr = -5;
             }
 
-//            //usleep(5000);
-//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
-//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//                sleep(10);
-//                //* errPtr = -5;
-//            }
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
             
             if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
                 DERR("************** Error reading alarms ***************");
             }
-//            if((resp=OBJ->getState(axisID,&state,desc1))<0){
-//                DERR("************** Error reading alarms ***************");
-//            }
+
             DPRINT("************** State of axisID AXISID_TEST partita: %s **************",desc1.c_str());
             DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
             DPRINT("************** Position potentiometer of axisID AXISID_TEST: %4.13f **************",position_mm_potentiometer);
-//            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
-            //DPRINT("************** State of axisID AXISID_TEST: %s  **************",desc1.c_str());
+            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
+         
             DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
-//            DPRINT("************** Code Alarms of axisID AXISID_TEST: %u **************",alarms);
             
             gettimeofday(&endTimeForMotor1,NULL);
             total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
@@ -128,32 +124,25 @@ void* checkProcedures(void* p){
 
 void* homingProcedures(void *p){ 
     
+    DPRINT("Starting homing procedure");
+    
     homingData* pstruct=(homingData*) p;
     int respHoming = pstruct->a;
     int numHoming = pstruct->b;
     common::actuators::AbstractActuator *OBJ = pstruct->obj;
     int axisID=pstruct->c;
    
-    struct timeval startTimeForMotor1,endTimeForMotor1;
-    double total_time_interval=0;
-    
-    double durationChecking = 120; // secondi
+//    struct timeval startTimeForMotor1,endTimeForMotor1;
+//    double total_time_interval=0;
+//    
+//    double durationChecking = 120; // secondi
 //        
-    checkData hd2;
-    hd2.axisID=axisID;
-    hd2.duration=durationChecking;
-    hd2.obj=OBJ;
-    //checkProcedures((void*)&hd2);
+//    checkData hd2;
+//    hd2.axisID=axisID;
+//    hd2.duration=durationChecking;
+//    hd2.obj=OBJ;
     
-//    int resp;
-//    if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
-//        DERR("************** Error returned by movement operation, code error %d **************",resp);
-//        sleep(10);
-//        //* errPtr = -5;
-//    }
-//    sleep(50);
-    
-    gettimeofday(&startTimeForMotor1,NULL);
+    ///gettimeofday(&startTimeForMotor1,NULL);
     
     for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
             // con successo o insuccesso
@@ -165,19 +154,21 @@ void* homingProcedures(void *p){
                 DERR("***************Procedura di homing terminata con errore n. %d ***************",respHoming);
                 break;
             }
-            gettimeofday(&endTimeForMotor1,NULL);
-            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
-            checkProcedures((void*)&hd2);
+            //gettimeofday(&endTimeForMotor1,NULL);
+            //total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
+            //checkProcedures((void*)&hd2);
             //DPRINT("************Valore ritornato dalla funzione di homing %d ***************",respHoming);
             //DPRINT("************Numero chiamata procedura di homing %d ***************",i);
         }
         if(respHoming==0){
             DPRINT("************ Procedura di homing n. %d terminata con successo ***************",i);
-            sleep(60);
+            sleep(20);
         }
         respHoming = 1;
         //usleep(5000000);
     }
+    
+    
 //    std::fstream myfile;
 //    std::stringstream stream;
 //    std::string filename = "//home/caschera/chaos_bundle/chaosframework/chaos-distrib-i686-linux26/fileProva.txt";
@@ -195,10 +186,6 @@ void* homingProcedures(void *p){
 //        std::cout<<"Errore nell'apertura del file"<<std::endl;
 //    }
 }
-
-
-
-
 
 struct stopMotionStruct{
     int axisID;
@@ -278,458 +265,47 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
             //* errPtr = -5;
         }
         
-//        if(OBJ->setParameter(axisID,"speed","100.0")<0){
-//            DERR("************** Error setparameter speed**************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if(OBJ->setParameter(axisID,"MAXSPEED","300.0")<0){
-//            DERR("************** Error setparameter MAXSPEED**************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if(OBJ->setParameter(axisID,"ACCELERATION","0.2")<0){
-//            DERR("************** Error setparameter ACCELERATION**************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if(OBJ->setParameter(axisID,"MAXACCELERATION","0.8")<0){
-//            DERR("************** Error setparameter MAXACCELERATION**************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-////        if(OBJ->setParameter(axisID,"RATIOFNOISE","0.0")<0){
-////            DERR("************** Error setparameter RATIOFNOISE**************");
-////            sleep(10);
-////            //* errPtr = -5;
-////        }
-//        if(OBJ->setParameter(axisID,"ISADDITIVE","0")<0){
-//            DERR("************** Error setparameter ISADDITIVE**************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if(OBJ->setParameter(axisID,"MOVEMENT","1")<0){
-//            DERR("************** Error setparameter MOVEMENT**************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if(OBJ->setParameter(axisID,"REFERENCEBASE","1")<0){
-//            DERR("************** Error setparameter REFERENCEBASE**************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        int ret;
-//        if((ret=OBJ->setParameter(axisID,"HIGHSPEEDHOMING","11.0"))<0){
-//            DERR("************** Error setparameter HIGHSPEEDHOMING %d **************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"MAXHIGHSPEEDHOMING","14.0"))<0){
-//            DERR("************** Error setparameter MAXHIGHSPEEDHOMING %d **************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"LOWSPEEDHOMING","1.5"))<0){
-//            DERR("************** Error setparameter LOWSPEEDHOMING %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"MAXLOWSPEEDHOMING","2.5"))<0){
-//            DERR("************** Error setparameter MAXLOWSPEEDHOMING %d **************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"ACCELERATIONHOMING","0.25"))<0){
-//            DERR("************** Error setparameter ACCELERATIONHOMING %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"MAXACCELERATIONHOMING","0.6"))<0){
-//            DERR("************** Error setparameter MAXACCELERATIONHOMING %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"ISADDITIVEHOMING","0"))<0){
-//            DERR("************** Error setparameter ISADDITIVEHOMING %d **************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"MOVEMENTHOMING","1"))<0){
-//            DERR("************** Error setparameter MOVEMENTHOMING %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"REFERENCEBASEHOMING","1"))<0){
-//            DERR("************** Error setparameter REFERENCEBASEHOMING %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"NUMENCODERLINES","200"))<0){
-//            DERR("************** Error setparameter NUMENCODERLINES %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"NUMMICROSTEPSPERSTEP","400"))<0){
-//            DERR("************** Error setparameter NUMMICROSTEPSPERSTEP %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"STEPSPERROUND","25"))<0){
-//            DERR("************** Error setparameter STEPSPERROUND %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"FIXEDNUMBEROFROUNDS","14"))<0){
-//            DERR("************** Error setparameter FIXEDNUMBEROFROUNDS %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"LINEARDISPLACEMENT[MM]","1.5"))<0){
-//            DERR("************** Error setparameter LINEARDISPLACEMENT[MM] %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//    
-//        DPRINT("SETPPARAMETER OK");
-//        sleep(60);
-
-//        int ret;
-//        if((ret=OBJ->setParameter(axisID,"voltage_LNS[V]","7.7"))<0){
-//            DERR("************** Error setparameter voltage_LNS[V] %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"voltage_LPS[V]","0.3"))<0){
-//            DERR("************** Error setparameter voltage_LPS[V] %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        if((ret=OBJ->setParameter(axisID,"range_slit[mm]","10.0"))<0){
-//            DERR("************** Error setparameter range_slit[mm] %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        
-//        if((ret=OBJ->setParameter(axisID,"fullscalePot","20.0"))<0){
-//            DERR("************** Error setparameter fullscalePot %d**************",ret);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-
-        //sleep(30);
-        DPRINT("************** Prima movimentazione relativa asse AXISID_TEST**************");
-        //int resp;
-        //sleep(5);
-    
-    
+        DPRINT("************** Prima movimentazione relativa in AVANTI prima di homing asse AXISID_TEST**************");
+        sleep(5);
         int resp;
-        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
+        if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
             DPRINT("************** Error returned by movement operation, code error %d **************",resp);
-            //sleep(10);
-            //* errPtr = -5;
         }
-       // sleep(10);
+        sleep(60);
+ 
+        double durationChecking=30;
+        checkData hd2;
+        hd2.axisID=axisID;
+        hd2.duration=durationChecking;
+        hd2.obj=OBJ;
+        checkProcedures((void*)&hd2);
         
-        //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
+        DPRINT("************** Homing all'INDIETRO asse AXISID_TEST**************");
+        sleep(5);
+        
+        homingData homeData;
+        homeData.a=1; // resp
+        homeData.b=1; // num volte homing
+        homeData.c=axisID; // Axis ID
+        homeData.obj=OBJ;
+        homingProcedures(&homeData);
 
-//        if((resp=OBJ->stopMotion(axisID))<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//        }
-//
-//        sleep(10);
-//
-//        DPRINT("togliamo corrente");
-//        if(OBJ->poweron(axisID,0)<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//        }
-//
-//        sleep(10);
-//
-//        DPRINT("************** Seconda movimentazione asse AXISID_TEST **************");
-//        int resp=0;
-//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,50))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//
-//        sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
-//
-//        int state;
-//        std::string descStr;
-
-//        struct timeval startTimeForMotor1,endTimeForMotor1;
-
-//        double total_time_interval=0;
-//        double duration = 15;
-//        double position_mm_encoder;
-//        double position_mm_counter;
-
-//        DPRINT("Stopping displacement");
-//        if((resp=OBJ->stopMotion(axisID))<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//        }
-//
-//        sleep(10);
-//
-//        DPRINT("Togliamo corrente");
-//        if(OBJ->poweron(axisID,0)<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//        }
-//
-//        sleep(10);
-//
-//        DPRINT("Riinseriamo corrente");
-//        if(OBJ->poweron(axisID,1)<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//        }
-//
-//        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa **************");
-//        sleep(5);
-
-//        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-
-//        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
+        durationChecking=30;
+        checkProcedures((void*)&hd2);
         
-//        DPRINT("************ Procedura di homing terminata con successo. Segue la lettura dei dati ***************");
-//        uint64_t alarms;
-//        std::string desc2;
+        DPRINT("************** Moving relative in avanti dopo homing asse AXISID_TEST **************");
+        sleep(5);
+        if((resp=OBJ->moveRelativeMillimeters(axisID,3))<0){
+            DPRINT("************** Error returned by movement operation, code error %d **************",resp);
+        }
+        sleep(60);
         
-//        double durationChecking = 120; // secondi
-////        
-////        pthread_t th1;
-//        checkData hd2;
-//        hd2.axisID=axisID;
-//        hd2.duration=durationChecking;
-//        hd2.obj=OBJ;
-//        checkProcedures((void*)&hd2);
-//        
-        
-//        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-        
-        //checkProcedures((void*)&hd2);
-        
-//        sleep(90);
-//        double durationChecking = 1500; // secondi
-//        
-//        pthread_t th2;
-//        //checkData hd2;
-//        hd2.axisID=axisID;
-//        hd2.duration=durationChecking;
-//        hd2.obj=OBJ;
-//        checkProcedures((void*)&hd2);
-
-//        pthread_create(&th1,NULL,checkProcedures,(void*)&hd2);
-//        pthread_join(th1,NULL);
-        
-        //checkProcedures(axisID, durationChecking,OBJ); // secondo parametro: durata intervallo di tempo dedicato al checking
-        
-//        gettimeofday(&startTimeForMotor1,NULL);
-//        
-//        while(total_time_interval<=duration){
-//            
-////            if((resp=OBJ->getState(axisID,&state, descStr))<0){
-////                DERR("************** Error returned by getState operation, code error %d **************",resp);
-////                sleep(10);
-////                //* errPtr = -5;
-////            }
-////            DPRINT("************** State of axisID AXISID_TEST partita: %s **************",descStr.c_str());
-//
-//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
-//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//                sleep(10);
-//                //* errPtr = -5;
-//            }
-//
-//            //usleep(5000);
-//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
-//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//                sleep(10);
-//                //* errPtr = -5;
-//            }
-//            
-//            if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
-//                DERR("************** Error reading alarms ***************");
-//            }
-//            
-//            DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
-//            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
-//            DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
-//            
-//            gettimeofday(&endTimeForMotor1,NULL);
-//            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
-//
-//            DPRINT("total_time_interval: %f",total_time_interval);
-//            
-//            usleep(1000000); // lettura ogni secondo...
-////
-//        }
-        
-//        sleep(10); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
-
-//        if((resp=OBJ->stopMotion(axisID))<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//        }
-
-//        DPRINT("Position Reading");
-//        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &deltaPosition_mm))<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//                //* errPtr = -5;
-//        }
-//
-//        DPRINT("************** Position ENCODER of axisID AXISID_TEST: %f mm **************",deltaPosition_mm);
-//
-//        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-//                //* errPtr = -5;
-//        }
-
-        //DPRINT("************** Position COUNTER of axisID AXISID_TEST: %f mm **************",position_mm);
-
-        // HOMING OPERATION
-//        int respHoming=1; // Operazione di homing non conclusa
-//        int numHoming = 1;
-//        
-//        DPRINT("************** Homing operation starting for axis AXISID_TEST. Total homing procedure = %d **************", numHoming);
-//        sleep(10);
-//        
-//        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-//            // con successo o insuccesso
-//            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
-//            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-//                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
-//                usleep(1000); // FREQUENZA DI 100 ms
-//                if(respHoming<0){
-//                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
-//                    break;
-//                }
-//            }
-//            if(respHoming==0){
-//                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
-//            }
-//            respHoming = 1;
-//            usleep(5000000);
-//        }
-       
-//        DPRINT("************** Homing operation starting. ***************");
-//        sleep(5);
-//        pthread_t th2;
-//        homingData hd;
-//        hd.a=1;
-//        hd.b=5;
-//        hd.obj=OBJ;
-//        hd.c=axisID;
-//        //pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
-//        homingProcedures((void*)&hd); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
-        
-        
-//           
-////        DPRINT("************** Visione andamento procedura di homing per 90 secondi **************");
-////        sleep(5);
-          double durationChecking=10;
-//        pthread_t th3;
-//        hd2.axisID=axisID;
-//        hd2.duration = durationChecking;
-//        hd2.obj=OBJ;
-//        
-//        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
-       
-          
-//        
-          checkData hd2;
-          hd2.axisID=axisID;
-          hd2.duration=durationChecking;
-          hd2.obj=OBJ;
-          checkProcedures((void*)&hd2);
-        
-//        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa 2 **************");
-//        sleep(5);
-        
-        //DPRINT("************** Fra 2 secondi tentativo di stoppare la procedura di homing **************");
-        //sleep(10);
-    
-//        pthread_t th4;
-//        stopMotionStruct strct;
-//        strct.axisID=axisID;
-//        strct.obj=OBJ;
-//        
-//        sleep(15);
-//        pthread_create(&th4,NULL,stopMotionProcedure,(void*)&strct);
-//        pthread_join(th4,NULL);
-//        pthread_join(th3,NULL);
-//        pthread_join(th2,NULL);
-        
-//        pthread_t th7;
-//        resetAlarmsStruct strct2;
-//        strct2.axisID=axisID;
-//        strct2.obj=OBJ;
-//        
-//        sleep(15);
-//        pthread_create(&th7,NULL,resetAlarmsProcedure,(void*)&strct2);
-//        pthread_join(th7,NULL);
-        
-        //pthread_join(th3,NULL);
-        //pthread_join(th2,NULL);
-        
-//        
-        //sleep(60);
+        durationChecking=30;
+        checkProcedures((void*)&hd2);
   
-//        if((resp=OBJ->stopMotion(axisID))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-        
-//        DPRINT("************** Continuiamo a fare il checking sulla procedura di homing per 10 secondi**************");
-//        sleep(2);
-//        pthread_t th5;
-//        hd2.duration=10;
-//        pthread_create(&th5,NULL,checkProcedures,(void*)&hd2);
-//        
-//        pthread_join(th2,NULL);
-//        pthread_join(th5,NULL);
-//        
-//        DPRINT("************** Sequenza operazioni n. %d completata **************",numSeq);
-//        sleep(5);
-//        
-        
-//        DPRINT("************** lANCIO OPERAZIONI DI HOMING SENZA BLOCCO **************");
-//        sleep(5);
-//        
-//        hd.a=1;
-//        hd.b=1;
-//        hd.obj=OBJ;
-//        hd.c=axisID;
-//        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
-//        
-//        hd2.duration=180;
-//        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
-//        
-//        pthread_join(th2,NULL);
-//        pthread_join(th3,NULL);
-          
-          if(OBJ->poweron(axisID,0)<0){
+        if(OBJ->poweron(axisID,0)<0){
             DERR("**************Error returned by poweron operation **************");
             sleep(10);
-            //* errPtr = -5;
         }
    
         return 0;
@@ -754,481 +330,14 @@ void* function1(void* str){
         DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
         sleep(10);
     }
-//    std::string strConfig15 = "15,../common/actuators/models/technosoft/conf/1setup001.t.zip";
-//    if((ret=OBJ->configAxis((void*)strConfig15.c_str()))!=0){
-//        DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
-//    }
+
     else{ // Invio comandi ai motori (axisID = AXISID_TEST)
         
-        int numVolteProcedura=2;
+        int numVolteProcedura=1;
         for(int i=1;i<=numVolteProcedura;i++){
             procedura(OBJ,i);
         }
-        
-        //int axisID=AXISID_TEST;
-        
-//        DPRINT("************** lANCIO OPERAZIONI DI HOMING SENZA BLOCCO **************");
-//        sleep(5);
-//        
-//        pthread_t th2;
-//        homingData hd;
-//        hd.a=1;
-//        hd.b=1;
-//        hd.obj=OBJ;
-//        hd.c=axisID;
-//        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
-        //homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
-//          
-          //DPRINT("************** Visione andamento procedura di homing per 180 secondi **************");
-        
-//        double durationChecking = 180; // secondi
-//        
-//        checkData hd2;
-//        pthread_t th3;
-//        hd2.axisID=axisID;
-//        hd2.duration = durationChecking;
-//        hd2.obj=OBJ;
-//        
-//        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
-//        pthread_join(th2,NULL);
-//        pthread_join(th3,NULL);
-        
-//        int axisID = AXISID_TEST;
-//
-//        // MOVIMENTAZIONE ASSE AXISID_TEST
-//        if(OBJ->poweron(axisID,1)<0){
-//            DERR("**************Error returned by poweron operation **************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        
-//        if(OBJ->setParameter(axisID,"speed","200")<0){
-//            DERR("************** Error setparameter **************");
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        DPRINT("SETPPARAMETER OK");
-//        //sleep(35);
-//        
-//        //DPRINT("************** Prima movimentazione asse AXISID_TEST, 8 settembre 2014 **************");
-//        int resp;
-//        //sleep(5);
-//
-//        int resp;
-//        int axisID=AXISID_TEST;
-//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,1))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//
-//        //sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
-//
-////        if((resp=OBJ->stopMotion(axisID))<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////        }
-////
-////        sleep(10);
-////
-////        DPRINT("togliamo corrente");
-////        if(OBJ->poweron(axisID,0)<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////        }
-////
-////        sleep(10);
-////
-////        DPRINT("************** Seconda movimentazione asse AXISID_TEST **************");
-////        if((resp=OBJ->moveAbsoluteMillimeters(axisID,3))<0){
-////            DERR("************** Error returned by movement operation, code error %d **************",resp);
-////            sleep(10);
-////            //* errPtr = -5;
-////        }
-////
-////        sleep(20); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
-////
-////        int state;
-////        std::string descStr;
-//
-////        struct timeval startTimeForMotor1,endTimeForMotor1;
-//
-////        double total_time_interval=0;
-////        double duration = 15;
-////        double position_mm_encoder;
-////        double position_mm_counter;
-//        
-//        
-//
-////        DPRINT("Stopping displacement");
-////        if((resp=OBJ->stopMotion(axisID))<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////        }
-////
-////        sleep(10);
-////
-////        DPRINT("Togliamo corrente");
-////        if(OBJ->poweron(axisID,0)<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////        }
-////
-////        sleep(10);
-////
-////        DPRINT("Riinseriamo corrente");
-////        if(OBJ->poweron(axisID,1)<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////        }
-////
-//        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa **************");
-//        sleep(5);
-//
-////        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-//
-//        if((resp=OBJ->moveRelativeMillimeters(axisID,10))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        
-////        DPRINT("************ Procedura di homing terminata con successo. Segue la lettura dei dati ***************");
-////        uint64_t alarms;
-////        std::string desc2;
-//        
-//        double durationChecking = 60; // secondi
-//        
-//        pthread_t th1;
-//        checkData hd2;
-//        hd2.axisID=axisID;
-//        hd2.duration=durationChecking;
-//        hd2.obj=OBJ;
-//        
-//        pthread_create(&th1,NULL,checkProcedures,(void*)&hd2);
-//        pthread_join(th1,NULL);
-//        
-//        //checkProcedures(axisID, durationChecking,OBJ); // secondo parametro: durata intervallo di tempo dedicato al checking
-//        
-////        gettimeofday(&startTimeForMotor1,NULL);
-////        
-////        while(total_time_interval<=duration){
-////            
-//////            if((resp=OBJ->getState(axisID,&state, descStr))<0){
-//////                DERR("************** Error returned by getState operation, code error %d **************",resp);
-//////                sleep(10);
-//////                //* errPtr = -5;
-//////            }
-//////            DPRINT("************** State of axisID AXISID_TEST partita: %s **************",descStr.c_str());
-////
-////            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
-////                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////                sleep(10);
-////                //* errPtr = -5;
-////            }
-////
-////            //usleep(5000);
-////            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
-////                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////                sleep(10);
-////                //* errPtr = -5;
-////            }
-////            
-////            if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
-////                DERR("************** Error reading alarms ***************");
-////            }
-////            
-////            DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
-////            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
-////            DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
-////            
-////            gettimeofday(&endTimeForMotor1,NULL);
-////            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
-////
-////            DPRINT("total_time_interval: %f",total_time_interval);
-////            
-////            usleep(1000000); // lettura ogni secondo...
-//////
-////        }
-//        
-////        sleep(10); // ********** Diamo tempo al thread di movimentazione relativa di completare l'operazione *************
-//
-////        if((resp=OBJ->stopMotion(axisID))<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////        }
-//
-////        DPRINT("Position Reading");
-////        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &deltaPosition_mm))<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////                //* errPtr = -5;
-////        }
-////
-////        DPRINT("************** Position ENCODER of axisID AXISID_TEST: %f mm **************",deltaPosition_mm);
-////
-////        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
-////            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-////            sleep(10);
-////                //* errPtr = -5;
-////        }
-//
-//        //DPRINT("************** Position COUNTER of axisID AXISID_TEST: %f mm **************",position_mm);
-//
-//        // HOMING OPERATION
-////        int respHoming=1; // Operazione di homing non conclusa
-////        int numHoming = 1;
-////        
-////        DPRINT("************** Homing operation starting for axis AXISID_TEST. Total homing procedure = %d **************", numHoming);
-////        sleep(10);
-////        
-////        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-////            // con successo o insuccesso
-////            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
-////            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-////                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::homing2); // Il parametro in ingresso alla funzione non e' piu letto
-////                usleep(1000); // FREQUENZA DI 100 ms
-////                if(respHoming<0){
-////                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
-////                    break;
-////                }
-////            }
-////            if(respHoming==0){
-////                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
-////            }
-////            respHoming = 1;
-////            usleep(5000000);
-////        }
-//       
-//        DPRINT("************** Homing operation starting. ***************");
-//        sleep(5);
-//        pthread_t th2;
-//        homingData hd;
-//        hd.a=1;
-//        hd.b=1;
-//        hd.obj=OBJ;
-//        hd.c=axisID;
-//        pthread_create(&th2,NULL,homingProcedures,(void*)&hd);
-//        //homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
-//          
-//        DPRINT("************** Visione andamento procedura di homing per 30 secondi **************");
-//        
-//        durationChecking=30;
-//        pthread_t th3;
-//        hd2.axisID=axisID;
-//        hd2.duration = durationChecking;
-//        hd2.obj=OBJ;
-//        
-//        pthread_create(&th3,NULL,checkProcedures,(void*)&hd2);
-//        
-//        //checkProcedures(axisID, durationChecking,OBJ);
-//        
-////        DPRINT("************** Fra cinque secondi partirà la movimentazione relativa 2 **************");
-////        sleep(5);
-//        
-//        DPRINT("************** Fra 2 secondi tentativo di stoppare la procedura di homing **************");
-//        //sleep(10);
-//    
-//        pthread_t th4;
-//        stopMotionStruct strct;
-//        strct.axisID=axisID;
-//        strct.obj=OBJ;
-//        
-//        sleep(15);
-//        pthread_create(&th4,NULL,stopMotionProcedure,(void*)&strct);
-//        pthread_join(th4,NULL);
-//        pthread_join(th3,NULL);
-//        
-//        //sleep(60);
-//  
-////        if((resp=OBJ->stopMotion(axisID))<0){
-////            DERR("************** Error returned by movement operation, code error %d **************",resp);
-////            sleep(10);
-////            //* errPtr = -5;
-////        }
-//        
-//        DPRINT("************** Continuiamo a fare il checking sulla procedura di homing  per 10 secondi**************");
-//        sleep(2);
-//        pthread_t th5;
-//        hd2.duration=10;
-//        pthread_create(&th5,NULL,checkProcedures,(void*)&hd2);
-//        
-//        pthread_join(th2,NULL);
-//        pthread_join(th5,NULL);
-//        
-//        
-//        // FINE PRIMA ESECUZIONE DEL THREAD
-//        DPRINT("************** Seconda nuova movimentazione in avanti fra 2 secondi **************");
-        
-        
-        
-        
-        //checkProcedures(axisID, durationChecking,OBJ);
-        
- 
-//        if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &deltaPosition_mm))<0){
-//            DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//            sleep(10);
-        
-//        if((resp=OBJ->moveAbsoluteMillimeters(axisID,5))<0){
-//            DERR("************** Error returned by movement operation, code error %d **************",resp);
-//            sleep(10);
-//            //* errPtr = -5;
-//        }
-//        
-//        durationChecking=30;
-//        checkProcedures(axisID, durationChecking,OBJ);
-//        
-//        DPRINT("************** Homing operation 2. ***************");
-//        sleep(5);
-//        homingProcedures(1,1,OBJ,axisID); // Secondo parametro> numero di volte in cui vuoi eseguire la procedura di homing
-//        
-//        durationChecking=15;
-//        checkProcedures(axisID, durationChecking,OBJ);
-        
-//        gettimeofday(&startTimeForMotor1,NULL);
-//        while(total_time_interval<=duration){
-//
-////            if((resp=OBJ->getState(axisID,&state, descStr))<0){
-////                DERR("************** Error returned by getState operation, code error %d **************",resp);
-////                sleep(10);
-////                //* errPtr = -5;
-////            }
-////            DPRINT("************** State of axisID AXISID_TEST partita: %s **************",descStr.c_str());
-//
-//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
-//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//                sleep(10);
-//                //* errPtr = -5;
-//            }
-//
-//            //usleep(5000);
-//            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
-//                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
-//                sleep(10);
-//                //* errPtr = -5;
-//            }
-//            
-//            if((resp=OBJ->getAlarms(axisID,&alarms,desc2))<0){
-//                DERR("************** Error reading alarms ***************");
-//            }
-//
-//            DPRINT("************** Position encoder of axisID AXISID_TEST: %4.13f **************",position_mm_encoder);
-//            DPRINT("************** Position counter of axisID AXISID_TEST: %4.13f  **************",position_mm_counter);
-//            DPRINT("************** Alarms of axisID AXISID_TEST: %s  **************",desc2.c_str());
-//            
-//            gettimeofday(&endTimeForMotor1,NULL);
-//            total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
-//
-//            usleep(1000000); // lettura ogni millisecondo..
-////
-//        }
-        
-
-//        DPRINT("************** Movimentazione asse AXISID_TEST partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
-//        sleep(30);
-
-//        // MOVIMENTAZIONE ASSE 15
-//        axisID = 15;
-//        if(OBJ->poweron(axisID,1)<0){
-//            DERR("**************Error returned by stop motion operation **************");
-//            //* errPtr = -5;
-//        }
-//
-//        DPRINT("************** Movimentazione asse 15 **************");
-//        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
-//            DERR("************** Error returned by movement operation **************");
-//            //* errPtr = -5;
-//        }
-//        DPRINT("************** Movimentazione asse 15 partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
-//        sleep(30);
-//
-//        // MOVIMENTAZIONE ASSE AXISID_TEST
-//        axisID = AXISID_TEST;
-//
-//        DPRINT("************** Movimentazione asse AXISID_TEST **************");
-//        if(OBJ->moveRelativeMillimeters(axisID,10)<0){
-//            DERR("************** Error returned by movement operation **************");
-//            //* errPtr = -5;
-//        }
-//        DPRINT("************** Movimentazione asse AXISID_TEST partita. Rimarro' in attesa 30 s per far finire la movimentazione **************");
-//        sleep(30);
-//
-//     // HOMING OPERATION
-//        int respHoming=1; // Operazione di homing non conclusa
-//        int numHoming = 3;
-//
-//        DPRINT("************** Homing operation starting for axis AXISID_TEST. Total homing procedure = %d **************", numHoming);
-//        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-//            // con successo o insuccesso
-//            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
-//            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-//                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
-//                usleep(100000); // FREQUENZA DI 1,5 ms
-//                if(respHoming<0){
-//                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
-//                    break;
-//                }
-//          
-                  
-//            if(respHoming==0){
-//                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
-//            }
-//            respHoming = 1;
-//            usleep(5000000);
-//        }
-//
-//        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
-//        sleep(10);
-//
-//        // HOMING OPERATION
-//        respHoming=1; // Operazione di homing non conclusa
-//        numHoming = 3;
-//        axisID = 15;
-//        DPRINT("************** Homing operation starting for axis 15. Total homing procedure = %d **************", numHoming);
-//        for(int i=1;i<=numHoming;i++){ // L'operazione di homing sara' eseguita piu volte consecutivamente, una volta che la precedente sia terminata indipendentemente
-//            // con successo o insuccesso
-//            DPRINT("*************Procedura di homing n. %d iniziata*************",i);
-//            while(respHoming){ // Finche' la procedura di homing non e' completata con successo
-//                respHoming = OBJ->homing(axisID,common::actuators::AbstractActuator::defaultHoming); // Il parametro in ingresso alla funzione non e' piu letto
-//                usleep(100000); // FREQUENZA DI 1,5 ms
-//                if(respHoming<0){
-//                    DERR("***************Procedura di homing n. %d terminata con errore ***************",respHoming);
-//                    break;
-//                }
-//            }
-//            if(respHoming==0){
-//                DPRINT("************Procedura di homing n. %d terminata con successo ***************",i);
-//            }
-//            respHoming = 1;
-//            usleep(5000000);
-//        }
-//
-//        DPRINT("************** Sleep di 10 secondi alla fine di tutte le operazioni di homing**************");
-//        sleep(10);
-//
-//        axisID = AXISID_TEST;
-//        if(OBJ->poweron(axisID,0)<0){
-//            DERR("**************Error returned by stop motion operation **************");
-//            //* errPtr = -5;
-//        }
-//        axisID = 15;
-//        if(OBJ->poweron(axisID,0)<0){
-//            DERR("**************Error returned by stop motion operation **************");
-//            //* errPtr = -5;
-//        }
-//
-//        DPRINT("************** deinit Asse AXISID_TEST **************");
-//        OBJ->deinit(AXISID_TEST);
-//
-//        DPRINT("************** deinit Asse 15 **************");
-//        OBJ->deinit(15);
-//
-//        DPRINT("************** delete ActuatorTechnoSoft OBJ **************");
-//        delete OBJ;
-
+       
         return 0;
     }
 }
