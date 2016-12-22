@@ -1001,6 +1001,8 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=0;
+        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
@@ -1337,6 +1339,8 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso c
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=0;
+        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_MoveAbsolute(absPosition, speed_mm_s, acceleration_mm_s2, movement, referenceBase)){
@@ -1402,6 +1406,8 @@ int TechnoSoftLowDriver::stopMotion(){
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=0;
+        lastTimeTakenForHoming.tv_usec=0;
     }
     DPRINT("Motor with axis = %d is stopped, %s",axisID, TS_GetLastErrorText());
     return 0;
@@ -1424,6 +1430,8 @@ int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando ********
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=0;
+        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_Power(POWER_ON)){
@@ -1463,6 +1471,8 @@ int TechnoSoftLowDriver::stopPower(){ //******** Inteso come comando *********
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=0;
+        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_Power(POWER_OFF)){
@@ -1767,6 +1777,8 @@ int TechnoSoftLowDriver::resetFault(){ // Considerato come COMANDO
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=0;
+        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_ResetFault()){
@@ -1910,7 +1922,8 @@ int getHoming2Procedure();
 ////        return -5;
 ////    }
 //    
-//    return -6;
+//    return -6;lastTimeTakenForHoming.tv_sec=0;
+                //lastTimeTakenForHoming.tv_usec=0;
 //}
 
 /*****************************************************************/
