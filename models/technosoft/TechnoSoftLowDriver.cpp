@@ -361,6 +361,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //            return -33;
 //    }
     
+    // Gestione eventuale sospensione homing
+    minimumIntervalForHoming=2;
+    
     return 0;
 }
 
@@ -831,9 +834,15 @@ int TechnoSoftLowDriver::homing(int mode){
         uint16_t contentReg;
         std::string descStr = "";
         short homingDone = 0;
+        
+        double time_interval;
+        struct timeval currentTimeTakenForHoming;
+
         switch (internalHomingStateHoming2) {
-            case 0:
+            case 0:       
                 DPRINT("************** Homing procedure Homing2. STATE 0. **************");
+                gettimeofday(&lastTimeTakenForHoming,NULL);
+                
                 if(moveVelocityHoming()<0){
                     internalHomingStateHoming2=0;
                     controlLNS=true;
@@ -845,6 +854,31 @@ int TechnoSoftLowDriver::homing(int mode){
                 break;
             case 1:
                 DPRINT("************** Homing procedure Homing2. STATE 1. **************");
+                
+                gettimeofday(&currentTimeTakenForHoming,NULL);
+                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+                // Aggiornamento lastTimeTakenForHoming
+                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+                
+                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
+                                                            // Potrebbe essere causata ad esempio da un comando di stop.
+                    
+                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+                    // Le operazioni di questo stato non dovranno essere eseguite! 
+                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+                    // Dobbiamo quindi far ripartire la procedura di homing 
+                    // come se fosse la prima volta che la procedura venisse chiamata,
+                    // in modo del tutto trasparente alla control unit
+                    
+                    internalHomingStateHoming2 = 0;
+                    controlLNS = true;
+                    //perche' deve avvenire in modo del tutto trasparente alla control unit:
+                    risp = 1;
+                    break;
+                }
+                DPRINT("time interval: %f",time_interval);
+
                 if((getStatusOrErrorReg(5, contentReg, descStr))<0){
                     //ERR("Reading state error: %s",descStr.c_str());
                     internalHomingStateHoming2=0;
@@ -866,6 +900,40 @@ int TechnoSoftLowDriver::homing(int mode){
             case 2:
                 DPRINT("************** Homing procedure Homing2. STATE 2. **************");
                 DPRINT("************** Reset encoder e counter **************");
+                
+                gettimeofday(&currentTimeTakenForHoming,NULL);
+                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+                // Aggiornamento lastTimeTakenForHoming
+                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+
+                // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+                // Le operazioni di questo stato non dovranno essere eseguite! 
+                // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+                // Dobbiamo quindi far ripartire la procedura di homing 
+                // come se fosse la prima volta che la procedura venisse chiamata,
+                // in modo del tutto trasparente alla control unit
+                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
+                                                            // Potrebbe essere causata ad esempio da un comando di stop.
+                    
+                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+                    // Le operazioni di questo stato non dovranno essere eseguite! 
+                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+                    // Dobbiamo quindi far ripartire la procedura di homing 
+                    // come se fosse la prima volta che la procedura venisse chiamata,
+                    // in modo del tutto trasparente alla control unit
+                    
+                    internalHomingStateHoming2 = 0;
+                    controlLNS = true;
+                    // in modo trasparente alla control unit:
+                    risp = 1;
+                    // Aggiornamento lastTimeTakenForHoming
+//                    lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+//                    lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+                    break;
+                }
+                DPRINT("time interval: %f",time_interval);
+                
                 if(resetEncoder()<0){
                     internalHomingStateHoming2=0;
                     controlLNS=true;
@@ -886,11 +954,16 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp= -41;
                     break;
                 }
+                lastTimeTakenForHoming.tv_sec=0; // Solo per lasciare pulita la memoria per molto tempo...
+                lastTimeTakenForHoming.tv_usec=0;
+                        
                 internalHomingStateHoming2=0;
                 controlLNS=true;
                 risp=0;
                 break;
             default:
+                lastTimeTakenForHoming.tv_sec=0;
+                lastTimeTakenForHoming.tv_usec=0;
                 internalHomingStateHoming2 = 0;
                 controlLNS=true;
                 risp=-42;
