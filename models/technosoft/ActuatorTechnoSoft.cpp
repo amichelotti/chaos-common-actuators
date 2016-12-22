@@ -1135,6 +1135,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
     uint16_t contentRegSRH; // remember typedef uint16_t WORD;
     uint16_t contentRegSRL;
+    uint16_t contentRegMER;
     
     if((i->second)->selectAxis()<0){
         return -2;
@@ -1154,7 +1155,14 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         ERR("Reading state error: %s",descStr.c_str());
         return -4;
     }
-    
+    indexReg = 5;
+    if(((i->second)->getStatusOrErrorReg(indexReg, contentRegMER, descStr))<0){
+        stCode|=ACTUATOR_UNKNOWN_STATUS;
+        descStr=descStr+"Unknown status. ";
+        ERR("Reading state error: %s",descStr.c_str());
+        return -4;
+    }
+
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
         descStr=descStr+"Ready. ";
@@ -1180,6 +1188,15 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         descStr+="Limit switch negative event/interrupt. ";
     }
     
+    if(contentRegSRH & ((uint16_t)1<<10)){
+        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
+        descStr+="Motor I2T protection warning. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<11)){
+        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
+        descStr+="Drive I2T protection warning";
+    }
+    
     if(contentRegSRH & ((uint16_t)1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         descStr+="Gear ratio in electronic gearing mode. ";
@@ -1192,6 +1209,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_FAULT;
         descStr+="Fault status. ";
     }
+
     //  Analysis of the register content SRL
     if(!(contentRegSRL & ((uint16_t)1<<10))){
         stCode |= ACTUATOR_INMOTION;
@@ -1208,6 +1226,18 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         descStr += "Homing in progress.";
     }
     
+    // Lettura stato limit switch
+    if(contentRegMER & ((uint16_t)1<<6)){
+        stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
+        descStr+="Positive limit switch active. ";    
+    }
+    
+    if(contentRegMER & ((uint16_t)1<<7)){
+        stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
+        descStr+="Negative limit switch active. ";
+        
+    }
+
     *state = stCode;
     return 0;
 }
@@ -1284,14 +1314,14 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
                 stCode|=ACTUATOR_HALL_SENSOR_MISSING;
                 descStr+= "Hall sensor missing / Resolver error / BiSS error / Position wrap around error. ";
             }
-            else if(i==6){
-                stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
-                descStr+="Positive limit switch active. ";
-            }
-            else if(i==7){
-                stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
-                descStr+="Negative limit switch active. ";
-            }
+//            else if(i==6){
+//                stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
+//                descStr+="Positive limit switch active. ";
+//            }
+//            else if(i==7){
+//                stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
+//                descStr+="Negative limit switch active. ";
+//            }
             else if(i==8){
                 stCode|=ACTUATOR_OVER_CURRENT;
                 descStr+="Over current error. ";
@@ -1323,15 +1353,15 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         }// chiudo if(contentRegMER & ((WORD)(base2^i)))
     } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
 
-    // Analysis of the register content REG_SRH
-    if(contentRegSRH & ((uint16_t)1<<10)){
-        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
-        descStr+="Motor I2T protection warning. ";
-    }
-    if(contentRegSRH & ((uint16_t)1<<11)){
-        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
-        descStr+="Drive I2T protection warning";
-    }
+//    // Analysis of the register content REG_SRH
+//    if(contentRegSRH & ((uint16_t)1<<10)){
+//        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
+//        descStr+="Motor I2T protection warning. ";
+//    }
+//    if(contentRegSRH & ((uint16_t)1<<11)){
+//        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
+//        descStr+="Drive I2T protection warning";
+//    }
      
     *alrm = stCode;
     
