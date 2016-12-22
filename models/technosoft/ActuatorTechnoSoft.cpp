@@ -1246,7 +1246,7 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
 
     DPRINT("Getting alarms of the actuator");
     
-    * alrm = ACTUATOR_NO_ALARMS_DETECTED;
+    * alrm = 0;
     descStr.assign("");
     
     // ************************** Operazione di selezione axisID ***************************
