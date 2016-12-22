@@ -161,6 +161,10 @@ namespace common{
                 double fullScalePot;
                 double constantPot;
                 
+                struct timeval lastTimeTakenForHoming;
+                double minimumIntervalForHoming; // in seconds
+                
+                
                 
                 //bool controlledInitialPositionHoming; 
                 //double epsylon;
