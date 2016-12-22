@@ -36,25 +36,32 @@ namespace common {
 typedef enum {
             // High part of the status
             //ACTUATOR_END_INIT = 0x1, // Bit per la gestione della lettura degli altri bit di stato
+                
+            // ******** Primi 8 bit dedicati ai warning **********
+            ACTUATOR_I2T_WARNING_MOTOR = 0x1,
+            ACTUATOR_I2T_WARNING_DRIVE = 0x2,
+    
+            // ******** dal nono bit in poi ci sono gli stati *******
+            ACTUATOR_READY = 0x100, 
 
-            //AGGIUNGERE STATO DI MOTORE PRONTO ALL'UTILIZZO:
-            ACTUATOR_READY = 0x1,
-
-            ACTUATOR_OVER_POSITION_TRIGGER = 0x2, // Position trigger
-            ACTUATOR_AUTORUN_ENABLED = 0x4, // Auto run mode status
-            ACTUATOR_LSP_EVENT_INTERRUPUT = 0x8, // Limit switch positive event/interrupt
-            ACTUATOR_LSN_EVENT_INTERRUPT = 0x10, // Limit switch negative event/interrupt
+            ACTUATOR_OVER_POSITION_TRIGGER = 0x200, // Position trigger
+            ACTUATOR_AUTORUN_ENABLED = 0x400, // Auto run mode status
+            ACTUATOR_LSP_EVENT_INTERRUPUT = 0x800, // Limit switch positive event/interrupt
+            ACTUATOR_LSN_EVENT_INTERRUPT = 0x1000, // Limit switch negative event/interrupt
            
-            ACTUATOR_IN_GEAR = 0x20, // Gear ratio in electronic gearing mode
-            ACTUATOR_IN_CAM = 0x40, // Reference position in absolute electronic camming mode
-            ACTUATOR_FAULT=0x80, // Fault status
+            ACTUATOR_IN_GEAR = 0x2000, // Gear ratio in electronic gearing mode
+            ACTUATOR_IN_CAM = 0x4000, // Reference position in absolute electronic camming mode
+            ACTUATOR_FAULT=0x8000, // Fault status
 
             // Low part of the status
-            ACTUATOR_INMOTION = 0x100, 
-            ACTUATOR_POWER_SUPPLIED = 0x200,  // cambiare nome
-            HOMING_IN_PROGRESS = 0x400,
+            ACTUATOR_INMOTION = 0x10000, 
+            ACTUATOR_POWER_SUPPLIED = 0x20000,  // cambiare nome
+            HOMING_IN_PROGRESS = 0x40000,
+            ACTUATOR_LSP_LIMIT_ACTIVE=0x80000,        
+            ACTUATOR_LSN_LIMIT_ACTIVE=0x100000,
+                    
             // Unknown status
-            ACTUATOR_UNKNOWN_STATUS = 0x800  // Unknown state of the actuator
+            ACTUATOR_UNKNOWN_STATUS = 0x200000  // Unknown state of the actuator
         } actuatorStatus;
 
         typedef enum {
@@ -65,20 +72,20 @@ typedef enum {
             ACTUATOR_SERIAL_COMM_ERROR=0x10, // Communication error
             ACTUATOR_HALL_SENSOR_MISSING=0x20, // Hall sensor missing / Resolver error / BiSS error / Position wrap around error
 
-            ACTUATOR_LSP_LIMIT_ACTIVE=0x40, // Positive limit switch status
-            ACTUATOR_LSN_LIMIT_ACTIVE=0x80, // Negative limit switch status
-            ACTUATOR_OVER_CURRENT=0x100, // Over-current error
-            ACTUATOR_I2T=0x200, // I2T protection error
-            ACTUATOR_OVERTEMP_MOTOR=0x400, // Motor over temperature error
-            ACTUATOR_OVERTEMP_DRIVE=0x800, // Drive over temperature error
-            ACTUATOR_OVERVOLTAGE=0x1000, // Over voltage error
-            ACTUATOR_UNDERVOLTAGE=0x2000, // Under voltage error
-            ACTUATOR_COMMANDERROR=0x4000, // Command error
+            //ACTUATOR_LSP_LIMIT_ACTIVE=0x40, // Positive limit switch status
+            //ACTUATOR_LSN_LIMIT_ACTIVE=0x80, // Negative limit switch status
+            ACTUATOR_OVER_CURRENT=0x40, // Over-current error
+            ACTUATOR_I2T=0x80, // I2T protection error
+            ACTUATOR_OVERTEMP_MOTOR=0x100, // Motor over temperature error
+            ACTUATOR_OVERTEMP_DRIVE=0x200, // Drive over temperature error
+            ACTUATOR_OVERVOLTAGE=0x400, // Over voltage error
+            ACTUATOR_UNDERVOLTAGE=0x800, // Under voltage error
+            ACTUATOR_COMMANDERROR=0x1000, // Command error
             //ACTUATOR_ENABLE_INPUT_ACTIVE // Enable status of drive/motor
-            ACTUATOR_I2T_WARNING_MOTOR = 0x8000, // Motor I2T protection warning
-            ACTUATOR_I2T_WARNING_DRIVE = 0x10000, // Drive I2T protection warning
-            ACTUATOR_NO_ALARMS_DETECTED = 0x20000,
-            ACTUATOR_ALARMS_READING_ERROR = 0x40000   
+            //ACTUATOR_I2T_WARNING_MOTOR = 0x8000, // Motor I2T protection warning
+            //ACTUATOR_I2T_WARNING_DRIVE = 0x10000, // Drive I2T protection warning
+            ACTUATOR_NO_ALARMS_DETECTED = 0x2000,
+            ACTUATOR_ALARMS_READING_ERROR = 0x4000   
         } actuatorAlarms;
 
     class AbstractActuator {
