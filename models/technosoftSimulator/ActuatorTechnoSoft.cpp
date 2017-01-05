@@ -745,6 +745,8 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 //        return -4;
 //    }
 //    (i->second)->regSRLrequest = false;
+    
+    
 
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
@@ -770,6 +772,15 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     if(contentRegSRH & ((uint16_t)1<<7)){
         stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
         descStr+="Limit switch negative event/interrupt. ";
+    }
+    
+    if(contentRegSRH & ((uint16_t)1<<10)){
+        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
+        descStr+="Motor I2T protection warning. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<11)){
+        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
+        descStr+="Drive I2T protection warning";
     }
 
     if(contentRegSRH & ((uint16_t)1<<12)){
@@ -806,6 +817,16 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     if((i->second)->internalHomingStateDefault>0 || (i->second)->internalHomingStateHoming2>0){
         stCode |= HOMING_IN_PROGRESS;
         descStr += "Homing in progress.";
+    }
+    
+    // STATO LIMIT SWITCHES
+    if((i->second)->LSPactive){
+        stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
+        descStr+="Positive limit switch active. ";
+    }
+    if((i->second)->LSNactive){
+        stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
+        descStr+="Negative limit switch active. ";
     }
 
     (i->second)->stateInfoRequest = false;
@@ -930,26 +951,8 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         }// chiudo if(contentRegMER & ((WORD)(base2^i)))
     } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
 
-
-    // STATO LIMIT SWITCHES
-    if((i->second)->LSPactive){
-        stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
-        descStr+="Positive limit switch active. ";
-    }
-    if((i->second)->LSNactive){
-        stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
-        descStr+="Negative limit switch active. ";
-    }
-
     // Analysis of the register content REG_SRH
-    if(contentRegSRH & ((uint16_t)1<<10)){
-        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
-        descStr+="Motor I2T protection warning. ";
-    }
-    if(contentRegSRH & ((uint16_t)1<<11)){
-        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
-        descStr+="Drive I2T protection warning";
-    }
+    
     
     // No alarms detected
 
@@ -1105,10 +1108,10 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"maxacceleration\",\"description\":\"Maximum value for acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"5.0\",\"default\":\"0.9\"},";
    dataset+="{\"name\":\"isadditive\",\"description\":\"Specifies how is computed the position to reach\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
    dataset+="{\"name\":\"movement\",\"description\":\"Defines the moment when the motion is started\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-   dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
+   //dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"highspeedhoming\",\"description\":\"Max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"15.0\",\"default\":\"10.0\"},";
    dataset+="{\"name\":\"maxhighspeedhoming\",\"description\":\"Maximum value for max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"100.0\",\"default\":\"14.0\"},";
-   dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"},";
+   dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit to LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"},";
    dataset+="{\"name\":\"maxlowspeedhoming\",\"description\":\"Max value for speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"6.0\",\"default\":\"4.0\"},"; 
    dataset+="{\"name\":\"accelerationhoming\",\"description\":\"Acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"0.6\",\"default\":\"0.3\"},";
    dataset+="{\"name\":\"maxaccelerationhoming\",\"description\":\"Max value for acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"1.0\",\"default\":\"0.8\"},";

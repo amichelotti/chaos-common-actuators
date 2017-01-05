@@ -1121,7 +1121,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     DPRINT("Getting state of the actuator. ");
 
     *state  = ACTUATOR_UNKNOWN_STATUS;
-    descStr.assign("");
+    descStr.assign("Actuator unknown status");
     
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
