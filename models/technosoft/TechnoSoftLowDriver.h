@@ -44,7 +44,7 @@
 #define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
-#define SPEED_DEFAULT 50.0 // 30.0  [mm/s] 
+#define SPEED_DEFAULT 50.0 // 30.0      [mm/s] 
 #define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]     
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS) 
 #define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
@@ -62,6 +62,9 @@
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm] 
+#define CONVERSION_FACTOR_DEG_UI 8.789 //[mm]
+#define REDUCTION_FACTOR 13.3333333333
+#define CONVERSION 
 
 #define FULLSCALE_POTENTIOMETER 20.0
 #define V_LNS 7.7 //[V]
@@ -136,8 +139,9 @@ namespace common{
                 double linear_movement_per_n_rounds;
                 
                 // Trapezoidal profile parameters for move relative and move absolute
-                double speed_mm_s;
-                double maxSpeed_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                //double speed_mm_s;
+                double speed_IU; //    [IU]  
+                double maxSpeed_IU; // [IU] VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double acceleration_mm_s2;
                 double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditive;
@@ -145,10 +149,10 @@ namespace common{
                 short referenceBase;
                 
                 // Speed parameters regarding homing procedure
-                double highSpeedHoming_mm_s; // The homing travel speed
-                double lowSpeedHoming_mm_s;
-                double maxHighSpeedHoming_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double maxLowSpeedHoming_mm_s;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double highSpeedHoming_IU; // The homing travel speed
+                double lowSpeedHoming_IU;
+                double maxHighSpeedHoming_IU; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double maxLowSpeedHoming_IU;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double accelerationHoming_mm_s2;
                 double maxAccelerationHoming_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditiveHoming;

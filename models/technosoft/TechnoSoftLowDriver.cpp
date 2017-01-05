@@ -165,13 +165,13 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(_maxSpeed_mm_s<=0){
         return -1;
     }
-    maxSpeed_mm_s=_maxSpeed_mm_s;
-    //DPRINT("maxSpeed_mm_s = %f",maxSpeed_mm_s);
+    maxSpeed_IU=(REDUCTION_FACTOR*360*_maxSpeed_mm_s) / CONVERSION_FACTOR_DEG_UI;
     
     if(_speed_mm_s<=0 || _speed_mm_s>_maxSpeed_mm_s){
         return -2;
     }
-    speed_mm_s = _speed_mm_s; 
+    speed_IU=(REDUCTION_FACTOR*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    
     //DPRINT("speed_mm_s = %f",speed_mm_s);
     
     if(_maxAcceleration_mm_s2<=0){
@@ -208,25 +208,31 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(_maxHighSpeedHoming_mm_s<=0){
         return -8;
     }   
-    maxHighSpeedHoming_mm_s = -_maxHighSpeedHoming_mm_s; // N.B. Dalla tastiera verra' inserito un numero positivo, 
+    maxHighSpeedHoming_IU=-(REDUCTION_FACTOR*360*_maxHighSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    //maxHighSpeedHoming_mm_s = -_maxHighSpeedHoming_mm_s; // N.B. Dalla tastiera verra' inserito un numero positivo, 
                                                // che poi solo all'interno del drive ne verra' considerato 
                                                // solamente il segno opposto
+   
     
     if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>_maxHighSpeedHoming_mm_s){
         return -9;
     }
-    highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+    highSpeedHoming_IU = -(REDUCTION_FACTOR*360*_highSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    //highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+    
     
     if(_maxLowSpeedHoming_mm_s<=0){
         return -10;
     }   
-    maxLowSpeedHoming_mm_s = _maxLowSpeedHoming_mm_s; // Verra' considerato il solo valore positivo perche' utilizzato
-                                            // nel moveAbsoluteHoming
+    maxLowSpeedHoming_IU = (REDUCTION_FACTOR*360*_maxLowSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    //maxLowSpeedHoming_mm_s = _maxLowSpeedHoming_mm_s; // Verra' considerato il solo valore positivo perche' utilizzato
+    // nel moveAbsoluteHoming
     
     if((_lowSpeedHoming_mm_s<=0) || (_lowSpeedHoming_mm_s>_maxLowSpeedHoming_mm_s)){
         return -11;
     }
-    lowSpeedHoming_mm_s=_lowSpeedHoming_mm_s;
+    lowSpeedHoming_IU=(REDUCTION_FACTOR*360*_lowSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    //lowSpeedHoming_mm_s=_lowSpeedHoming_mm_s;
     
     if(_maxAccelerationHoming_mm_s2<=0){
         return -12;
@@ -982,7 +988,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso
 //        if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE))
 //            return -1;
 //    }
-    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_mm_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
+    //DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_mm_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
@@ -1005,7 +1011,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso
         lastTimeTakenForHoming.tv_usec=0;
     }
     
-    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
+    if(!TS_MoveRelative(deltaPosition, speed_IU, acceleration_mm_s2, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
         return -3;
     }
@@ -1037,26 +1043,75 @@ double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
 //    return 0;
 //}
 
-int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
+int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){ // _speed_mm_s [mm/s] 
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
     //DPRINT("Chiamata setspeed");
-    if(_speed_mm_s<=0 || _speed_mm_s>maxSpeed_mm_s){
-        DERR("Speed = %f",_speed_mm_s);
+    
+    // Conversione [mm/s]->[IU]
+    
+    // 1. [mm/s]->[deg/s] ?   (Cioe' di quanti rad/s devo muovere il motore)
+    
+    // [mm/s]-------- rapporto di riduzione -------- [deg/s] ?
+    
+    // Il discorso si riduce al ragionamento:
+    
+    // La relazione n. giri/movimento lineare e' rappresentato dalle seguente costanti:
+    
+    // #define N_ROUNDS_DEFAULT 20.0 [giri]                  // numero giri per effettuare 1.5 mm (spostamento lineare)
+    // #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 [mm]
+    
+    // Se considerati nell'unita' di tempo di un secondo, avremo:
+    // N_ROUNDS_DEFAULT 20.0 [giri/s] 
+    // LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 [mm/s]
+    
+    // 20.0*360 [deg/s] : 1.5 [mm/s] = x [deg/s] : _speed_mm_s [mm/s]
+    // x [deg/s] =(20.0*360*_speed_mm_s)/1.5
+    //
+    // Sfruttiamo ora la relazione data dalla casa costruttrice:
+    //
+    // 1 [UI]: 8.789 [deg/s] = y[UI] : x [deg/s] 
+    // 
+    // E quindi:
+    //
+    // y[UI] = x [deg/s] / 8.789 [deg/s]
+    
+    // Per cui in definitiva l'operazione che dobbiamo fare e' la seguente:
+    
+    // y[UI] = ((20.0*360*_speed_mm_s)/1.5) / 8.789;
+    // y[UI] = ((REDUCTION_FACTOR*360*_speed_mm_s)) / 8.789;
+    
+    if(_speed_mm_s<0){
+        DERR("Speed = %f <0 mm/s",_speed_mm_s);
         return -1;
     }
-    speed_mm_s = _speed_mm_s;
+    
+    double _speed_UI = (REDUCTION_FACTOR*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    
+    if(_speed_UI>maxSpeed_IU){
+        DERR("Speed = %f IU > maxSpeed",_speed_UI);
+        return -2;
+    }
+    
+    speed_IU = _speed_UI;
     return 0;
 }
 
 
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
 
-    DPRINT("setMaxSpeed: _maxspeed_mm_s=%f,speed_mm_s=%f",_maxspeed_mm_s,speed_mm_s);
-    if(_maxspeed_mm_s<=0 || _maxspeed_mm_s<speed_mm_s){
-        DERR("Max speed = %f",_maxspeed_mm_s);
+    //DPRINT("setMaxSpeed: _maxspeed_mm_s=%f,speed_mm_s=%f",_maxspeed_mm_s,speed_mm_s);
+    if(_maxspeed_mm_s<=0){
+        DERR("max speed= %f <=0 mm/s",_maxspeed_mm_s);
         return -1;
     }
-    maxSpeed_mm_s = _maxspeed_mm_s;
+    double _maxSpeed_IU = (REDUCTION_FACTOR*360*_maxspeed_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    
+    if(_maxSpeed_IU<speed_IU){
+        DERR("Max speed = %f IU < current speed",_maxSpeed_IU);
+        return -2;
+    }
+    
+    maxSpeed_IU = _maxSpeed_IU;
     return 0;
 }
 
@@ -1117,11 +1172,23 @@ int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s)
 //    DPRINT("Chiamata sethighSpeedHoming");
 //    DPRINT("_highSpeedHoming_mm_s = %f", _highSpeedHoming_mm_s);
 //    DPRINT("maxHighSpeedHoming_mm_s = %f", maxHighSpeedHoming_mm_s);
-    DPRINT("sethighSpeedHoming: _highSpeedHoming_mm_s=%f,-maxHighSpeedHoming_mm_s=%f",_highSpeedHoming_mm_s,-maxHighSpeedHoming_mm_s);
-    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>(-maxHighSpeedHoming_mm_s)){   // MODIFICA DA RIPORTAREEEEEEEEEEEEEEEEEEEEE
+    //DPRINT("sethighSpeedHoming: _highSpeedHoming_mm_s=%f,-maxHighSpeedHoming_mm_s=%f",_highSpeedHoming_mm_s,-maxHighSpeedHoming_mm_s);
+    
+    if(_highSpeedHoming_mm_s<=0){
         return -1;
     }
-    highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+    
+    double _highSpeedHoming_IU = (REDUCTION_FACTOR*360*_highSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    
+    if(_highSpeedHoming_IU>(-maxHighSpeedHoming_IU)){
+        return -2;
+    }
+
+//    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>(-maxHighSpeedHoming_mm_s)){   // MODIFICA DA RIPORTAREEEEEEEEEEEEEEEEEEEEE
+//        return -1;
+//    }
+    
+    highSpeedHoming_IU = -_highSpeedHoming_IU;
     return 0;
 }
 
@@ -1132,21 +1199,38 @@ int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming
 //    DPRINT("-highSpeedHoming_mm_s = %f", -highSpeedHoming_mm_s);
 //    DPRINT("maxLowSpeedHoming_mm_s = %f", maxLowSpeedHoming_mm_s);
     
-    
-     if(_maxhighSpeedHoming_mm_s<=0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
+    if(_maxhighSpeedHoming_mm_s<=0){
         return -1;
     }
-    maxHighSpeedHoming_mm_s = _maxhighSpeedHoming_mm_s;
+    
+    double _maxHighSpeedHoming_IU = (REDUCTION_FACTOR*360*_maxhighSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    
+    if(_maxHighSpeedHoming_IU<-highSpeedHoming_IU || _maxHighSpeedHoming_IU<maxLowSpeedHoming_IU){
+        return -2;
+    }
+//    if(_maxhighSpeedHoming_mm_s<=0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
+//        return -1;
+//    }
+    maxHighSpeedHoming_IU = _maxHighSpeedHoming_IU;
     return 0;
 }
 
 int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
     //printf("speed = %f, max speed = %f", _speed,maxSpeed);
     //DPRINT("Chiamata setlowSpeedHoming");
-    if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+    
+    if(_lowSpeedHoming_mm_s<=0){
         return -1;
     }
-    lowSpeedHoming_mm_s = _lowSpeedHoming_mm_s;
+    double _lowSpeedHoming_IU = (REDUCTION_FACTOR*360*_lowSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    
+    if(_lowSpeedHoming_IU>maxLowSpeedHoming_IU){
+        return -2;
+    }
+//    if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+//        return -1;
+//    }
+    lowSpeedHoming_IU = _lowSpeedHoming_IU;
     return 0;
 }
 
@@ -1157,10 +1241,19 @@ int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_m
 //    DPRINT("lowSpeedHoming_mm_s %f",lowSpeedHoming_mm_s);
 //    DPRINT("maxHighSpeedHoming_mm_s %f",maxHighSpeedHoming_mm_s);
     
-    if(_maxlowSpeedHoming_mm_s<=0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
+    if(_maxlowSpeedHoming_mm_s<=0){
         return -1;
     }
-    maxLowSpeedHoming_mm_s = _maxlowSpeedHoming_mm_s;
+    double _maxLowSpeedHoming_IU = (REDUCTION_FACTOR*360*_maxlowSpeedHoming_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    
+    if(_maxLowSpeedHoming_IU<lowSpeedHoming_IU || _maxLowSpeedHoming_IU>maxHighSpeedHoming_IU){
+        return-2;
+    }
+    
+//    if(_maxlowSpeedHoming_mm_s<=0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
+//        return -1;
+//    }
+    maxLowSpeedHoming_IU = _maxLowSpeedHoming_IU;
     return 0;
 }
 
@@ -1323,7 +1416,7 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso c
 //    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
 //        return -4;
 //    }
-    DPRINT("moving Absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
+//    DPRINT("moving Absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
@@ -1343,30 +1436,30 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso c
         lastTimeTakenForHoming.tv_usec=0;
     }
     
-    if(!TS_MoveAbsolute(absPosition, speed_mm_s, acceleration_mm_s2, movement, referenceBase)){
+    if(!TS_MoveAbsolute(absPosition, speed_IU, acceleration_mm_s2, movement, referenceBase)){
         DERR("error absolute step moving");
         return -3;
     }
     return 0;
 }
 
-int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
-    
-    DPRINT("Valore letto dell'high speed homing %f:", highSpeedHoming_mm_s);
-    _highSpeedHoming_mm_s = highSpeedHoming_mm_s;
-    return 0;
-}
+//int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
+//    
+//    DPRINT("Valore letto dell'high speed homing %f:", highSpeedHoming_mm_s);
+//    _highSpeedHoming_mm_s = highSpeedHoming_mm_s;
+//    return 0;
+//}
 
 int TechnoSoftLowDriver::moveVelocityHoming(){
     
     //double highSpeedHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*highSpeedHoming_mm_s)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     //double accelerationHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*accelerationHoming_mm_s2/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
+//    DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    if(!TS_MoveVelocity(highSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
+    if(!TS_MoveVelocity(highSpeedHoming_IU, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
         DERR("(homing) Error moving velocity ");
         return -2;
     }
@@ -1375,12 +1468,12 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
 
 int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
     
-    DPRINT("(homing) moving absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
+//    DPRINT("(homing) moving absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
-    if(!TS_MoveAbsolute(absPosition, lowSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
+    if(!TS_MoveAbsolute(absPosition, lowSpeedHoming_IU, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
         DERR("(homing) Error absolute steps moving");
         return -2;
     }
@@ -1442,7 +1535,7 @@ int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando ********
     /*	Wait for power stage to be enabled */
     WORD sAxiOn_flag = 0;
     while(sAxiOn_flag == 0){
-        DPRINT("CHECKING POWER ON COMPLETED");
+        //DPRINT("CHECKING POWER ON COMPLETED");
         /* Check the status of the power stage */
         if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
 	    
