@@ -44,18 +44,18 @@
 #define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
-#define SPEED_DEFAULT 50.0 // 30.0      [mm/s] 
-#define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]     
-#define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS) 
-#define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
+#define SPEED_DEFAULT 50.0 // 30.0        [IU] 
+#define ACCELERATION_DEFAULT 0.6 // 0.6   [IU]     
+#define MAX_SPEED_DEFAULT 500.0    //     [IU]              (da MDS) 
+#define MAX_ACCELERATION_DEFAULT 2.0   // [IU]              (da MDS)
 
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]           //10.0
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS) //15.0 
-#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]                     //1.0 
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)  //3.0 
-#define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]                  //0.3 
-#define MAX_ACCELERATION_HOMING_DEFAULT 0.6// [mm/s^2]   (da MDS)  // 0.6
+#define HIGH_SPEED_HOMING_DEFAULT 10.0 //    [IU]           //10.0
+#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [IU]           (da MDS) //15.0 
+#define LOW_SPEED_HOMING_DEFAULT 1.0 //      [IU]                     //1.0 
+#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 //   [IU]           (da MDS)  //3.0 
+#define ACCELERATION_HOMING_DEFAULT 0.3 //   [IU]                  //0.3 
+#define MAX_ACCELERATION_HOMING_DEFAULT 0.6//[IU]           (da MDS)  // 0.6
 
 #define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
@@ -63,6 +63,7 @@
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm] 
 #define CONVERSION_FACTOR_DEG_UI 8.789 //[mm]
+#define CONVERSION_FACTOR_DEGs2_UI 10986 //[mm]
 #define REDUCTION_FACTOR 13.3333333333
 #define CONVERSION 
 
@@ -142,8 +143,8 @@ namespace common{
                 //double speed_mm_s;
                 double speed_IU; //    [IU]  
                 double maxSpeed_IU; // [IU] VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double acceleration_mm_s2;
-                double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double acceleration_IU;
+                double maxAcceleration_IU; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
@@ -153,8 +154,8 @@ namespace common{
                 double lowSpeedHoming_IU;
                 double maxHighSpeedHoming_IU; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 double maxLowSpeedHoming_IU;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double accelerationHoming_mm_s2;
-                double maxAccelerationHoming_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double accelerationHoming_IU;
+                double maxAccelerationHoming_IU; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;

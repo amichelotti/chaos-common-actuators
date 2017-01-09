@@ -264,15 +264,21 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
             sleep(10);
             //* errPtr = -5;
         }
+    
+        if(OBJ->setParameter(axisID,"speed","0.5")<0){
+            DPRINT("************** Error returned by setParameter operation **************");
+        }
+        DPRINT("************** speed settata **************");
+        sleep(5);
         
         DPRINT("************** Prima movimentazione relativa in AVANTI prima di homing asse AXISID_TEST**************");
         sleep(5);
         int resp;
-        if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
+        if((resp=OBJ->moveAbsoluteMillimeters(axisID,35))<0){
             DPRINT("************** Error returned by movement operation, code error %d **************",resp);
         }
-        sleep(60);
- 
+        sleep(30);
+        
         double durationChecking=30;
         checkData hd2;
         hd2.axisID=axisID;
@@ -280,28 +286,28 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         hd2.obj=OBJ;
         checkProcedures((void*)&hd2);
         
-        DPRINT("************** Homing all'INDIETRO asse AXISID_TEST**************");
-        sleep(5);
-        
-        homingData homeData;
-        homeData.a=1; // resp
-        homeData.b=1; // num volte homing
-        homeData.c=axisID; // Axis ID
-        homeData.obj=OBJ;
-        homingProcedures(&homeData);
-
-        durationChecking=30;
-        checkProcedures((void*)&hd2);
-        
-        DPRINT("************** Moving relative in avanti dopo homing asse AXISID_TEST **************");
-        sleep(5);
-        if((resp=OBJ->moveRelativeMillimeters(axisID,3))<0){
-            DPRINT("************** Error returned by movement operation, code error %d **************",resp);
-        }
-        sleep(60);
-        
-        durationChecking=30;
-        checkProcedures((void*)&hd2);
+//        DPRINT("************** Homing all'INDIETRO asse AXISID_TEST**************");
+//        sleep(5);
+//        
+//        homingData homeData;
+//        homeData.a=1; // resp
+//        homeData.b=1; // num volte homing
+//        homeData.c=axisID; // Axis ID
+//        homeData.obj=OBJ;
+//        homingProcedures(&homeData);
+//
+//        durationChecking=30;
+//        checkProcedures((void*)&hd2);
+//        
+//        DPRINT("************** Moving relative in avanti dopo homing asse AXISID_TEST **************");
+//        sleep(5);
+//        if((resp=OBJ->moveRelativeMillimeters(axisID,3))<0){
+//            DPRINT("************** Error returned by movement operation, code error %d **************",resp);
+//        }
+//        sleep(60);
+//        
+//        durationChecking=30;
+//        checkProcedures((void*)&hd2);
   
         if(OBJ->poweron(axisID,0)<0){
             DERR("**************Error returned by poweron operation **************");
