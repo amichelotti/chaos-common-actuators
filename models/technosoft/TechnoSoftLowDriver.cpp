@@ -135,12 +135,12 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 
 double speedfromMMsToIU(double _speed_mm_s){
     
-    return (REDUCTION_FACTOR*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
+    return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
 }
 
 double accelerationfromMMs2ToIU(double _acceleration_mm_s2){
     
-    return (REDUCTION_FACTOR*360*_acceleration_mm_s2) / CONVERSION_FACTOR_DEGs2_UI;
+    return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_acceleration_mm_s2) / CONVERSION_FACTOR_DEGs2_UI;
 }
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
@@ -1039,6 +1039,9 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso
         lastTimeTakenForHoming.tv_sec=0;
         lastTimeTakenForHoming.tv_usec=0;
     }
+    
+    DPRINT("Velocita' movimentazione relativa: %f",speed_IU);
+    DPRINT("Accelerazione movimentazione relativa: %f",acceleration_IU);
     
     if(!TS_MoveRelative(deltaPosition, speed_IU, acceleration_IU, isAdditive, movement, referenceBase)){
         DERR("error relative moving");

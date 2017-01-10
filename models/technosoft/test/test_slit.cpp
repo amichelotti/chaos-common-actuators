@@ -265,19 +265,19 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
             //* errPtr = -5;
         }
     
-        if(OBJ->setParameter(axisID,"speed","0.5")<0){
-            DPRINT("************** Error returned by setParameter operation **************");
-        }
+//        if(OBJ->setParameter(axisID,"speed","0.5")<0){
+//            DPRINT("************** Error returned by setParameter operation **************");
+//        }
         DPRINT("************** speed settata **************");
         sleep(5);
         
         DPRINT("************** Prima movimentazione relativa in AVANTI prima di homing asse AXISID_TEST**************");
         sleep(5);
         int resp;
-        if((resp=OBJ->moveAbsoluteMillimeters(axisID,35))<0){
+        if((resp=OBJ->moveRelativeMillimeters(axisID,35))<0){
             DPRINT("************** Error returned by movement operation, code error %d **************",resp);
         }
-        sleep(30);
+        sleep(120);
         
         double durationChecking=30;
         checkData hd2;

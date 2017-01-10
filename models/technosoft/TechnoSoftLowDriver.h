@@ -44,18 +44,17 @@
 #define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
-#define SPEED_DEFAULT 50.0 // 30.0        [IU] 
-#define ACCELERATION_DEFAULT 0.6 // 0.6   [IU]     
-#define MAX_SPEED_DEFAULT 500.0    //     [IU]              (da MDS) 
-#define MAX_ACCELERATION_DEFAULT 2.0   // [IU]              (da MDS)
-
+#define SPEED_DEFAULT 0.0916      //     [mm/s]     (50.0 [IU]) 
+#define ACCELERATION_DEFAULT 1.373 //    [mm/s2]    ( 0.6  [IU])     
+#define MAX_SPEED_DEFAULT 0.824  //      [mm/s]    (450.0 [IU])             
+#define MAX_ACCELERATION_DEFAULT 4.577 //[mm/s2]     (2.0 [IU])     
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 10.0 //    [IU]           //10.0
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [IU]           (da MDS) //15.0 
-#define LOW_SPEED_HOMING_DEFAULT 1.0 //      [IU]                     //1.0 
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 //   [IU]           (da MDS)  //3.0 
-#define ACCELERATION_HOMING_DEFAULT 0.3 //   [IU]                  //0.3 
-#define MAX_ACCELERATION_HOMING_DEFAULT 0.6//[IU]           (da MDS)  // 0.6
+#define HIGH_SPEED_HOMING_DEFAULT 0.018  // [mm/s]    (10.0 [IU])          
+#define MAX_HIGHSPEED_HOMING_DEFAULT 0.027 // [mm/s]  (15.0 [IU])
+#define LOW_SPEED_HOMING_DEFAULT 0.002   // [mm/s]     (1.0 [IU])
+#define MAXLOW_SPEED_HOMING_DEFAULT 0.006 //[mm/s]     (3.0 [IU])
+#define ACCELERATION_HOMING_DEFAULT 0.687 //[mm/s2]    (0.3 [IU])
+#define MAX_ACCELERATION_HOMING_DEFAULT 1.372 // [mm/s2]    (0.6 [IU])
 
 #define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
@@ -64,9 +63,7 @@
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm] 
 #define CONVERSION_FACTOR_DEG_UI 8.789 //[mm]
 #define CONVERSION_FACTOR_DEGs2_UI 10986 //[mm]
-#define REDUCTION_FACTOR 13.3333333333
-#define CONVERSION 
-
+//#define REDUCTION_FACTOR 13.3333333333
 #define FULLSCALE_POTENTIOMETER 20.0
 #define V_LNS 7.7 //[V]
 #define V_LSP 0.3 //[V]
