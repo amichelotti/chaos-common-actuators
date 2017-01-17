@@ -1633,7 +1633,9 @@ int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando ********
 				
     /*	Wait for power stage to be enabled */
     WORD sAxiOn_flag = 0;
-    while(sAxiOn_flag == 0){
+    int maxCount=20;
+    int count=0;
+    while(sAxiOn_flag == 0 && count<maxCount){
         //DPRINT("CHECKING POWER ON COMPLETED");
         /* Check the status of the power stage */
         if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
@@ -1641,11 +1643,12 @@ int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando ********
             //ERR("ALEDEBUG Error TS_ReadStatus");
             return -3;
         }
-
         sAxiOn_flag=((sAxiOn_flag & 1<<15) != 0 ? 1 : 0);
+        count++;
     }
     //DPRINT("ALEDEBUG correctly powered on");
     //poweron=true;
+    usleep(5000);
     return 0;
 }
 
