@@ -91,6 +91,8 @@ namespace common{
                     //int selectAxis(); // Non e' relativa a ciascun axis ID
 
                     int resetAlarms(int axisID,uint64_t alrm);
+                    
+                    int hardreset();
 
                     int stopMotion(int axisID);                                              // *******OK********
                     int getPosition(int axisID,readingTypes mode, double* deltaPosition_mm); // *******OK********

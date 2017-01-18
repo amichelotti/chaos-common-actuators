@@ -187,6 +187,10 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     DPRINT("Costruttore di copia eseguito");
 }
 
+
+
+
+
 ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objActuator){ // Overloading operatori di assegnamento
     
     if(this==& objActuator){
@@ -218,6 +222,18 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     return *this;
 }
 
+int ActuatorTechnoSoft::hardreset(){ 
+    
+    DPRINT("Deleting Actuator Technosoft");
+    //delectingActuator = true;
+    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+        deinit(it->first); 
+        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+    } 
+    
+    return 0;
+}
+
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
     
@@ -229,12 +245,15 @@ int ActuatorTechnoSoft::deinit(int axisID){
         return -1;
     }
     // Invio comando stop di movimentazione al motore
-    if((i->second)->selectAxis()<0)
+    if((i->second)->selectAxis()<0){
         return -2;
-    if((i->second)->stopMotion()<0)
+    }    
+    if((i->second)->stopMotion()<0){
         return -3;
-    if((i->second)->stopPower()<0)
+    }   
+    if((i->second)->stopPower()<0){
         return -4;
+    }    
     
     // Invio comando apertura circuito alimentazione motore
     if(i->second!=NULL){

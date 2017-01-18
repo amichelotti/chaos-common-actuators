@@ -244,6 +244,18 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     return *this;
 }
 
+int ActuatorTechnoSoft::hardreset(){ 
+    
+    DPRINT("Deleting Actuator Technosoft");
+    //delectingActuator = true;
+    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+        deinit(it->first); 
+        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+    } 
+    
+    return 0;
+}
+
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
 
