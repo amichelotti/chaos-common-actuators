@@ -39,6 +39,8 @@ namespace common{
                     SerialCommChannelTechnosoft *channel;
 
                     static std::map<int,TechnoSoftLowDriver *> motors;
+                    
+                    pthread_mutex_t mu;
 
           public:
                     

@@ -66,10 +66,10 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
     
-    if(initChannelAlreadyDone){
-        DPRINT("This object has already a communication channel correctly initialized");
-        return -1;
-    }
+//    if(initChannelAlreadyDone){
+//        DPRINT("This object has already a communication channel correctly initialized");
+//        return -1;
+//    }
     
     std::string params;
     params.assign((const char*)initialization_string);
@@ -100,7 +100,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
             return -3;
         }
        
-        initChannelAlreadyDone = true;
+        //initChannelAlreadyDone = true;
         return 0;
     }
     ERR("Cannot possible init channel %s",params.c_str());
@@ -1510,7 +1510,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"maxacceleration\",\"description\":\"Maximum value for acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"5.0\",\"default\":\"0.9\"},";
    dataset+="{\"name\":\"isadditive\",\"description\":\"Specifies how is computed the position to reach\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
    dataset+="{\"name\":\"movement\",\"description\":\"Defines the moment when the motion is started\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-   dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
+   //dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"highspeedhoming\",\"description\":\"Max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"15.0\",\"default\":\"10.0\"},";
    dataset+="{\"name\":\"maxhighspeedhoming\",\"description\":\"Maximum value for max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"100.0\",\"default\":\"14.0\"},";
    dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"},";

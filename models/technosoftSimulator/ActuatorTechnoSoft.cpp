@@ -79,10 +79,10 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
 
-    if(initChannelAlreadyDone){
-        //DPRINT("This object has already a communication channel correctly initialized");
-        return -1;
-    }
+//    if(initChannelAlreadyDone){
+//        //DPRINT("This object has already a communication channel correctly initialized");
+//        return -1;
+//    }
 
     std::string params;
     params.assign((const char*)initialization_string);
@@ -111,7 +111,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         if(channel->open()<0){
             return -3;
         }
-        initChannelAlreadyDone = true;
+        //initChannelAlreadyDone = true;
         return 0;
     }
     ERR("Cannot possible init channel %s",params.c_str());
