@@ -79,10 +79,10 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
 
-    if(initChannelAlreadyDone){
-        //DPRINT("This object has already a communication channel correctly initialized");
-        return 0;
-    }
+//    if(initChannelAlreadyDone){
+//        //DPRINT("This object has already a communication channel correctly initialized");
+//        return 0;
+//    }
 
     std::string params;
     params.assign((const char*)initialization_string);
@@ -111,7 +111,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         if(channel->open()<0){
             return -3;
         }
-        initChannelAlreadyDone = true;
+        //initChannelAlreadyDone = true;
         return 0;
     }
     ERR("Cannot possible init channel %s",params.c_str());
@@ -248,11 +248,22 @@ int ActuatorTechnoSoft::hardreset(){
     
     DPRINT("Deleting Actuator Technosoft");
     //delectingActuator = true;
+    int resp;
+    bool prob=false;
+    
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        deinit(it->first); 
+        resp=deinit(it->first); 
+        if(resp<0){
+            prob=true;
+            break;
         //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+        }   
     } 
     
+    if(prob){
+        return -1;
+    }
+  
     return 0;
 }
 
