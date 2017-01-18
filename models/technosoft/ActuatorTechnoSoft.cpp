@@ -135,12 +135,23 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 return -1;
             }  
             int val;
+            
+            if(pthread_mutex_lock(&(mu))!=0){
+
+            }
             if((val=driver->init(conf_path,axid))<0){
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
+                if(pthread_mutex_unlock(&(mu))!=0){
+
+                }
                 return -2;
             }
+            if(pthread_mutex_unlock(&(mu))!=0){
+
+            }
+            
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
             DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
@@ -229,7 +240,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
 
 int ActuatorTechnoSoft::hardreset(){ 
     
-    DPRINT("Deleting Actuator Technosoft");
+    DPRINT("hardreset calling drive actuator");
     //delectingActuator = true;
     int resp;
     bool prob=false;
