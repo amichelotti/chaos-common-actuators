@@ -136,21 +136,21 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             }  
             int val;
             
-            if(pthread_mutex_lock(&(mu))!=0){
-
-            }
+//            if(pthread_mutex_lock(&(mu))!=0){
+//
+//            }
             if((val=driver->init(conf_path,axid))<0){
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
-                if(pthread_mutex_unlock(&(mu))!=0){
-
-                }
+//                if(pthread_mutex_unlock(&(mu))!=0){
+//
+//                }
                 return -2;
             }
-            if(pthread_mutex_unlock(&(mu))!=0){
-
-            }
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//
+//            }
             
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
