@@ -37,7 +37,6 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
     channel = NULL;
     initChannelAlreadyDone = false;
     //configAxisAlreadyDone = false,
-    delectingActuator = false;
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
@@ -104,6 +103,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         
         // Inizializzazione mutex
         pthread_mutex_init(&(mu),NULL);
+        delectingActuator = false;
         
         return 0;
     }
@@ -240,26 +240,45 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
 
 int ActuatorTechnoSoft::hardreset(){ 
     
+//    DPRINT("hardreset calling drive actuator");
+//    //delectingActuator = true;
+//    int resp;
+//    bool prob=false;
+//    
+//    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+//        resp=deinit2(it->first); 
+//        if(resp<0){
+//            prob=true;
+//            break;
+//        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+//        }   
+//    } 
+//    
+//    if(prob){
+//        return -1;
+//    }
+//  
+//    return 0;
     DPRINT("hardreset calling drive actuator");
-    //delectingActuator = true;
-    int resp;
-    bool prob=false;
-    
+    delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        resp=deinit(it->first); 
-        if(resp<0){
-            prob=true;
-            break;
+        deinit(it->first); 
         //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
-        }   
     } 
+    // Remove all the element from the map container
+    motors.clear();
     
-    if(prob){
-        return -1;
+    DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
+    
+    // close the communication channel
+    if(channel!=NULL){
+        delete channel; 
+        channel = NULL;
     }
-  
-    return 0;
+    DPRINT("Object Actuator Technosoft is deleted");
 }
+
+
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
