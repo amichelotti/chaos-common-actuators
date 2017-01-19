@@ -69,7 +69,7 @@
 // Features of trapezoidal speed profile
 //#define SPEED_DEFAULT 400.0 // 30.0  [mm/s]
 #define SPEED_DEFAULT 400 //  [microstep/ms]
-#define PERCNOISE_DEFAULT 0.0
+#define PERCNOISE_DEFAULT 0.01
 
 #define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS)

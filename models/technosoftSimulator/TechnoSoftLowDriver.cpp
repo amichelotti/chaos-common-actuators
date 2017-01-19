@@ -390,8 +390,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     //positiveLimitPosition = 60000000;
     //durationAlarmsInterval = 60;
     
-    pthread_t th1;
-    pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
+    //pthread_t th1;
+    //pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
     
 //    pthread_t th2;
 //    pthread_create(&th2, NULL,staticResetFaultsTimerForThread,this);

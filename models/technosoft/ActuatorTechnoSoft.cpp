@@ -291,15 +291,15 @@ int ActuatorTechnoSoft::deinit(int axisID){
         return -1;
     }
     // Invio comando stop di movimentazione al motore
-    if((i->second)->selectAxis()<0){
-        return -2;
-    }    
-    if((i->second)->stopMotion()<0){
-        return -3;
-    }   
-    if((i->second)->stopPower()<0){
-        return -4;
-    }    
+//    if((i->second)->selectAxis()<0){
+//        return -2;
+//    }    
+//    if((i->second)->stopMotion()<0){
+//        return -3;
+//    }   
+//    if((i->second)->stopPower()<0){
+//        return -4;
+//    }    
     
     // Invio comando apertura circuito alimentazione motore
     if(i->second!=NULL){
