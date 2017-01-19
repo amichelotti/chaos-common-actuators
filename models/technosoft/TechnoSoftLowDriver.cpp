@@ -428,6 +428,27 @@ int TechnoSoftLowDriver::homing(int mode){
         }
         if(contentRegMER & ((uint16_t)1<<7)){
             // Il LNS e' attivo. Non c'e' bisogno di effettuare la procedura di homing.
+            // Reset encoder e counter
+            
+            if(resetEncoder()<0){
+                internalHomingStateDefault = 0;
+                controlLNS=true; 
+                cap_position=0;
+                    //if(stopMotion()<0){
+                    //return -23;
+                    //}
+            }
+            if(resetCounter()<0){
+                internalHomingStateDefault = 0;
+                controlLNS=true; 
+                cap_position=0;
+                    //if(stopMotion()<0){
+                    //return -25;
+                    //}
+            }
+            cap_position=0;
+            internalHomingStateDefault = 0;
+            controlLNS=true;
             return 0;
         }
         // IL LNS non e' attivo. La procedura di homing deve cominciare, senza piu' fare questo controllo.

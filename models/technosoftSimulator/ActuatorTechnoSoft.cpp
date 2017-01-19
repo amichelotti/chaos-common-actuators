@@ -77,6 +77,7 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
 // quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale
 // apertura del canale
+
 int ActuatorTechnoSoft::init(void*initialization_string){
 
 //    if(initChannelAlreadyDone){
