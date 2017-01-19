@@ -155,10 +155,12 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                              // In questo caso creero' un nuovo oggetto motore.
             TechnoSoftLowDriver* driver = new (std::nothrow) TechnoSoftLowDriver();
             if(driver==NULL){
+                DPRINT("Simulatore: deallocazione errata oggetto technosoftlowdriver");
                 return -1;
             }
             int val;
             if((val=driver->init(conf_path,axid))<0){
+                DPRINT("simulatore: init driver error");
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
@@ -169,7 +171,8 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             //DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
             return 0;
         }
-        //DPRINT("Axis id %d è stato già configurato correttamente.", axid);
+        //DPRINT("Axis id %d è stato già configurato correttamente.", axid
+        DPRINT("simulatore: il motore è già stato configurato");
         return -3;
         //HOMING procedure parameters
         //**********************************************************************
@@ -182,6 +185,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         // ***********************GESTIONE_READY_STATE*************************
 //return 0;
     }
+    DPRINT("simulatore: errore matching stringhe");
     ERR("error parsing initialization string:\"%s\" ",params.c_str());
     return -4;
 }
