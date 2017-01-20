@@ -1592,7 +1592,7 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
 //        descStr+="Drive I2T protection warning";
 //    }
     
-    if(emergengyState){
+    if(!emergengyState){
         stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
         descStr+="Emergency error. ";
     }
