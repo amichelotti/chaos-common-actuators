@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 
+
 #define AXISID_TEST 14
 
 using namespace common::actuators::models;
@@ -838,7 +839,12 @@ int main(int argc,const char* argv[]){
 
     //PRINT("************ using axis %d, moving of %f mm**************",axis1,pos1);
     sprintf(sinit1,"%d,%d,%d,%s",hostID,btType,baudrate,dev1);
-
+    
+//    std::string s = "Boost Libraries";
+//    boost::regex expr("\\w+\\s\\w+");
+//    std::cout << std::boolalpha << boost::regex_match(s, expr) << '\n';
+//    
+    
     //common::actuators::AbstractActuator*mySlit1 = NULL;
 
 //    // Inizializzazione parametri ASSE 2

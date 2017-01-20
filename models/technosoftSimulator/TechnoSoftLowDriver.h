@@ -86,8 +86,8 @@
 #define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
 #define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
 
-#define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
-#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
+#define N_ENCODER_LINES_DEFAULT 800.0      // numero linee encoder                                     (da MDS)
+#define CONST_MULT_TECHNOFT_DEFAULT 256.0  // numero micro steps per step                              (da MDS)
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]

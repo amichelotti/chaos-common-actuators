@@ -84,7 +84,8 @@ typedef enum {
             //ACTUATOR_ENABLE_INPUT_ACTIVE // Enable status of drive/motor
             //ACTUATOR_I2T_WARNING_MOTOR = 0x8000, // Motor I2T protection warning
             //ACTUATOR_I2T_WARNING_DRIVE = 0x10000, // Drive I2T protection warning
-            ACTUATOR_ALARMS_READING_ERROR = 0x2000   
+            ACTUATOR_ALARMS_READING_ERROR = 0x2000,
+            ACTUATOR_ALARMS_EMERGENCY_ERROR = 0X4000
         } actuatorAlarms;
 
     class AbstractActuator {

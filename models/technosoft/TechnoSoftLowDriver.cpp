@@ -1984,6 +1984,15 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
     return 0;
 }
 
+int TechnoSoftLowDriver::getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr){
+    
+    if(!TS_GetInput(nIO, inValue)){
+        descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
+        return -1;   
+    }
+    return 0;
+}
+
 int TechnoSoftLowDriver::resetFault(){ // Considerato come COMANDO
     
     if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){

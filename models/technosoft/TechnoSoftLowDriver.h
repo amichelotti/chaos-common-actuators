@@ -213,7 +213,6 @@ namespace common{
             public:
                 // Costruttore device channel and device name
                 TechnoSoftLowDriver();
-                // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
                 int init(const std::string& setupFilePath,
@@ -250,6 +249,7 @@ namespace common{
                 int getinternalHomingStateDefault();
                 int getinternalHomingStateHoming2();
                 
+                int getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr);
 
                 int providePower();
                 int stopPower();

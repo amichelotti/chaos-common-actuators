@@ -279,7 +279,6 @@ int ActuatorTechnoSoft::hardreset(){
 }
 
 
-
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
     
@@ -1346,6 +1345,16 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         descStr+= "Alarms reading error. ";
         return -4;
     }
+    
+    // Lettura eventuale stato di emergenza:
+    //uint8_t numRegEmergency = 16;
+    uint8_t emergengyState;
+    if((i->second)->getEmergency(16,emergengyState,descStr)<0){
+        DERR("Reading alarms error: %s",descStr.c_str());
+        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+        descStr+= "Alarms reading error. ";
+        return -5;
+    }
 
     for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
         if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
@@ -1415,6 +1424,7 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
                 stCode|=ACTUATOR_COMMANDERROR;
                 descStr+="Command error. ";
             }
+            
         }// chiudo if(contentRegMER & ((WORD)(base2^i)))
     } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
 
@@ -1427,6 +1437,11 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
 //        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
 //        descStr+="Drive I2T protection warning";
 //    }
+    
+    if(emergengyState){
+        stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
+        descStr+="Emergency error. ";
+    }
      
     *alrm = stCode;
     
