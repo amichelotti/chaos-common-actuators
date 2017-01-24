@@ -18,7 +18,7 @@ using namespace common::actuators::models::simul;
 //void OpeningChannelException::badOpeningChannelInfo(){
 //
 //    std::cerr<< "Channel can not be opened. " << std::endl;
-//}
+//}                                            
 
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(int hostID, const std::string& pszDevName,BYTE btType,DWORD baudrate){
     init(hostID, pszDevName,btType,baudrate); // La funzione init non ritorna mai un numero negativo per quello che fa, quindi
@@ -2142,6 +2142,34 @@ void* TechnoSoftLowDriver::staticStopMotionForThread(void* objPointer){ // Metod
     ((TechnoSoftLowDriver*)objPointer)->stopMotion();
 
     pthread_exit(NULL);
+}
+
+int TechnoSoftLowDriver::hardreset(bool mode){
+    
+//    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -1;
+//        }
+//        internalHomingStateHoming2 = 0;
+//        internalHomingStateDefault = 0;
+//        controlLNS=true;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
+//    }
+//    
+    if(mode){
+//        if(!TS_Save()){
+//            return -2;
+//        }
+    }
+    
+//    if(!TS_Reset()){
+//        return -3;
+//    }
+    
+    // solo per adesso mettiamo cosi...
+
+    return 0;
 }
 
 int TechnoSoftLowDriver::providePower(){

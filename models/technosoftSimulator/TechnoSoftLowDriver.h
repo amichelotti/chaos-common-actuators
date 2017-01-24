@@ -101,6 +101,8 @@
 #define V_LSP 0.3 //[V]
 #define RANGE 500 //[mm]
 
+#define HARD_RESET_MODE_DEFAULT false
+
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -246,6 +248,8 @@ namespace common{
                 int resetStatesTimer();
                 void* staticResetStatesTimerForThread(void* objPointer);
                 
+                
+                
                 WORD contentRegisterMER;
                 
                 //int homingType;
@@ -385,6 +389,9 @@ namespace common{
                 int setMaxlowSpeedHoming(const double& speed);
                 int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
                 int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
+                
+                int hardreset(bool mode=HARD_RESET_MODE_DEFAULT); 
+                
 //                int setAdditiveHoming(const BOOL& isAdditive);
 //                int setMovementHoming(const short& movement);
 //                int setReferenceBaseHoming(const short& referenceBase);

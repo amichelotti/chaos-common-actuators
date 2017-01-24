@@ -83,7 +83,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 //    if(initChannelAlreadyDone){
 //        //DPRINT("This object has already a communication channel correctly initialized");
 //        return 0;
-//    }
+//    }              
 
     std::string params;
     params.assign((const char*)initialization_string);
@@ -249,26 +249,40 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     return *this;
 }
 
-int ActuatorTechnoSoft::hardreset(){ 
+int ActuatorTechnoSoft::hardreset(int axisID, bool mode){ 
     
-    DPRINT("Deleting Actuator Technosoft");
-    //delectingActuator = true;
-    int resp;
-    bool prob=false;
-    
-    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        resp=deinit(it->first); 
-        if(resp<0){
-            prob=true;
-            break;
-        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
-        }   
-    } 
-    
-    if(prob){
+//    DPRINT("Deleting Actuator Technosoft");
+//    //delectingActuator = true;
+//    int resp;
+//    bool prob=false;
+//    
+//    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+//        resp=deinit(it->first); 
+//        if(resp<0){
+//            prob=true;
+//            break;
+//        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+//        }   
+//    } 
+//    
+//    if(prob){
+//        return -1;
+//    }
+  
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato, non c'e' quindi alcun motore da inizializzare
         return -1;
     }
-  
+    
+    if((i->second)->selectAxis()<0){
+        return -2;
+    }
+    if((i->second)->hardreset(mode)<0){
+        return -3;
+    }
+    
     return 0;
 }
 

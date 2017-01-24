@@ -2011,6 +2011,33 @@ int TechnoSoftLowDriver::resetFault(){ // Considerato come COMANDO
          // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
          // errors when the function is executed)
     }
+ 
+    return 0;
+}
+
+int TechnoSoftLowDriver::hardreset(bool mode){
+    
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        if(!TS_Stop()){
+            return -1;
+        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=0;
+        lastTimeTakenForHoming.tv_usec=0;
+    }
+    
+    if(mode){
+        if(!TS_Save()){
+            return -2;
+        }
+    }
+    
+    if(!TS_Reset()){
+        return -3;
+    }
+    
     return 0;
 }
 

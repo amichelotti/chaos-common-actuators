@@ -99,7 +99,7 @@ namespace common{
                     int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);           // *******OK********
                     uint64_t getFeatures(){return 0;}
                     
-                    int hardreset();
+                    int hardreset(int axisID,bool mode);
      
         /**
         @brief get the actuator position using the readingType mode chosen for reading
