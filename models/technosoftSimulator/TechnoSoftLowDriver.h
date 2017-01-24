@@ -381,6 +381,7 @@ namespace common{
                 int getSpeed(double& speed);
 
                 int getHighSpeedHoming(double& _highSpeedHoming);
+                //int getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr);
 
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);

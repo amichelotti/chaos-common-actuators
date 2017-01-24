@@ -1369,7 +1369,6 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     }
 
     if(contentRegMER & ((uint16_t)1<<0)){
-    
         stCode|=ACTUATOR_CANBUS_ERROR; // IMPORTANTE: ACTUATOR_CANBUS_ERROR è di tipo int (32 bit)
         // Nell'operazione di OR logico, automaticamente il contenuto
         // a destra dell'uguale viene prima memorizzato in una locazione

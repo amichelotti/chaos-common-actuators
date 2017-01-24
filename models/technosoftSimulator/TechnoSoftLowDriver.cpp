@@ -1152,6 +1152,21 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
     pthread_exit(NULL);
 }
 
+//int TechnoSoftLowDriver::getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr){
+//    
+////    if(!TS_GetInput(nIO, inValue)){
+////        descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
+////        return -1;   
+////    }
+////    return 0;
+//    if(LSNactive){
+//        
+//    }
+//    
+//    inValue=1;
+//    return 0;
+//}
+
 int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 
     //DPRINT("Relative Moving axis: %d, deltaMicroSteps %l, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
@@ -2157,6 +2172,21 @@ int TechnoSoftLowDriver::hardreset(bool mode){
 //        lastTimeTakenForHoming.tv_usec=0;
 //    }
 //    
+    
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -1;
+//        }
+        if(stopMotion()<0){
+            return -1;
+        }
+        usleep(10000);
+        
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+    }
+    
     if(mode){
 //        if(!TS_Save()){
 //            return -2;
@@ -2167,8 +2197,26 @@ int TechnoSoftLowDriver::hardreset(bool mode){
 //        return -3;
 //    }
     
-    // solo per adesso mettiamo cosi...
+    // Solo per adesso mettiamo cosi...
+    
+    if(pthread_mutex_lock(&(mu))!=0){
 
+    }
+    
+        // Da verificare facendo prima il test con il motore vero per vedere cosa succede 
+        // quando invio il comando di TS_reset() 
+    
+        contentRegMER=0; // qui dentro c'e' l'emergency...da gestire
+        contentRegSRH=0;
+        contentRegSRL=0;
+        LSPactive=0;
+        LSNactive=0;
+        
+        
+    if(pthread_mutex_unlock(&(mu))!=0){
+
+    }
+    
     return 0;
 }
 

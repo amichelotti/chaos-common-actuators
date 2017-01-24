@@ -769,7 +769,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
     (i->second)->stateInfoRequest = true; // Comunico al motore che sto richiedendo info riguardanti gli allarmi
 
-
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
     (i->second)->regSRHrequest = true;
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
@@ -787,8 +786,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 //        return -4;
 //    }
 //    (i->second)->regSRLrequest = false;
-    
-    
 
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
@@ -806,6 +803,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_AUTORUN_ENABLED;
         descStr+="Auto run mode. ";
     }
+    
     if(contentRegSRH & ((uint16_t)1<<6)){
         stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
         descStr+="Limit switch positive event/interrupt. ";
@@ -824,7 +822,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode|=ACTUATOR_I2T_WARNING_DRIVE;
         descStr+="Drive I2T protection warning";
     }
-
     if(contentRegSRH & ((uint16_t)1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         descStr+="Gear ratio in electronic gearing mode. ";
@@ -921,6 +918,14 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         return -4;
     }
     (i->second)->regSRHrequest = false;
+    
+//    uint8_t emergengyState;
+//    if((i->second)->getEmergency(16,emergengyState,descStr)<0){
+//        DERR("Reading alarms error: %s",descStr.c_str());
+//        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+//        descStr+= "Alarms reading error. ";
+//        return -5;
+//    }
 
     for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
         if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
@@ -990,13 +995,18 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
                 stCode|=ACTUATOR_COMMANDERROR;
                 descStr+="Command error. ";
             }
+            else if(i==15){
+                stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
+                descStr+="Emergency. ";
+            }
         }// chiudo if(contentRegMER & ((WORD)(base2^i)))
     } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
 
     // Analysis of the register content REG_SRH
-    
-    
-    // No alarms detected
+//    if(!emergengyState){
+//        stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
+//        descStr+="Emergency error. ";
+//    }
 
     *alrm = stCode;
     (i->second)->alarmsInfoRequest = false; // Comunico al motore che ho terminato di richiedere info riguardanti gli allarmi

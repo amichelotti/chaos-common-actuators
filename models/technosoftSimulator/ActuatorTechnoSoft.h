@@ -93,7 +93,6 @@ namespace common{
                     int resetAlarms(int axisID,uint64_t alrm);
                     
                     int hardreset(int axisID, bool mode);
-                 
 
                     int stopMotion(int axisID);                                              // *******OK********
                     int getPosition(int axisID,readingTypes mode, double* deltaPosition_mm); // *******OK********
