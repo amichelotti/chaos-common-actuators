@@ -242,7 +242,7 @@ namespace common{
                 static void* staticMoveAbsolutePositionForThread(void*);
                 int moveAbsolutePositionHoming();
                 
-                int resetFaultsTimer();
+                int faultsGeneration();
                 static void* staticResetFaultsTimerForThread(void* objPointer);
                 
                 int resetStatesTimer();
@@ -423,7 +423,7 @@ namespace common{
                 //int resetCounter();// reset TPOS_register();
                 int resetCounterHoming();
                 int resetEncoderHoming();// reset APOS_register();
-                static void* staticResetCounterForThread(void*);
+//                static void* staticResetCounterForThread(void*);
                 static void* staticResetEncoderForThread(void*);
 
 

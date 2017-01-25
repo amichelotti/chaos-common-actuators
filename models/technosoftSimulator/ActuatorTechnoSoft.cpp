@@ -737,7 +737,7 @@ int ActuatorTechnoSoft::homing(int axisID,homingType mode){
     if((i->second)->selectAxis()<0){
         return -2;
     }
-    return ((i->second)->homing(mode));
+    return ((i->second)->homing(mode));                          
 }
 
 int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){

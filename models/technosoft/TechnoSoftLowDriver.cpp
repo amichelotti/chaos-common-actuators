@@ -429,11 +429,18 @@ int TechnoSoftLowDriver::homing(int mode){
         if(contentRegMER & ((uint16_t)1<<7)){
             // Il LNS e' attivo. Non c'e' bisogno di effettuare la procedura di homing.
             // Reset encoder e counter
+            if(selectAxis()<0){
+                internalHomingStateDefault = 0;
+                controlLNS=true;
+                cap_position=0;  
+                return -2; 
+            }
             
             if(resetEncoder()<0){
                 internalHomingStateDefault = 0;
                 controlLNS=true; 
                 cap_position=0;
+                return -3;
                     //if(stopMotion()<0){
                     //return -23;
                     //}
@@ -442,6 +449,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 internalHomingStateDefault = 0;
                 controlLNS=true; 
                 cap_position=0;
+                return -4;
                     //if(stopMotion()<0){
                     //return -25;
                     //}
@@ -1666,10 +1674,11 @@ int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando ********
         }
         sAxiOn_flag=((sAxiOn_flag & 1<<15) != 0 ? 1 : 0);
         count++;
+        usleep(5000);
     }
     //DPRINT("ALEDEBUG correctly powered on");
     //poweron=true;
-    usleep(5000);
+    
     return 0;
 }
 
@@ -1680,6 +1689,8 @@ int TechnoSoftLowDriver::stopPower(){ //******** Inteso come comando *********
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
+    
+    
     if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
         if(!TS_Stop()){
             return -1;
@@ -1979,7 +1990,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         //DERR("Error at the register reading: %s",TS_GetLastErrorText());
         //descrErr.assign(TS_GetLastErrorText());
         descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
-        return -2;
+        return -1;
     }
     return 0;
 }
