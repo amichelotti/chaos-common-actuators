@@ -448,21 +448,14 @@ namespace common{
                 int setPosition(const long& posValue);
 
                 int getLVariable(std::string& nameVar, long& var);
-
                 int checkEvent(BOOL& event);
-
                 int getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr);
-
                 int getMERregister();// read content of the error register
                 int getSRLregister();// read content of the low part of the status register
                 int getSRHregister();// read content of the high part of the status register
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
-
                 int getFirmwareVers(char* firmwareVers);
-
                 int selectAxis();
-
-                //int incrDecrPositionHoming();
 
            };
 

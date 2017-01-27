@@ -1245,12 +1245,12 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 //        if(!TS_Stop()){
 //            return -1;
 //        }
-        if(stopMotion()<0){
-            if(pthread_mutex_unlock(&(mu))!=0){
-            }
-            return -1;
-        }
-        usleep(10000);
+//        if(stopMotion()<0){
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//            }
+//            return -1;
+//        }
+//        usleep(10000);
         
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
@@ -1288,112 +1288,12 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
     return 0;
 }
 
-//int TechnoSoftLowDriver::incrDecrPositionHoming(){
-//
-//    // Stima grossolana tempo necessario per la movimentazione
-////    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-////    double tol = 30;
-////    deltaT += (deltaT*tol/100);
-////
-////    double totalTimeInterval = 0;   // solo per far partire il ciclo while
-////    struct timeval startTime,endTime;
-////    gettimeofday(&startTime,NULL);
-//
-////    while(totalTimeInterval<=deltaT && !stopMotionCommand && !powerOffCommand){
-////        actuatorIDInMotion = true;
-////        // L'incremento deve avvenire ad una determinata velocita'
-////        if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
-////
-////        }
-////            if(((containerIncrementPosition*)arg)->deltaPosition>=0){
-////                position+=speed_ms_s;
-////            }
-////            else{
-////                position-=speed_ms_s;
-////            }
-////        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-////
-////        }
-////        // Aggiornamento deltaT, stopMotion, stopPower
-////        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-////        deltaT += (deltaT*tol/100);
-////
-////        gettimeofday(&endTime,NULL);
-////        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
-////        sleep(1); // Sleep for 1 second
-////    }
-//
-//    // L'incremento deve avvenire ad una determinata velocita'
-//    if(pthread_mutex_lock(&(cIP.mu))!=0){
-//
-//    }
-//    stopMotionCommand = false;
-//    actuatorIDInMotion = true; //deltaPosition>=0
-//    long currentPosition = position;
-//    while((fabs(currentPosition-position)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand)){
-//
-//        if(cIP.deltaPosition>=0){
-//            currentPosition+=speed_ms_s;
-//        }
-//        else{
-//            currentPosition-=speed_ms_s;
-//        }
-//        usleep(1000); // Sleep for 1 milli second
-//    }
-//    position = currentPosition;
-//    actuatorIDInMotion = false;
-//    stopMotionCommand = false;
-//
-//    if(pthread_mutex_unlock(&(cIP.mu))!=0){
-//
-//    }
-//    pthread_exit(NULL);
-//}
 
 double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
 
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
 }
 
-//void* TechnoSoftLowDriver::staticIncrDecrPositionHomingFunctionForThread(void* objPointer){ // Metodo statico chiamato eseguito direttamente dai threads
-//
-//    //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
-//    ((TechnoSoftLowDriver*)objPointer)->incrDecrPositionHoming();
-//
-//    return 0;
-//}
-
-
-//int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
-//    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
-//
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-////    if(!TS_MoveRelative(deltaPosition, highSpeedHoming_mm_s, accelerationHoming_mm_s2, isAdditiveHoming, movementHoming, referenceBaseHoming)){
-////        DERR("error relative moving homing");
-////        return -2;
-////    }
-//    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-////    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
-////        DERR("error relative moving");
-////        return -2;
-////    }
-//    int random_variable = std::rand();
-//    if(random_variable<p*(RAND_MAX/20))
-//        return -1;
-//
-//    cIP.deltaPosition = deltaPosition;
-//    pthread_t th;
-//    pthread_create(&th, NULL,staticIncrDecrPositionHomingFunctionForThread,this);
-//
-//    return 0;
-//}
 
 // Set trapezoidal parameters
 int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
@@ -1554,33 +1454,6 @@ int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAcceleratio
     maxAccelerationHoming_mm_s2 = _maxAccelerationHoming_mm_s2;
     return 0;
 }
-
-//int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
-//    //DPRINT("Chiamata setAdditiveHoming");
-//    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
-//        return -1;
-//    }
-//    isAdditiveHoming = _isAdditiveHoming;
-//    return 0;
-//}
-//
-//int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
-//    //DPRINT("Chiamata setMovementHoming");
-//    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
-//        return -1;
-//    }
-//    movementHoming = _movementHoming;
-//    return 0;
-//}
-//
-//int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
-//    //DPRINT("Chiamata setReferenceBaseHoming");
-//    if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
-//        return -1;
-//    }
-//    referenceBaseHoming=_referenceBaseHoming;
-//    return 0;
-//}
 
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
@@ -1845,41 +1718,26 @@ void* TechnoSoftLowDriver::staticMoveAbsolutePositionForThread(void* objPointer)
 
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
 
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("error selecting axis");
-//        return -1;
-//    }
-    //deltaPosition*=CONST_MULT_TECHNOFT;
-    //printf("%ld",deltaPosition);
-    //DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
-//    if(speed<0 || speed>MAX_SPEED){
-//        return -1;
-//    }
-//    if(acceleration<0 || acceleration>MAX_ACCELERATION){
-//        return -2;
-//    }
-//    // nota: MAX_SPEED, MAX_ACCELERATION in TechnoSoftLowDriver.h
-//
-//    if((movement!=UPDATE_NONE) || (movement!=UPDATE_IMMEDIATE) || (movement!=UPDATE_ON_EVENT)){
-//        return -3;
-//    }
-//    // nota: UPDATE_NONE, UPDATE_IMMEDIATE, UPDATE_ON_EVENT costanti definite in TML_LIB.h
-//
-//    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
-//        return -4;
-//    }
-    //("moving Absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_ms_s,acceleration_mm_s2,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_MoveAbsolute(absPosition, speed_mm_s, acceleration_mm_s2, movement, referenceBase)){
-//        DERR("error absolute step moving");
-//        return -2;
-//    }
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
+    
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -1;
+//        }
+//        if(stopMotion()<0){
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//            }
+//            return -1;
+//        }
+//        usleep(10000);
+        
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+    }
+    
     motionscalled++;
     
     if(motionscalled>1){
@@ -2263,18 +2121,6 @@ void* TechnoSoftLowDriver::staticStopMotionForThread(void* objPointer){ // Metod
 
 int TechnoSoftLowDriver::hardreset(bool mode){
     
-//    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
-//        if(!TS_Stop()){
-//            return -1;
-//        }
-//        internalHomingStateHoming2 = 0;
-//        internalHomingStateDefault = 0;
-//        controlLNS=true;
-//        lastTimeTakenForHoming.tv_sec=0;
-//        lastTimeTakenForHoming.tv_usec=0;
-//    }
-//    
-    
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)){
         return -1;
@@ -2288,13 +2134,13 @@ int TechnoSoftLowDriver::hardreset(bool mode){
 //        if(!TS_Stop()){
 //            return -1;
 //        }
-        if(stopMotion()<0){
-            if(pthread_mutex_unlock(&(mu))!=0){
-
-            }
-            return -2;
-        }
-        usleep(10000);
+//        if(stopMotion()<0){
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//
+//            }
+//            return -2;
+//        }
+//        usleep(10000);
         
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
@@ -2330,19 +2176,6 @@ int TechnoSoftLowDriver::hardreset(bool mode){
 }
 
 int TechnoSoftLowDriver::providePower(){
-    //DPRINT("provide power to axis:%d",axisID);
-//      if(!TS_SelectAxis(axisID)){
-//        ERR("ALEDEBUG Error selecting axis");
-//        return -1;
-//    }
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_Power(POWER_ON)){
-//        //ERR("ALEDEBUG Error selecting axis");
-//        return -2;
-//    }
 
     // Simulazione dialogo con il drive/motor
     
@@ -2356,13 +2189,13 @@ int TechnoSoftLowDriver::providePower(){
     }
     
     if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
-        if(stopMotion()<0){
-            if(pthread_mutex_unlock(&(mu))!=0){
-
-            }
-            return -2;
-        }
-        usleep(10000);
+//        if(stopMotion()<0){
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//
+//            }
+//            return -2;
+//        }
+//        usleep(10000);
         
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
@@ -2416,13 +2249,13 @@ int TechnoSoftLowDriver::stopPower(){
     }
     
     if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
-        if(stopMotion()<0){
-            if(pthread_mutex_unlock(&(mu))!=0){
-
-            }
-            return -2;
-        }
-        usleep(10000);
+//        if(stopMotion()<0){
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//
+//            }
+//            return -2;
+//        }
+//        usleep(10000);
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
@@ -2445,95 +2278,17 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
 }
 
 int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
-
-    //DPRINT("Reading COUNTER position");
-    //long tposition;
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_GetLongVariable("TPOS", tposition)){
-//        return -1;
-//    }
-
+    
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)){
         return -1;
     }
 
-    //*deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
-//    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
-
-//    if(random_variable>0.0005){
-//        pos=positionCounter+random_variable;
-//    }
-//    else{
-//        pos=positionCounter-random_variable;
-//    }
-
-//    // This is the underlying integer random number generator
-//    boost::mt19937 igen;
-//    long pos = positionCounter;
-//    // The second template parameter is the actual floating point
-//    // distribution that the user wants
-//    double stdv = abs(pos+pos*0.1);
-//    boost::variate_generator<boost::mt19937, boost::normal_distribution<> >
-//        gen(igen, boost::normal_distribution<>(pos,stdv));
-//
-//    DPRINT("Real position counter %f, position counter with noise %ld",pos,gen());
-
-    //double pos = positionCounter;
-    //DPRINT("pos = %ld",pos);
-//    long min = pos-(long)deltaNoise;
-//    long max = pos+(long)deltaNoise;
-    //long deltaNoise = (long)(pos*percNoise);
-    //DPRINT("Delta noise = %ld",deltaNoise);
-
-//    const long rangeMin = pos-deltaNoise;
-//    const long rangeMax = pos+deltaNoise;
-//
-//    NumberDistribution distribution(rangeMin, rangeMax);
-//    Generator numberGenerator(generator, distribution);
-
-    //std::srand(std::time(0));
-    //DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
-
-//    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
-//    double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-//    double deltaNoise = (pos_mm*percNoise);
-//    const double rangeMin = pos_mm-deltaNoise;
-//    const double rangeMax = pos_mm+deltaNoise;
-//    NumberDistribution distribution(rangeMin, rangeMax);
-//    Generator numberGenerator(generator, distribution);
-//    *deltaPosition_mm = numberGenerator();
     double pos = positionCounter;
     *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
     return 0;
 }
-
-//double getRandomDoubleUsingNormalDistribution(double mean, double sigma)
-//{
-// //typedef normal_distribution<> NormalDistribution;
-// typedef boost::mt19937 RandomGenerator;
-// typedef boost::variate_generator GaussianGenerator;
-//
-//  /** Initiate Random Number generator with current time */
-//  static RandomGenerator rng(static_cast (time(0)));
-//
-//  /* Choose Normal Distribution */
-//  typedef normal_distribution<> gaussian_dist(mean, sigma);
-//
-//  /* Create a Gaussian Random Number generator
-//   *  by binding with previously defined
-//   *  normal distribution object
-//   */
-//  GaussianGenerator generator(rng, gaussian_dist);
-//
-//  // sample from the distribution
-//  return generator();
-//}
-
 
 int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 
@@ -2549,58 +2304,7 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
         return -1;
     }
 
-//    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
-
-//    std::srand(std::time(0));
-//
-//    long pos = positionEncoder;
-//    long min = pos-(long)deltaNoise;
-//    long max = pos+(long)deltaNoise;
-
-    //Rumore gaussiano: e' necessario lo standard C++ 2011
-//    double stdv = abs(pos+pos*0.001);
-//    std::normal_distribution<double> distribution(pos,stdv);
-//    pos = (long)(distribution(generator));
-
-//    if(random_variable>0.0005){
-//        pos=positionEncoder+random_variable;
-//    }
-//    else{
-//        pos=positionEncoder-random_variable;
-//    }
-
-    // This is the underlying integer random number generator
-//    boost::mt19937 igen;
-//    long pos= positionEncoder;
-//    // The second template parameter is the actual floating point
-//    // distribution that the user wants
-//    double stdv = abs(pos+pos*0.1);
-////    boost::variate_generator<boost::mt19937, boost::normal_distribution<> >
-////        generator(boost::mt19937(time(0)), boost::normal_distribution<>(pos,stdv));
-//
-//    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,getRandomDoubleUsingNormalDistribution(pos,stdv));
-////    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
-
-    //std::srand(std::time(0));
-
     double pos = positionEncoder;
-//    long min = pos-(long)deltaNoise;
-//    long max = pos+(long)deltaNoise;
-//    long deltaNoise = (long)(pos*percNoise);
-//
-//    const long rangeMin = pos-deltaNoise;
-//    const long rangeMax = pos+deltaNoise;
-//
-//    NumberDistribution distribution(rangeMin, rangeMax);
-//    Generator numberGenerator(generator, distribution);
-
-//    for(int i=0;i<10;i++){
-//    std::cout << numberGenerator() << std::endl;
-//    }
-
-    //DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
-
-    //*deltaPosition_mm = (numberGenerator()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
     
     if(percNoise>0){
         double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
@@ -2629,73 +2333,14 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 }
 
 int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
-    
-    //DPRINT("Reading ENCODER position");
-//    long aposition;
-//    if(!TS_GetLongVariable("APOS", aposition)){
-//        return -1;
-//    }
-    //DPRINT("E' questo il getEncoder???????????????");
-    
-    
+
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)){
         return -1;
     }
 
-//    random_variable = (std::rand()/RAND_MAX)/1000; // Normalizzazione variabile random_variable
-
-//    std::srand(std::time(0));
-//
-//    long pos = positionEncoder;
-//    long min = pos-(long)deltaNoise;
-//    long max = pos+(long)deltaNoise;
-
-    //Rumore gaussiano: e' necessario lo standard C++ 2011
-//    double stdv = abs(pos+pos*0.001);
-//    std::normal_distribution<double> distribution(pos,stdv);
-//    pos = (long)(distribution(generator));
-
-//    if(random_variable>0.0005){
-//        pos=positionEncoder+random_variable;
-//    }
-//    else{
-//        pos=positionEncoder-random_variable;
-//    }
-
-    // This is the underlying integer random number generator
-//    boost::mt19937 igen;
-//    long pos= positionEncoder;
-//    // The second template parameter is the actual floating point
-//    // distribution that the user wants
-//    double stdv = abs(pos+pos*0.1);
-////    boost::variate_generator<boost::mt19937, boost::normal_distribution<> >
-////        generator(boost::mt19937(time(0)), boost::normal_distribution<>(pos,stdv));
-//
-//    DPRINT("Real position encoder %ld, position encoder with noise %f",pos,getRandomDoubleUsingNormalDistribution(pos,stdv));
-////    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
-
-    //std::srand(std::time(0));
-
     double pos = positionEncoder;
-//    long min = pos-(long)deltaNoise;
-//    long max = pos+(long)deltaNoise;
-//    long deltaNoise = (long)(pos*percNoise);
-//
-//    const long rangeMin = pos-deltaNoise;
-//    const long rangeMax = pos+deltaNoise;
-//
-//    NumberDistribution distribution(rangeMin, rangeMax);
-//    Generator numberGenerator(generator, distribution);
-
-//    for(int i=0;i<10;i++){
-//    std::cout << numberGenerator() << std::endl;
-//    }
-
-    //DPRINT("Real position encoder %ld, position encoder with noise %ld",pos,(long)(min+(max-min)*std::rand()/RAND_MAX));
-
-    //*deltaPosition_mm = (numberGenerator()*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
     
     if(percNoise>0){
         double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
@@ -2724,13 +2369,7 @@ int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
 } 
 
 int TechnoSoftLowDriver::getLVariable(std::string& nameVar, long& var) {
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_GetLongVariable(nameVar.c_str(), var)){
-//        return -1;
-//    }
+
 
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
@@ -2775,57 +2414,8 @@ int TechnoSoftLowDriver::resetCounterHoming(){
     return 0;
 }
 
-//void* TechnoSoftLowDriver::(void* objPointer){
-//
-////    ((TechnoSoftLowDriver*)objPointer)->resetCounterHoming();
-////    pthread_exit(NULL);
-//}
-
-
-//int resetCounter(){ //Deve essere chiamato dal metodo statico, quest'ultimo eseguito dal thread
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-////    if(!TS_Execute("SAP 0")){
-////        return -1;
-////    }
-//    // Simulazione dialogo con il drive/motor
-////    int random_variable = std::rand();
-////    if(random_variable<p*(RAND_MAX/100)){
-////        return -1;
-////    }
-////    if(pthread_mutex_lock(&(mu))!=0){
-////
-////    }
-////        positionCounter = 0;
-////        //position = 0;
-////    if(pthread_mutex_unlock(&(mu))!=0){
-////
-////    }
-////    int random_variable = std::rand();
-////    if(random_variable<p*(RAND_MAX/100)){
-////        return -1;
-////    }
-//    pthread_t th;
-//    pthread_create(&th, NULL,,this);
-//    return 0;
-//}
-
 int TechnoSoftLowDriver::resetEncoderHoming(){
     
-    //double highSpeedHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*highSpeedHoming_mm_s)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    //double accelerationHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*accelerationHoming_mm_s2/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-//    DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
-//////    if(!TS_SelectAxis(axisID)){
-//////        DERR("failed to select axis %d",axisID);
-//////        return -1;
-//////    }
-////    if(!TS_MoveVelocity(highSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
-////        DERR("(homing) Error moving velocity ");
-////        return -2;
-////    }
-//    
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)){
@@ -2852,45 +2442,8 @@ void* TechnoSoftLowDriver::staticResetEncoderForThread(void* objPointer){
     pthread_exit(NULL);
 }
 
-//int TechnoSoftLowDriver::resetEncoder(){
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-////    if(!TS_Execute("APOS=0")){
-////        return -1;
-////    }
-//    // Simulazione dialogo con il drive/motor
-//    int random_variable = std::rand();
-//    if(random_variable<p*(RAND_MAX/100)){
-//        return -1;
-//    }
-//
-//    if(pthread_mutex_lock(&(mu))!=0){
-//
-//    }
-//    positionEncoder = 0;
-//    if(pthread_mutex_unlock(&(mu))!=0){
-//
-//    }
-//
-//    return 0;
-//}
-
-//void* TechnoSoftLowDriver::staticResetEncoderForThread(void* objPointer){
-//
-//    ((TechnoSoftLowDriver*)objPointer)->resetEncoder();
-//    pthread_exit(NULL);
-//}
-
 int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_SetEventOnLimitSwitch(lswType, transitionType, waitEvent, enableStop)){
-//	return -1;
-//    }
+
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)) {
@@ -2901,13 +2454,6 @@ int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionTy
 }
 
 int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent, BOOL enableStop){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_SetEventOnMotionComplete(waitEvent,enableStop)){
-//	return -2;
-//    }
     
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
@@ -2918,40 +2464,8 @@ int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent, BOOL enableSto
     return 0;
 }
 
-//int TechnoSoftLowDriver::checkEvent(BOOL& event){
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-////    if(!TS_CheckEvent(event)){
-////        return -1;
-////    }
-//    int random_variable = std::rand();
-//    if(random_variable<1*(RAND_MAX/100)) {
-//        return -1;
-//    }
-//
-//    if(position <= -epsylon){
-//        LNStransition = true; // Evento che segnale il limit switch transition
-//        // Occorre "bloccare" il motion, ovvero terminare il thread che si sta occupando del motion
-//        //stopMotionCommand = true; // Il thread terminera' cosicche' il motion stesso terminera'...
-//        event = true;
-//    }
-//    else{
-//        LNStransition = false;
-//        event = false;
-//    }
-//    return 0;
-//}
 
 int TechnoSoftLowDriver::checkEvent(BOOL& event){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_CheckEvent(event)){
-//        return -1;
-//    }
 
     //Evento che segnala il limit switch transition
 
@@ -2984,28 +2498,11 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
-    
-//    if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//    }
+
     return 0;
 }
 
 int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_ReadStatus(regIndex,contentRegister)){
-//
-//        //DERR("Error at the register reading: %s",TS_GetLastErrorText());
-//        //descrErr.assign(TS_GetLastErrorText());
-//        descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
-//        return -2;
-//    }
-    
-
-    //usleep(1000);
     
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
@@ -3013,37 +2510,6 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         //descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
         return -1;
     }
-    
-    
-//    double value =2;
-//    double deltaNoise = 1;
-//        //DPRINT("pos_mm=%f",pos_mm);
-//        //DPRINT("deltaNoise=%f",deltaNoise);
-//    double rangeMin = value-deltaNoise;
-//    double rangeMax = value+deltaNoise;
-//        //DPRINT("rangeMin=%f",rangeMin);
-//        //DPRINT("rangeMax=%f", rangeMax);
-//    
-//    
-//    double newvalue; // = numberGenerator();
-//    //DPRINT("value=%f",newvalue);
-    
-    
-    //DPRINT("Get status or error register function chiamata");
-    // Inizializzazione "casuale" codici allarmi:
-//    if(alarmsInfoRequest && regMERrequest){
-//        for(uint16_t i=0; i<sizeof(contentRegister)*8; i++){
-//            //random_variable = std::rand();
-//            NumberDistribution distribution(rangeMin, rangeMax);
-//            Generator numberGenerator1(generator, distribution);
-//            newvalue = numberGenerator1();
-//            //printf("valore generato: %f",newvalue);
-//            if(newvalue<value)
-//                contentRegister |= ((WORD)1<<i);
-//        }
-//        //contentRegister = contentRegMER;
-//        return 0;
-//    }
     
     if(pthread_mutex_lock(  &(mu))!=0){
 
@@ -3056,20 +2522,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         }
         return 0;
     }
- 
-//    else if(alarmsInfoRequest && regSRHrequest){
-//        for(uint16_t i=10; i<12; i++){
-//            //random_variable = std::rand();
-//            NumberDistribution distribution(rangeMin, rangeMax);
-//            Generator numberGenerator1(generator, distribution);
-//            newvalue = numberGenerator1();
-//            //printf("valore generato: %f",newvalue);
-//            if(newvalue<value)
-//                contentRegSRH |= ((WORD)1<<i);
-//        }
-//        contentRegister = contentRegSRH;
-//        return 0;
-//    }
+
     else if(alarmsInfoRequest && regSRHrequest){
         contentRegister=contentRegSRH;
         if(pthread_mutex_unlock(&(mu))!=0){
@@ -3077,22 +2530,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         }
         return 0;
     }
-    // Inizializzazione "casuale" codici stati:
-//    else if(stateInfoRequest && regSRHrequest){ // Non posso modificare il contenuto dei bit 10, 11 di SRH
-//        for(uint16_t i=0; i<sizeof(contentRegSRH)*8; i++){
-//            if(i==5 || i==6 || i==7 ||i==12 || i==14 || i==15){
-//                //random_variable = std::rand();
-//                NumberDistribution distribution(rangeMin, rangeMax);
-//                Generator numberGenerator1(generator, distribution);
-//                newvalue = numberGenerator1();
-//                //printf("valore generato: %f",newvalue);
-//                if(newvalue<value)
-//                    contentRegSRH |= ((WORD)1<<i);
-//            }
-//        }
-//        contentRegister = contentRegSRH;
-//        return 0;
-//    }
+  
     else if(stateInfoRequest && regSRHrequest){
         contentRegister=0;
         if(pthread_mutex_unlock(&(mu))!=0){
@@ -3100,26 +2538,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         }
         return 0;
     }
-//    else if(stateInfoRequest && regSRLrequest){
-//        //random_variable = std::rand();
-//        NumberDistribution distribution1(rangeMin, rangeMax);
-//        Generator numberGenerator1(generator, distribution1);
-//        newvalue = numberGenerator1();
-//        //printf("valore generato: %f",newvalue);
-//        if(newvalue<value){
-//            contentRegSRL |= ((WORD)1<<10);
-//        }
-//        //random_variable = std::rand();
-//        NumberDistribution distribution2(rangeMin, rangeMax);
-//        Generator numberGenerator2(generator, distribution2);
-//        newvalue = numberGenerator2();
-//        //printf("valore generato: %f",newvalue);
-//        if(newvalue<value){
-//            contentRegSRL |= ((WORD)1<<15);
-//        }
-//        contentRegister = contentRegSRL;
-//        return 0;
-//    }
+
     else if(stateInfoRequest && regSRLrequest){
         contentRegister = 0;
         if(pthread_mutex_unlock(&(mu))!=0){
@@ -3128,23 +2547,28 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         return 0;
     }
     
-//    if(pthread_mutex_unlock(&(mu))!=0){
-//
-//    }
-    
     return -1;
 }
 
 int TechnoSoftLowDriver::faultsGeneration(){
     
-    //double durationAlarmsInterval = 60;
     struct timeval startTimeForMotor1,endTimeForMotor1;
     
     double total_time_interval=0;
     gettimeofday(&startTimeForMotor1,NULL);
     WORD contatoreRegMer = 0;
-    WORD contatoreRegSRH = 10;
+    WORD maxcontatoreRegMer = 15;
+    const double rangeMinRegMer = 0;
+    const double rangeMaxRegMer = 14; // e non 15 perche' 15 e' l'emergency. L'emulatore non crea (e gestisce) lo scenario di emergenza
     
+    WORD contatoreRegSRH = 0;
+    WORD maxcontatoreRegSRH = 5;
+    const double rangeMinRegSRH = 10;
+    const double rangeMaxRegSRH = 11;
+    
+    WORD positionRegMer = 0;
+    WORD positionRegSRH = 0;
+
     while(1 && !deallocateTimerAlarms){
  
         // Lettura ogni secondo...
@@ -3153,32 +2577,30 @@ int TechnoSoftLowDriver::faultsGeneration(){
             if(pthread_mutex_lock(&(mu))!=0){
 
             }
-            
-            //1. Reset di tutti gli allarmi:
-            //contentRegMER = 0;
-            //contentRegSRH = 0;
-            // ma nn solo...
-            //LSPactive = false;
-            //LSNactive = false;
-            
-            if(contatoreRegMer<16){
-                //2. Generazione di un solo fault alla volta:
+
+            if(contatoreRegMer<maxcontatoreRegMer){
                 contentRegSRH=0;
                 contentRegMER=0;
-                contentRegMER |= ((WORD)1<<contatoreRegMer);
+                NumberDistribution distribution(rangeMinRegMer, rangeMaxRegMer);
+                Generator numberGenerator(generator, distribution);
+                positionRegMer = (WORD)numberGenerator();
+                contentRegMER |= ((WORD)1<<positionRegMer);
                 contatoreRegMer++;
             }
-            else{
+            else if(contatoreRegSRH<maxcontatoreRegSRH){ // Generazione due warning...
                 contentRegSRH =0;
                 contentRegMER=0;
-                contentRegSRH |= ((WORD)1<<contatoreRegSRH);
+                NumberDistribution distribution(rangeMinRegSRH, rangeMaxRegSRH);
+                Generator numberGenerator(generator, distribution);
+                positionRegSRH = (WORD)numberGenerator();
+                contentRegSRH |= ((WORD)1<<positionRegSRH);
                 contatoreRegSRH++;
-                if(contatoreRegSRH>11){
-                    contatoreRegMer=0;
-                    contatoreRegSRH=10;
-                }
             }
-
+            else{
+                contatoreRegMer=0;
+                contatoreRegSRH=0;
+            }
+ 
             if(pthread_mutex_unlock(&(mu))!=0){
 
             }
@@ -3201,25 +2623,14 @@ void* TechnoSoftLowDriver::staticResetFaultsTimerForThread(void* objPointer){
     pthread_exit(NULL); 
 }
 
-
 int TechnoSoftLowDriver::resetFault(){
-    
-    //Simulazione dialogo con il drive motor
-//    int random_variable = std::rand();
-//    if(random_variable<p*(RAND_MAX/100)){
-//        return -1;
-//    }
+
     //DPRINT("LSNactive resettato prima del lock");
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
         
     if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
-        if(stopMotion()<0){
-            if(pthread_mutex_unlock(&(mu))!=0){
-            }
-            return -1;
-        }
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
@@ -3239,14 +2650,13 @@ int TechnoSoftLowDriver::resetFault(){
     LSPactive = false;
     LSNactive = false;
     
-        //DPRINT("LSNactive resettato dentro il lock");
+    //DPRINT("LSNactive resettato dentro il lock");
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
        
     return 0;
 }
-
 
 int TechnoSoftLowDriver::selectAxis(){
 
@@ -3261,14 +2671,7 @@ int TechnoSoftLowDriver::selectAxis(){
 
 // retrieve firmware version of the active drive
 int TechnoSoftLowDriver::getFirmwareVers(char* firmwareVers){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!MSK_GetDriveVersion(firmwareVers)){
-//        DERR("Errore lettura versione driver");
-//        return -2;
-//    }
+
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)){
