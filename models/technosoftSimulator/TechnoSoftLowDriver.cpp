@@ -1669,18 +1669,6 @@ void* TechnoSoftLowDriver::staticMoveConstantVelocityHomingFunctionForThread(voi
 
 int TechnoSoftLowDriver::moveVelocityHoming(){
     
-    //double highSpeedHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*highSpeedHoming_mm_s)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    //double accelerationHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*accelerationHoming_mm_s2/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    //DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-//    if(!TS_MoveVelocity(highSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
-//        DERR("(homing) Error moving velocity ");
-//        return -2;
-//    }
-    
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100)){
