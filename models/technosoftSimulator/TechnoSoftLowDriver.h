@@ -112,24 +112,6 @@ namespace common{
        namespace models {
            namespace simul {
 
-//           class ElectricPowerException{
-//                public:
-//                    ElectricPowerException(){}
-//                    void badElectricPowerInfo();
-//           };
-//
-//           class StopMotionException{
-//                public:
-//                    StopMotionException(){}
-//                    void badStopMotionInfo();
-//           };
-//
-//           class OpeningChannelException{
-//                public:
-//                    OpeningChannelException(){}
-//                    void badOpeningChannelInfo();
-//           };
-
            struct containerIncrementPosition{
                long deltaPosition;
                //long absolutePosition;
@@ -230,6 +212,8 @@ namespace common{
                 long absolutePosition;
                 long deltaPosition;
                 pthread_mutex_t mu;
+                
+                pthread_t thstaticFaultsGeneration;
 
                 int moveAbsolutePosition();
                 int incrDecrPosition();
@@ -243,12 +227,10 @@ namespace common{
                 int moveAbsolutePositionHoming();
                 
                 int faultsGeneration();
-                static void* staticResetFaultsTimerForThread(void* objPointer);
+                static void* staticFaultsGeneration(void* objPointer);
                 
                 int resetStatesTimer();
                 void* staticResetStatesTimerForThread(void* objPointer);
-                
-                
                 
                 WORD contentRegisterMER;
                 

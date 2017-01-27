@@ -4,22 +4,6 @@
 
 using namespace common::actuators::models::simul;
 
-//--------------------------------------------
-//void ElectricPowerException::badElectricPowerInfo(){
-//
-//    std::cerr<< "The electrical power has not been turned off." << std::endl;
-//}
-//
-//void StopMotionException::badStopMotionInfo(){
-//
-//    std::cerr<< "The eventual motion can not be stopped" << std::endl;
-//}
-//
-//void OpeningChannelException::badOpeningChannelInfo(){
-//
-//    std::cerr<< "Channel can not be opened. " << std::endl;
-//}                                            
-
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(int hostID, const std::string& pszDevName,BYTE btType,DWORD baudrate){
     init(hostID, pszDevName,btType,baudrate); // La funzione init non ritorna mai un numero negativo per quello che fa, quindi
                                        // e' inutile mettere il controllo. E poi se ritornasse un numero negativo bisognerebbe lanciare
@@ -42,10 +26,6 @@ int SerialCommChannelTechnosoft::init(int _hostID, const std::string& _pszDevNam
 
 void SerialCommChannelTechnosoft::close(){
 
-//    if(fd!=-1){
-//	TS_CloseChannel(fd); // chiusura canale di comunicazione
-//    }
-    //DPRINT("Chiusura canale di comunicazione in fase di deallocazione delle risorse");
 }
 
 SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
@@ -54,26 +34,9 @@ SerialCommChannelTechnosoft::~SerialCommChannelTechnosoft(){
 }
 
 int SerialCommChannelTechnosoft::open(){
-//    int resp;
-//    /*	Open the comunication channel: COM1, RS232, 1, 115200 */
-//    DPRINT("opening dev %s type %d baud %d, hostid:%d",pszDevName.c_str(),btType,baudrate,hostID);
-//    resp=TS_OpenChannel(pszDevName.c_str(), btType, hostID, baudrate);
-//    if(resp < 0){
-//      ERR("failed opening channel dev:%s type:%d host:%d baudrate: %d",pszDevName.c_str(), btType, hostID, baudrate);
-//      return -1;
-//    }
-//    this->fd = resp;
-//    DPRINT("Openchannel file descriptor=%d",resp);
-//    std::srand(std::time(0));
-//    random_variable = std::rand();
-//    if(random_variable<p*(RAND_MAX/100))
-//        return -1;
-    
-    //DPRINT("Channel is opened");
+
     return 0;
 }
-
-//TechnoSoftLowDriver::channel_map_t TechnoSoftLowDriver::channels; // Anche se non viene inizializzato...
 
 //----------------------------------------------
 TechnoSoftLowDriver::TechnoSoftLowDriver(){
@@ -81,11 +44,9 @@ TechnoSoftLowDriver::TechnoSoftLowDriver(){
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
-    //deinit();
-    //DPRINT("Deallocazione oggetto TechnoSoftLowDriver");
-    deallocateTimerAlarms=true;
-    //deallocateTimerStates=true;
-    usleep(10000);
+
+    deallocateTimerAlarms = true;
+    usleep(1500000);
 }
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
@@ -365,36 +326,24 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     // *********** Constants ************
     epsylon = 0;
-
-//    // State of possible threads
-//    threadMoveRelativeOn = false;
-//    threadMoveAbsoluteOn = false;
-
+    
     // ************ Limit transitions *************
     LNStransition = false;
     LPStransition = false;
     
     LSNactive=false; // BIT DI STATO
     LSPactive=false; // BIT DI STATO
-
+    
     // ************ Thread manager *************
     motionscalled=0;
     
-    //deltaNoise = 100; // Number of microsteps. Used for noise
     controlledPositionHoming = false;
     homingStopped = false;
     
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
     
-    //positiveLimitPosition = 60000000;
-    //durationAlarmsInterval = 60;
-    
-    //pthread_t th1;
-    //pthread_create(&th1, NULL,staticResetFaultsTimerForThread,this);
-    
-//    pthread_t th2;
-//    pthread_create(&th2, NULL,staticResetFaultsTimerForThread,this);
+    pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
     
     controlLNS=true;
     
@@ -972,88 +921,6 @@ int TechnoSoftLowDriver::homing(int mode){
 
 int TechnoSoftLowDriver::incrDecrPosition(){
 
-    // Stima grossolana tempo necessario per la movimentazione
-//    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-//    double tol = 30;
-//    deltaT += (deltaT*tol/100);
-//
-//    double totalTimeInterval = 0;   // solo per far partire il ciclo while
-//    struct timeval startTime,endTime;
-//    gettimeofday(&startTime,NULL);
-
-//    while(totalTimeInterval<=deltaT && !stopMotionCommand && !powerOffCommand){
-//        actuatorIDInMotion = true;
-//        // L'incremento deve avvenire ad una determinata velocita'
-//        if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//        }
-//            if(((containerIncrementPosition*)arg)->deltaPosition>=0){
-//                position+=speed_ms_s;
-//            }
-//            else{
-//                position-=speed_ms_s;
-//            }
-//        if(pthread_mutex_unlock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//        }
-//        // Aggiornamento deltaT, stopMotion, stopPower
-//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_ms_s); //[s]
-//        deltaT += (deltaT*tol/100);
-//
-//        gettimeofday(&endTime,NULL);
-//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
-//        sleep(1); // Sleep for 1 second
-//    }
-
-    // L'incremento deve avvenire ad una determinata velocita'
-//    if(pthread_mutex_lock(&(cIP.mu))!=0){
-//
-//    }
-//    //threadMoveRelativeOn = true;
-//    stopMotionCommand = false;
-//    actuatorIDInMotion = true; //deltaPosition>=0
-//    if(pthread_mutex_unlock(&(cIP.mu))!=0){
-//
-//    }
-//
-//    long initPosition = position;
-//    while(fabs(position-initPosition)<=fabs(cIP.deltaPosition) && !stopMotionCommand && !powerOffCommand){
-//
-//        if(pthread_mutex_lock(&(cIP.mu))!=0){
-//
-//        }
-//        if(cIP.deltaPosition>=0){
-//            position+=speed_ms_s;
-//            positionCounter+=speed_ms_s;
-//            positionEncoder+=speed_ms_s;
-//        }
-//        else{
-//            position-=speed_ms_s;
-//            positionCounter-=speed_ms_s;
-//            positionEncoder-=speed_ms_s;
-//        }
-//        if(pthread_mutex_unlock(&(cIP.mu))!=0){
-//
-//        }
-//        usleep(1000); // Sleep for 1 milli second
-//    }
-//    //position = currentPosition;
-//
-//    if(pthread_mutex_lock(&(cIP.mu))!=0){
-//
-//    }
-//    actuatorIDInMotion = false;
-//    stopMotionCommand = false;
-//
-//    if(pthread_mutex_unlock(&(cIP.mu))!=0){
-//
-//    }
-//    pthread_exit(NULL);
-//
-//    return 0;
-
-    //DPRINT("Thread di movimentazione partito!!!!!!!!!");
-
     bool goahead=false; // Per default vai indietro
     if(pthread_mutex_lock(&(mu))!=0){
 
@@ -1077,28 +944,6 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     long initPosition = position;
     bool resetLimitSwicth=true;
 
-    //DPRINT("%ld",position);
-
-//    if(!(position>=0)){
-//        DPRINT("!(position>=0)");
-//    }
-//
-//    if(!(position<LONG_MAX)){
-//        DPRINT("!(position<LONG_MAX)");
-//    }
-//
-//    if(!(abs(position-initPosition)<=abs(deltaPosition)))
-//        DPRINT("!(abs(position-initPosition)<=abs(deltaPosition))");
-//
-//    if(stopMotionCommand)
-//        DPRINT("stopMotionCommand");
-//
-//    if(powerOffCommand)
-//        DPRINT("powerOffCommand");
-    
-    // Gestione limit switch positivo
-    //long positiveLimitPosition = 1000000000;
-
     while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
 
         if(pthread_mutex_lock(&(mu))!=0){
@@ -1120,10 +965,6 @@ int TechnoSoftLowDriver::incrDecrPosition(){
             LSPactive=false;
         }
 
-        //DPRINT("Posizione  dopo l'incremento effettuato: %ld", position);
-        //DPRINT("Posizione encoder dopo l'incremento effettuato: %ld", positionEncoder);
-        //DPRINT("Posizione counter dopo l'incremento effettuato: %ld", positionCounter);
-
         if(resetLimitSwicth){
             if (position >= 0){
                 LSNactive=false;
@@ -1143,22 +984,6 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     }
 
     // DEBUG
-//    if(!(position>=0)){
-//        DPRINT("!(position>=0)");
-//    }
-//
-//    if(!(position<LONG_MAX)){
-//        DPRINT("!(position<LONG_MAX)");
-//    }
-//
-//    if(!(abs(position-initPosition)<=abs(deltaPosition)))
-//        DPRINT("!(abs(position-initPosition)<=abs(deltaPosition))");
-//
-//    if(stopMotionCommand)
-//        DPRINT("stopMotionCommand");
-//
-//    if(powerOffCommand)
-//        DPRINT("powerOffCommand");
 
     if(pthread_mutex_lock(&(mu))!=0){
 
@@ -1188,11 +1013,6 @@ int TechnoSoftLowDriver::incrDecrPosition(){
         position=positiveLimitPosition; 
     }
     
-//    if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
-//        LSPactive=true;
-//        position = LONG_MAX;
-//    }
-    
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
@@ -1209,32 +1029,8 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
     pthread_exit(NULL);
 }
 
-//int TechnoSoftLowDriver::getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr){
-//    
-////    if(!TS_GetInput(nIO, inValue)){
-////        descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
-////        return -1;   
-////    }
-////    return 0;
-//    if(LSNactive){
-//        
-//    }
-//    
-//    inValue=1;
-//    return 0;
-//}
 
 int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
-
-    //DPRINT("Relative Moving axis: %d, deltaMicroSteps %l, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_ms_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
-//        DERR("error relative moving");
-//        return -2;
-//    }
 
     //threadMoveRelativeOn=false; // Spegnamo il thread correntemente in esecuzione
     if(pthread_mutex_lock(&(mu))!=0){
@@ -2610,11 +2406,11 @@ int TechnoSoftLowDriver::faultsGeneration(){
         gettimeofday(&endTimeForMotor1,NULL);
         total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
-        sleep(1); 
+        usleep(500000); 
     }
 }
 
-void* TechnoSoftLowDriver::staticResetFaultsTimerForThread(void* objPointer){
+void* TechnoSoftLowDriver::staticFaultsGeneration(void* objPointer){
     
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->faultsGeneration();
