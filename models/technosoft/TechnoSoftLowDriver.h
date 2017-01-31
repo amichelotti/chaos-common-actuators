@@ -68,6 +68,7 @@
 #define V_LNS 7.7 //[V]
 #define V_LSP 0.3 //[V]
 #define RANGE 1 //[m]
+#define HARD_RESET_MODE_DEFAULT false //[m]
 
 #include <map>
 //#include <boost/shared_ptr.hpp>
@@ -165,6 +166,8 @@ namespace common{
                 
                 struct timeval lastTimeTakenForHoming;
                 double minimumIntervalForHoming; // in seconds
+                
+                bool hardResetMode;
                 
                 
                 
@@ -327,6 +330,8 @@ namespace common{
                 int getLVariable(std::string& nameVar, long& var);
                 
                 int checkEvent(BOOL& event);
+                
+                int hardreset(bool mode=HARD_RESET_MODE_DEFAULT);
                 
                 int getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr);
 

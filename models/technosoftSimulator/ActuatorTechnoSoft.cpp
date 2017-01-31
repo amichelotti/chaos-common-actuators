@@ -83,7 +83,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 //    if(initChannelAlreadyDone){
 //        //DPRINT("This object has already a communication channel correctly initialized");
 //        return 0;
-//    }
+//    }              
 
     std::string params;
     params.assign((const char*)initialization_string);
@@ -249,26 +249,40 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     return *this;
 }
 
-int ActuatorTechnoSoft::hardreset(){ 
+int ActuatorTechnoSoft::hardreset(int axisID, bool mode){ 
     
-    DPRINT("Deleting Actuator Technosoft");
-    //delectingActuator = true;
-    int resp;
-    bool prob=false;
-    
-    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        resp=deinit(it->first); 
-        if(resp<0){
-            prob=true;
-            break;
-        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
-        }   
-    } 
-    
-    if(prob){
+//    DPRINT("Deleting Actuator Technosoft");
+//    //delectingActuator = true;
+//    int resp;
+//    bool prob=false;
+//    
+//    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+//        resp=deinit(it->first); 
+//        if(resp<0){
+//            prob=true;
+//            break;
+//        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+//        }   
+//    } 
+//    
+//    if(prob){
+//        return -1;
+//    }
+  
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato, non c'e' quindi alcun motore da inizializzare
         return -1;
     }
-  
+    
+    if((i->second)->selectAxis()<0){
+        return -2;
+    }
+    if((i->second)->hardreset(mode)<0){
+        return -3;
+    }
+    
     return 0;
 }
 
@@ -723,7 +737,7 @@ int ActuatorTechnoSoft::homing(int axisID,homingType mode){
     if((i->second)->selectAxis()<0){
         return -2;
     }
-    return ((i->second)->homing(mode));
+    return ((i->second)->homing(mode));                          
 }
 
 int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
@@ -755,7 +769,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
     (i->second)->stateInfoRequest = true; // Comunico al motore che sto richiedendo info riguardanti gli allarmi
 
-
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
     (i->second)->regSRHrequest = true;
     if(((i->second)->getStatusOrErrorReg(indexReg, contentRegSRH, descStr))<0){
@@ -773,8 +786,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 //        return -4;
 //    }
 //    (i->second)->regSRLrequest = false;
-    
-    
 
     if((i->second)->readyState){ // readyState = true se la procedura di inizializzazione è andata a buon fine. Accendo il primo bit
         stCode|=ACTUATOR_READY;
@@ -792,6 +803,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_AUTORUN_ENABLED;
         descStr+="Auto run mode. ";
     }
+    
     if(contentRegSRH & ((uint16_t)1<<6)){
         stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
         descStr+="Limit switch positive event/interrupt. ";
@@ -810,7 +822,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode|=ACTUATOR_I2T_WARNING_DRIVE;
         descStr+="Drive I2T protection warning";
     }
-
     if(contentRegSRH & ((uint16_t)1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         descStr+="Gear ratio in electronic gearing mode. ";
@@ -907,6 +918,14 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         return -4;
     }
     (i->second)->regSRHrequest = false;
+    
+//    uint8_t emergengyState;
+//    if((i->second)->getEmergency(16,emergengyState,descStr)<0){
+//        DERR("Reading alarms error: %s",descStr.c_str());
+//        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+//        descStr+= "Alarms reading error. ";
+//        return -5;
+//    }
 
     for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
         if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
@@ -976,13 +995,18 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
                 stCode|=ACTUATOR_COMMANDERROR;
                 descStr+="Command error. ";
             }
+            else if(i==15){
+                stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
+                descStr+="Emergency. ";
+            }
         }// chiudo if(contentRegMER & ((WORD)(base2^i)))
     } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
 
     // Analysis of the register content REG_SRH
-    
-    
-    // No alarms detected
+//    if(!emergengyState){
+//        stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
+//        descStr+="Emergency error. ";
+//    }
 
     *alrm = stCode;
     (i->second)->alarmsInfoRequest = false; // Comunico al motore che ho terminato di richiedere info riguardanti gli allarmi

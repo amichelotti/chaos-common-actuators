@@ -101,6 +101,8 @@
 #define V_LSP 0.3 //[V]
 #define RANGE 500 //[mm]
 
+#define HARD_RESET_MODE_DEFAULT false
+
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -109,24 +111,6 @@ namespace common{
     namespace actuators{
        namespace models {
            namespace simul {
-
-//           class ElectricPowerException{
-//                public:
-//                    ElectricPowerException(){}
-//                    void badElectricPowerInfo();
-//           };
-//
-//           class StopMotionException{
-//                public:
-//                    StopMotionException(){}
-//                    void badStopMotionInfo();
-//           };
-//
-//           class OpeningChannelException{
-//                public:
-//                    OpeningChannelException(){}
-//                    void badOpeningChannelInfo();
-//           };
 
            struct containerIncrementPosition{
                long deltaPosition;
@@ -228,6 +212,8 @@ namespace common{
                 long absolutePosition;
                 long deltaPosition;
                 pthread_mutex_t mu;
+                
+                pthread_t thstaticFaultsGeneration;
 
                 int moveAbsolutePosition();
                 int incrDecrPosition();
@@ -240,8 +226,8 @@ namespace common{
                 static void* staticMoveAbsolutePositionForThread(void*);
                 int moveAbsolutePositionHoming();
                 
-                int resetFaultsTimer();
-                static void* staticResetFaultsTimerForThread(void* objPointer);
+                int faultsGeneration();
+                static void* staticFaultsGeneration(void* objPointer);
                 
                 int resetStatesTimer();
                 void* staticResetStatesTimerForThread(void* objPointer);
@@ -377,6 +363,7 @@ namespace common{
                 int getSpeed(double& speed);
 
                 int getHighSpeedHoming(double& _highSpeedHoming);
+                //int getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr);
 
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
@@ -385,6 +372,9 @@ namespace common{
                 int setMaxlowSpeedHoming(const double& speed);
                 int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
                 int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
+                
+                int hardreset(bool mode=HARD_RESET_MODE_DEFAULT); 
+                
 //                int setAdditiveHoming(const BOOL& isAdditive);
 //                int setMovementHoming(const short& movement);
 //                int setReferenceBaseHoming(const short& referenceBase);
@@ -415,7 +405,7 @@ namespace common{
                 //int resetCounter();// reset TPOS_register();
                 int resetCounterHoming();
                 int resetEncoderHoming();// reset APOS_register();
-                static void* staticResetCounterForThread(void*);
+//                static void* staticResetCounterForThread(void*);
                 static void* staticResetEncoderForThread(void*);
 
 
@@ -440,21 +430,14 @@ namespace common{
                 int setPosition(const long& posValue);
 
                 int getLVariable(std::string& nameVar, long& var);
-
                 int checkEvent(BOOL& event);
-
                 int getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr);
-
                 int getMERregister();// read content of the error register
                 int getSRLregister();// read content of the low part of the status register
                 int getSRHregister();// read content of the high part of the status register
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
-
                 int getFirmwareVers(char* firmwareVers);
-
                 int selectAxis();
-
-                //int incrDecrPositionHoming();
 
            };
 

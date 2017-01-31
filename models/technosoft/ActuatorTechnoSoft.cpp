@@ -203,10 +203,6 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     DPRINT("Costruttore di copia eseguito");
 }
 
-
-
-
-
 ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objActuator){ // Overloading operatori di assegnamento
     
     if(this==& objActuator){
@@ -238,7 +234,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     return *this;
 }
 
-int ActuatorTechnoSoft::hardreset(){ 
+int ActuatorTechnoSoft::hardreset(int axisID, bool mode){ 
     
 //    DPRINT("hardreset calling drive actuator");
 //    //delectingActuator = true;
@@ -259,23 +255,39 @@ int ActuatorTechnoSoft::hardreset(){
 //    }
 //  
 //    return 0;
-    DPRINT("hardreset calling drive actuator");
-    delectingActuator = true;
-    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        deinit(it->first); 
-        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
-    } 
-    // Remove all the element from the map container
-    motors.clear();
     
-    DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
+//    DPRINT("hardreset calling drive actuator");
+//    delectingActuator = true;
+//    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+//        deinit(it->first); 
+//        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+//    } 
+//    // Remove all the element from the map container
+//    motors.clear();
+//    
+//    DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
+//    
+//    // close the communication channel
+//    if(channel!=NULL){
+//        delete channel; 
+//        channel = NULL;
+//    }
+//    DPRINT("Object Actuator Technosoft is deleted");
     
-    // close the communication channel
-    if(channel!=NULL){
-        delete channel; 
-        channel = NULL;
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato, non c'e' quindi alcun motore da inizializzare
+        return -1;
     }
-    DPRINT("Object Actuator Technosoft is deleted");
+    
+    if((i->second)->selectAxis()<0){
+        return -2;
+    }
+    if((i->second)->hardreset(mode)<0){
+        return -3;
+    }
+    return 0;
 }
 
 
@@ -1357,7 +1369,6 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
     }
 
     if(contentRegMER & ((uint16_t)1<<0)){
-    
         stCode|=ACTUATOR_CANBUS_ERROR; // IMPORTANTE: ACTUATOR_CANBUS_ERROR è di tipo int (32 bit)
         // Nell'operazione di OR logico, automaticamente il contenuto
         // a destra dell'uguale viene prima memorizzato in una locazione

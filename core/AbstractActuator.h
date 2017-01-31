@@ -137,23 +137,23 @@ typedef enum {
         @brief initialize and poweron the motor
         @return 0 if success
         */
-            virtual int init(void*)=0;
+        virtual int init(void*)=0;
          /**
            @brief de-initialize the actuator and close the communication
            @return 0 if success
           */
             
-            virtual int configAxis(void*initialization_string)=0;
+        virtual int configAxis(void*initialization_string)=0;
 
-            virtual int deinit(int axisID)=0; // (2)      
-            virtual int hardreset(int axisID,int mode)=0;
+        virtual int deinit(int axisID)=0; // (2)      
+        virtual int hardreset(int axisID, bool mode)=0;
             
         /**
            @brief returns the SW/FW version of the driver/FW
            @param version returning string
            @return 0 if success or an error code
         */
-            virtual int getSWVersion(int axisID, std::string& version)=0;        
+        virtual int getSWVersion(int axisID, std::string& version)=0;        
 
         /**
         @brief returns the HW version of the actuator
