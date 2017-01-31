@@ -146,7 +146,7 @@ typedef enum {
             virtual int configAxis(void*initialization_string)=0;
 
             virtual int deinit(int axisID)=0; // (2)      
-            virtual int hardreset()=0;
+            virtual int hardreset(int axisID,int mode)=0;
             
         /**
            @brief returns the SW/FW version of the driver/FW
