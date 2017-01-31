@@ -235,45 +235,7 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
 }
 
 int ActuatorTechnoSoft::hardreset(int axisID, bool mode){ 
-    
-//    DPRINT("hardreset calling drive actuator");
-//    //delectingActuator = true;
-//    int resp;
-//    bool prob=false;
-//    
-//    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-//        resp=deinit2(it->first); 
-//        if(resp<0){
-//            prob=true;
-//            break;
-//        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
-//        }   
-//    } 
-//    
-//    if(prob){
-//        return -1;
-//    }
-//  
-//    return 0;
-    
-//    DPRINT("hardreset calling drive actuator");
-//    delectingActuator = true;
-//    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-//        deinit(it->first); 
-//        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
-//    } 
-//    // Remove all the element from the map container
-//    motors.clear();
-//    
-//    DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
-//    
-//    // close the communication channel
-//    if(channel!=NULL){
-//        delete channel; 
-//        channel = NULL;
-//    }
-//    DPRINT("Object Actuator Technosoft is deleted");
-    
+
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
     if(i==motors.end()){ 
@@ -289,7 +251,6 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
     }
     return 0;
 }
-
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
@@ -355,6 +316,249 @@ void setUpperCase(const std::string& str,std::string& strResult){
 
 bool to_bool(const std::string & s) {
      return s != "0";
+}
+
+int ActuatorTechnoSoft::getParameter(int axisID,const std::string& parName,std::string& resultString){
+    
+//    // ************************** Operazione di selezione axisID ***************************
+//    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+//    // Controlliamo comunque se l'axis id e' stato configurato
+//    if(i==motors.end()){ 
+//        // In questo caso il motore axisID non e' stato configurato
+//        return -1;
+//    }
+//    
+//    DPRINT("getParameter execution");
+//    
+//    // trim
+//    trim2(parName);
+//    // To upper case
+//    std::string strResultparName;
+//    setUpperCase(parName,strResultparName);
+//    
+//    DPRINT("Stringa elaborata %s",strResultparName.c_str());
+//    
+//    double doubleValue;
+//    int intValue;
+//    
+//    if(strResultparName.compare("SPEED")==0){ 
+//        if((i->second)->getSpeed(doubleValue)<0){
+//            DPRINT("getParameter execution error");
+//            return -2;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita 
+//        
+//        return 0;
+//    } 
+//    else if(strResultparName.compare("MAXSPEED")==0){ 
+//        if((i->second)->getMaxSpeed(doubleValue)<0){
+//            DPRINT("getParameter execution error");
+//            return -3;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita 
+//        
+//        return 0;
+//    }  
+//    else if(strResultparName.compare("ACCELERATION")==0){
+//        if((i->second)->getAcceleration(doubleValue)<0){ 
+//            DPRINT("getParameter execution error");
+//            return -4;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;
+//    }
+//    else if(strResultparName.compare("ISADDITIVE")==0){
+//        // Conversion from string to bool
+//        //boolValue = to_bool(valueOfparName);
+//        if((i->second)->getAdditive(intValue)<0){ 
+//            return -5;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;
+//    }
+//    else if(strResultparName.compare("MOVEMENT")==0){
+//        if((i->second)->getMovement((short)intValue)<0){ 
+//            return -6;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;
+//    }
+//    else if(strResultparName.compare("REFERENCEBASE")==0){
+//        if((i->second)->getReferenceBase((short)intValue)<0){ 
+//            return -7;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
+//        if((i->second)->gethighSpeedHoming(doubleValue)<0){ 
+//            return -8;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;       
+//    }
+//    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
+//        if((i->second)->getMaxhighSpeedHoming(doubleValue)<0){ 
+//            return -9;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;       
+//    }
+//    else if(strResultparName.compare("LOWSPEEDHOMING")==0){
+//        if((i->second)->getlowSpeedHoming(doubleValue)<0){ 
+//            return -10;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
+//        if((i->second)->getMaxlowSpeedHoming(doubleValue)<0){ 
+//            return -11;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("ACCELERATIONHOMING")==0){
+//        if((i->second)->getaccelerationHoming(doubleValue)<0){ 
+//            return -12;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
+//        if((i->second)->getMaxAccelerationHoming(doubleValue)<0){ 
+//            return -13;
+//        }
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("NUMENCODERLINES")==0){
+//        if((i->second)->getEncoderLines(doubleValue)<0){ 
+//            return -17;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
+//        if((i->second)->getConst_mult_technsoft(doubleValue)<0){ 
+//            return -18;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("STEPSPERROUND")==0){
+//        doubleValue = atof(valueOfparName.c_str());
+//        if((i->second)->getSteps_per_rounds(doubleValue)<0){ 
+//            return -19;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    } 
+//    else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
+//        if((i->second)->getN_rounds(doubleValue)<0){ 
+//            return -20;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    } 
+//    else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
+//        if((i->second)->getLinear_movement_per_n_rounds(doubleValue)<0){ 
+//            return -21;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    } 
+//    else if(strResultparName.compare("VOLTAGE_LNS[V]")==0){ 
+//        if((i->second)->getvoltage_LNS(doubleValue)<0){ 
+//            return -22;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("VOLTAGE_LPS[V]")==0){
+//        if((i->second)->getvoltage_LPS(doubleValue)<0){ 
+//            return -23;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("RANGE_SLIT[MM]")==0){  //range_slit[mm]
+//        if((i->second)->getRange(doubleValue)<0){ 
+//            return -24;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else if(strResultparName.compare("FULLSCALEPOT")==0){ //fullscalePot
+//        doubleValue = atof(valueOfparName.c_str());
+//        if((i->second)->getFullscalePot(doubleValue)<0){ 
+//            return -25;
+//        }
+//        // 1. Conversione valore numerico ---> Stringa
+//        
+//        // 2. resultString =  nuova_stringa_convertita
+//        
+//        return 0;   
+//    }
+//    else{
+//        return -26;
+//    }
+    
+    return 0;
 }
 
 int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string valueOfparName){
@@ -920,277 +1124,7 @@ int ActuatorTechnoSoft::homing(int axisID,homingType mode){
         return -2;
     }
     return ((i->second)->homing(mode));     
-}
-
-//int ActuatorTechnoSoft::homing(int axisID,homingType mode){
-//    // Attenzione: la variabile mode non viene utilizzata
-//    if(mode==defaultHoming){
-//        
-//        int risp;
-//        int switchTransited=0;
-//        int motionCompleted = 0;
-//        std::string cappos = "CAPPOS";
-//        long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
-//        int absoluteMotionCompleted = 0;
-//    
-//        switch (internalHomingStateDefault) {
-//            case 0:
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -1;
-//                    break;
-//                }
-//                if(driver->moveVelocityHoming()<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                        risp = -2;
-//                        break;
-//                    }
-//                    risp = -3;
-//                    break;
-//                }
-//                DPRINT(" STATE 0: move velocity activated ");
-//                if(driver->setEventOnLimitSwitch()<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                        risp = -4;
-//                        break;
-//                    }
-//                    risp = -5;
-//                    break;
-//                }
-//                DPRINT("STATE 0: event on limit switch activated ");
-//                internalHomingStateDefault = 1;
-//                risp = 1;
-//                break; 
-//            case 1:
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -6;
-//                    break;
-//                }
-//                if(driver->checkEvent(switchTransited)<0){
-//                    internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
-//                    if(driver->stopMotion()<0){
-//                        risp = -7;
-//                        break;
-//                    }    
-//                    risp = -8;
-//                    break;
-//                } 
-//                DPRINT(" STATE 1: possible limit switch transition just checked ");
-//                if(switchTransited){
-//                    if(driver->setEventOnMotionComplete()<0){ 
-//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
-//                        if(driver->stopMotion()<0){
-//                            risp= -9;
-//                            break;
-//                        }
-//                        risp =-10;
-//                        break;
-//                    }  
-//                    //eventOnMotionCompleteSet = true;
-//                    internalHomingStateDefault=2;
-//                    DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
-//                }
-//                // **************DA IMPLEMENTARE:*****************
-//                // RESET ON Limit Switch Transition Event
-//                risp = 1;
-//                break; 
-//            case 2:
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -11;
-//                    break;
-//                }
-//                if(driver->checkEvent(motionCompleted)<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                        risp = -12;
-//                        break;
-//                    }
-//                    risp= -13;
-//                    break;
-//                }
-//                DPRINT("************** STATE 2: possible event on motion completed checked **************");
-//                if(motionCompleted){
-//                    DPRINT("************** STATE 2: Motion completed after transition **************");
-//                    internalHomingStateDefault = 3;
-//                }
-//                risp= 1;
-//                break;
-//            case 3:
-//                // The motor is not in motion
-//                DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -13;
-//                    break;
-//                }
-//                if(driver->getLVariable(cappos, cap_position)<0){ 
-//    //                if(driver->stopMotion()<0){
-//    //                    return -13;
-//    //                }
-//                    internalHomingStateDefault=0;
-//                    risp = -14;
-//                    break;
-//                }
-//                DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
-//        
-//            /*	Command an absolute positioning on the captured position */
-//                if(driver->moveAbsoluteStepsHoming(cap_position)<0){  
-//                    internalHomingStateDefault=0;
-//                    risp = -15;
-//                    break;
-//                }
-//                DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
-//                internalHomingStateDefault = 4;
-//                risp= 1;
-//                break;
-//            case 4:
-//                DPRINT("************** STATE 4: wait for positioning to end **************");
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -16;
-//                    break;
-//                }
-////        if(!eventOnMotionCompleteSet){
-////            if(driver->setEventOnMotionComplete()<0){
-////                if(driver->stopMotion()<0){
-////                    eventOnMotionCompleteSet = false;
-////                    internalHomingStateDefault = 0;
-////                    return -12;
-////                }
-////                eventOnMotionCompleteSet = false;
-////                internalHomingStateDefault = 0;
-////                return -13;
-////            } 
-////        }
-//                if(driver->checkEvent(absoluteMotionCompleted)<0){
-//                    internalHomingStateDefault = 0;
-//                    if(driver->stopMotion()<0){
-//                    //eventOnMotionCompleteSet = false;
-//                        risp= -17;
-//                        break;
-//                    }
-//                //eventOnMotionCompleteSet = false;
-//                    risp= -18;
-//                    break;
-//                }
-//                if(absoluteMotionCompleted){
-//                    internalHomingStateDefault = 5;
-//                    DPRINT("************** STATE 4: motor positioned to end **************");
-//                }
-//            // **************DA IMPLEMENTARE:*****************
-//            // RESET ON Event On Motion Complete
-//                risp= 1;
-//                break;
-//            case 5:
-//                // The motor is positioned to end
-//                if(driver->selectAxis()<0){
-//                    internalHomingStateDefault = 0;
-//                    risp = -19;
-//                    break;
-//                }
-//        
-//                if(driver->resetEncoder()<0){
-//                    internalHomingStateDefault = 0;
-//                    //if(driver->stopMotion()<0){
-//                    //return -23;
-//                    //}
-//                    risp= -20;
-//                    break;
-//                }
-//                if(driver->resetCounter()<0){
-//                    internalHomingStateDefault = 0;
-//                    //if(driver->stopMotion()<0){
-//                    //return -25;
-//                    //}
-//                    risp= -21;
-//                    break;
-//                }
-//                DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
-//                internalHomingStateDefault = 0;
-//                risp= 0;
-//                break;
-//            default:
-//                internalHomingStateDefault = 0;
-//                risp= -22;
-//                break; 
-//        } 
-//        return risp;
-//    }
-//    else if(mode==homing2){
-//        int risp;
-//        uint16_t contentReg;
-//        std::string descStr = "";
-//        short homingDone = 0;
-//        switch (internalHomingStateHoming2) {
-//            case 0:
-//                DPRINT("************** Homing procedure Homing2. STATE 0. **************");
-//                if(driver->moveVelocityHoming()<0){
-//                    internalHomingStateHoming2=0;
-//                    risp= -1;
-//                    break;
-//                }
-//                internalHomingStateHoming2=1;
-//                risp= 1;
-//                break;
-//            case 1:
-//                DPRINT("************** Homing procedure Homing2. STATE 1. **************");
-//                if((driver->getStatusOrErrorReg(5, contentReg, descStr))<0){
-//                    //ERR("Reading state error: %s",descStr.c_str());
-//                    internalHomingStateHoming2=0;
-//                    if(driver->stopMotion()<0){
-//                        risp= -2;
-//                        break;
-//                    }
-//                    risp= -3;
-//                    break;
-//                }
-//                // lettura bit di interesse
-//                homingDone=((contentReg & ((uint16_t)1)<<7) != 0 ? 1 : 0);
-//                if(homingDone){
-//                   internalHomingStateHoming2=2;
-//                }
-//                risp= 1;
-//                break;
-//            case 2:
-//                DPRINT("************** Homing procedure Homing2. STATE 2. **************");
-//                DPRINT("************** Reset encoder e counter **************");
-//                if(driver->resetEncoder()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(driver->stopMotion()<0){
-//                        risp= -4;
-//                        break;
-//                    }
-//                    risp= -5;
-//                    break;
-//                }
-//                if(driver->resetCounter()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(driver->stopMotion()<0){
-//                        risp= -6;
-//                        break;
-//                    }
-//                    risp= -7;
-//                    break;
-//                }
-//                internalHomingStateHoming2=0;
-//                risp=0;
-//                break;
-//            default:
-//                internalHomingStateHoming2 = 0;
-//                risp=-22;
-//                break;
-//        }
-//        return risp;
-//    }
-//    else{
-//        return -100;
-//    }
-//}
-
+} 
 
 int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
@@ -1409,12 +1343,7 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         stCode|=ACTUATOR_OVER_CURRENT;
         descStr+="Over current error. ";       
     }
-     
-//    if(contentRegMER & ((uint16_t)1<<8)){
-//        stCode|=ACTUATOR_OVER_CURRENT;
-//        descStr+="Over current error. ";       
-//    }
-    
+
     if(contentRegMER & ((uint16_t)1<<9)){
         stCode|=ACTUATOR_I2T;
         descStr+="I2T protection error. ";
@@ -1444,164 +1373,6 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         stCode|=ACTUATOR_COMMANDERROR;
         descStr+="Command error. ";
     }
-    
-//     else if(i==13){
-//                stCode|=ACTUATOR_UNDERVOLTAGE;
-//                descStr+="Under voltage error. ";
-//            }
-//            else if(i==14){
-//                stCode|=ACTUATOR_COMMANDERROR;
-//                descStr+="Command error. ";
-//            }
-
-//    for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
-//        if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
-//            if(i==0){
-//                stCode|=ACTUATOR_CANBUS_ERROR; // IMPORTANTE: ACTUATOR_CANBUS_ERROR è di tipo int (32 bit)
-//                // Nell'operazione di OR logico, automaticamente il contenuto
-//                // a destra dell'uguale viene prima memorizzato in una locazione
-//                // a 64 bit di tipo unsigned cosicché si possa fare l'OR logico
-//                // bit a bit con la variabile a primo membro
-//                // In corrispondenza di questo errore accendo il bit 0 di *alarm
-//                //desc.assign("CAN bus error. ");
-//                descStr=descStr+"CAN bus error. ";
-//            }
-//            else if(i==1){
-//                stCode|=ACTUATOR_SHORT_CIRCUIT; // In corrispondenza di questo errore accendo il bit 1 di *alarm
-//                descStr+="Short circuit. ";
-//            }
-//            else if(i==2){
-//                stCode|=ACTUATOR_INVALID_SETUP_DATA;
-//                descStr+= "Invalid setup data. ";
-//            }
-//            else if(i==3){
-//                stCode|=ACTUATOR_CONTROL_ERROR;
-//                descStr+= "Control error. ";
-//            }
-//            else if(i==4){
-//                stCode|=ACTUATOR_SERIAL_COMM_ERROR;
-//                descStr= descStr+ "Communication error. ";
-//            }
-//            else if(i==5){
-//                stCode|=ACTUATOR_HALL_SENSOR_MISSING;
-//                descStr+= "Hall sensor missing / Resolver error / BiSS error / Position wrap around error. ";
-//            }
-////            else if(i==6){
-////                stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
-////                descStr+="Positive limit switch active. ";
-////            }
-////            else if(i==7){
-////                stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
-////                descStr+="Negative limit switch active. ";
-////            }
-//            else if(i==8){
-//                stCode|=ACTUATOR_OVER_CURRENT;
-//                descStr+="Over current error. ";
-//            }
-//            else if(i==9){
-//                stCode|=ACTUATOR_I2T;
-//                descStr+="I2T protection error. ";
-//            }
-//            else if(i==10){
-//                stCode|=ACTUATOR_OVERTEMP_MOTOR;
-//                descStr+="Motor over temperature error. ";
-//            }
-//            else if(i==11){
-//                stCode|=ACTUATOR_OVERTEMP_DRIVE;
-//                descStr+="Drive over temperature error. ";
-//            }
-//            else if(i==12){
-//                stCode|=ACTUATOR_OVERVOLTAGE;
-//                descStr+="Over voltage error. ";
-//            }
-//            else if(i==13){
-//                stCode|=ACTUATOR_UNDERVOLTAGE;
-//                descStr+="Under voltage error. ";
-//            }
-//            else if(i==14){
-//                stCode|=ACTUATOR_COMMANDERROR;
-//                descStr+="Command error. ";
-//            }
-            
-//            switch (i) {
-//                case 0:
-//   	    		stCode|=ACTUATOR_CANBUS_ERROR; // IMPORTANTE: ACTUATOR_CANBUS_ERROR è di tipo int (32 bit)
-//                        // Nell'operazione di OR logico, automaticamente il contenuto
-//                        // a destra dell'uguale viene prima memorizzato in una locazione
-//                        // a 64 bit di tipo unsigned cosicché si possa fare l'OR logico
-//                        // bit a bit con la variabile a primo membro
-//                        // In corrispondenza di questo errore accendo il bit 0 di *alarm
-//                        //desc.assign("CAN bus error. ");
-//                        descStr=descStr+"CAN bus error. ";
-//   	    		break;
-//                case 1:
-//   	    		stCode|=ACTUATOR_SHORT_CIRCUIT; // In corrispondenza di questo errore accendo il bit 1 di *alarm
-//                        descStr+="Short circuit. ";
-//   	    		break;	
-//                case 2:
-//   	    		stCode|=ACTUATOR_INVALID_SETUP_DATA;
-//                        descStr+= "Invalid setup data. ";
-//   	    		break;        
-//                case 3: 
-//                        stCode|=ACTUATOR_CONTROL_ERROR;
-//                        descStr+= "Control error. ";
-//                        break;
-//                case 4: 
-//                        stCode|=ACTUATOR_SERIAL_COMM_ERROR;
-//                        descStr= descStr+ "Communication error. ";
-//                        break; 
-//                case 5:
-//                        stCode|=ACTUATOR_HALL_SENSOR_MISSING;
-//                        descStr+= "Hall sensor missing / Resolver error / BiSS error / Position wrap around error. ";
-//                        break;
-//                case 8:
-//                        stCode|=ACTUATOR_OVER_CURRENT;
-//                        descStr+="Over current error. ";
-//                        break;  
-//                case 9:
-//                        stCode|=ACTUATOR_I2T;
-//                        descStr+="I2T protection error. ";
-//                        break;
-//                case 10:
-//                        stCode|=ACTUATOR_OVERTEMP_MOTOR;
-//                        descStr+="Motor over temperature error. ";
-//                        break;
-//                case 11:
-//                        stCode|=ACTUATOR_OVERTEMP_DRIVE;
-//                        descStr+="Drive over temperature error. ";
-//                        break;
-//                case 12:
-//                        stCode|=ACTUATOR_OVERVOLTAGE;
-//                        descStr+="Over voltage error. ";
-//                        break;
-//                case 13:
-//                        stCode|=ACTUATOR_UNDERVOLTAGE;
-//                        descStr+="Under voltage error. ";
-//                        break;
-//                case 14:
-//                        stCode|=ACTUATOR_COMMANDERROR;
-//                        descStr+="Command error. ";
-//                        break;
-//                default:
-//                        // Non vogliamo modificare ne stCode, ne descStr
-//	     		break;
-//	    }
-//	    
-//            
-//        }// chiudo if(contentRegMER & ((WORD)(base2^i)))
-//    } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
-    
-    
-
-//    // Analysis of the register content REG_SRH
-//    if(contentRegSRH & ((uint16_t)1<<10)){
-//        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
-//        descStr+="Motor I2T protection warning. ";
-//    }
-//    if(contentRegSRH & ((uint16_t)1<<11)){
-//        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
-//        descStr+="Drive I2T protection warning";
-//    }
     
     if(!emergengyState){
         stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;

@@ -247,6 +247,10 @@ namespace common{
                         const double fullScalePot = FULLSCALE_POTENTIOMETER //[V] 
                         );
                 
+                double speedfromIUTOMMs(double _speed_IU);
+                double accelerationfromIUToMMs(double _acceleration_IU);
+                
+                
                 int homing(int mode);
                 
                 int getinternalHomingStateDefault();
@@ -265,43 +269,70 @@ namespace common{
                 
                 // Set trapezoidal profile parameters
                 int setSpeed(const double& speed);
-                int setMaxSpeed(const double& maxspeed);
-                int setAcceleration(const double& acceleration);
-                int setMaxAcceleration(const double& maxAcceleration);
-                int setAdditive(const BOOL& isAdditive);
-                int setMovement(const short& movement);
-                int setReferenceBase(const short& referenceBase);
-                //Get methods
                 int getSpeed(double& speed);
-                  
-                int getHighSpeedHoming(double& _highSpeedHoming);
+                
+                int setMaxSpeed(const double& maxspeed);
+                int getMaxSpeed(double& maxspeed);
+                
+                int setAcceleration(const double& acceleration);
+                int getAcceleration(double& acceleration);
+                
+                int setMaxAcceleration(const double& maxAcceleration);
+                int getMaxAcceleration(double& maxAcceleration);
 
+                int setAdditive(const BOOL& isAdditive);
+                int getAdditive(BOOL& isAdditive);
+
+                int setMovement(const short& movement);
+                int getMovement(short& movement);
+                
+                int setReferenceBase(const short& referenceBase);
+                int getReferenceBase(short& referenceBase);
+                
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
+                int getHighSpeedHoming(double& _highSpeedHoming);
+                
                 int setMaxhighSpeedHoming(const double& _speed);
+                int getMaxhighSpeedHoming(double& _speed);
+                
                 int setlowSpeedHoming(const double& _lowSpeedHoming_mm_s);
+                int getlowSpeedHoming(double& _lowSpeedHoming_mm_s);
+                
                 int setMaxlowSpeedHoming(const double& speed);
+                int getMaxlowSpeedHoming(double& _lowSpeedHoming_mm_s);
+                
                 int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
+                int getaccelerationHoming(double& _accelerationHoming_mm_s2);
+                
                 int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
-//                int setAdditiveHoming(const BOOL& isAdditive);
-//                int setMovementHoming(const short& movement);
-//                int setReferenceBaseHoming(const short& referenceBase);
+                int getMaxAccelerationHoming(double& _maxaccelerationHoming_mm_s2);
+                           
+                int setConst_mult_technsoft(const double& _const_mult_technsoft);
+                int getConst_mult_technsoft(double& _const_mult_technsoft);
                 
-                int setConst_mult_technsoft(double& _const_mult_technsoft);
-                int setSteps_per_rounds(double& _steps_per_rounds);
-                int setN_rounds(double& _n_rounds);
-                int setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
-                int setEncoderLines(double& _encoderLines);
+                int setSteps_per_rounds(const double& _steps_per_rounds);
+                int getSteps_per_rounds(double& _steps_per_rounds);
                 
-                int setFullscalePot(double& _fullScale);
+                int setN_rounds(const double& _n_rounds);
+                int getN_rounds(double& _n_rounds);
+                
+                int setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds);
+                int getLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
+                
+                int setEncoderLines(const double& _encoderLines);
+                int getEncoderLines(double& _encoderLines);
+                
+                int setFullscalePot(const double& _fullScale);
+                int getFullscalePot(double& _fullScale);
                 
                 //Encoder lines
 
                 int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position) const;
-                int setvoltage_LNS(double& _voltage_LNS);
-                int setvoltage_LPS(double& _voltage_LPS);
-                int setRange(double& _range);
+                int setvoltage_LNS(const double& _voltage_LNS);
+                int setvoltage_LPS(const double& _voltage_LPS);
+                int setRange(const double& _range);
                 
                 // get methods for variables
                 //channel_psh getMyChannel();

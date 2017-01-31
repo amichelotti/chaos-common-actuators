@@ -100,6 +100,8 @@ namespace common{
                     uint64_t getFeatures(){return 0;}
                     
                     int hardreset(int axisID,bool mode);
+                    
+                    int getParameter(int axisID,const std::string& parName,std::string& resultString);
      
         /**
         @brief get the actuator position using the readingType mode chosen for reading

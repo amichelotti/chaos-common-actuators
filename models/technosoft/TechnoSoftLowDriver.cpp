@@ -69,9 +69,19 @@ double speedfromMMsToIU(double _speed_mm_s){
     return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
 }
 
+double speedfromIUTOMMs(double _speed_IU){
+    
+    return (_speed_IU*CONVERSION_FACTOR_DEG_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
+}
+
 double accelerationfromMMs2ToIU(double _acceleration_mm_s2){
     
     return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_acceleration_mm_s2) / CONVERSION_FACTOR_DEGs2_UI;
+}
+
+double accelerationfromIUToMMs2(double _acceleration_IU){
+    
+    return (_acceleration_IU*CONVERSION_FACTOR_DEGs2_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
 }
 
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
@@ -974,6 +984,15 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){ // _speed_mm_s [mm
     return 0;
 }
 
+int TechnoSoftLowDriver::getSpeed(double& _speed){
+    
+    // Conversione  
+    
+//    _speed =    
+
+    return 0;
+}
+
 
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
 
@@ -1155,7 +1174,7 @@ int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAcceleratio
 }
 
 // Set encoder lines
-int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
+int TechnoSoftLowDriver::setEncoderLines(const double& _encoderLines){
     //DPRINT("Chiamata setEncoderLines");
     if(_encoderLines<=0){
         return -1;
@@ -1164,7 +1183,7 @@ int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
     return 0;
 }
 
-int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
+int TechnoSoftLowDriver::setConst_mult_technsoft(const double& _const_mult_technsoft){
     //DPRINT("Chiamata setConst_mult_technsoft");
     if(_const_mult_technsoft<=0){
         return -1;
@@ -1173,7 +1192,7 @@ int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
     return 0;
 }
 
-int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
+int TechnoSoftLowDriver::setSteps_per_rounds(const double& _steps_per_rounds){
     //DPRINT("Chiamata setSteps_per_rounds");
     if(_steps_per_rounds<=0){
         return -1;
@@ -1182,7 +1201,7 @@ int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
     return 0;
 }
 
-int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
+int TechnoSoftLowDriver::setN_rounds(const double& _n_rounds){
     //DPRINT("Chiamata setN_rounds");
     if(_n_rounds<=0){
         return -1;
@@ -1191,7 +1210,7 @@ int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
     return 0;
 }
 
-int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
+int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_linear_movement_per_n_rounds<=0){
         return -1;
@@ -1200,7 +1219,7 @@ int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movemen
     return 0;
 }
 
-int TechnoSoftLowDriver::setvoltage_LNS(double& _voltage_LNS){
+int TechnoSoftLowDriver::setvoltage_LNS(const double& _voltage_LNS){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_voltage_LNS<0){
         return -1;
@@ -1209,7 +1228,7 @@ int TechnoSoftLowDriver::setvoltage_LNS(double& _voltage_LNS){
     return 0;
 }
 
-int TechnoSoftLowDriver::setvoltage_LPS(double& _voltage_LPS){
+int TechnoSoftLowDriver::setvoltage_LPS(const double& _voltage_LPS){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_voltage_LPS<0){
         return -1;
@@ -1218,7 +1237,7 @@ int TechnoSoftLowDriver::setvoltage_LPS(double& _voltage_LPS){
     return 0;
 }
 
-int TechnoSoftLowDriver::setRange(double& _range){
+int TechnoSoftLowDriver::setRange(const double& _range){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_range<0){
         return -1;
@@ -1227,7 +1246,7 @@ int TechnoSoftLowDriver::setRange(double& _range){
     return 0;
 }
 
-int TechnoSoftLowDriver::setFullscalePot(double& _fullScale){
+int TechnoSoftLowDriver::setFullscalePot(const double& _fullScale){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_fullScale<0){
         return -1;
@@ -1547,6 +1566,19 @@ int TechnoSoftLowDriver::hardreset(bool mode){
     
     if(!TS_Reset()){
         return -3;
+    }
+    
+    /*	Execute the initialization of the drive (ENDINIT) */
+    if(!TS_DriveInitialisation()){
+        DERR("failed Low driver initialisation");
+        return -4;
+    }
+    
+     // Settare il registro per la lettura dell'encoder
+    if(!TS_Execute("SCR=0x4338")){
+        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        DERR("Failed TS_Execute command");
+        return -5;
     }
     
     return 0;

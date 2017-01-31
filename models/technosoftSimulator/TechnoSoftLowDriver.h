@@ -95,6 +95,8 @@
 #define POSITIVE_LIMIT_POSITION_DEFAULT 60000000
 #define PERC_NOISE_DEFAULT 0.0
 #define DURATION_ALARMS_INTERVAL_DEFAULT 60.0
+#define ALARMS_PRESENT_DEFAULT true   
+
 
 #define FULLSCALE_POTENTIOMETER 20.0
 #define V_LNS 7.7 //[V]
@@ -332,7 +334,8 @@ namespace common{
                         const double voltage_LNS = V_LNS, //[V]
                         const double voltage_LPS = V_LSP, //[V]
                         const double range = RANGE,  //[meter]
-                        const double fullScalePot = FULLSCALE_POTENTIOMETER //[V] 
+                        const double fullScalePot = FULLSCALE_POTENTIOMETER, //[V]
+                        const bool _alarmsPresent = ALARMS_PRESENT_DEFAULT 
                         );
 
 

@@ -43,6 +43,7 @@ static const boost::regex driver_match2("(\\d+),(.+)");
 //(([1-9][0-9]*\\.?[0-9]*)|(\\.[0-9]+))([Ee][+-]?[0-9]+)? 
 
 
+
 std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
@@ -132,21 +133,6 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         std::string conf_path=match[2];
         std::string straxid=match[1];
         int axid = atoi(straxid.c_str());
-        
-//        std::string strpositiveLimitPosition = match[2];
-//        long positiveLimitPosition = atol(strpositiveLimitPosition.c_str());
-//         
-//        std::string strpercNoise = match[3];
-//        double percNoise = atof(strpercNoise.c_str());
-//        
-//        std::string strdurationAlarmsInterval = match[4];
-//        double durationAlarmsInterval = atof(strdurationAlarmsInterval.c_str());
-//        
-//        DPRINT("positiveLimitPosition= %s",strpositiveLimitPosition.c_str());
-//        DPRINT("percNoise=%s",strpercNoise.c_str());
-//        DPRINT("durationAlarmsInterval=%s",strdurationAlarmsInterval.c_str());
-        
-        //sleep(120);
 
         // Controllo mappa motori
         std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axid); // iteratore alla mappa statica

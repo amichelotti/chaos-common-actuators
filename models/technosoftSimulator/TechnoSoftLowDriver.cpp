@@ -75,7 +75,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _voltage_LNS, //[V]
                         const double _voltage_LPS, //[V]
                         const double _range,  //[meter]
-                        const double _fullScalePot //[V] 
+                        const double _fullScalePot,
+                        const bool _alarms//[V] 
                         ){
 
     //DPRINT("Inizializzazione parametri");
@@ -343,10 +344,12 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
     
-    pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
+    if(_alarms){
+        pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
+    }
+    
     
     controlLNS=true;
-    
     return 0;
 }
 

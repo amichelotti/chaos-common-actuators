@@ -165,7 +165,6 @@ typedef enum {
 /**
 @brief returns a string containing the dataset attributes from driver which responds to SetParameter method
 
-
 */
         virtual int sendDataset(std::string& dataset)=0; // ****Da implementare***  (2)
          /**
