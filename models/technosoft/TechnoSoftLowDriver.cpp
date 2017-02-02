@@ -1258,6 +1258,13 @@ int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAcceleratio
     return 0;
 }
 
+int TechnoSoftLowDriver::getMaxAccelerationHoming(double&  _maxAccelerationHoming_mm_s2){
+    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    
+    _maxAccelerationHoming_mm_s2=accelerationfromIUToMMs2(maxAccelerationHoming_IU);
+    return 0;
+}
+
 // Set encoder lines
 int TechnoSoftLowDriver::setEncoderLines(const double& _encoderLines){
     //DPRINT("Chiamata setEncoderLines");
@@ -1265,6 +1272,12 @@ int TechnoSoftLowDriver::setEncoderLines(const double& _encoderLines){
         return -1;
     }
     n_encoder_lines=_encoderLines;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getEncoderLines(double& _encoderLines){
+    //DPRINT("Chiamata setEncoderLines");
+    _encoderLines=n_encoder_lines;
     return 0;
 }
 
@@ -1277,12 +1290,25 @@ int TechnoSoftLowDriver::setConst_mult_technsoft(const double& _const_mult_techn
     return 0;
 }
 
+int TechnoSoftLowDriver::getConst_mult_technsoft(double& _const_mult_technsoft){
+    //DPRINT("Chiamata setConst_mult_technsoft");
+    
+    _const_mult_technsoft=const_mult_technsoft;
+    return 0;
+}
+
 int TechnoSoftLowDriver::setSteps_per_rounds(const double& _steps_per_rounds){
     //DPRINT("Chiamata setSteps_per_rounds");
     if(_steps_per_rounds<=0){
         return -1;
     }
     steps_per_rounds=_steps_per_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getSteps_per_rounds(double& _steps_per_rounds){
+    //DPRINT("Chiamata setSteps_per_rounds");
+    _steps_per_rounds=steps_per_rounds;
     return 0;
 }
 
@@ -1295,12 +1321,29 @@ int TechnoSoftLowDriver::setN_rounds(const double& _n_rounds){
     return 0;
 }
 
+int TechnoSoftLowDriver::getN_rounds(double& _n_rounds){
+    //DPRINT("Chiamata setN_rounds");
+    
+    _n_rounds=n_rounds;
+    return 0;
+}
+
+
 int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_linear_movement_per_n_rounds<=0){
         return -1;
     }
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+//    if(_linear_movement_per_n_rounds<=0){
+//        return -1;
+//    }
+    _linear_movement_per_n_rounds=linear_movement_per_n_rounds;
     return 0;
 }
 
@@ -1313,12 +1356,25 @@ int TechnoSoftLowDriver::setvoltage_LNS(const double& _voltage_LNS){
     return 0;
 }
 
+int TechnoSoftLowDriver::getvoltage_LNS(double& _voltage_LNS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    _voltage_LNS=voltage_LNS;
+    return 0;
+}
+
 int TechnoSoftLowDriver::setvoltage_LPS(const double& _voltage_LPS){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_voltage_LPS<0){
         return -1;
     }
     voltage_LPS=_voltage_LPS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getvoltage_LPS(double& _voltage_LPS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    
+    _voltage_LPS=voltage_LPS;
     return 0;
 }
 
@@ -1331,6 +1387,12 @@ int TechnoSoftLowDriver::setRange(const double& _range){
     return 0;
 }
 
+int TechnoSoftLowDriver::getRange(double& _range){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    _range=range;
+    return 0;
+}
+
 int TechnoSoftLowDriver::setFullscalePot(const double& _fullScale){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_fullScale<0){
@@ -1338,6 +1400,14 @@ int TechnoSoftLowDriver::setFullscalePot(const double& _fullScale){
     }
     fullScalePot=_fullScale;
     constantPot=_fullScale/65535;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getFullscalePot(double& _fullScale){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    
+//    fullScalePot=_fullScale;
+    _fullScale=fullScalePot;
     return 0;
 }
 

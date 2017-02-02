@@ -307,9 +307,13 @@ namespace common{
                 int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position) const;
                 int setvoltage_LNS(const double& _voltage_LNS);
-                int setvoltage_LPS(const double& _voltage_LPS);
-                int setRange(const double& _range);
+                int getvoltage_LNS(double& _voltage_LNS);
                 
+                int setvoltage_LPS(const double& _voltage_LPS);
+                int getvoltage_LPS(double& _voltage_LNS);
+                
+                int setRange(const double& _range);
+                int getRange(double& _range);
                 // get methods for variables
                 //channel_psh getMyChannel();
                 int getCounter(double* deltaPosition_mm);
