@@ -308,7 +308,11 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     controlLNS=true;
     
     // Gestione eventuale sospensione homing
-    minimumIntervalForHoming=2;
+    minimumIntervalForHoming=2; // s
+    
+    // Inizializzazione ultima volta esecuzione funzione homing
+    lastTimeTakenForHoming.tv_sec=0;
+    lastTimeTakenForHoming.tv_usec=0;
     
     return 0;
 }
@@ -316,49 +320,51 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 int TechnoSoftLowDriver::homing(int mode){
     // Attenzione: la variabile mode non viene utilizzata
     
+    double time_interval;
+    struct timeval currentTimeTakenForHoming;
+    
+    gettimeofday(&currentTimeTakenForHoming,NULL);
+    time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+    
+    if(time_interval>minimumIntervalForHoming){
+       internalHomingStateDefault = 0;
+       controlLNS=true;
+       cap_position=0; 
+    }
+    
     if(controlLNS){
         std::string descStr="";
         uint16_t contentRegMER=0;
         if((getStatusOrErrorReg(5, contentRegMER, descStr))<0){
+            lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+            lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+            internalHomingStateDefault = 0;
+            controlLNS=true;
+            cap_position=0;
             return -1;
         }
         if(contentRegMER & ((uint16_t)1<<7)){
             // Il LNS e' attivo. Non c'e' bisogno di effettuare la procedura di homing.
             // Reset encoder e counter
+            lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+            lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+            internalHomingStateDefault = 0;
+            controlLNS=true;
+            cap_position=0; 
+            
             if(selectAxis()<0){
-                internalHomingStateDefault = 0;
-                controlLNS=true;
-                cap_position=0;  
                 return -2; 
             }
             
             if(resetEncoder()<0){
-                internalHomingStateDefault = 0;
-                controlLNS=true; 
-                cap_position=0;
                 return -3;
-                    //if(stopMotion()<0){
-                    //return -23;
-                    //}
+                   
             }
             if(resetCounter()<0){
-                internalHomingStateDefault = 0;
-                controlLNS=true; 
-                cap_position=0;
                 return -4;
-                    //if(stopMotion()<0){
-                    //return -25;
-                    //}
             }
-            cap_position=0;
-            internalHomingStateDefault = 0;
-            controlLNS=true;
             return 0;
-        }
-        // IL LNS non e' attivo. La procedura di homing deve cominciare, senza piu' fare questo controllo.
-//        if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
-//            return -2;
-//        }
+        }  
         controlLNS=false;    
     }
     
@@ -376,11 +382,14 @@ int TechnoSoftLowDriver::homing(int mode){
     
         switch (internalHomingStateDefault) {
             case 0:
+//                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+//                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
                 if(selectAxis()<0){
+                    
                     internalHomingStateDefault = 0;
                     controlLNS=true;
-                   
-                    risp = -3;
+                    cap_position=0;
+                    risp = -5;
                     break;
                 }
 //                if(setEventOnMotionComplete()<0){ 
@@ -398,11 +407,11 @@ int TechnoSoftLowDriver::homing(int mode){
                     internalHomingStateDefault = 0;
                     controlLNS=true;
                     if(stopMotion()<0){
-                        risp = -4;
+                        risp = -6;
                         break;
                     }
                     
-                    risp = -5;
+                    risp = -7;
                     break;
                 }
                 
@@ -410,10 +419,10 @@ int TechnoSoftLowDriver::homing(int mode){
                     internalHomingStateDefault = 0;
                     controlLNS=true;
                     if(stopMotion()<0){
-                        risp = -6;
+                        risp = -8;
                         break;
                     }
-                    risp = -7;
+                    risp = -9;
                     break;
                 }
                 
@@ -429,17 +438,17 @@ int TechnoSoftLowDriver::homing(int mode){
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
                     controlLNS=true;
-                    risp = -8;
+                    risp = -10;
                     break;
                 }
                 if(checkEvent(switchTransited)<0){
                     internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
                     controlLNS=true; 
                     if(stopMotion()<0){
-                        risp = -9;
+                        risp = -11;
                         break;
                     }   
-                    risp = -10;
+                    risp = -12;
                     break;
                 } 
                 DPRINT(" STATE 1: possible limit switch transition just checked ");
@@ -492,7 +501,7 @@ int TechnoSoftLowDriver::homing(int mode){
                         risp = -11;
                         break;
                     }
-                    risp = -12;
+                    risp = -13;
                     break;
                 }
                 
@@ -520,10 +529,10 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    descStr=descStr+"Unknown status. ";
 //                    ERR("Reading state error: %s",descStr.c_str());
                     if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
-                        risp = -13;
+                        risp = -14;
                         break;
                     }
-                    risp= -14;
+                    risp= -15;
                     break;
                 }
                 if((contentRegSRL & ((uint16_t)1<<10))){
@@ -540,7 +549,7 @@ int TechnoSoftLowDriver::homing(int mode){
                     //sleep(60);
                 }
                 if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
-                    risp = -15;
+                    risp = -16;
                     break;
                 }
                 risp= 1;
@@ -555,10 +564,10 @@ int TechnoSoftLowDriver::homing(int mode){
                     internalHomingStateDefault = 0;
                     controlLNS=true; 
                     if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
-                        risp = -16;
+                        risp = -17;
                         break;
                     }
-                    risp = -17;
+                    risp = -18;
                     break;
                 }
                 
@@ -787,6 +796,8 @@ int TechnoSoftLowDriver::homing(int mode){
                 risp= -34;
                 break; 
         } 
+        lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+        lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
         return risp;
     }
     else if(mode==1){
@@ -801,7 +812,7 @@ int TechnoSoftLowDriver::homing(int mode){
         switch (internalHomingStateHoming2) {
             case 0:       
                 DPRINT("************** Homing procedure Homing2. STATE 0. **************");
-                gettimeofday(&lastTimeTakenForHoming,NULL);
+                //gettimeofday(&lastTimeTakenForHoming,NULL);
                 
                 if(moveVelocityHoming()<0){
                     internalHomingStateHoming2=0;
@@ -815,38 +826,38 @@ int TechnoSoftLowDriver::homing(int mode){
             case 1:
                 DPRINT("************** Homing procedure Homing2. STATE 1. **************");
                 
-                gettimeofday(&currentTimeTakenForHoming,NULL);
-                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
-                // Aggiornamento lastTimeTakenForHoming
-                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
-                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+//                gettimeofday(&currentTimeTakenForHoming,NULL);
+//                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+//                // Aggiornamento lastTimeTakenForHoming
+//                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+//                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
                 
-                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
-                                                            // Potrebbe essere causata ad esempio da un comando di stop.
-                    
-                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
-                    // Le operazioni di questo stato non dovranno essere eseguite! 
-                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
-                    // Dobbiamo quindi far ripartire la procedura di homing 
-                    // come se fosse la prima volta che la procedura venisse chiamata,
-                    // in modo del tutto trasparente alla control unit
-                    
-                    internalHomingStateHoming2 = 0;
-                    controlLNS = true;
-                    //perche' deve avvenire in modo del tutto trasparente alla control unit:
-                    risp = 1;
-                    break;
-                }
-                DPRINT("time interval: %f",time_interval);
+//                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
+//                                                            // Potrebbe essere causata ad esempio da un comando di stop.
+//                    
+//                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+//                    // Le operazioni di questo stato non dovranno essere eseguite! 
+//                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+//                    // Dobbiamo quindi far ripartire la procedura di homing 
+//                    // come se fosse la prima volta che la procedura venisse chiamata,
+//                    // in modo del tutto trasparente alla control unit
+//                    
+//                    internalHomingStateHoming2 = 0;
+//                    controlLNS = true;
+//                    //perche' deve avvenire in modo del tutto trasparente alla control unit:
+//                    risp = 1;
+//                    break;
+//                }
+//                DPRINT("time interval: %f",time_interval);
 
                 if((getStatusOrErrorReg(5, contentReg, descStr))<0){
                     //ERR("Reading state error: %s",descStr.c_str());
                     internalHomingStateHoming2=0;
                     controlLNS=true;
-                    if(stopMotion()<0){
-                        risp= -36;
-                        break;
-                    }
+//                    if(stopMotion()<0){
+//                        risp= -36;
+//                        break;
+//                    }
                     risp= -37;
                     break;
                 }
@@ -861,11 +872,11 @@ int TechnoSoftLowDriver::homing(int mode){
                 DPRINT("************** Homing procedure Homing2. STATE 2. **************");
                 DPRINT("************** Reset encoder e counter **************");
                 
-                gettimeofday(&currentTimeTakenForHoming,NULL);
-                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
-                // Aggiornamento lastTimeTakenForHoming
-                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
-                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+//                gettimeofday(&currentTimeTakenForHoming,NULL);
+//                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+//                // Aggiornamento lastTimeTakenForHoming
+//                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+//                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
 
                 // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
                 // Le operazioni di questo stato non dovranno essere eseguite! 
@@ -873,50 +884,49 @@ int TechnoSoftLowDriver::homing(int mode){
                 // Dobbiamo quindi far ripartire la procedura di homing 
                 // come se fosse la prima volta che la procedura venisse chiamata,
                 // in modo del tutto trasparente alla control unit
-                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
-                                                            // Potrebbe essere causata ad esempio da un comando di stop.
-                    
-                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
-                    // Le operazioni di questo stato non dovranno essere eseguite! 
-                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
-                    // Dobbiamo quindi far ripartire la procedura di homing 
-                    // come se fosse la prima volta che la procedura venisse chiamata,
-                    // in modo del tutto trasparente alla control unit
-                    
-                    internalHomingStateHoming2 = 0;
-                    controlLNS = true;
-                    // in modo trasparente alla control unit:
-                    risp = 1;
-                    // Aggiornamento lastTimeTakenForHoming
-//                    lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
-//                    lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
-                    break;
-                }
+//                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
+//                                                            // Potrebbe essere causata ad esempio da un comando di stop.
+//                    
+//                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+//                    // Le operazioni di questo stato non dovranno essere eseguite! 
+//                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+//                    // Dobbiamo quindi far ripartire la procedura di homing 
+//                    // come se fosse la prima volta che la procedura venisse chiamata,
+//                    // in modo del tutto trasparente alla control unit
+//                    
+//                    internalHomingStateHoming2 = 0;
+//                    controlLNS = true;
+//                    // in modo trasparente alla control unit:
+//                    risp = 1;
+//                    // Aggiornamento lastTimeTakenForHoming
+////                    lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+////                    lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+//                    break;
+//                }
                 DPRINT("time interval: %f",time_interval);
                 
                 if(resetEncoder()<0){
                     internalHomingStateHoming2=0;
                     controlLNS=true;
-                    if(stopMotion()<0){
-                        risp= -38;
-                        break;
-                    }
+//                    if(stopMotion()<0){
+//                        risp= -38;
+//                        break;
+//                    }
                     risp= -39;
                     break;
                 }
                 if(resetCounter()<0){
                     internalHomingStateHoming2=0;
                     controlLNS=true;
-                    if(stopMotion()<0){
-                        risp= -40;
-                        break;
-                    }
+//                    if(stopMotion()<0){
+//                        risp= -40;
+//                        break;
+//                    }
                     risp= -41;
                     break;
                 }
-                lastTimeTakenForHoming.tv_sec=0; // Solo per lasciare pulita la memoria per molto tempo...
-                lastTimeTakenForHoming.tv_usec=0;
-                        
+//                lastTimeTakenForHoming.tv_sec=0; // Solo per lasciare pulita la memoria per molto tempo...
+//                lastTimeTakenForHoming.tv_usec=0;     
                 internalHomingStateHoming2=0;
                 controlLNS=true;
                 risp=0;
@@ -929,9 +939,13 @@ int TechnoSoftLowDriver::homing(int mode){
                 risp=-42;
                 break;
         }
+        lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+        lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
         return risp;
     }
     else{
+        lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+        lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
         return -100;
     }
 }
@@ -984,15 +998,12 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){ // _speed_mm_s [mm
     return 0;
 }
 
-int TechnoSoftLowDriver::getSpeed(double& _speed){
+int TechnoSoftLowDriver::getSpeed(double& _speed_mms){
     
-    // Conversione  
-    
-//    _speed =    
-
+    // Conversione speed_IU in mm/s
+    _speed_mms=speedfromIUTOMMs(speed_IU);
     return 0;
 }
-
 
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
 
@@ -1010,6 +1021,13 @@ int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
     
     maxSpeed_IU = _maxSpeed_IU;
     return 0;
+}
+
+int TechnoSoftLowDriver::getMaxSpeed(double& _maxspeed_mms){
+    
+    // Conversione speed_IU in mm/s
+    _maxspeed_mms=speedfromIUTOMMs(speed_IU);
+    return 0;    
 }
 
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
@@ -1030,6 +1048,12 @@ int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
     return 0;
 }
 
+int TechnoSoftLowDriver::getAcceleration(double& _acceleration_mms){
+    
+    _acceleration_mms=accelerationfromIUToMMs2(acceleration_IU);
+    return 0;
+}
+
 int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2){
 
     if(_maxacceleration_mm_s2<=0){
@@ -1046,6 +1070,12 @@ int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2
     return 0;
 }
 
+int TechnoSoftLowDriver::getMaxAcceleration(double& _maxacceleration_mms){
+    
+    _maxacceleration_mms=accelerationfromIUToMMs2(maxAcceleration_IU);
+    return 0;
+}
+
 int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
     //DPRINT("Chiamata setAdditive");
     if((_isAdditive!=TRUE) && (_isAdditive!=FALSE)){
@@ -1053,6 +1083,13 @@ int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
         return -1;
     }
     isAdditive = _isAdditive;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getAdditive(BOOL& _isAdditive){
+    //DPRINT("Chiamata setAdditive");
+    
+    _isAdditive=isAdditive;
     return 0;
 }
 
@@ -1066,6 +1103,13 @@ int TechnoSoftLowDriver::setMovement(const short& _movement){
     return 0;
 }
 
+int TechnoSoftLowDriver::getMovement(short& _movement){
+    //DPRINT("Chiamata setAdditive");
+    
+    _movement=movement;
+    return 0;
+}
+
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
     //DPRINT("Chiamata setReferenceBase");
     if((_referenceBase!=FROM_MEASURE) && (_referenceBase!=FROM_REFERENCE)){
@@ -1073,6 +1117,13 @@ int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
         return -1;
     }
     referenceBase=_referenceBase;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getReferenceBase(short& _referenceBase){
+    //DPRINT("Chiamata setReferenceBase");
+
+    _referenceBase=referenceBase;
     return 0;
 }
 
@@ -1093,6 +1144,13 @@ int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s)
     return 0;
 }
 
+int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
+    
+    // Conversione speed_IU in mm/s
+    _highSpeedHoming_mm_s=speedfromIUTOMMs(highSpeedHoming_IU);
+    return 0;
+}
+
 int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming_mm_s){
 
     if(_maxhighSpeedHoming_mm_s<=0){
@@ -1106,6 +1164,13 @@ int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming
     }
 
     maxHighSpeedHoming_IU = _maxHighSpeedHoming_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getMaxhighSpeedHoming(double& _maxhighSpeedHoming_mm_s){
+    
+    // Conversione speed_IU in mm/s
+    _maxhighSpeedHoming_mm_s=speedfromIUTOMMs(maxHighSpeedHoming_IU);
     return 0;
 }
 
@@ -1128,6 +1193,13 @@ int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
     return 0;
 }
 
+int TechnoSoftLowDriver::getlowSpeedHoming(double& _lowSpeedHoming_mm_s){
+    
+    // Conversione speed_IU in mm/s
+    _lowSpeedHoming_mm_s=speedfromIUTOMMs(lowSpeedHoming_IU);
+    return 0;
+}
+
 int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_mm_s){
 
     if(_maxlowSpeedHoming_mm_s<=0){
@@ -1143,6 +1215,13 @@ int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_m
     return 0;
 }
 
+int TechnoSoftLowDriver::getMaxlowSpeedHoming(double& _maxlowSpeedHoming_mm_s){
+    
+    // Conversione speed_IU in mm/s
+    _maxlowSpeedHoming_mm_s=speedfromIUTOMMs(maxLowSpeedHoming_IU);
+    return 0;
+}
+
 int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
 
     if(_accelerationHoming_mm_s2<=0){
@@ -1154,6 +1233,12 @@ int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHomin
         return -2;
     }
     accelerationHoming_IU = _accelerationHoming_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getaccelerationHoming(double&  _accelerationHoming_mm_s2){
+    
+    _accelerationHoming_mm_s2=accelerationfromIUToMMs2(accelerationHoming_IU);
     return 0;
 }
 

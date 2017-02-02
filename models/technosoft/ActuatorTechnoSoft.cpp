@@ -454,7 +454,8 @@ int ActuatorTechnoSoft::getParameter(int axisID,const std::string& parName,std::
 //        
 //        // 2. resultString =  nuova_stringa_convertita
 //        
-//        return 0;   
+//        return 0;  
+//    }
     
     return 0;
 }

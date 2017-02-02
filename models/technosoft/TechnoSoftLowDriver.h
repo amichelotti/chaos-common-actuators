@@ -187,30 +187,6 @@ namespace common{
                 
                 bool readyState;
                  
-                // Additional parameters for s-curve profile
-                //long jerkTime;
-                //short decelerationType;
-                
-                //char setupFilePath[200];
-                
-                // ************** cosa rappresentano queste tre variabili? ***************
-                //int absoluteSteps;// contatore software
-                //int status_register;// Reg_MER
-                //int error_register; 
-                
-                //Encoder parameter
-                //int encoderLines; // (passato da MDS)
-//                typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh;
-//                channel_psh my_channel;
-//                typedef std::map<std::string,channel_psh> channel_map_t;
-                
-                //static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
-                                              // percio e dichiarata di tipo static
-                
-                //bool alreadyopenedChannel;  // Canale di comunicazione aperto
-                //bool poweron; // alimentazione al drive motor erogata
-                //bool channelJustOpened;
-                
                 // Transition parameters
                 
             public:
@@ -247,8 +223,8 @@ namespace common{
                         const double fullScalePot = FULLSCALE_POTENTIOMETER //[V] 
                         );
                 
-                double speedfromIUTOMMs(double _speed_IU);
-                double accelerationfromIUToMMs(double _acceleration_IU);
+                //double speedfromIUTOMMs(double _speed_IU);
+                //double accelerationfromIUToMMs(double _acceleration_IU);
                 
                 
                 int homing(int mode);
