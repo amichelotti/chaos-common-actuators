@@ -330,6 +330,8 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
     
     DPRINT("getParameter execution");
     
+    std::stringstream ss;
+    
     // trim
     trim2(parName);
     // To upper case
@@ -348,9 +350,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -2;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita 
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;
     } 
     else if(strResultparName.compare("MAXSPEED")==0){ 
@@ -359,9 +362,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -3;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita 
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;
     }  
     else if(strResultparName.compare("ACCELERATION")==0){
@@ -370,9 +374,21 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -4;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;
+    }
+    else if(strResultparName.compare("MAXACCELERATION")==0){
+        if((i->second)->getMaxAcceleration(doubleValue)<0){ 
+            return -6;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;
     }
     else if(strResultparName.compare("ISADDITIVE")==0){
@@ -382,9 +398,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -5;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<intValue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;
     }
     else if(strResultparName.compare("MOVEMENT")==0){
@@ -392,9 +409,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -6;                                  
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<shortvalue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASE")==0){
@@ -402,9 +420,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -7;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<shortvalue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;   
     }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
@@ -412,9 +431,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -8;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;       
     }
     else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
@@ -422,9 +442,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -9;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;       
     }
     else if(strResultparName.compare("LOWSPEEDHOMING")==0){
@@ -432,9 +453,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -10;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;   
     }
     else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
@@ -442,9 +464,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -11;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;   
     }
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
@@ -452,9 +475,10 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -12;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita
-        
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;  
     }
     else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
@@ -462,23 +486,116 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
             return -13;
         }
         // 1. Conversione valore numerico ---> Stringa
-        
+        ss<<doubleValue;
         // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;   
     }
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         if((i->second)->getEncoderLines(doubleValue)<0){ 
             return -17;
         }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;   
     }
     else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
-        if((i->second)->setConst_mult_technsoft(doubleValue)<0){ 
+        if((i->second)->getConst_mult_technsoft(doubleValue)<0){ 
             return -18;
         }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
         return 0;   
     }
-    
+    else if(strResultparName.compare("STEPSPERROUND")==0){
+        if((i->second)->getSteps_per_rounds(doubleValue)<0){ 
+            return -19;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
+        if((i->second)->getN_rounds(doubleValue)<0){ 
+            return -20;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    } 
+    else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
+        if((i->second)->getLinear_movement_per_n_rounds(doubleValue)<0){ 
+            return -21;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("VOLTAGE_LNS[V]")==0){ 
+        if((i->second)->getvoltage_LNS(doubleValue)<0){ 
+            return -22;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("VOLTAGE_LPS[V]")==0){
+        if((i->second)->getvoltage_LPS(doubleValue)<0){ 
+            return -23;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("RANGE_SLIT[MM]")==0){  //range_slit[mm]
+        if((i->second)->getRange(doubleValue)<0){ 
+            return -24;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("FULLSCALEPOT")==0){ 
+        if((i->second)->getFullscalePot(doubleValue)<0){ 
+            return -25;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else{
+        resultString.assign("");
+        ss.str(std::string());
+        return -26;
+    }
     
     return 0;
 }
@@ -693,7 +810,6 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;   
     }
-    
     else{
         return -26;
     }

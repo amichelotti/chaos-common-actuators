@@ -732,9 +732,7 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -27;
                     break;
                 }
-                
-           
-                
+
 //                double capturePositionHoming;
 //                capturePositionHoming = (linear_movement_per_n_rounds*cap_position)/(steps_per_rounds*n_rounds*const_mult_technsoft);
 //                DPRINT("************** cap_position value: %ld **************",cap_position);
