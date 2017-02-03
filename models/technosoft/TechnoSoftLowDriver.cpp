@@ -311,8 +311,10 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     minimumIntervalForHoming=2; // s
     
     // Inizializzazione ultima volta esecuzione funzione homing
-    lastTimeTakenForHoming.tv_sec=0;
-    lastTimeTakenForHoming.tv_usec=0;
+//    lastTimeTakenForHoming.tv_sec=0;
+//    lastTimeTakenForHoming.tv_usec=0;
+    
+    gettimeofday(&lastTimeTakenForHoming,NULL);
     
     return 0;
 }
@@ -327,7 +329,7 @@ int TechnoSoftLowDriver::homing(int mode){
     time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
     
     if(time_interval>minimumIntervalForHoming){
-       internalHomingStateDefault = 0;
+       internalHomingStateDefault=0;
        controlLNS=true;
        cap_position=0; 
     }
@@ -959,8 +961,8 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
-        lastTimeTakenForHoming.tv_sec=0;
-        lastTimeTakenForHoming.tv_usec=0;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
     }
     
     DPRINT("Velocita' movimentazione relativa: %f",speed_IU);
@@ -1105,7 +1107,6 @@ int TechnoSoftLowDriver::setMovement(const short& _movement){
 
 int TechnoSoftLowDriver::getMovement(short& _movement){
     //DPRINT("Chiamata setAdditive");
-    
     _movement=movement;
     return 0;
 }
@@ -1386,7 +1387,6 @@ int TechnoSoftLowDriver::setRange(const double& _range){
     range=_range;
     return 0;
 }
-
 int TechnoSoftLowDriver::getRange(double& _range){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     _range=range;
@@ -1422,8 +1422,6 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso c
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
-        lastTimeTakenForHoming.tv_sec=0;
-        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_MoveAbsolute(absPosition, speed_IU, acceleration_IU, movement, referenceBase)){
@@ -1462,8 +1460,8 @@ int TechnoSoftLowDriver::stopMotion(){
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
-        lastTimeTakenForHoming.tv_sec=0;
-        lastTimeTakenForHoming.tv_usec=0;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
     }
     DPRINT("Motor with axis = %d is stopped, %s",axisID, TS_GetLastErrorText());
     return 0;
@@ -1486,8 +1484,8 @@ int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando ********
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
-        lastTimeTakenForHoming.tv_sec=0;
-        lastTimeTakenForHoming.tv_usec=0;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_Power(POWER_ON)){
@@ -1527,8 +1525,8 @@ int TechnoSoftLowDriver::stopPower(){ //******** Inteso come comando *********
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
-        lastTimeTakenForHoming.tv_sec=0;
-        lastTimeTakenForHoming.tv_usec=0;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_Power(POWER_OFF)){
@@ -1687,8 +1685,8 @@ int TechnoSoftLowDriver::resetFault(){ // Considerato come COMANDO
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
-        lastTimeTakenForHoming.tv_sec=0;
-        lastTimeTakenForHoming.tv_usec=0;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(!TS_ResetFault()){
@@ -1709,8 +1707,8 @@ int TechnoSoftLowDriver::hardreset(bool mode){
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
-        lastTimeTakenForHoming.tv_sec=0;
-        lastTimeTakenForHoming.tv_usec=0;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
     }
     
     if(mode){

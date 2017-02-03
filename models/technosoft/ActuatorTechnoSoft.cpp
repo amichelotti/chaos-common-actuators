@@ -318,74 +318,74 @@ bool to_bool(const std::string & s) {
      return s != "0";
 }
 
-int ActuatorTechnoSoft::getParameter(int axisID,const std::string& parName,std::string& resultString){
+int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string& resultString){
     
-//    // ************************** Operazione di selezione axisID ***************************
-//    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
-//    // Controlliamo comunque se l'axis id e' stato configurato
-//    if(i==motors.end()){ 
-//        // In questo caso il motore axisID non e' stato configurato
-//        return -1;
-//    }
+    // ************************** Operazione di selezione axisID ***************************
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato
+        return -1;
+    }
+    
+    DPRINT("getParameter execution");
+    
+    // trim
+    trim2(parName);
+    // To upper case
+    std::string strResultparName;
+    setUpperCase(parName,strResultparName);
+    
+    DPRINT("Stringa elaborata %s",strResultparName.c_str());
+    
+    double doubleValue;
+    int intValue;
 //    
-//    DPRINT("getParameter execution");
-//    
-//    // trim
-//    trim2(parName);
-//    // To upper case
-//    std::string strResultparName;
-//    setUpperCase(parName,strResultparName);
-//    
-//    DPRINT("Stringa elaborata %s",strResultparName.c_str());
-//    
-//    double doubleValue;
-//    int intValue;
-//    
-//    if(strResultparName.compare("SPEED")==0){ 
-//        if((i->second)->getSpeed(doubleValue)<0){
-//            DPRINT("getParameter execution error");
-//            return -2;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita 
-//        
-//        return 0;
-//    } 
-//    else if(strResultparName.compare("MAXSPEED")==0){ 
-//        if((i->second)->getMaxSpeed(doubleValue)<0){
-//            DPRINT("getParameter execution error");
-//            return -3;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita 
-//        
-//        return 0;
-//    }  
-//    else if(strResultparName.compare("ACCELERATION")==0){
-//        if((i->second)->getAcceleration(doubleValue)<0){ 
-//            DPRINT("getParameter execution error");
-//            return -4;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;
-//    }
-//    else if(strResultparName.compare("ISADDITIVE")==0){
-//        // Conversion from string to bool
-//        //boolValue = to_bool(valueOfparName);
-//        if((i->second)->getAdditive(intValue)<0){ 
-//            return -5;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;
-//    }
+    if(strResultparName.compare("SPEED")==0){ 
+        if((i->second)->getSpeed(doubleValue)<0){
+            DPRINT("getParameter execution error");
+            return -2;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita 
+        
+        return 0;
+    } 
+    else if(strResultparName.compare("MAXSPEED")==0){ 
+        if((i->second)->getMaxSpeed(doubleValue)<0){
+            DPRINT("getParameter execution error");
+            return -3;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita 
+        
+        return 0;
+    }  
+    else if(strResultparName.compare("ACCELERATION")==0){
+        if((i->second)->getAcceleration(doubleValue)<0){ 
+            DPRINT("getParameter execution error");
+            return -4;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;
+    }
+    else if(strResultparName.compare("ISADDITIVE")==0){
+        // Conversion from string to bool
+        //boolValue = to_bool(valueOfparName);
+        if((i->second)->getAdditive(intValue)<0){ 
+            return -5;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;
+    }
 //    else if(strResultparName.compare("MOVEMENT")==0){
 //        if((i->second)->getMovement((short)intValue)<0){ 
 //            return -6;

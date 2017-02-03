@@ -101,7 +101,7 @@ namespace common{
                     
                     int hardreset(int axisID,bool mode);
                     
-                    int getParameter(int axisID,const std::string& parName,std::string& resultString);
+                    int getParameter(int axisID,std::string parName,std::string& resultString);
      
         /**
         @brief get the actuator position using the readingType mode chosen for reading
