@@ -330,6 +330,7 @@ int TechnoSoftLowDriver::homing(int mode){
     
     if(time_interval>minimumIntervalForHoming){
        internalHomingStateDefault=0;
+       internalHomingStateHoming2=0;
        controlLNS=true;
        cap_position=0; 
     }
@@ -341,6 +342,7 @@ int TechnoSoftLowDriver::homing(int mode){
             lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
             lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
             internalHomingStateDefault = 0;
+            internalHomingStateHoming2=0;
             controlLNS=true;
             cap_position=0;
             return -1;
@@ -351,6 +353,7 @@ int TechnoSoftLowDriver::homing(int mode){
             lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
             lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
             internalHomingStateDefault = 0;
+            internalHomingStateHoming2=0;
             controlLNS=true;
             cap_position=0; 
             
@@ -697,9 +700,7 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    risp= -18;
 //                    break;
 //                }
-                
-                
-                
+  
                 if(absoluteMotionCompleted){
                     internalHomingStateDefault = 5;
                     
@@ -934,18 +935,20 @@ int TechnoSoftLowDriver::homing(int mode){
                 risp=0;
                 break;
             default:
-                lastTimeTakenForHoming.tv_sec=0;
-                lastTimeTakenForHoming.tv_usec=0;
+//                lastTimeTakenForHoming.tv_sec=0;
+//                lastTimeTakenForHoming.tv_usec=0;
                 internalHomingStateHoming2 = 0;
                 controlLNS=true;
                 risp=-42;
                 break;
         }
-        lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
-        lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+        lastTimeTakenForHoming.tv_sec = currentTimeTakenForHoming.tv_sec;
+        lastTimeTakenForHoming.tv_usec= currentTimeTakenForHoming.tv_usec;
         return risp;
     }
     else{
+        internalHomingStateHoming2=0;               
+        controlLNS=true;
         lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
         lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
         return -100;
