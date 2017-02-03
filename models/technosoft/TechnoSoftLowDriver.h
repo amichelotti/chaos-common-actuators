@@ -44,13 +44,13 @@
 #define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
-#define SPEED_DEFAULT 0.0916      //     [mm/s]     (50.0 [IU]) 
+#define SPEED_DEFAULT 0.3      //     [mm/s]     (50.0 [IU]) 
 #define ACCELERATION_DEFAULT 1.373 //    [mm/s2]    ( 0.6  [IU])     
 #define MAX_SPEED_DEFAULT 0.824  //      [mm/s]    (450.0 [IU])             
 #define MAX_ACCELERATION_DEFAULT 4.577 //[mm/s2]     (2.0 [IU])     
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 0.018  // [mm/s]    (10.0 [IU])          
-#define MAX_HIGHSPEED_HOMING_DEFAULT 0.027 // [mm/s]  (15.0 [IU])
+#define HIGH_SPEED_HOMING_DEFAULT 0.2  // [mm/s]    (10.0 [IU])          
+#define MAX_HIGHSPEED_HOMING_DEFAULT 0.5 // [mm/s]  (15.0 [IU])
 #define LOW_SPEED_HOMING_DEFAULT 0.002   // [mm/s]     (1.0 [IU])
 #define MAXLOW_SPEED_HOMING_DEFAULT 0.006 //[mm/s]     (3.0 [IU])
 #define ACCELERATION_HOMING_DEFAULT 0.687 //[mm/s2]    (0.3 [IU])

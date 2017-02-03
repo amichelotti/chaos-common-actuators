@@ -340,6 +340,7 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
     
     double doubleValue;
     int intValue;
+    short shortvalue;
 //    
     if(strResultparName.compare("SPEED")==0){ 
         if((i->second)->getSpeed(doubleValue)<0){
@@ -386,76 +387,76 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
         
         return 0;
     }
-//    else if(strResultparName.compare("MOVEMENT")==0){
-//        if((i->second)->getMovement((short)intValue)<0){ 
-//            return -6;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;
-//    }
-//    else if(strResultparName.compare("REFERENCEBASE")==0){
-//        if((i->second)->getReferenceBase((short)intValue)<0){ 
-//            return -7;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;   
-//    }
-//    else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
-//        if((i->second)->gethighSpeedHoming(doubleValue)<0){ 
-//            return -8;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;       
-//    }
-//    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
-//        if((i->second)->getMaxhighSpeedHoming(doubleValue)<0){ 
-//            return -9;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;       
-//    }
-//    else if(strResultparName.compare("LOWSPEEDHOMING")==0){
-//        if((i->second)->getlowSpeedHoming(doubleValue)<0){ 
-//            return -10;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;   
-//    }
-//    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
-//        if((i->second)->getMaxlowSpeedHoming(doubleValue)<0){ 
-//            return -11;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;   
-//    }
-//    else if(strResultparName.compare("ACCELERATIONHOMING")==0){
-//        if((i->second)->getaccelerationHoming(doubleValue)<0){ 
-//            return -12;
-//        }
-//        // 1. Conversione valore numerico ---> Stringa
-//        
-//        // 2. resultString =  nuova_stringa_convertita
-//        
-//        return 0;  
-//    }
+    else if(strResultparName.compare("MOVEMENT")==0){
+        if((i->second)->getMovement(shortvalue)<0){ 
+            return -6;                                  
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;
+    }
+    else if(strResultparName.compare("REFERENCEBASE")==0){
+        if((i->second)->getReferenceBase(shortvalue)<0){ 
+            return -7;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;   
+    }
+    else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
+        if((i->second)->getHighSpeedHoming(doubleValue)<0){ 
+            return -8;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;       
+    }
+    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
+        if((i->second)->getMaxhighSpeedHoming(doubleValue)<0){ 
+            return -9;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;       
+    }
+    else if(strResultparName.compare("LOWSPEEDHOMING")==0){
+        if((i->second)->getlowSpeedHoming(doubleValue)<0){ 
+            return -10;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;   
+    }
+    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
+        if((i->second)->getMaxlowSpeedHoming(doubleValue)<0){ 
+            return -11;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;   
+    }
+    else if(strResultparName.compare("ACCELERATIONHOMING")==0){
+        if((i->second)->getaccelerationHoming(doubleValue)<0){ 
+            return -12;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        
+        return 0;  
+    }
     
     return 0;
 }
