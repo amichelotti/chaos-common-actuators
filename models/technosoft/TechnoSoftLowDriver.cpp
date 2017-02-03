@@ -732,6 +732,9 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -27;
                     break;
                 }
+                
+           
+                
 //                double capturePositionHoming;
 //                capturePositionHoming = (linear_movement_per_n_rounds*cap_position)/(steps_per_rounds*n_rounds*const_mult_technsoft);
 //                DPRINT("************** cap_position value: %ld **************",cap_position);
@@ -741,6 +744,8 @@ int TechnoSoftLowDriver::homing(int mode){
 //                getEncoder(&finalPositionAfterHoming);
 //                DPRINT("************** finalPositionAfterHoming in mm: %f **************",finalPositionAfterHoming);
                 cap_position=0;
+                usleep(500000);
+                
                 if(resetEncoder()<0){
                     internalHomingStateDefault = 0;
                     controlLNS=true; 
@@ -774,19 +779,6 @@ int TechnoSoftLowDriver::homing(int mode){
                 DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
                 internalHomingStateDefault = 0;
                 risp= 0;
-                //stateHoming5++;
-//                DPRINT("************** STATE homing 0: %d **************",stateHoming0);
-//        DPRINT("************** STATE homing 1: %d **************",stateHoming1);
-//        DPRINT("************** STATE homing 2: %d **************",stateHoming2);
-//        DPRINT("************** STATE homing 3: %d **************",stateHoming3);
-//        DPRINT("************** STATE homing 4: %d **************",stateHoming4);
-//        DPRINT("************** STATE homing 5: %d **************",stateHoming5);
-//        stateHoming0=0;
-//    stateHoming1=0;
-//    stateHoming2=0;
-//    stateHoming3=0;
-//    stateHoming4=0;
-//    stateHoming5=0;
                 controlLNS=true;
                 break;
             default:

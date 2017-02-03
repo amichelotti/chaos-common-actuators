@@ -457,6 +457,28 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
         
         return 0;  
     }
+    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
+        if((i->second)->getMaxAccelerationHoming(doubleValue)<0){ 
+            return -13;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        
+        // 2. resultString =  nuova_stringa_convertita
+        return 0;   
+    }
+    else if(strResultparName.compare("NUMENCODERLINES")==0){
+        if((i->second)->getEncoderLines(doubleValue)<0){ 
+            return -17;
+        }
+        return 0;   
+    }
+    else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
+        if((i->second)->setConst_mult_technsoft(doubleValue)<0){ 
+            return -18;
+        }
+        return 0;   
+    }
+    
     
     return 0;
 }
