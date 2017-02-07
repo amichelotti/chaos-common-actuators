@@ -98,28 +98,11 @@ typedef enum {
         public:
         AbstractActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
         virtual ~AbstractActuator() {};
-        /**
-        @brief set timeout in ms for the completion of the operation (0 wait undefinitively)
-        @return 0 if success or an error code
-        */
-        //int setTimeout(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
-        /**
-        @brief get timeout in ms for the completion of the operation
-        @return 0 if success or an error code
-        */
-        //int getTimeout(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
-        /**
-        @brief Move the actuator X millimeters away from current position
-        @return 0 if success or an error code
-        */
         
-        //int setTimeoutHoming(uint64_t timeo_ms); // ***** DA ELIMINARE il corpo *****
-        //int getTimeoutHoming(uint64_t* timeo_ms); // ***** DA ELIMINARE il corpo *****
-        
-        // Funzioni relative al drive-motor in generale (1)
-        // Funzioni relative ad uno SPECIFICO motore (2)
         virtual int setParameter(int axisID, std::string parName,std::string value)=0; // (2)
         virtual int moveRelativeMillimeters(int axisID,double mm)=0;  // (2)
+
+virtual int getParameter(int axisID,std::string parName,std::string& resultString)=0;
 
         /**
         @brief get the actuator position using the readingType mode chosen for reading
