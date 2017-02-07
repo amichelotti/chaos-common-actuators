@@ -372,18 +372,20 @@ int TechnoSoftLowDriver::homing(int mode){
         }  
         controlLNS=false;    
     }
+    uint16_t contentRegSRL=0;
+    bool motionCompleted=false;
     
     if(mode==0){
 
         int risp;
         int switchTransited=0;
-        int motionCompleted = 0;
+        
         std::string cappos = "CAPPOS";
         //long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
         std::string descStr;
         //descStr.assign("");
         int absoluteMotionCompleted = 0;
-        uint16_t contentRegSRL=0;
+        
     
         switch (internalHomingStateDefault) {
             case 0:
@@ -499,6 +501,7 @@ int TechnoSoftLowDriver::homing(int mode){
                 //stateHoming1++;
                 break; 
             case 2:
+
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
                     controlLNS=true; 
@@ -682,6 +685,10 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    ERR("Reading state error: %s",descStr.c_str());
                     controlLNS=true; 
                     internalHomingStateDefault = 0;
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -25;
+                        break;
+                    }
                     risp= -24;
                     break;
                 }
@@ -732,17 +739,9 @@ int TechnoSoftLowDriver::homing(int mode){
                     risp = -27;
                     break;
                 }
-
-//                double capturePositionHoming;
-//                capturePositionHoming = (linear_movement_per_n_rounds*cap_position)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-//                DPRINT("************** cap_position value: %ld **************",cap_position);
-//                cap_position=0; //  ********** lasciamolo cosi************
-                //DPRINT("************** Captured Position Homing in mm: %f **************",capturePositionHoming);
-//                double finalPositionAfterHoming;
-//                getEncoder(&finalPositionAfterHoming);
-//                DPRINT("************** finalPositionAfterHoming in mm: %f **************",finalPositionAfterHoming);
+                
                 cap_position=0;
-                usleep(500000);
+                usleep(1000000);
                 
                 if(resetEncoder()<0){
                     internalHomingStateDefault = 0;
@@ -798,7 +797,6 @@ int TechnoSoftLowDriver::homing(int mode){
         uint16_t contentReg;
         std::string descStr = "";
         short homingDone = 0;
-        
         double time_interval;
         struct timeval currentTimeTakenForHoming;
 
@@ -862,6 +860,37 @@ int TechnoSoftLowDriver::homing(int mode){
                 risp= 1;
                 break;
             case 2:
+                DPRINT("************** STATE 2: wait for stopping motor after switch transition**************");
+                if(selectAxis()<0){
+                    internalHomingStateHoming2= 0;
+                    controlLNS=true; 
+                    risp = -38;
+                    break;
+                }
+                if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
+//                    descStr=descStr+"Unknown status. ";
+//                    ERR("Reading state error: %s",descStr.c_str());
+                    controlLNS=true; 
+                    internalHomingStateHoming2 = 0;
+                    risp= -39;
+                    break;
+                }
+                
+                if((contentRegSRL & ((uint16_t)1<<10))){
+                    motionCompleted=true;
+                }
+  
+                if(motionCompleted){
+                    internalHomingStateHoming2 = 3;
+                    
+//                    DPRINT("************** STATE 4: motor positioned to end **************");
+//                    double positionHoming;
+//                    getEncoder(&positionHoming);
+//                    DPRINT("************** STATE 4 current position in mm: %f **************",positionHoming);
+                }
+                risp= 1;
+                break;
+            case 3:
                 DPRINT("************** Homing procedure Homing2. STATE 2. **************");
                 DPRINT("************** Reset encoder e counter **************");
                 
@@ -897,6 +926,7 @@ int TechnoSoftLowDriver::homing(int mode){
 //                    break;
 //                }
                 DPRINT("time interval: %f",time_interval);
+                usleep(1000000);
                 
                 if(resetEncoder()<0){
                     internalHomingStateHoming2=0;
@@ -905,7 +935,7 @@ int TechnoSoftLowDriver::homing(int mode){
 //                        risp= -38;
 //                        break;
 //                    }
-                    risp= -39;
+                    risp= -40;
                     break;
                 }
                 if(resetCounter()<0){
