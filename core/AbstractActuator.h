@@ -100,7 +100,6 @@ typedef enum {
         virtual ~AbstractActuator() {};
         
         virtual int setParameter(int axisID, std::string parName,std::string value)=0; // (2)
-        virtual int getParameter(int axisID,std::string parName,std::string& resultString)=0;
         
         virtual int moveRelativeMillimeters(int axisID,double mm)=0;  // (2)
 
