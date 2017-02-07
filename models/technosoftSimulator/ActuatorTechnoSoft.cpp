@@ -90,7 +90,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
     params.assign((const char*)initialization_string);
     boost::smatch match;
 
-    //DPRINT("Initialization string %s", params.c_str());
+    DPRINT("Initialization string %s", params.c_str());
 
     if(regex_match(params, match, driver_match1, boost::match_extra)){
 

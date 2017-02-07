@@ -54,7 +54,6 @@ void* checkProcedures(void* p){
                 //* errPtr = -5;
             }
             
-
             if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
                 DERR("************** Error returned by getPosition operation, code error %d **************",resp);
                 sleep(10);
@@ -85,7 +84,7 @@ void* checkProcedures(void* p){
 
             DPRINT("total_time_interval: %f",total_time_interval);
             
-            //usleep(1000); // lettura ogni decimo di secondo...
+            usleep(1000000); // lettura ogni decimo di secondo...
         }
 }
 
@@ -108,8 +107,6 @@ void* homingProcedures(void *p){
     hd2.duration=durationChecking;
     hd2.obj=OBJ;
     //checkProcedures((void*)&hd2);
-    
-
     
     gettimeofday(&startTimeForMotor1,NULL);
     
@@ -211,21 +208,22 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
     DPRINT("************** Procedura n. %d starting **************",numSeq);
     int axisID = 14;
 
-        // MOVIMENTAZIONE ASSE 14
-        if(OBJ->poweron(axisID,1)<0){
-            DERR("**************Error returned by poweron operation **************");
-            sleep(10);
-            //* errPtr = -5;
-        }
-          double durationChecking=180;
+    // MOVIMENTAZIONE ASSE 14
+    if(OBJ->poweron(axisID,1)<0){
+        DERR("**************Error returned by poweron operation **************");
+        sleep(10);
+        //* errPtr = -5;
+    }
+          
+    double durationChecking=1500;
 
-          checkData hd2;
-          hd2.axisID=axisID;
-          hd2.duration=durationChecking;
-          hd2.obj=OBJ;
-          checkProcedures((void*)&hd2);
+    checkData hd2;
+    hd2.axisID=axisID;
+    hd2.duration=durationChecking;
+    hd2.obj=OBJ;
+    checkProcedures((void*)&hd2);
     
-        return 0;
+    return 0;
 }
 
 void* function1(void* str){
@@ -327,21 +325,21 @@ int main(int argc,const char* argv[]){
     pthread_t th1;
     DPRINT("%s",sinit1);
     DPRINT("main eseguito");
-//    pthread_create(&th1,NULL,function1,&sinit1[0]);
-//    pthread_join(th1,NULL); //pthread_join modifica il contenuto del puntatore resp_th_1
+    pthread_create(&th1,NULL,function1,&sinit1[0]);
+    pthread_join(th1,NULL); //pthread_join modifica il contenuto del puntatore resp_th_1
     
-    std::string cardNumber;
-    cardNumber.assign("1234-5678-9876-0987");
-    bool resp=validate_card_format(cardNumber);
-    if(resp){
-        DPRINT("************ Formato carta corretto **************");
-    }
-    else{
-        DPRINT("************ Formato carta non corretto **************");
-    }
-    
-    DPRINT("Machine readable card number: %s",machine_readable_card_number(cardNumber).c_str());
-    DPRINT("Human readable card number: %s",human_readable_card_number(cardNumber).c_str());
+//    std::string cardNumber;
+//    cardNumber.assign("1234-5678-9876-0987");
+//    bool resp=validate_card_format(cardNumber);
+//    if(resp){
+//        DPRINT("************ Formato carta corretto **************");
+//    }
+//    else{
+//        DPRINT("************ Formato carta non corretto **************");
+//    }
+//    
+//    DPRINT("Machine readable card number: %s",machine_readable_card_number(cardNumber).c_str());
+//    DPRINT("Human readable card number: %s",human_readable_card_number(cardNumber).c_str());
 
     return 0;
 }

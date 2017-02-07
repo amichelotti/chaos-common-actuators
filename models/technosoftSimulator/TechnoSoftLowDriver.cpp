@@ -2624,7 +2624,7 @@ int TechnoSoftLowDriver::faultsGeneration(){
         gettimeofday(&endTimeForMotor1,NULL);
         total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
 
-        usleep(500000); 
+        usleep(1000000); 
     }
 }
 
