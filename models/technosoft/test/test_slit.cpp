@@ -287,6 +287,167 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         hd2.obj=OBJ;
         checkProcedures((void*)&hd2);
         
+        // controllo correttezza funzioni getParameters
+        
+        double doubleValue;
+        std::string resultString;
+        
+        std::string parName=" speed  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" maxspeed    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" acceleration    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" maxacceleration    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" isadditive   ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" movement  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" refErenceBase  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        
+        parName=" HIGHSpEEDHOMING  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" MAXHIGHSPEEDHOMING    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName=" LOWSPEEDHOmING    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="MAxLOWSPEEDHOMING    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="ACCELERATIONHOMING    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        
+        parName="MAXACCELERAtIONHOMING    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="nUMENCODERLINES    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    NUMMICROSTEPSPERStEP    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    STEPSPERROUND    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    FiXEDNUMBEROFROUnDS    ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    LINEARDISPlACEMENT[MM]   ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    VOLTAGE_LNS[V]  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    VOLTAgE_LPS[V]  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    RAnGE_SLIT[MM]  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
+        parName="    FULLSCALEPOT  ";
+        if(OBJ->getParameter(axisID,parName,resultString)<0){
+            DERR("************** Error returned by getParameter %s **************",parName.c_str());
+            sleep(10);
+        }
+        DPRINT("************** Value of %s = %s **************",parName.c_str(),resultString.c_str());
+        
 //        DPRINT("************** Homing all'INDIETRO asse AXISID_TEST**************");
 //        sleep(5);
 //        

@@ -198,7 +198,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>_maxAccelerationHoming_mm_s2){
         return -13;
     }
-    accelerationHoming_IU = _accelerationHoming_mm_s2; 
+    accelerationHoming_IU = accelerationfromMMs2ToIU(_accelerationHoming_mm_s2); 
     
     if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
         return -14;
@@ -1021,7 +1021,7 @@ int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
 int TechnoSoftLowDriver::getMaxSpeed(double& _maxspeed_mms){
     
     // Conversione speed_IU in mm/s
-    _maxspeed_mms=speedfromIUTOMMs(speed_IU);
+    _maxspeed_mms=speedfromIUTOMMs(maxSpeed_IU);
     return 0;    
 }
 
@@ -1141,7 +1141,7 @@ int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s)
 int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
     
     // Conversione speed_IU in mm/s
-    _highSpeedHoming_mm_s=speedfromIUTOMMs(highSpeedHoming_IU);
+    _highSpeedHoming_mm_s=std::abs(speedfromIUTOMMs(highSpeedHoming_IU));
     return 0;
 }
 
@@ -1164,7 +1164,7 @@ int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming
 int TechnoSoftLowDriver::getMaxhighSpeedHoming(double& _maxhighSpeedHoming_mm_s){
     
     // Conversione speed_IU in mm/s
-    _maxhighSpeedHoming_mm_s=speedfromIUTOMMs(maxHighSpeedHoming_IU);
+    _maxhighSpeedHoming_mm_s=std::abs(speedfromIUTOMMs(maxHighSpeedHoming_IU));
     return 0;
 }
 
@@ -1322,7 +1322,6 @@ int TechnoSoftLowDriver::getN_rounds(double& _n_rounds){
     return 0;
 }
 
-
 int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_linear_movement_per_n_rounds<=0){
@@ -1380,6 +1379,7 @@ int TechnoSoftLowDriver::setRange(const double& _range){
     range=_range;
     return 0;
 }
+
 int TechnoSoftLowDriver::getRange(double& _range){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     _range=range;

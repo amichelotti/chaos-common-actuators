@@ -58,7 +58,9 @@ namespace common{
                     int moveRelativeMillimeters(int axisID,double deltaMillimeters); // Non e' relativa a ciascun axis ID
 
                     int setParameter(int axisID,std::string parName,std::string value); // Non e' relativa a ciascun axis ID
-
+                    
+                    int getParameter(int axisID,std::string parName,std::string& resultString);
+                    
 //                    //int setTrapezoidalProfile(double speed, double acceleration, bool isAdditive, int32_t movement, int32_t referenceBase); // Non e' relativa a ciascun axis ID
 //                    int setSpeed(double speed); // Non e' relativa a ciascun axis ID
 //                    int setMaxSpeed(double speed); //[mm/s], // Non e' relativa a ciascun axis ID
