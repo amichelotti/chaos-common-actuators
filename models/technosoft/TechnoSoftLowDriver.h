@@ -140,9 +140,9 @@ namespace common{
                 // Trapezoidal profile parameters for move relative and move absolute
                 //double speed_mm_s;
                 double speed_IU; //    [IU]  
-                double maxSpeed_IU; // [IU] VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double maxSpeed_IU; // [IU] 
                 double acceleration_IU;
-                double maxAcceleration_IU; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double maxAcceleration_IU; 
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
@@ -150,10 +150,10 @@ namespace common{
                 // Speed parameters regarding homing procedure
                 double highSpeedHoming_IU; // The homing travel speed
                 double lowSpeedHoming_IU;
-                double maxHighSpeedHoming_IU; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double maxLowSpeedHoming_IU;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double maxHighSpeedHoming_IU; 
+                double maxLowSpeedHoming_IU;   
                 double accelerationHoming_IU;
-                double maxAccelerationHoming_IU; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double maxAccelerationHoming_IU; 
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
