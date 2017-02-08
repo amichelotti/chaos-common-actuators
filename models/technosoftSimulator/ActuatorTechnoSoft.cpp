@@ -86,6 +86,9 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 //        return 0;
 //    }              
 
+    //DPRINT("******** CIAO QUESTA E' LA VERSIONE GIUSTA DI INIT", params.c_str());
+    
+    
     std::string params;
     params.assign((const char*)initialization_string);
     boost::smatch match;

@@ -25,6 +25,7 @@ struct checkData{
     common::actuators::AbstractActuator *obj;
 };
 
+
 void* checkProcedures(void* p){
     
     checkData* pstruct=(checkData*) p;
@@ -54,6 +55,11 @@ void* checkProcedures(void* p){
                 //* errPtr = -5;
             }
             
+            if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_COUNTER, &position_mm_counter))<0){
+                DERR("************** Error returned by getPosition operation, code error %d **************",resp);
+                sleep(10);
+                //* errPtr = -5;
+            }
             if((resp=OBJ->getPosition(axisID,common::actuators::AbstractActuator::READ_ENCODER, &position_mm_encoder))<0){
                 DERR("************** Error returned by getPosition operation, code error %d **************",resp);
                 sleep(10);
@@ -71,13 +77,15 @@ void* checkProcedures(void* p){
 //            if((resp=OBJ->getState(axisID,&state,desc1))<0){
 //                DERR("************** Error reading alarms ***************");
 //            }
-            DPRINT("************** State of axisID 14 partita: %s **************",desc1.c_str());
-            DPRINT("************** Position encoder of axisID 14: %4.13f **************",position_mm_encoder);
-            DPRINT("************** Position potentiometer of axisID 14: %4.13f **************",position_mm_potentiometer);
+            DPRINT("************** State of axisID partita: %s **************",desc1.c_str());
+            DPRINT("************** Alarms of axisID : %s  **************",desc2.c_str());
+            DPRINT("************** Position encoder of axisID : %4.13f **************",position_mm_encoder);
+            DPRINT("************** Position counter of axisID : %4.13f **************",position_mm_counter);
+            DPRINT("************** Position potentiometer of axisID : %4.13f **************",position_mm_potentiometer);
 //            DPRINT("************** Position counter of axisID 14: %4.13f  **************",position_mm_counter);
             //DPRINT("************** State of axisID 14: %s  **************",desc1.c_str());
-            DPRINT("************** Alarms of axisID 14: %s  **************",desc2.c_str());
-            DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
+            
+            //DPRINT("************** Code Alarms of axisID 14: %u **************",alarms);
             
             gettimeofday(&endTimeForMotor1,NULL);
             total_time_interval = ((double)endTimeForMotor1.tv_sec+(double)endTimeForMotor1.tv_usec/1000000.0)-((double)startTimeForMotor1.tv_sec+(double)startTimeForMotor1.tv_usec/1000000.0);
@@ -87,7 +95,6 @@ void* checkProcedures(void* p){
             usleep(1000000); // lettura ogni decimo di secondo...
         }
 }
-
 
 void* homingProcedures(void *p){ 
     
@@ -215,12 +222,31 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         //* errPtr = -5;
     }
           
-    double durationChecking=1500;
+    double durationChecking=60;
 
     checkData hd2;
     hd2.axisID=axisID;
     hd2.duration=durationChecking;
     hd2.obj=OBJ;
+    checkProcedures((void*)&hd2);
+    
+    DPRINT("************** Prima movimentazione relativa in AVANTI **************");
+    sleep(5);
+    int resp;
+    if((resp=OBJ->moveRelativeMillimeters(axisID,15))<0){
+        DPRINT("************** Error returned by movement operation, code error %d **************",resp);
+    }
+    
+    durationChecking=30;
+    checkProcedures((void*)&hd2);
+    
+    DPRINT("************** Operazione di hard reset eseguita fra 5 secondi **************");
+    sleep(5);
+    if((resp=OBJ->hardreset(axisID, false))<0){
+        DPRINT("************** Error returned by hardreset operation**************");
+    }
+    
+    durationChecking=30;
     checkProcedures((void*)&hd2);
     
     return 0;

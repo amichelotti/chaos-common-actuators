@@ -206,7 +206,7 @@ namespace common{
                 long position; // expressed in microsteps
                 long positionCounter;
                 long positionEncoder;
-
+                long positionPotentiometer;
                 long cap_position;
                 bool LNStransition;
                 bool LPStransition;

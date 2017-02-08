@@ -126,9 +126,9 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         int axid = atoi(straxid.c_str());
         
         // Controllo mappa motori
-        if(pthread_mutex_lock(&(mu))!=0){
-
-        }
+//        if(pthread_mutex_lock(&(mu))!=0){
+//
+//        }
         std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axid); // iteratore alla mappa statica
         
         if(i==motors.end()){ // Il motore con il corrente axis id non e' stato configurato. 
@@ -143,14 +143,14 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
-                if(pthread_mutex_unlock(&(mu))!=0){
-
-                }
+//                if(pthread_mutex_unlock(&(mu))!=0){
+//
+//                }
                 return -2;
             }
-            if(pthread_mutex_unlock(&(mu))!=0){
-
-            }
+//            if(pthread_mutex_unlock(&(mu))!=0){
+//
+//            }
             
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
