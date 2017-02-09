@@ -883,46 +883,6 @@ int TechnoSoftLowDriver::homing(int mode){
                 
                 // Attendiamo che il motore si fermi prima di fare il reset:
 
-//                while(actuatorIDInMotion){
-//                    usleep(1000);
-//                }
-
-                // Il motore e' fermo. Possiamo fare il reset
-//                pthread_t th1;
-//                pthread_create(&th1, NULL,staticResetEncoderForThread,this);
-//                pthread_join(th1,NULL);
-                
-//                if(resetCounter()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(stopMotion()<0){
-//                        risp= -1;
-//                        break;
-//                    }
-//                    risp= -2;
-//                    break;
-//                }
-                
-//                if(resetEncoder()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(stopMotion()<0){
-//                        risp= -3;
-//                        break;
-//                    }
-//                    risp= -4;
-//                    break;
-//                }
-//                pthread_t th2;
-//                pthread_create(&th2, NULL,,this);
-//                pthread_join(th2,NULL);
-//                if(resetCounter()<0){
-//                    internalHomingStateHoming2=0;
-//                    if(stopMotion()<0){
-//                        risp= -6;
-//                        break;
-//                    }
-//                    risp= -7;
-//                    break;
-//                }
                     internalHomingStateHoming2=0;
                     controlLNS=true;
                     risp=0;
@@ -978,43 +938,47 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     long initPosition = position;
     bool resetLimitSwicth=true;
 
-    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand && !powerOffCommand){
+    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand){
 
-        if(pthread_mutex_lock(&(mu))!=0){
+        if(!powerOffCommand){
+            
+            if(pthread_mutex_lock(&(mu))!=0){
 
-        }
-
-        if(goahead){ // vai avanti
-            position+=speed_IU;
-            positionCounter+=speed_IU;
-            positionEncoder+=speed_IU;
-            positionPotentiometer+=speed_IU;
-            LNStransition = false;
-            LSNactive = false;
-        }
-        else{ // vai indietro
-            position-=speed_IU;
-            positionCounter-=speed_IU;
-            positionEncoder-=speed_IU;
-            positionPotentiometer-=speed_IU;
-            LPStransition = false;
-            LSPactive=false;
-        }
-
-        if(resetLimitSwicth){
-            if (position >= 0){
-                LSNactive=false;
-                resetLimitSwicth=false;
             }
-            if (position<=positiveLimitPosition){
+
+            if(goahead){ // vai avanti
+                position+=speed_IU;
+                positionCounter+=speed_IU;
+                positionEncoder+=speed_IU;
+                positionPotentiometer+=speed_IU;
+                LNStransition = false;
+                LSNactive = false;
+            }
+            else{ // vai indietro
+                position-=speed_IU;
+                positionCounter-=speed_IU;
+                positionEncoder-=speed_IU;
+                positionPotentiometer-=speed_IU;
+                LPStransition = false;
                 LSPactive=false;
-                resetLimitSwicth=false;
             }
+
+            if(resetLimitSwicth){
+                if (position >= 0){
+                    LSNactive=false;
+                    resetLimitSwicth=false;
+                }
+                if (position<=positiveLimitPosition){
+                    LSPactive=false;
+                    resetLimitSwicth=false;
+                }    
+            }
+            
+            if(pthread_mutex_unlock(&(mu))!=0){
+
+            } 
         }
 
-        if(pthread_mutex_unlock(&(mu))!=0){
-
-        }
         //DPRINT("Posizione incrementata!!!!!");
         usleep(1000); // Sleep for 1 milli second
     }
@@ -1577,20 +1541,6 @@ int TechnoSoftLowDriver::getFullscalePot(double& _fullScale){
 int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     // Stima grossolana tempo necessario per la movimentazione
-//    double deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_IU); //[s]
-//    double tol = 30;
-//    deltaT += (deltaT*tol/100);
-//
-//    double otalTimeInterval = 0;   // solo per far partire il ciclo while
-//    struct timeval startTime,endTime;
-//
-//    gettimeofday(&startTime,NULL);
-
-//    if(pthread_mutex_lock(&(((containerIncrementPosition*)arg)->mu))!=0){
-//
-//    }
-
-    //DPRINT("moveAbsolutePosition: Thread partito");
 
     bool goahead = false;
     if(pthread_mutex_lock(&(mu))!=0){
@@ -1647,12 +1597,15 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     }
 
-    while(std::labs(position-absolutePosition)>tol && !stopMotionCommand && !powerOffCommand){// L'incremento dovra' avvenire ad una determinata velocita'
+    while(std::labs(position-absolutePosition)>tol && !stopMotionCommand){// L'incremento dovra' avvenire ad una determinata velocita'
 
         //DPRINT("moveAbsolutePosition: dentro il ciclo while: inizio prima del lock!!!");
-        if(pthread_mutex_lock(&(mu))!=0){
 
-        }
+        if(!powerOffCommand){
+            
+            if(pthread_mutex_lock(&(mu))!=0){
+
+            }
 
             if(goahead){ // vai avanti
                 position+=speed_IU;
@@ -1671,12 +1624,6 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
                 LSPactive = false;
             }
 
-            //DPRINT("moveAbsolutePosition: position %ld",position);
-//            DPRINT("moveAbsolutePosition: positionCounter %ld",positionCounter);
-//            DPRINT("moveAbsolutePosition: positionEncoder %ld",positionEncoder);
-//
-//            DPRINT("moveAbsolutePosition: labs(position-absolutePosition) %ld",labs(position-absolutePosition));
-
             if(resetLimitSwicth){
                 if(position >= 0){
                     LSNactive=false;
@@ -1690,15 +1637,10 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
             if(pthread_mutex_unlock(&(mu))!=0){
 
-            }
-        //DPRINT("moveAbsolutePosition: dentro il ciclo while: appena fuori il blocco del lock!!!");
-        // Aggiornamento deltaT, stopMotion, stopPower
-//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_IU); //[s]
-//        deltaT += (deltaT*tol/100);
-//
-//        gettimeofday(&endTime,NULL);
-//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
-            usleep(1000); // Sleep for 5 milli second
+            } 
+        }
+
+        usleep(1000); // Sleep for 5 milli second
     }
     //position=currentPosition;
     if(pthread_mutex_lock(&(mu))!=0){
@@ -1709,10 +1651,6 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     stopMotionCommand = false;
     motionscalled--;
 
-//    if(position<0){ // nel qual caso absolutePosition dato in input ==0
-//        LSNactive = true;
-//        position = 0;
-//    }
     if(turnLNS && std::labs(position-absolutePosition)<=tol){ // nel qual caso absolutePosition dato in input ==0
         position =0;
         positionCounter=0;
@@ -1728,15 +1666,6 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         LSPactive = true;
     }
      
-//    if(turnLPS){ // nel qual caso absolutePosition dato in input ==0
-//        position -= LONG_MAX+; // non si pu
-//    }
-    
-//    if(position>LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
-//        LSPactive = true;
-//        position = LONG_MAX;
-//    }
-    
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
@@ -1839,39 +1768,23 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 
     }
     
-    while(!stopMotionCommand && !powerOffCommand && !LNStransition){
+    while(!stopMotionCommand && !LNStransition){
 
-//            if(goahead){
-//                position+=highSpeedHoming_IU;
-//            }
-//            else{
-        if(pthread_mutex_lock(&(mu))!=0){
+        if(!powerOffCommand){
+            
+            if(pthread_mutex_lock(&(mu))!=0){
 
+            }
+
+            position+=highSpeedHoming_IU;
+            positionCounter+=highSpeedHoming_IU;
+            positionEncoder+=highSpeedHoming_IU;
+       
+            if(pthread_mutex_unlock(&(mu))!=0){
+
+            } 
         }
 
-        position+=highSpeedHoming_IU;
-        positionCounter+=highSpeedHoming_IU;
-        positionEncoder+=highSpeedHoming_IU;
-        
-        //DPRINT("Movimentazione all'indietro: posizione corrente in steps: %ld",position);
-//            }
-        if(pthread_mutex_unlock(&(mu))!=0){
-
-        }
-        
-//        if(resetLimitSwicth){
-//            if (position > 0){
-//                LSNactive=false;
-//            }
-//            if (position<LONG_MAX){
-//                LSPactive=false;
-//            }
-//            resetLimitSwicth=false;
-//        }
-
-        // Aggiornamento deltaT, stopMotion, stopPower
-//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_IU); //[s]
-//        deltaT += (deltaT*tol/100)
         usleep(2300); // Sleep for 1 milli second
     }
     
@@ -1975,46 +1888,39 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
 
     long tol = 150;
     bool resetLimitSwicth=true;
-    while(labs(position-absolutePosition)>tol && !stopMotionCommand && !powerOffCommand){// L'incremento dovra' avvenire ad una determinata velocita'
+    while(labs(position-absolutePosition)>tol && !stopMotionCommand){// L'incremento dovra' avvenire ad una determinata velocita'
         
-        //DPRINT("Posizione corrente durante il recupero: %ld",position);
-        if(pthread_mutex_lock(&(mu))!=0){
+        if(!powerOffCommand){
+            
+            //DPRINT("Posizione corrente durante il recupero: %ld",position);
+            if(pthread_mutex_lock(&(mu))!=0){
 
-        }
-
-        //DPRINT("Go ahead = true");
-        position+=lowSpeedHoming_IU;
-        positionCounter+=lowSpeedHoming_IU;
-        positionEncoder+=lowSpeedHoming_IU;
-        positionPotentiometer+=lowSpeedHoming_IU;
-        
-//        else{
-//            DPRINT("Go ahead = false");
-//            position-=lowSpeedHoming_mm_s;
-//            positionCounter-=lowSpeedHoming_mm_s;
-//            positionEncoder-=lowSpeedHoming_mm_s;
-//        }
-        if(resetLimitSwicth){
-            if (position >= 0){
-                LNStransition = false;
-                LSNactive=false;
             }
+
+            //DPRINT("Go ahead = true");
+            position+=lowSpeedHoming_IU;
+            positionCounter+=lowSpeedHoming_IU;
+            positionEncoder+=lowSpeedHoming_IU;
+            positionPotentiometer+=lowSpeedHoming_IU;
+
+            if(resetLimitSwicth){
+                if (position >= 0){
+                    LNStransition = false;
+                    LSNactive=false;
+                }
             if (position<=positiveLimitPosition){
                 LPStransition = false;
                 LSPactive=false;
             }
             resetLimitSwicth=false;
-        }
+            }
         
-        if(pthread_mutex_unlock(&(mu))!=0){
+            if(pthread_mutex_unlock(&(mu))!=0){
 
+            }
+            
         }
-        // Aggiornamento deltaT, stopMotion, stopPower
-//        deltaT = fabs(((containerIncrementPosition*)arg)->deltaPosition/speed_IU); //[s]
-//        deltaT += (deltaT*tol/100);
-//
-//        gettimeofday(&endTime,NULL);
-//        totalTimeInterval = ((double)endTime.tv_sec+(double)endTime.tv_usec/1000000.0)-((double)startTime.tv_sec+(double)startTime.tv_usec/1000000.0);
+
         usleep(1000); // Sleep for 1 milli second
     }
     //position=currentPosition;
@@ -2025,13 +1931,6 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
     actuatorIDInMotion = false;
     stopMotionCommand = false;
     motionscalled--;
-
-//    if(position==0){ // nel qual caso absolutePosition dato in input ==0
-//        LSNactive = true;
-//    }
-//    if(position== LONG_MAX){  // nel qual caso absolutePosition dato in input == LONG_MAX
-//        LSPactive = true;
-//    }
 
     if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -2050,14 +1949,7 @@ void* TechnoSoftLowDriver::staticMoveAbsolutePositionHomingFunctionForThread(voi
 int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition){
 
     //DPRINT("(homing) moving absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_IU,acceleration_mm_s2,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_MoveAbsolute(absPosition, lowSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
-//        DERR("(homing) Error absolute steps moving");
-//        return -1;
-//    }
+
     // Simulazione dialogo con il drive/motor
 
     if(pthread_mutex_lock(&(mu))!=0){

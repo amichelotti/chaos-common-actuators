@@ -199,8 +199,7 @@ namespace common{
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
-                
-                 
+
                  
                 bool stopMotionCommand;
                 long position; // expressed in microsteps
