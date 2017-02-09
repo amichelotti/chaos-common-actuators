@@ -354,7 +354,8 @@ namespace common{
                         const double range = RANGE,  //[meter]
                         const double fullScalePot = FULLSCALE_POTENTIOMETER, //[V]
                         const int _alarmsPresent = ALARMS_PRESENT_DEFAULT,
-                        const double _alarmsInterval = DURATION_ALARMS_INTERVAL_DEFAULT
+                        const double _alarmsInterval = DURATION_ALARMS_INTERVAL_DEFAULT,
+                        const double _percOfnoise = PERC_NOISE_DEFAULT
                         );
 
 
@@ -453,6 +454,9 @@ namespace common{
                 
                 int setAlarmsInterval(const double& _value);
                 int getAlarmsInterval(double& _value);
+                
+                int setPercOfNoise(const double& value);
+                int getPercOfNoise(double& value);
                 
                 //Encoder lines
                 int moveAbsoluteSteps(const long& position);

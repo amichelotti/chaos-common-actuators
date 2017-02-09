@@ -97,7 +97,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _range,  //[meter]
                         const double _fullScalePot, 
                         const int _alarmsPresent,
-                        const double _alarmsInterval
+                        const double _alarmsInterval,
+                        const double _percOfnoise
                         ){
 
     DPRINT("Inizializzazione parametri");
@@ -257,7 +258,10 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    if(_percNoise<0 || _percNoise>1){
 //        return -23;
 //    }
-    percNoise = PERC_NOISE_DEFAULT;
+    if(_percOfnoise<0.0 || _percOfnoise>1.0)
+        return -28;
+
+    percNoise = _percOfnoise;
     
 //    if(_positiveLimitPosition<0){
 //        return -24;
@@ -1575,6 +1579,25 @@ int TechnoSoftLowDriver::getAlarmsInterval(double& _alarms){
     
     return 0;
 }
+
+int TechnoSoftLowDriver::setPercOfNoise(const double& value){
+    
+    if(value<0.0 || value>1.0)
+        return -1;
+    
+    percNoise=value;
+    
+    return 0;
+}
+    
+int TechnoSoftLowDriver::getPercOfNoise(double& value){
+    
+    value=percNoise;
+    return 0;
+}
+
+
+int getPercOfNoise(double& value);
 
 int TechnoSoftLowDriver::moveAbsolutePosition(){
 
