@@ -95,8 +95,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _voltage_LNS, //[V]
                         const double _voltage_LPS, //[V]
                         const double _range,  //[meter]
-                        const double _fullScalePot,
-                        const bool _alarms//[V] 
+                        const double _fullScalePot, 
+                        const int _alarmsPresent,
+                        const double _alarmsInterval
                         ){
 
     DPRINT("Inizializzazione parametri");
@@ -250,6 +251,9 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     fullScalePot=_fullScalePot;
     constantPot=_fullScalePot/65535;
     
+    if(_alarmsInterval<=0)
+        return -27;
+    
 //    if(_percNoise<0 || _percNoise>1){
 //        return -23;
 //    }
@@ -263,7 +267,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    if(_durationAlarmsInterval<0){
 //        return -25;
 //    }
-    durationAlarmsInterval = DURATION_ALARMS_INTERVAL_DEFAULT;
+   
     
 //    axisRef = TS_LoadSetup(setupFilePath.c_str());
 //    if(axisRef < 0){
@@ -275,7 +279,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -26;
+        return -28;
 
     /*	Setup the axis based on the setup data previously, for axisID*/
 //    if(!TS_SetupAxis(_axisID, axisRef)){
@@ -284,7 +288,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -27;
+        return -29;
 
 //    if(!TS_SelectAxis(_axisID)){
 //        DERR("failed to select axis %d, %s",_axisID,TS_GetLastErrorText());
@@ -292,7 +296,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -28;
+        return -30;
 
     /*	Execute the initialization of the drive (ENDINIT) */
 //    if(!TS_DriveInitialisation()){
@@ -301,7 +305,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -29;
+        return -31;
 
      // Settare il registro per la lettura dell'encoder
 //    if(!TS_Execute("SCR=0x4338")){
@@ -311,14 +315,14 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -30;
+        return -32;
 
 //    if(!TS_SetEventOnMotionComplete(0,0)){
 //	return -30;
 //    }
     random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
-        return -31;
+        return -33;
 
     readyState = true;
     internalHomingStateDefault=0;
@@ -375,10 +379,10 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
     
-    if(_alarms){
-        pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
-    }
+    pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
     
+    alarms=(bool)_alarmsPresent;
+    durationAlarmsInterval=_alarmsInterval;
     
     controlLNS=true;
     return 0;
@@ -1388,7 +1392,7 @@ int TechnoSoftLowDriver::getMaxAccelerationHoming(double&  _maxAccelerationHomin
 }
 
 // Set encoder lines
-int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
+int TechnoSoftLowDriver::setEncoderLines(const double& _encoderLines){
     //DPRINT("Chiamata setEncoderLines");
     if(_encoderLines<=0){
         return -1;
@@ -1403,7 +1407,7 @@ int TechnoSoftLowDriver::getEncoderLines(double& _encoderLines){
     return 0;
 }
 
-int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
+int TechnoSoftLowDriver::setConst_mult_technsoft(const double& _const_mult_technsoft){
     //DPRINT("Chiamata setConst_mult_technsoft");
     if(_const_mult_technsoft<=0){
         return -1;
@@ -1420,7 +1424,7 @@ int TechnoSoftLowDriver::getConst_mult_technsoft(double& _const_mult_technsoft){
     return 0;
 }
 
-int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
+int TechnoSoftLowDriver::setSteps_per_rounds(const double& _steps_per_rounds){
     //DPRINT("Chiamata setSteps_per_rounds");
     if(_steps_per_rounds<=0){
         return -1;
@@ -1436,7 +1440,7 @@ int TechnoSoftLowDriver::getSteps_per_rounds(double& _steps_per_rounds){
     return 0;
 }
 
-int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
+int TechnoSoftLowDriver::setN_rounds(const double& _n_rounds){
     //DPRINT("Chiamata setN_rounds");
     if(_n_rounds<=0){
         return -1;
@@ -1453,7 +1457,7 @@ int TechnoSoftLowDriver::getN_rounds(double& _n_rounds){
     return 0;
 }
 
-int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
+int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_linear_movement_per_n_rounds<=0){
         return -1;
@@ -1472,7 +1476,7 @@ int TechnoSoftLowDriver::getLinear_movement_per_n_rounds(double& _linear_movemen
     return 0;
 }
 
-int TechnoSoftLowDriver::setvoltage_LNS(double& _voltage_LNS){
+int TechnoSoftLowDriver::setvoltage_LNS(const double& _voltage_LNS){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_voltage_LNS<0){
         return -1;
@@ -1487,7 +1491,7 @@ int TechnoSoftLowDriver::getvoltage_LNS(double& _voltage_LNS){
     return 0;
 }
 
-int TechnoSoftLowDriver::setvoltage_LPS(double& _voltage_LPS){
+int TechnoSoftLowDriver::setvoltage_LPS(const double& _voltage_LPS){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_voltage_LPS<0){
         return -1;
@@ -1503,7 +1507,7 @@ int TechnoSoftLowDriver::getvoltage_LPS(double& _voltage_LPS){
     return 0;
 }
 
-int TechnoSoftLowDriver::setRange(double& _range){
+int TechnoSoftLowDriver::setRange(const double& _range){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_range<0){
         return -1;
@@ -1520,7 +1524,7 @@ int TechnoSoftLowDriver::getRange(double& _range){
 }
 
 
-int TechnoSoftLowDriver::setFullscalePot(double& _fullScale){
+int TechnoSoftLowDriver::setFullscalePot(const double& _fullScale){
     //DPRINT("Chiamata setLinear_movement_per_n_rounds");
     if(_fullScale<0){
         return -1;
@@ -1535,6 +1539,40 @@ int TechnoSoftLowDriver::getFullscalePot(double& _fullScale){
     
 //    fullScalePot=_fullScale;
     _fullScale=fullScalePot;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setAlarmsGeneration(const int& _alarms){
+    
+    if(_alarms)
+        alarms=true;
+    else
+        alarms=false;
+    
+    return 0;
+}
+
+int TechnoSoftLowDriver::getAlarmsGeneration(int& _alarms){
+    
+    _alarms=(int)alarms;
+    
+    return 0;
+}
+
+int TechnoSoftLowDriver::setAlarmsInterval(const double& _value){
+    
+    if(_value<0)
+        return -1;
+        
+    durationAlarmsInterval=_value;
+    
+    return 0;
+}
+
+int TechnoSoftLowDriver::getAlarmsInterval(double& _alarms){
+    
+    _alarms=durationAlarmsInterval;
+    
     return 0;
 }
 
@@ -2452,27 +2490,26 @@ int TechnoSoftLowDriver::faultsGeneration(){
         // Lettura ogni secondo...
         if(total_time_interval>durationAlarmsInterval){
             
-            if(pthread_mutex_lock(&(mu))!=0){
+            if(alarms){
+                if(pthread_mutex_lock(&(mu))!=0){
 
-            }
-
-//            if(contatoreRegMer<maxcontatoreRegMer){
+                }
                 
-            contentRegMER = 0;
-            while((numTentativi<maxNumTentativi) && (positionRegMer==6 || positionRegMer==7)){
-                NumberDistribution distribution(rangeMinRegMer, rangeMaxRegMer);
-                Generator numberGenerator(generator, distribution);
-                positionRegMer = (WORD)numberGenerator();
-                numTentativi++;
-            }
-            contentRegMER |= ((WORD)1<<positionRegMer);
-            //contatoreRegMer++;
-            numTentativi=0;
-            positionRegMer=6;
-            
+                contentRegMER = 0;
+                while((numTentativi<maxNumTentativi) && (positionRegMer==6 || positionRegMer==7)){
+                    NumberDistribution distribution(rangeMinRegMer, rangeMaxRegMer);
+                    Generator numberGenerator(generator, distribution);
+                    positionRegMer = (WORD)numberGenerator();
+                    numTentativi++;
+                }
+                contentRegMER |= ((WORD)1<<positionRegMer);
+                //contatoreRegMer++;
+                numTentativi=0;
+                positionRegMer=6;
  
-            if(pthread_mutex_unlock(&(mu))!=0){
+                if(pthread_mutex_unlock(&(mu))!=0){
 
+                }
             }
             gettimeofday(&startTimeForMotor1,NULL);
         }

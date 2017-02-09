@@ -98,7 +98,7 @@
 #define POSITIVE_LIMIT_POSITION_DEFAULT 60000000
 #define PERC_NOISE_DEFAULT 0.0
 #define DURATION_ALARMS_INTERVAL_DEFAULT 60.0
-#define ALARMS_PRESENT_DEFAULT true   
+#define ALARMS_PRESENT_DEFAULT false  
 
 
 #define FULLSCALE_POTENTIOMETER 20.0
@@ -245,6 +245,8 @@ namespace common{
                 int moveAbsolutePositionHoming();
                 
                 int faultsGeneration();
+                bool alarms;
+                
                 static void* staticFaultsGeneration(void* objPointer);
                 
                 int resetStatesTimer();
@@ -351,7 +353,8 @@ namespace common{
                         const double voltage_LPS = V_LSP, //[V]
                         const double range = RANGE,  //[meter]
                         const double fullScalePot = FULLSCALE_POTENTIOMETER, //[V]
-                        const bool _alarmsPresent = ALARMS_PRESENT_DEFAULT 
+                        const int _alarmsPresent = ALARMS_PRESENT_DEFAULT,
+                        const double _alarmsInterval = DURATION_ALARMS_INTERVAL_DEFAULT
                         );
 
 
@@ -393,12 +396,8 @@ namespace common{
                 int setReferenceBase(const short& referenceBase);
                 int getReferenceBase(short& referenceBase);
                 
-                
-                //Get methods
-                
-
-                
-                //int getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr);
+                int setAlarmsGeneration(const int& intValue);
+                int getAlarmsGeneration(int& intValue);
 
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
@@ -425,32 +424,35 @@ namespace common{
 //                int setMovementHoming(const short& movement);
 //                int setReferenceBaseHoming(const short& referenceBase);
 
-                int setConst_mult_technsoft(double& _const_mult_technsoft);
+                int setConst_mult_technsoft(const double& _const_mult_technsoft);
                 int getConst_mult_technsoft(double& _const_mult_technsoft);
                 
-                int setSteps_per_rounds(double& _steps_per_rounds);
+                int setSteps_per_rounds(const double& _steps_per_rounds);
                 int getSteps_per_rounds(double& _steps_per_rounds);
                 
-                int setN_rounds(double& _n_rounds);
+                int setN_rounds(const double& _n_rounds);
                 int getN_rounds(double& _n_rounds);
                 
-                int setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
+                int setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds);
                 int getLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
                 
-                int setEncoderLines(double& _encoderLines);
+                int setEncoderLines(const double& _encoderLines);
                 int getEncoderLines(double& _encoderLines);
                 
-                int setvoltage_LNS(double& _voltage_LNS);
+                int setvoltage_LNS(const double& _voltage_LNS);
                 int getvoltage_LNS(double& _voltage_LNS);
                 
-                int setvoltage_LPS(double& _voltage_LPS);
+                int setvoltage_LPS(const double& _voltage_LPS);
                 int getvoltage_LPS(double& _voltage_LNS);
                 
-                int setRange(double& _range);
+                int setRange(const double& _range);
                 int getRange(double& _range);
                 
-                int setFullscalePot(double& _fullScale);
+                int setFullscalePot(const double& _fullScale);
                 int getFullscalePot(double& _fullScale);
+                
+                int setAlarmsInterval(const double& _value);
+                int getAlarmsInterval(double& _value);
                 
                 //Encoder lines
                 int moveAbsoluteSteps(const long& position);
