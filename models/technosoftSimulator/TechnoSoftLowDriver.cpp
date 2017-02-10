@@ -1596,9 +1596,6 @@ int TechnoSoftLowDriver::getPercOfNoise(double& value){
     return 0;
 }
 
-
-int getPercOfNoise(double& value);
-
 int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     // Stima grossolana tempo necessario per la movimentazione
