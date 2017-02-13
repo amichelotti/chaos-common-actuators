@@ -1786,13 +1786,6 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
     return 0;
 }
 
-//int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_IU){
-//
-//    //DPRINT("Valore letto dell'high speed homing %f:", highSpeedHoming_IU);
-//    _highSpeedHoming_IU = highSpeedHoming_IU;
-//    return 0;
-//}
-
 int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 
     if(pthread_mutex_lock(&(mu))!=0){
@@ -1826,7 +1819,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
 
     }
     
-    while(!stopMotionCommand && !LNStransition){
+    while(!stopMotionCommand && !LNStransition && !powerOffCommand){
 
         if(!powerOffCommand){
             
@@ -1863,9 +1856,7 @@ int TechnoSoftLowDriver::moveConstantVelocityHoming(){
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
-    //DPRINT("Posizione raggiunta dopo la rilevazione della transizione dello switch %ld",position);
-    //sleep(30);
-    //LNStransition = false;
+
     return 0;
 }
 
@@ -1975,8 +1966,7 @@ int TechnoSoftLowDriver::moveAbsolutePositionHoming(){
         
             if(pthread_mutex_unlock(&(mu))!=0){
 
-            }
-            
+            }  
         }
 
         usleep(1000); // Sleep for 1 milli second
@@ -2188,14 +2178,16 @@ int TechnoSoftLowDriver::stopPower(){
 
     }
     
+    powerOffCommand = true;
+    
     if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
 
+        usleep(5000);
+        
         internalHomingStateHoming2 = 0;
         internalHomingStateDefault = 0;
         controlLNS=true;
     }
-    
-    powerOffCommand = true;
     
     if(pthread_mutex_unlock(&(mu))!=0){
 
