@@ -98,7 +98,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _fullScalePot, 
                         const int _alarmsPresent,
                         const double _alarmsInterval,
-                        const double _percOfnoise
+                        const double _percOfnoise,
+                        const double _probabilityError
                         ){
 
     DPRINT("Inizializzazione parametri");
@@ -279,7 +280,12 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -24;
 //    }
     std::srand(std::time(0)); // Inizializza generatore numeri pseudo-casuali
-    p = 0.0;
+    
+    
+    if(_probabilityError<0 || _probabilityError>1)
+        return -90;
+        
+    p = _probabilityError;
 
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX/100))
@@ -1593,6 +1599,22 @@ int TechnoSoftLowDriver::setPercOfNoise(const double& value){
 int TechnoSoftLowDriver::getPercOfNoise(double& value){
     
     value=percNoise;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setProbError(const double& value){
+    
+    if(value<0.0 || value>1.0)
+        return -1;
+    
+    p=value;
+    
+    return 0;
+}
+
+int TechnoSoftLowDriver::getProbError(double& value){
+    
+    value=p;
     return 0;
 }
 

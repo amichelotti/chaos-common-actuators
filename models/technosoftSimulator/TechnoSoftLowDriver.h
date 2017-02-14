@@ -107,6 +107,7 @@
 #define RANGE 500 //[mm]
 
 #define HARD_RESET_MODE_DEFAULT false
+#define PROBABILITY_OPERATION_ERROR 0.0
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -355,7 +356,8 @@ namespace common{
                         const double fullScalePot = FULLSCALE_POTENTIOMETER, //[V]
                         const int _alarmsPresent = ALARMS_PRESENT_DEFAULT,
                         const double _alarmsInterval = DURATION_ALARMS_INTERVAL_DEFAULT,
-                        const double _percOfnoise = PERC_NOISE_DEFAULT
+                        const double _percOfnoise = PERC_NOISE_DEFAULT,
+                        const double _probabilityError = PROBABILITY_OPERATION_ERROR
                         );
 
 
@@ -457,6 +459,9 @@ namespace common{
                 
                 int setPercOfNoise(const double& value);
                 int getPercOfNoise(double& value);
+                
+                int setProbError(const double& value);
+                int getProbError(double& Value);
                 
                 //Encoder lines
                 int moveAbsoluteSteps(const long& position);

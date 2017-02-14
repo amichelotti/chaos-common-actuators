@@ -586,8 +586,15 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;      
     }
+    else if(strResultparName.compare("PROBERROROPERATION")==0){ //fullscalePot
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setProbError(doubleValue)<0){ 
+            return -29;
+        }
+        return 0;      
+    }        
     else{
-        return -29;
+        return -30;
     }
 }
 
@@ -897,10 +904,21 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
         ss.str(std::string());
         return 0;   
     }
+    else if(strResultparName.compare("PROBERROROPERATION")==0){ //fullscalePot
+        if((i->second)->getProbError(doubleValue)<0){ 
+            return -29;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;      
+    }   
     else{
         resultString.assign("");
         ss.str(std::string());
-        return -29;
+        return -30;
     }
     
     return 0;
@@ -1506,6 +1524,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"generateRandomAlarms\",\"description\":\"Decide if alarms are randomly generated. One per minute \",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
    dataset+="{\"name\":\"alarmsInterval\",\"description\":\"Time interval, in seconds, between two consecutive alarms generated\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"60.0\"},";
    dataset+="{\"name\":\"percNoise\",\"description\":\"Percent of noise added to measure performed by potentiometer and encoder\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.0\",\"max\":\"1.0\",\"default\":\"0.0\"},";
+   dataset+="{\"name\":\"probErrorOperation\",\"description\":\"Operation error probability\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.0\",\"max\":\"1.0\",\"default\":\"0.0\"},";
    dataset+="{\"name\":\"fullscalePot\",\"description\":\"Full scale of the potentiometer\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"20.0\"}";
 
    dataset+="]}";
