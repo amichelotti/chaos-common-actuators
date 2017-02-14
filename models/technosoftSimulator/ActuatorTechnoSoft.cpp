@@ -565,7 +565,7 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;   
     }
-    else if(strResultparName.compare("ALARMS")==0){ //fullscalePot
+    else if(strResultparName.compare("GENERATERANDOMALARMS")==0){ //fullscalePot
         intValue = atoi(valueOfparName.c_str());
         if((i->second)->setAlarmsGeneration(intValue)<0){ 
             return -26;
@@ -864,7 +864,7 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
         ss.str(std::string());
         return 0;   
     }
-    else if(strResultparName.compare("ALARMS")==0){ //fullscalePot
+    else if(strResultparName.compare("GENERATERANDOMALARMS")==0){ //fullscalePot
         if((i->second)->getAlarmsGeneration(intValue)<0){ 
             return -26;
         }
@@ -1503,7 +1503,7 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset+="{\"name\":\"voltage_LNS[V]\",\"description\":\"Voltage associated with LNS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"7.7\"},";
    dataset+="{\"name\":\"voltage_LPS[V]\",\"description\":\"Voltage associated with LPS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"0.3\"},";
    dataset+="{\"name\":\"range_slit[mm]\",\"description\":\"Maximum linear displacement of the slit [m]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"10.0\"},";
-   dataset+="{\"name\":\"alarms\",\"description\":\"Decide if alarms are randomly generated. One per minute \",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
+   dataset+="{\"name\":\"generateRandomAlarms\",\"description\":\"Decide if alarms are randomly generated. One per minute \",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
    dataset+="{\"name\":\"alarmsInterval\",\"description\":\"Time interval, in seconds, between two consecutive alarms generated\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"60.0\"},";
    dataset+="{\"name\":\"percNoise\",\"description\":\"Percent of noise added to measure performed by potentiometer and encoder\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.0\",\"max\":\"1.0\",\"default\":\"0.0\"},";
    dataset+="{\"name\":\"fullscalePot\",\"description\":\"Full scale of the potentiometer\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"20.0\"}";
