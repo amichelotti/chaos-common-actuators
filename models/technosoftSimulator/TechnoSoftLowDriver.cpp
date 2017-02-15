@@ -291,8 +291,8 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(random_variable<p*(RAND_MAX))
         return -28;
 
-    DPRINT("random_variable = %d",random_variable);
-    DPRINT("p*(RAND_MAX/100) = %d",p*(RAND_MAX));
+//    DPRINT("random_variable = %d",random_variable);
+//    DPRINT("p*(RAND_MAX/100) = %d",p*(RAND_MAX));
     
     /*	Setup the axis based on the setup data previously, for axisID*/
 //    if(!TS_SetupAxis(_axisID, axisRef)){
