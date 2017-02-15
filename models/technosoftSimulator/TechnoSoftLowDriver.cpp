@@ -288,16 +288,19 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     p = _probabilityError;
 
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX))
         return -28;
 
+    DPRINT("random_variable = %d",random_variable);
+    DPRINT("p*(RAND_MAX/100) = %d",p*(RAND_MAX));
+    
     /*	Setup the axis based on the setup data previously, for axisID*/
 //    if(!TS_SetupAxis(_axisID, axisRef)){
 //        DERR("failed to setup axis %d, %s",axisID,TS_GetLastErrorText());
 //        return -25;
 //    }
     random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX))
         return -29;
 
 //    if(!TS_SelectAxis(_axisID)){
@@ -305,7 +308,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -26;
 //    }
     random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX))
         return -30;
 
     /*	Execute the initialization of the drive (ENDINIT) */
@@ -314,7 +317,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -27;
 //    }
     random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX))
         return -31;
 
      // Settare il registro per la lettura dell'encoder
@@ -324,14 +327,14 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        return -28;
 //    }
     random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX))
         return -32;
 
 //    if(!TS_SetEventOnMotionComplete(0,0)){
 //	return -30;
 //    }
     random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100))
+    if(random_variable<p*(RAND_MAX))
         return -33;
 
     readyState = true;
@@ -1081,7 +1084,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
     }
 
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         if(pthread_mutex_unlock(&(mu))!=0){
         }
         return -3;
@@ -1790,7 +1793,7 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
     }
 
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         if(pthread_mutex_unlock(&(mu))!=0){
 
         }
@@ -1894,7 +1897,7 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
     
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
     
@@ -2033,7 +2036,7 @@ int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition){
     }
 
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         if(pthread_mutex_unlock(&(mu))!=0){
 
         }
@@ -2056,7 +2059,7 @@ int TechnoSoftLowDriver::stopMotion(){
 
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }    
 
@@ -2095,7 +2098,7 @@ void* TechnoSoftLowDriver::staticStopMotionForThread(void* objPointer){ // Metod
 int TechnoSoftLowDriver::hardreset(bool mode){
     
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }  
     
@@ -2140,7 +2143,7 @@ int TechnoSoftLowDriver::providePower(){
     // Simulazione dialogo con il drive/motor
     
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }    
     
@@ -2192,7 +2195,7 @@ int TechnoSoftLowDriver::stopPower(){
 
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
     
@@ -2228,7 +2231,7 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
 
@@ -2247,7 +2250,7 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     //DPRINT("E' questo il getEncoder???????????????");
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
 
@@ -2283,11 +2286,11 @@ int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
 
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
 
-    double pos = positionPotentiometer;
+    double pos = position;
     
     if(percNoise>0){
         double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
@@ -2320,7 +2323,7 @@ int TechnoSoftLowDriver::getLVariable(std::string& nameVar, long& var) {
 
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
     
@@ -2346,7 +2349,7 @@ int TechnoSoftLowDriver::resetCounterHoming(){
     
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
     
@@ -2365,7 +2368,7 @@ int TechnoSoftLowDriver::resetEncoderHoming(){
     
     // Simulazione dialogo con il drive/motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
 //    
@@ -2393,7 +2396,7 @@ int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionTy
 
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)) {
+    if(random_variable<p*(RAND_MAX)) {
         return -1;
     }
 
@@ -2404,7 +2407,7 @@ int TechnoSoftLowDriver::setEventOnMotionComplete(BOOL waitEvent, BOOL enableSto
     
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)) {
+    if(random_variable<p*(RAND_MAX)) {
         return -1;
     }
 
@@ -2418,7 +2421,7 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
 
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)) {
+    if(random_variable<p*(RAND_MAX)) {
         return -1;
     }
     
@@ -2453,7 +2456,7 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
     
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/1000)) {
+    if(random_variable<p*(RAND_MAX)) {
         //descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
         return -1;
     }
@@ -2579,7 +2582,7 @@ int TechnoSoftLowDriver::resetFault(){
     
     //Simulazione dialogo con il drive motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         if(pthread_mutex_unlock(&(mu))!=0){
         }
         return -2;
@@ -2603,7 +2606,7 @@ int TechnoSoftLowDriver::selectAxis(){
 
     //Simulazione dialogo con il drive motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }    
 
@@ -2615,7 +2618,7 @@ int TechnoSoftLowDriver::getFirmwareVers(char* firmwareVers){
 
     // Simulazione dialogo con il drive motor
     int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX/100)){
+    if(random_variable<p*(RAND_MAX)){
         return -1;
     }
     char msg[] = "Simulated firmware.";

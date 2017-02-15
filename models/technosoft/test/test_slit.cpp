@@ -226,7 +226,7 @@ void* stopMotionProcedure(void* p){
     DPRINT("************** Comando di stop eseguito **************");
 }
 
-int getParameter(common::actuators::AbstractActuator *OBJ,int axisID,std::string parName,std::string resultString ){
+int getParameter(common::actuators::AbstractActuator *OBJ,int axisID,std::string parName,std::string& resultString ){
     
     if(OBJ->getParameter(axisID,parName,resultString)<0){
         DERR("************** Error returned by getParameter %s **************",parName.c_str());

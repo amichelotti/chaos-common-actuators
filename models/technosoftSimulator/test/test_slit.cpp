@@ -25,6 +25,25 @@ struct checkData{
     common::actuators::AbstractActuator *obj;
 };
 
+int setParameter(common::actuators::AbstractActuator *OBJ,int axisID,std::string parName,std::string value){
+    
+    if(OBJ->setParameter(axisID,parName,value)<0){
+        DERR("************** Error returned by setParameter %s **************",parName.c_str());
+        return -1;
+    }
+    //DPRINT("************** Value of %s updated to %s **************",parName.c_str(),value.c_str());
+
+    return 0;  
+}
+
+int getParameter(common::actuators::AbstractActuator *OBJ,int axisID,std::string parName,std::string& resultString ){
+    
+    if(OBJ->getParameter(axisID,parName,resultString)<0){
+        DERR("************** Error returned by getParameter %s **************",parName.c_str());
+        return -1;
+    }
+    return 0;  
+}
 
 void* checkProcedures(void* p){
     
@@ -222,7 +241,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
         //* errPtr = -5;
     }
           
-    double durationChecking=60;
+    double durationChecking=30;
 
     checkData hd2;
     hd2.axisID=axisID;
@@ -230,24 +249,45 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
     hd2.obj=OBJ;
     checkProcedures((void*)&hd2);
     
-    DPRINT("************** Prima movimentazione relativa in AVANTI **************");
-    sleep(5);
     int resp;
-    if((resp=OBJ->moveRelativeMillimeters(axisID,15))<0){
+    if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
         DPRINT("************** Error returned by movement operation, code error %d **************",resp);
     }
     
-    durationChecking=30;
+    sleep(20);
+    std::string nameParameter = " probErrorOperation    ";
+    setParameter(OBJ,axisID,nameParameter,"0.8");
+    
+    std::string valueStr;
+    if(getParameter(OBJ,axisID,nameParameter,valueStr)>=0)
+        DPRINT("************** Value of  %s = %s **************",nameParameter.c_str(),valueStr.c_str());
+
+//    nameParameter = " alarmsInterval    ";
+//    setParameter(OBJ,axisID,nameParameter,"120");
+//    if(getParameter(OBJ,axisID,nameParameter,valueStr)>=0)
+//        DPRINT("************** Value of  %s = %s **************",nameParameter.c_str(),valueStr.c_str());
+    
+    sleep(10);
+    
+    hd2.duration=600;
     checkProcedures((void*)&hd2);
     
-    DPRINT("************** Operazione di hard reset eseguita fra 5 secondi **************");
-    sleep(5);
-    if((resp=OBJ->hardreset(axisID, false))<0){
-        DPRINT("************** Error returned by hardreset operation**************");
-    }
+//    DPRINT("************** Prima movimentazione relativa in AVANTI **************");
+//    sleep(5);
+
     
-    durationChecking=30;
-    checkProcedures((void*)&hd2);
+//    durationChecking=30;
+//    checkProcedures((void*)&hd2);
+//    
+//    DPRINT("************** Operazione di hard reset eseguita fra 5 secondi **************");
+//    sleep(5);
+//    int resp;
+//    if((resp=OBJ->hardreset(axisID, false))<0){
+//        DPRINT("************** Error returned by hardreset operation**************");
+//    }
+//    
+//    durationChecking=30;
+//    checkProcedures((void*)&hd2);
     
     return 0;
 }
