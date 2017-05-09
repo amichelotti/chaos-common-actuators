@@ -256,9 +256,6 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     if(_alarmsInterval<=0)
         return -27;
     
-//    if(_percNoise<0 || _percNoise>1){
-//        return -23;
-//    }
     if(_percOfnoise<0.0 || _percOfnoise>1.0)
         return -28;
 
@@ -1052,6 +1049,7 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
 int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 
     //threadMoveRelativeOn=false; // Spegnamo il thread correntemente in esecuzione
+    stopMotionCommand=false; 
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
@@ -1328,9 +1326,6 @@ int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
     if(_lowSpeedHoming_IU>maxLowSpeedHoming_IU){
         return -2;
     }
-//    if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
-//        return -1;
-//    }
     lowSpeedHoming_IU = _lowSpeedHoming_IU;
     return 0;
 }
@@ -1462,6 +1457,13 @@ int TechnoSoftLowDriver::setN_rounds(const double& _n_rounds){
     positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
     return 0;
 }
+
+
+int TechnoSoftLowDriver::setMeasureUnit(const bool& inSteps)
+{
+ this->useUI=inSteps;
+}
+
 
 int TechnoSoftLowDriver::getN_rounds(double& _n_rounds){
     //DPRINT("Chiamata setN_rounds");
@@ -1626,6 +1628,8 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     // Stima grossolana tempo necessario per la movimentazione
 
     bool goahead = false;
+    stopMotionCommand=false;
+    DPRINT("moveAbsolute starts here with stopMotionCommand=%d",stopMotionCommand);
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
@@ -1657,6 +1661,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         if(pthread_mutex_unlock(&(mu))!=0){
 
         }
+	DPRINT("Before returning 0 (ALEDEBUG)");
         return 0;
     }
     
@@ -1672,7 +1677,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     bool resetLimitSwicth = true;
 
-    //DPRINT("moveAbsolutePosition: appena prima del ciclo while");
+    DPRINT("moveAbsolutePosition: appena prima del ciclo while");
 
     long tol = speed_IU;
     
@@ -1729,6 +1734,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
+    DPRINT("Putting actuatorIDInMotion(%d) to false. stopMotionCommand is %d",actuatorIDInMotion,stopMotionCommand);
  
     actuatorIDInMotion = false;
     stopMotionCommand = false;
@@ -1759,12 +1765,12 @@ void* TechnoSoftLowDriver::staticMoveAbsolutePositionForThread(void* objPointer)
 
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePosition();
-
     pthread_exit(NULL); // Perche' e' la funzione chiamata direttamente dal thread
 }
 
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
 
+    DPRINT("MoveAbsoluteSteps called with %d",absPosition);
     if(pthread_mutex_lock(&(mu))!=0){
 
     }

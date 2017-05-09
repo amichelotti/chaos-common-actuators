@@ -168,6 +168,7 @@ namespace common{
                 double minimumIntervalForHoming; // in seconds
                 
                 bool hardResetMode;
+		bool useUI;
                 
                 
                 
@@ -253,6 +254,7 @@ namespace common{
                 int setAcceleration(const double& acceleration);
                 int getAcceleration(double& acceleration);
                 
+                int setMeasureUnit(const bool& inSteps);
                 int setMaxAcceleration(const double& maxAcceleration);
                 int getMaxAcceleration(double& maxAcceleration);
 

@@ -114,6 +114,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     DPRINT("Inizializzazione parametri");
     
+    this.useUI=false;
     // max speed
     if(_maxSpeed_mm_s<=0){
         return -1;
@@ -1028,6 +1029,11 @@ int TechnoSoftLowDriver::getSpeed(double& _speed_mms){
     // Conversione speed_IU in mm/s
     _speed_mms=speedfromIUTOMMs(speed_IU);
     return 0;
+}
+
+int TechnoSoftLowDriver::setMeasureUnit(const bool& inSteps)
+{
+ this->useUI=inSteps;
 }
 
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){

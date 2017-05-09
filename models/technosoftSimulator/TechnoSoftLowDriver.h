@@ -182,6 +182,7 @@ namespace common{
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
+		bool useUI;
 
                 // Speed parameters regarding homing procedure
 //                double highSpeedHoming_mm_s; // The homing travel speed
@@ -387,6 +388,8 @@ namespace common{
                 int setAcceleration(const double& acceleration);
                 int getAcceleration(double& acceleration);
                 
+		int setMeasureUnit(const bool& inSteps);
+
                 int setMaxAcceleration(const double& maxAcceleration);
                 int getMaxAcceleration(double& maxAcceleration);
                 
