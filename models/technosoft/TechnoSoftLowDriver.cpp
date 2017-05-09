@@ -114,7 +114,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     DPRINT("Inizializzazione parametri");
     
-    this.useUI=false;
+    this->useUI=false;
     // max speed
     if(_maxSpeed_mm_s<=0){
         return -1;
