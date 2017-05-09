@@ -1034,6 +1034,7 @@ int TechnoSoftLowDriver::getSpeed(double& _speed_mms){
 int TechnoSoftLowDriver::setMeasureUnit(const bool& inSteps)
 {
  this->useUI=inSteps;
+ return 0;
 }
 
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){

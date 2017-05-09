@@ -593,8 +593,15 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;      
     }        
+    else if(strResultparName.compare("USEIU")==0){ //Use internal units 
+        int intVal= atoi(valueOfparName.c_str());
+        if((i->second)->setMeasureUnit((bool)intVal)<0){ 
+            return -30;
+        }
+        return 0;      
+    }        
     else{
-        return -30;
+        return -31;
     }
 }
 
