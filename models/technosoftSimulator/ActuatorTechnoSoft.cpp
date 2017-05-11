@@ -975,7 +975,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
     // Calcolo argomento funzione moveAbsoluteSteps
     //double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double nMicroSteps = (i->second)->getdeltaMicroSteps(millimeters);
-    //DPRINT("nMicroSteps=%f\n",nMicroSteps);
+    //DPRINT("ALEDEBUG nMicroSteps=%f\n",nMicroSteps);
 
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
@@ -1070,6 +1070,7 @@ int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaP
             break;
     }
  
+    DPRINT("ALEDEBUG ActuatorTechnosoftSim, deltaPosition is %f",*deltaPosition_mm);
     return 0;
 }
 

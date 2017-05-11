@@ -140,7 +140,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             int val;
             
             if((val=driver->init(conf_path,axid))<0){
-                ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
+                ERR("****************Tipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
 //                if(pthread_mutex_unlock(&(mu))!=0){
@@ -810,6 +810,14 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         }
         return 0;   
     }
+    else if(strResultparName.compare("USEIU")==0){ //Use internal units
+        int intVal= atoi(valueOfparName.c_str());
+        if((i->second)->setMeasureUnit((bool)intVal)<0){
+            return -30;
+        }
+        return 0;
+    }
+
     else{
         return -26;
     }

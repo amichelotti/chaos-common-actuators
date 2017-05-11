@@ -49,22 +49,28 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
     usleep(1500000);
 }
 
-double speedfromMMsToIU(double _speed_mm_s){
-    
+double TechnoSoftLowDriver::speedfromMMsToIU(double _speed_mm_s){
+    if (this->useUI)
+	return _speed_mm_s; 
     return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
 }
 
-double speedfromIUTOMMs(double _speed_IU){
-    
+double TechnoSoftLowDriver::speedfromIUTOMMs(double _speed_IU){
+    if (this->useUI)
+        return _speed_IU; 
     return (_speed_IU*CONVERSION_FACTOR_DEG_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
 }
 
-double accelerationfromMMs2ToIU(double _acceleration_mm_s2){
+double TechnoSoftLowDriver::accelerationfromMMs2ToIU(double _acceleration_mm_s2){
+    if (this->useUI)
+	return _acceleration_mm_s2;
     
     return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_acceleration_mm_s2) / CONVERSION_FACTOR_DEGs2_UI;
 }
 
-double accelerationfromIUToMMs2(double _acceleration_IU){
+double TechnoSoftLowDriver::accelerationfromIUToMMs2(double _acceleration_IU){
+    if (this->useUI)
+	return _acceleration_IU;
     
     return (_acceleration_IU*CONVERSION_FACTOR_DEGs2_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
 }
@@ -1103,6 +1109,15 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 
 
 double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
+    if (this->useUI)
+    {
+	DPRINT("ALEDEBUG conversion to be checked now %f",deltaMillimeters*const_mult_technsoft);
+	return deltaMillimeters*const_mult_technsoft;
+    }
+    else
+    {
+       DPRINT("ALEDEBUG no useUI (%d)",this->useUI);
+    }
 
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
 }
@@ -1462,7 +1477,6 @@ int TechnoSoftLowDriver::setN_rounds(const double& _n_rounds){
 int TechnoSoftLowDriver::setMeasureUnit(const bool& inSteps)
 {
  this->useUI=inSteps;
- DPRINT("ALEDEBUG in setMeasureUnit");
  return 0;
 }
 
@@ -1682,7 +1696,6 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     DPRINT("moveAbsolutePosition: appena prima del ciclo while");
 
     long tol = speed_IU;
-    
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
@@ -1737,6 +1750,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     }
     DPRINT("Putting actuatorIDInMotion(%d) to false. stopMotionCommand is %d",actuatorIDInMotion,stopMotionCommand);
+    DPRINT("position is %d, absolute is  %d tolerance %d",position,absolutePosition,tol); 
  
     actuatorIDInMotion = false;
     stopMotionCommand = false;
@@ -2244,6 +2258,9 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     }
 
     double pos = positionCounter;
+    if (this->useUI)
+       *deltaPosition_mm=pos;
+    else
     *deltaPosition_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
     return 0;
 }
@@ -2263,9 +2280,14 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     }
 
     double pos = positionEncoder;
-    
     if(percNoise>0){
-        double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+	double pos_mm;
+    if (this->useUI)
+    {
+       pos_mm=pos/const_mult_technsoft;
+    }
+    else
+       pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
         if(pos_mm==0){
             pos_mm=0.000001;
         }
@@ -2283,8 +2305,15 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
         //sleep(1);
     }
     else
-        *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-    
+    {
+	if (this->useUI)
+        {
+           *deltaPosition_mm=pos/const_mult_technsoft;
+    		DPRINT("ALEDEBUG deltaPosition returning %f",(*deltaPosition_mm)); 
+        }
+        else
+           *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+    } 
     //DPRINT("Real position encoder %f millimeter", *deltaPosition_mm);
    
     return 0;
@@ -2301,7 +2330,7 @@ int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
     double pos = position;
     
     if(percNoise>0){
-        double pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+        double pos_mm =(this->useUI)? (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft) : pos;
         if(pos_mm==0){
             pos_mm=0.000001;
         }
@@ -2319,8 +2348,12 @@ int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
         //sleep(1);
     }
     else
-        *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
-    
+    {
+	if (this->useUI)
+         *deltaPosition_mm=pos;
+        else
+         *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+   } 
     //DPRINT("Real position encoder %f millimeter", *deltaPosition_mm);
    
     return 0;

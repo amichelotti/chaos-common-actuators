@@ -366,6 +366,10 @@ namespace common{
 
                 int getinternalHomingStateDefault();
                 int getinternalHomingStateHoming2();
+		double speedfromMMsToIU(double _speed_mm_s);
+ 		double speedfromIUTOMMs(double _speed_IU);
+		double accelerationfromMMs2ToIU(double _acceleration_mm_s2);
+		double accelerationfromIUToMMs2(double _acceleration_IU);
 
                 int providePower();
                 int stopPower();
