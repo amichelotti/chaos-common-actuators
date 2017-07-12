@@ -958,7 +958,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     long initPosition = position;
     bool resetLimitSwicth=true;
 
-    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<=abs(deltaPosition) && !stopMotionCommand){
+    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<abs(deltaPosition) && !stopMotionCommand){
 
         if(!powerOffCommand){
             
@@ -966,32 +966,56 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 
             }
 
-            if(goahead){ // vai avanti
-                position+=speed_IU;
-                positionCounter+=speed_IU;
-                positionEncoder+=speed_IU;
-                positionPotentiometer+=speed_IU;
-                LNStransition = false;
-                LSNactive = false;
+            if(goahead)
+	    { // vai avanti
+ 		if (!this->useUI)
+		{	
+                	position+=speed_IU;
+                	positionCounter+=speed_IU;
+                	positionEncoder+=speed_IU;
+                	positionPotentiometer+=speed_IU;
+                	LNStransition = false;
+                	LSNactive = false;
+        	}
+		else
+		{
+                	position+=1;
+                	positionCounter+=1;
+                	positionEncoder+=1;
+                	positionPotentiometer+=1;
+                	LNStransition = false;
+                	LSNactive = false;
+		}
             }
             else{ // vai indietro
-                position-=speed_IU;
-                positionCounter-=speed_IU;
-                positionEncoder-=speed_IU;
-                positionPotentiometer-=speed_IU;
-                LPStransition = false;
-                LSPactive=false;
+ 		if (!this->useUI)
+		{	
+                	position-=speed_IU;
+                	positionCounter-=speed_IU;
+                	positionEncoder-=speed_IU;
+                	positionPotentiometer-=speed_IU;
+                	LPStransition = false;
+                	LSPactive=false;
+		}
+		else
+		{	
+                	position-=1;
+                	positionCounter-=1;
+                	positionEncoder-=1;
+                	positionPotentiometer-=1;
+                	LPStransition = false;
+                	LSPactive=false;
+		}
+		
             }
 
-            if(resetLimitSwicth){
-                if (position >= 0){
-                    LSNactive=false;
-                    resetLimitSwicth=false;
-                }
+            if(resetLimitSwicth)
+	    {
+                LSNactive=false;
                 if (position<=positiveLimitPosition){
                     LSPactive=false;
-                    resetLimitSwicth=false;
                 }    
+                resetLimitSwicth=false;
             }
             
             if(pthread_mutex_unlock(&(mu))!=0){
@@ -1000,7 +1024,10 @@ int TechnoSoftLowDriver::incrDecrPosition(){
         }
 
         //DPRINT("Posizione incrementata!!!!!");
-        usleep(1000); // Sleep for 1 milli second
+	if (!this->useUI)
+        	usleep(1000); // Sleep for 1 milli second
+	else
+		usleep(100);
     }
 
     // DEBUG
@@ -1016,16 +1043,6 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 //        if(position==0){ // nel qual caso absolutePosition dato in input ==0
 //            LSNactive = true;
 //        }
-    if(position<0){
-        LSNactive=true;                              
-//        position=0;
-//        positionCounter=0;
-//        positionEncoder=0;
-        positionCounter=0;
-        positionEncoder=0;
-        positionPotentiometer=0;
-        position=0;   
-    }
     
     if(position>positiveLimitPosition){
         LSPactive=true;
@@ -1112,7 +1129,8 @@ double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
     if (this->useUI)
     {
 	DPRINT("ALEDEBUG conversion to be checked now %f",deltaMillimeters*const_mult_technsoft);
-	return deltaMillimeters*const_mult_technsoft;
+	//return deltaMillimeters*const_mult_technsoft;
+	return deltaMillimeters;
     }
     else
     {
@@ -1544,7 +1562,8 @@ int TechnoSoftLowDriver::setRange(const double& _range){
         return -1;
     }
     range=_range;
-    positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
+    //positiveLimitPosition = (long)((n_rounds*range)/linear_movement_per_n_rounds)*steps_per_rounds*const_mult_technsoft;
+    positiveLimitPosition = (long) 1000000000000000000;
     return 0;
 }
 
@@ -1659,16 +1678,10 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     
     bool turnLNS = false;
     bool turnLPS = false;
-    if(absolutePosition<0){
-//        if(pthread_mutex_unlock(&(mu))!=0){
-//
-//        }
-        absolutePosition=0;
-        turnLNS = true;
-        //turnLNS = true;
+ 
         //return -1;
-    }
-    else if(absolutePosition>positiveLimitPosition){
+    
+    if(absolutePosition>positiveLimitPosition){
         absolutePosition=positiveLimitPosition;
         turnLPS=true;
     }
@@ -1696,6 +1709,8 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
     DPRINT("moveAbsolutePosition: appena prima del ciclo while");
 
     long tol = speed_IU;
+    if (this->useUI)
+	tol=0;
     if(pthread_mutex_unlock(&(mu))!=0){
 
     }
@@ -1710,21 +1725,47 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
             }
 
-            if(goahead){ // vai avanti
-                position+=speed_IU;
-                positionCounter+=speed_IU;
-                positionEncoder+=speed_IU;
-                positionPotentiometer+=speed_IU;
-                LNStransition = false;
-                LSNactive = false;
+            if(goahead)
+	    { // vai avanti
+		if (!this->useUI)
+		{
+                	position+=speed_IU;
+                	positionCounter+=speed_IU;
+                	positionEncoder+=speed_IU;
+                	positionPotentiometer+=speed_IU;
+                	LNStransition = false;
+                	LSNactive = false;
+		}
+		else
+		{
+                	position+=1;
+                	positionCounter+=1;
+                	positionEncoder+=1;
+                	positionPotentiometer+=1;
+                	LNStransition = false;
+                	LSNactive = false;
+		}
             }
-            else{
-                position-=speed_IU;
-                positionCounter-=speed_IU;
-                positionEncoder-=speed_IU;
-                positionPotentiometer-=speed_IU;
-                LPStransition = false;
-                LSPactive = false;
+            else
+	    {
+		if (!this->useUI)
+		{
+                	position-=speed_IU;
+                	positionCounter-=speed_IU;
+                	positionEncoder-=speed_IU;
+                	positionPotentiometer-=speed_IU;
+                	LPStransition = false;
+                	LSPactive = false;
+		}
+		else
+		{
+                	position-=1;
+                	positionCounter-=1;
+                	positionEncoder-=1;
+                	positionPotentiometer-=1;
+                	LPStransition = false;
+                	LSPactive = false;
+		}
             }
 
             if(resetLimitSwicth){
@@ -1743,7 +1784,10 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
             } 
         }
 
-        usleep(1000); // Sleep for 5 milli second
+	if (!this->useUI)
+        	usleep(1000); // Sleep for 5 milli second
+	else
+		usleep(100);
     }
     //position=currentPosition;
     if(pthread_mutex_lock(&(mu))!=0){
@@ -2284,7 +2328,8 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
 	double pos_mm;
     if (this->useUI)
     {
-       pos_mm=pos/const_mult_technsoft;
+       //pos_mm=pos/const_mult_technsoft;
+       pos_mm=pos;
     }
     else
        pos_mm = (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
@@ -2308,8 +2353,9 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     {
 	if (this->useUI)
         {
-           *deltaPosition_mm=pos/const_mult_technsoft;
-    		DPRINT("ALEDEBUG deltaPosition returning %f",(*deltaPosition_mm)); 
+           //*deltaPosition_mm=pos/const_mult_technsoft;
+           *deltaPosition_mm=pos;
+    		DPRINT("ALEDEBUG deltaPosition retuFrning %f, speed_IU %f",(*deltaPosition_mm),speed_IU); 
         }
         else
            *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
@@ -2330,7 +2376,7 @@ int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
     double pos = position;
     
     if(percNoise>0){
-        double pos_mm =(this->useUI)? (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft) : pos;
+        double pos_mm =(!this->useUI)? (pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft) : pos;
         if(pos_mm==0){
             pos_mm=0.000001;
         }
