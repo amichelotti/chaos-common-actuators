@@ -19,6 +19,7 @@
 #include <functional> 
 #include <cctype>
 #include <locale>         // std::locale, std::toupper
+#include <json/json.h>
 
 using namespace boost;
 using namespace ::common::actuators::models;
@@ -70,21 +71,67 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 //        return 0;
 //    }
     
-    std::string params;
-    params.assign((const char*)initialization_string);
+    const std::string& params = (const char*)initialization_string;
+    //const std::string& params = "\"porcoddiomarcio\"";
+    //params.assign((const char*)initialization_string);
     boost::smatch match;
+    bool jsonInitialization = false; 
+    DPRINT("Init actuatorTechnosoft Initialization string %s", params.c_str());
+
+    Json::Value                                 json_parameter;
+    Json::Reader                                json_reader;
+    //parse json string
+    Json::Value json_HostID ; 
+    Json::Value json_btType; 
+    Json::Value json_baudrate; 
+    Json::Value json_device ; 
+    if(!json_reader.parse(params, json_parameter)) 
+    {
+  	DPRINT ( "ALEDEBUG Bad Json parameter ");
+    }
+    else
+    {
+	if (json_parameter.isObject())
+        {
+  	 DPRINT ( "ALEDEBUG good Json parameter: %s ",json_parameter.asString().c_str());
+         json_HostID = json_parameter["HostID"];
+         json_btType = json_parameter["btType"];
+         json_baudrate =  json_parameter["baudrate"];
+         json_device = json_parameter["device"];
+	 if ((!json_HostID.isNull()) && (!json_btType.isNull()) && (!json_baudrate.isNull()) && (!json_device.isNull())  )
+	 {
+		jsonInitialization=true;
+	 }
+	}
+	else
+	{ DPRINT("ALEDEBUG Json param isn't a Json Object"); }
+
+    }
+
     
-    DPRINT("Initialization string %s", params.c_str());
-    
-    if(regex_match(params, match, driver_match1, boost::match_extra)){
-        
-        std::string strHostID = match[1]; 
-        hostID = atoi(strHostID.c_str());
-        std::string strbtType = match[2];
-        btType = atoi(strbtType.c_str());
-        std::string strbaudrate = match[3]; 
-        baudrate = atoi(strbaudrate.c_str());
-        dev_name=match[4]; 
+    if(jsonInitialization || (regex_match(params, match, driver_match1, boost::match_extra)) )
+    {
+	std::string strHostID,strbtType,strbaudrate;
+	if (jsonInitialization==false)
+	{
+         strHostID = match[1]; 
+         hostID = atoi(strHostID.c_str());
+         strbtType = match[2];
+         btType = atoi(strbtType.c_str());
+         strbaudrate = match[3]; 
+         baudrate = atoi(strbaudrate.c_str());
+         dev_name=match[4]; 
+	}
+	else
+	{
+		strHostID=json_HostID.asString();
+         	hostID = atoi(strHostID.c_str());
+		strbtType=json_btType.asString();
+         	btType = atoi(strbtType.c_str());
+		strbaudrate = json_baudrate.asString();
+         	baudrate = atoi(strbaudrate.c_str());
+		dev_name = json_device.asString(); 
+	}
         
         DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
         
