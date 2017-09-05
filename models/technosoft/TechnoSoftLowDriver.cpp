@@ -64,22 +64,31 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 }    
  
 
-double speedfromMMsToIU(double _speed_mm_s){
+double TechnoSoftLowDriver::speedfromMMsToIU(double _speed_mm_s){
     
+    if (this->useUI)
+        return _speed_mm_s;
+
     return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
 }
 
-double speedfromIUTOMMs(double _speed_IU){
+double TechnoSoftLowDriver::speedfromIUTOMMs(double _speed_IU){
+    if (this->useUI)
+        return _speed_IU;
     
     return (_speed_IU*CONVERSION_FACTOR_DEG_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
 }
 
-double accelerationfromMMs2ToIU(double _acceleration_mm_s2){
+double TechnoSoftLowDriver::accelerationfromMMs2ToIU(double _acceleration_mm_s2){
+   if (this->useUI)
+        return _acceleration_mm_s2;
     
     return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_acceleration_mm_s2) / CONVERSION_FACTOR_DEGs2_UI;
 }
 
-double accelerationfromIUToMMs2(double _acceleration_IU){
+double TechnoSoftLowDriver::accelerationfromIUToMMs2(double _acceleration_IU){
+    if (this->useUI)
+        return _acceleration_IU;
     
     return (_acceleration_IU*CONVERSION_FACTOR_DEGs2_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
 }
@@ -1001,6 +1010,13 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso
 
 double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
     
+ if (this->useUI)
+    {
+        DPRINT("ALEDEBUG conversion to be checked now %f %f",deltaMillimeters,deltaMillimeters*const_mult_technsoft);
+        //return deltaMillimeters*const_mult_technsoft;
+        return deltaMillimeters;
+    }
+
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
 }
 
@@ -1012,6 +1028,8 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){ // _speed_mm_s [mm
     }
     
     double _speed_UI = speedfromMMsToIU(_speed_mm_s);
+    DPRINT("Aledebug: %f (speed_UI) %f (maxSpeed)",_speed_UI,maxSpeed_IU);
+    DPRINT("ALEDEBUG: %f (before conversion) ",_speed_mm_s);
     
     if(_speed_UI>maxSpeed_IU){
         DERR("Speed = %f IU > maxSpeed",_speed_UI);
@@ -1454,6 +1472,7 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso c
         controlLNS=true;
     }
     
+    DPRINT("ALEDEBUG: Move Absolute Steps %d",absPosition);
     if(!TS_MoveAbsolute(absPosition, speed_IU, acceleration_IU, movement, referenceBase)){
         DERR("error absolute step moving");
         return -3;
@@ -1582,7 +1601,10 @@ int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     if(!TS_GetLongVariable("TPOS", tposition)){
         return -1;
     }
-    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+    if (this->useUI)
+       *deltaPosition_mm=tposition;
+    else
+       *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
     return 0;
 }
 
@@ -1612,7 +1634,12 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
         return -1;
     }
     //DPRINT("Final APOS for homing %ld",aposition);
-    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
+    if (this->useUI)
+    {
+       *deltaPosition_mm=aposition;
+    }
+    else
+       *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
     return 0;
 }
 

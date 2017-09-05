@@ -885,10 +885,11 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimete
     //double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double deltaMicroSteps=(i->second)->getdeltaMicroSteps(deltaMillimeters);
     DPRINT("deltaMicroSteps = %f mm",deltaMicroSteps);
+/*
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
     }    
-    
+  */  
     if((i->second)->selectAxis()<0){
         return -3;
     } 
@@ -916,9 +917,11 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
     double nMicroSteps = (i->second)->getdeltaMicroSteps(millimeters);
     DPRINT("nMicroSteps=%f\n",nMicroSteps);
     
+/*
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
     }
+*/
     if((i->second)->selectAxis()<0){
         return -3;
     }
@@ -999,6 +1002,7 @@ int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaP
             if((i->second)->getEncoder(deltaPosition_mm)<0){
                 return -4;
             }
+            DERR("ALEDEBUG: getting encoder read %f ",*deltaPosition_mm);
         break;
             case (READ_POTENTIOMETER):
             if((i->second)->getPotentiometer(deltaPosition_mm)<0){
