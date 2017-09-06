@@ -1002,7 +1002,6 @@ int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaP
             if((i->second)->getEncoder(deltaPosition_mm)<0){
                 return -4;
             }
-            DERR("ALEDEBUG: getting encoder read %f ",*deltaPosition_mm);
         break;
             case (READ_POTENTIOMETER):
             if((i->second)->getPotentiometer(deltaPosition_mm)<0){

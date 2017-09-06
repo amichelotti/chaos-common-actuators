@@ -1028,8 +1028,6 @@ int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){ // _speed_mm_s [mm
     }
     
     double _speed_UI = speedfromMMsToIU(_speed_mm_s);
-    DPRINT("Aledebug: %f (speed_UI) %f (maxSpeed)",_speed_UI,maxSpeed_IU);
-    DPRINT("ALEDEBUG: %f (before conversion) ",_speed_mm_s);
     
     if(_speed_UI>maxSpeed_IU){
         DERR("Speed = %f IU > maxSpeed",_speed_UI);
