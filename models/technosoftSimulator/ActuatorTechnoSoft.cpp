@@ -1070,7 +1070,7 @@ int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaP
             break;
     }
  
-    DPRINT("ALEDEBUG ActuatorTechnosoftSim, deltaPosition is %f",*deltaPosition_mm);
+   // DPRINT("ALEDEBUG ActuatorTechnosoftSim, deltaPosition is %f",*deltaPosition_mm);
     return 0;
 }
 

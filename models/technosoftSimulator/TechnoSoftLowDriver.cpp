@@ -1132,10 +1132,6 @@ double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
 	//return deltaMillimeters*const_mult_technsoft;
 	return deltaMillimeters;
     }
-    else
-    {
-       DPRINT("ALEDEBUG no useUI (%d)",this->useUI);
-    }
 
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
 }
@@ -1690,7 +1686,6 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
         if(pthread_mutex_unlock(&(mu))!=0){
 
         }
-	DPRINT("Before returning 0 (ALEDEBUG)");
         return 0;
     }
     
@@ -2241,13 +2236,11 @@ int TechnoSoftLowDriver::providePower(){
 //        /* Check the status of the power stage */
 //        if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
 //
-//            //ERR("ALEDEBUG Error TS_ReadStatus");
 //            return -3;
 //        }
 //
 //        sAxiOn_flag=((sAxiOn_flag & 1<<15) != 0 ? 1 : 0);
 //    }
-    //DPRINT("ALEDEBUG correctly powered on");
     //poweron=true;
     if(pthread_mutex_unlock(&(mu))!=0){
 
@@ -2355,7 +2348,6 @@ int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
         {
            //*deltaPosition_mm=pos/const_mult_technsoft;
            *deltaPosition_mm=pos;
-    		DPRINT("ALEDEBUG deltaPosition retuFrning %f, speed_IU %f",(*deltaPosition_mm),speed_IU); 
         }
         else
            *deltaPosition_mm=(pos*linear_movement_per_n_rounds)/(steps_per_rounds*n_rounds*const_mult_technsoft);
