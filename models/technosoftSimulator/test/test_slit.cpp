@@ -113,6 +113,7 @@ void* checkProcedures(void* p){
             
             usleep(1000000); // lettura ogni decimo di secondo...
         }
+    return NULL;
 }
 
 void* homingProcedures(void *p){ 
@@ -159,7 +160,7 @@ void* homingProcedures(void *p){
         respHoming = 1;
         //usleep(5000000);
     }
-
+    return NULL;
 }
 
 
@@ -211,6 +212,7 @@ void* resetAlarmsProcedure(void* p){
     else{
         std::cout<<"Errore nell'apertura del file"<<std::endl;
     }
+    return NULL;
 }
 
 void* stopMotionProcedure(void* p){
@@ -227,6 +229,7 @@ void* stopMotionProcedure(void* p){
             //* errPtr = -5;
     }
     DPRINT("************** Comando di stop eseguito **************");
+    return NULL;
 }
 
 int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
@@ -320,11 +323,10 @@ void* function1(void* str){
 
         return 0;
     }
+    return NULL;
 }
 
-void* function2(void* str){
-    
-}
+
 
 bool validate_card_format(const std::string& s){
     static const boost::regex e("(\\d{4}[-]){3}\\d{4}"); // Formato che la stringa in input deve rispettare: 1234-5678-0321-8756
@@ -357,18 +359,12 @@ std::string human_readable_card_number(const std::string s){
 
 int main(int argc,const char* argv[]){
 
-    int axis1ID;
-    int axis2;
+ 
 
-    double pos1,pos2;
-    double rpos=-1000,rpos1=-1000;
-    int ret;
-    int status;
     int hostID;
     int btType;
     int baudrate;
 
-    const char *dev1,*conf1;
     char sinit1[256];
     //char sinit2[256];
     if(argc!=5){
@@ -383,7 +379,7 @@ int main(int argc,const char* argv[]){
     hostID =   atoi(argv[1]);
     btType =   atoi(argv[2]);
     baudrate = atoi(argv[3]);
-    dev1 = argv[4];        // [string], <dev/tty>
+    const char* dev1 = argv[4];        // [string], <dev/tty>
 
     //PRINT("************ using axis %d, moving of %f mm**************",axis1,pos1);
     sprintf(sinit1,"%d,%d,%d,%s",hostID,btType,baudrate,dev1);
