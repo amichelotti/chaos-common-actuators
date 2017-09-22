@@ -69,7 +69,7 @@
 // Features of trapezoidal speed profile
 //#define SPEED_DEFAULT 400.0 // 30.0  [mm/s]
 #define SPEED_DEFAULT 400 //  [microstep/ms]
-#define PERCNOISE_DEFAULT 0.0
+#define PERCNOISE_DEFAULT 0.01
 
 #define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]
 #define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS)
@@ -86,11 +86,28 @@
 #define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
 #define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
 
-#define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
-#define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
+#define N_ENCODER_LINES_DEFAULT 800.0      // numero linee encoder                                     (da MDS)
+#define CONST_MULT_TECHNOFT_DEFAULT 256.0  // numero micro steps per step                              (da MDS)
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm]
+
+#define CONVERSION_FACTOR_DEG_UI 8.789 //[mm]
+#define CONVERSION_FACTOR_DEGs2_UI 10986 //[mm]
+
+#define POSITIVE_LIMIT_POSITION_DEFAULT 60000000
+#define PERC_NOISE_DEFAULT 0.0
+#define DURATION_ALARMS_INTERVAL_DEFAULT 60.0
+#define ALARMS_PRESENT_DEFAULT false  
+
+
+#define FULLSCALE_POTENTIOMETER 20.0
+#define V_LNS 7.7 //[V]
+#define V_LSP 0.3 //[V]
+#define RANGE 500 //[mm]
+
+#define HARD_RESET_MODE_DEFAULT false
+#define PROBABILITY_OPERATION_ERROR 0.0
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -100,24 +117,6 @@ namespace common{
     namespace actuators{
        namespace models {
            namespace simul {
-
-           class ElectricPowerException{
-                public:
-                    ElectricPowerException(){}
-                    void badElectricPowerInfo();
-           };
-
-           class StopMotionException{
-                public:
-                    StopMotionException(){}
-                    void badStopMotionInfo();
-           };
-
-           class OpeningChannelException{
-                public:
-                    OpeningChannelException(){}
-                    void badOpeningChannelInfo();
-           };
 
            struct containerIncrementPosition{
                long deltaPosition;
@@ -171,35 +170,55 @@ namespace common{
                 double linear_movement_per_n_rounds;
 
                 // Trapezoidal profile parameters for move relative and move absolute
-                double speed_ms_s;
-                double maxSpeed_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double acceleration_mm_s2;
-                double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+//                double speed_ms_s;
+//                double maxSpeed_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+//                double acceleration_mm_s2;
+//                double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                
+                double speed_IU; //    [IU]  
+                double maxSpeed_IU; // [IU] 
+                double acceleration_IU;
+                double maxAcceleration_IU;
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
+		bool useUI;
 
                 // Speed parameters regarding homing procedure
-                double highSpeedHoming_mm_s; // The homing travel speed
-                double lowSpeedHoming_mm_s;
-                double maxHighSpeedHoming_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double maxLowSpeedHoming_mm_s;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double accelerationHoming_mm_s2;
-                double maxAccelerationHoming_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+//                double highSpeedHoming_mm_s; // The homing travel speed
+//                double lowSpeedHoming_mm_s;
+//                double maxHighSpeedHoming_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+//                double maxLowSpeedHoming_mm_s;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+//                double accelerationHoming_mm_s2;
+//                double maxAccelerationHoming_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                
+                double highSpeedHoming_IU; 
+                double lowSpeedHoming_IU;
+                double maxHighSpeedHoming_IU; 
+                double maxLowSpeedHoming_IU;   
+                double accelerationHoming_IU;
+                double maxAccelerationHoming_IU; 
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
 
+                 
                 bool stopMotionCommand;
                 long position; // expressed in microsteps
                 long positionCounter;
                 long positionEncoder;
-
+                long positionPotentiometer;
                 long cap_position;
                 bool LNStransition;
+                bool LPStransition;
+                
+                bool controlLNS;
 
                 long epsylon;
                 double p;
+                
+                bool deallocateTimerAlarms;
+                bool deallocateTimerStates;
 
                 // Stato esecuzione thread
 //                bool threadMoveRelativeOn;
@@ -213,6 +232,8 @@ namespace common{
                 long absolutePosition;
                 long deltaPosition;
                 pthread_mutex_t mu;
+                
+                pthread_t thstaticFaultsGeneration;
 
                 int moveAbsolutePosition();
                 int incrDecrPosition();
@@ -224,11 +245,27 @@ namespace common{
                 static void* staticMoveAbsolutePositionHomingFunctionForThread(void*);
                 static void* staticMoveAbsolutePositionForThread(void*);
                 int moveAbsolutePositionHoming();
+                
+                int faultsGeneration();
+                bool alarms;
+                
+                static void* staticFaultsGeneration(void* objPointer);
+                
+                int resetStatesTimer();
+                void* staticResetStatesTimerForThread(void* objPointer);
+                
+                WORD contentRegisterMER;
+                
+                //int homingType;
 
                 //long deltaNoise;
                 double percNoise;
+                bool homingStopped;
                 
                 bool controlledPositionHoming;
+                long positiveLimitPosition;
+                
+                double durationAlarmsInterval;
 
             public:
                 bool alarmsInfoRequest;
@@ -252,6 +289,12 @@ namespace common{
 
                 bool LSNactive;
                 bool LSPactive;
+               
+                double voltage_LNS; //[V]
+                double voltage_LPS; //[V]
+                double range;
+                double fullScalePot;
+                double constantPot;
 
                 // Additional parameters for s-curve profile
                 //long jerkTime;
@@ -288,10 +331,10 @@ namespace common{
                 int init(const std::string& setupFilePath,
                         const int& axisID,
                         const double speed=SPEED_DEFAULT,
-                        const double maxSpeed=MAX_SPEED_DEFAULT,
+                        const double maxSpeed=MAX_SPEED_DEFAULT, 
                         const double acceleration=ACCELERATION_DEFAULT,
                         const double maxAcceleration = MAX_ACCELERATION_DEFAULT,
-                        const BOOL isAdditive=FALSE,
+                        const BOOL isAdditive=FALSE, 
                         const short moveMoment =UPDATE_IMMEDIATE,
                         const short referenceBase=FROM_REFERENCE,
                         const double _highSpeedHoming=HIGH_SPEED_HOMING_DEFAULT,
@@ -303,18 +346,30 @@ namespace common{
                         const BOOL _isAdditiveHoming=FALSE,
                         const short _movementHoming=UPDATE_IMMEDIATE,
                         const short _referenceBaseHoming=FROM_REFERENCE,
-                        const double _n_encoder_lines=N_ENCODER_LINES_DEFAULT,
-                        const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT,
-                        const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,
-                        const double _n_rounds=N_ROUNDS_DEFAULT,
+                        const double _n_encoder_lines=N_ENCODER_LINES_DEFAULT, 
+                        const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT, 
+                        const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
+                        const double _n_rounds=N_ROUNDS_DEFAULT,            
                         const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
-                        const double _percOfNoise=PERCNOISE_DEFAULT);
+                        const double voltage_LNS = V_LNS, //[V]
+                        const double voltage_LPS = V_LSP, //[V]
+                        const double range = RANGE,  //[meter]
+                        const double fullScalePot = FULLSCALE_POTENTIOMETER, //[V]
+                        const int _alarmsPresent = ALARMS_PRESENT_DEFAULT,
+                        const double _alarmsInterval = DURATION_ALARMS_INTERVAL_DEFAULT,
+                        const double _percOfnoise = PERC_NOISE_DEFAULT,
+                        const double _probabilityError = PROBABILITY_OPERATION_ERROR
+                        );
 
 
                 int homing(int mode);
 
                 int getinternalHomingStateDefault();
                 int getinternalHomingStateHoming2();
+		double speedfromMMsToIU(double _speed_mm_s);
+ 		double speedfromIUTOMMs(double _speed_IU);
+		double accelerationfromMMs2ToIU(double _acceleration_mm_s2);
+		double accelerationfromIUToMMs2(double _acceleration_IU);
 
                 int providePower();
                 int stopPower();
@@ -327,51 +382,116 @@ namespace common{
 
                 // Set trapezoidal profile parameters
                 int setSpeed(const double& speed);
-                int setRatiOfNoise(const double& _ratiOfNoise);
-                int setMaxSpeed(const double& maxspeed);
-                int setAcceleration(const double& acceleration);
-                int setMaxAcceleration(const double& maxAcceleration);
-                int setAdditive(const BOOL& isAdditive);
-                int setMovement(const short& movement);
-                int setReferenceBase(const short& referenceBase);
-                //Get methods
                 int getSpeed(double& speed);
+                
+                int setRatiOfNoise(const double& _ratiOfNoise);
+                
+                int setMaxSpeed(const double& maxspeed);
+                int getMaxSpeed(double& maxspeed);
+                
+                int setAcceleration(const double& acceleration);
+                int getAcceleration(double& acceleration);
+                
+		int setMeasureUnit(const bool& inSteps);
 
-                int getHighSpeedHoming(double& _highSpeedHoming);
+                int setMaxAcceleration(const double& maxAcceleration);
+                int getMaxAcceleration(double& maxAcceleration);
+                
+                int setAdditive(const BOOL& isAdditive);
+                int getAdditive(BOOL& isAdditive);
+                
+                int setMovement(const short& movement);
+                int getMovement(short& movement);
+                
+                int setReferenceBase(const short& referenceBase);
+                int getReferenceBase(short& referenceBase);
+                
+                int setAlarmsGeneration(const int& intValue);
+                int getAlarmsGeneration(int& intValue);
 
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
+                int getHighSpeedHoming(double& _highSpeedHoming);
+                
                 int setMaxhighSpeedHoming(const double& _speed);
+                int getMaxhighSpeedHoming(double& _speed);
+                
                 int setlowSpeedHoming(const double& _lowSpeedHoming_mm_s);
+                int getlowSpeedHoming(double& _lowSpeedHoming_mm_s);
+                
                 int setMaxlowSpeedHoming(const double& speed);
+                int getMaxlowSpeedHoming(double& _lowSpeedHoming_mm_s);
+                
                 int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
+                int getaccelerationHoming(double& _accelerationHoming_mm_s2);
+                
                 int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
-                int setAdditiveHoming(const BOOL& isAdditive);
-                int setMovementHoming(const short& movement);
-                int setReferenceBaseHoming(const short& referenceBase);
+                int getMaxAccelerationHoming(double& _maxaccelerationHoming_mm_s2);
+                
+                int hardreset(bool mode=HARD_RESET_MODE_DEFAULT); 
+                
+//                int setAdditiveHoming(const BOOL& isAdditive);
+//                int setMovementHoming(const short& movement);
+//                int setReferenceBaseHoming(const short& referenceBase);
 
-                int setConst_mult_technsoft(double& _const_mult_technsoft);
-                int setSteps_per_rounds(double& _steps_per_rounds);
-                int setN_rounds(double& _n_rounds);
-                int setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
-                int setEncoderLines(double& _encoderLines);
-
+                int setConst_mult_technsoft(const double& _const_mult_technsoft);
+                int getConst_mult_technsoft(double& _const_mult_technsoft);
+                
+                int setSteps_per_rounds(const double& _steps_per_rounds);
+                int getSteps_per_rounds(double& _steps_per_rounds);
+                
+                int setN_rounds(const double& _n_rounds);
+                int getN_rounds(double& _n_rounds);
+                
+                int setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds);
+                int getLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
+                
+                int setEncoderLines(const double& _encoderLines);
+                int getEncoderLines(double& _encoderLines);
+                
+                int setvoltage_LNS(const double& _voltage_LNS);
+                int getvoltage_LNS(double& _voltage_LNS);
+                
+                int setvoltage_LPS(const double& _voltage_LPS);
+                int getvoltage_LPS(double& _voltage_LNS);
+                
+                int setRange(const double& _range);
+                int getRange(double& _range);
+                
+                int setFullscalePot(const double& _fullScale);
+                int getFullscalePot(double& _fullScale);
+                
+                int setAlarmsInterval(const double& _value);
+                int getAlarmsInterval(double& _value);
+                
+                int setPercOfNoise(const double& value);
+                int getPercOfNoise(double& value);
+                
+                int setProbError(const double& value);
+                int getProbError(double& Value);
+                
                 //Encoder lines
                 int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position);
+                
+                int getPotentiometer(double* deltaPosition_mm);
 
                 // get methods for variables
                 //channel_psh getMyChannel();
                 int getCounter(double* deltaPosition_mm);
                 int getEncoder(double* deltaPosition_mm);
                 // resetting methos
-                int resetCounter();// reset TPOS_register();
-                int resetEncoder();// reset APOS_register();
-                static void* staticResetCounterForThread(void*);
+                //int resetCounter();// reset TPOS_register();
+                int resetCounterHoming();
+                int resetEncoderHoming();// reset APOS_register();
+//                static void* staticResetCounterForThread(void*);
                 static void* staticResetEncoderForThread(void*);
 
 
                 int resetFault();
+                int resetFaultAlarms();
+                static void* staticResetFaultFunctionForThread(void* objPointer);
+                
                 int resetSetup();
                 int getPower(BOOL& powered); //***************** Questo metodo dovrà essere sostituito da:
                 //int getRegister()**********************;
@@ -389,21 +509,14 @@ namespace common{
                 int setPosition(const long& posValue);
 
                 int getLVariable(std::string& nameVar, long& var);
-
                 int checkEvent(BOOL& event);
-
                 int getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr);
-
                 int getMERregister();// read content of the error register
                 int getSRLregister();// read content of the low part of the status register
                 int getSRHregister();// read content of the high part of the status register
                 //******************* da aggiungere la lettura dell'altro registro rimanente ******************
-
                 int getFirmwareVers(char* firmwareVers);
-
                 int selectAxis();
-
-                //int incrDecrPositionHoming();
 
            };
 

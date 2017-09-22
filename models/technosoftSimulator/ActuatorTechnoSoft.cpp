@@ -40,6 +40,9 @@ using namespace ::common::actuators;
 static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
 static const boost::regex driver_match2("(\\d+),(.+)");
+//(([1-9][0-9]*\\.?[0-9]*)|(\\.[0-9]+))([Ee][+-]?[0-9]+)? 
+
+
 
 std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
@@ -53,7 +56,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     // show content:
-    DPRINT("Deleting Actuator Technosoft");
+    //DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
         deinit(it->first);
@@ -62,26 +65,30 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     // Remove all the element from the map container
     motors.clear();
 
-    DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
+    //DPRINT("Verifichiamo ora la dimensione della mappa statica: %d", motors.size());
 
     // close the communication channel
     if(channel!=NULL){
         delete channel;
         channel = NULL;
     }
-    DPRINT("Object Actuator Technosoft is deleted");
+    //DPRINT("Object Actuator Technosoft is deleted");
 }
 
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
 // quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale
 // apertura del canale
+
 int ActuatorTechnoSoft::init(void*initialization_string){
 
-    if(initChannelAlreadyDone){
-        DPRINT("This object has already a communication channel correctly initialized");
-        return -1;
-    }
+//    if(initChannelAlreadyDone){
+//        //DPRINT("This object has already a communication channel correctly initialized");
+//        return 0;
+//    }              
 
+    //DPRINT("******** CIAO QUESTA E' LA VERSIONE GIUSTA DI INIT", params.c_str());
+    
+    
     std::string params;
     params.assign((const char*)initialization_string);
     boost::smatch match;
@@ -97,8 +104,8 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         std::string strbaudrate = match[3];
         baudrate = atoi(strbaudrate.c_str());
         dev_name=match[4];
-
-        DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
+ 
+        //DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
 
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
         channel = new (std::nothrow) SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
@@ -109,7 +116,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         if(channel->open()<0){
             return -3;
         }
-        initChannelAlreadyDone = true;
+        //initChannelAlreadyDone = true;
         return 0;
     }
     ERR("Cannot possible init channel %s",params.c_str());
@@ -122,7 +129,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
     params.assign((const char*)initialization_string);
     boost::smatch match;
 
-    DPRINT("Configuration string %s", params.c_str());
+    //DPRINT("Configuration string %s", params.c_str());
 
     if(regex_match(params, match, driver_match2, boost::match_extra)){
 
@@ -137,21 +144,24 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                              // In questo caso creero' un nuovo oggetto motore.
             TechnoSoftLowDriver* driver = new (std::nothrow) TechnoSoftLowDriver();
             if(driver==NULL){
+                DPRINT("Simulatore: deallocazione errata oggetto technosoftlowdriver");
                 return -1;
             }
             int val;
             if((val=driver->init(conf_path,axid))<0){
+                DPRINT("simulatore: init driver error");
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
                 return -2;
             }
-            DPRINT("Axis id %d configurato correttamente.", axid);
+            //DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            //DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
             return 0;
         }
-        DPRINT("Axis id %d è stato già configurato correttamente.", axid);
+        //DPRINT("Axis id %d è stato già configurato correttamente.", axid
+        DPRINT("simulatore: il motore è già stato configurato");
         return -3;
         //HOMING procedure parameters
         //**********************************************************************
@@ -164,6 +174,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         // ***********************GESTIONE_READY_STATE*************************
 //return 0;
     }
+    DPRINT("simulatore: errore matching stringhe");
     ERR("error parsing initialization string:\"%s\" ",params.c_str());
     return -4;
 }
@@ -193,7 +204,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(const ActuatorTechnoSoft& objActuator){ /
     channel->hostID = (objActuator.channel)->hostID;
     channel->fd = (objActuator.channel)->fd;
 
-    DPRINT("Costruttore di copia eseguito");
+    //DPRINT("Costruttore di copia eseguito");
 }
 
 ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objActuator){ // Overloading operatori di assegnamento
@@ -223,8 +234,45 @@ ActuatorTechnoSoft& ActuatorTechnoSoft::operator=(const ActuatorTechnoSoft& objA
     channel->hostID = (objActuator.channel)->hostID;
     channel->fd = (objActuator.channel)->fd;
 
-    DPRINT("Operatore di assegnamento eseguito");
+    //DPRINT("Operatore di assegnamento eseguito");
     return *this;
+}
+
+int ActuatorTechnoSoft::hardreset(int axisID, bool mode){ 
+    
+//    DPRINT("Deleting Actuator Technosoft");
+//    //delectingActuator = true;
+//    int resp;
+//    bool prob=false;
+//    
+//    for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
+//        resp=deinit(it->first); 
+//        if(resp<0){
+//            prob=true;
+//            break;
+//        //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
+//        }   
+//    } 
+//    
+//    if(prob){
+//        return -1;
+//    }
+  
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato, non c'e' quindi alcun motore da inizializzare
+        return -1;
+    }
+    
+    if((i->second)->selectAxis()<0){
+        return -2;
+    }
+    if((i->second)->hardreset(mode)<0){
+        return -3;
+    }
+    
+    return 0;
 }
 
 int ActuatorTechnoSoft::deinit(int axisID){
@@ -278,7 +326,7 @@ int ActuatorTechnoSoft::deinit(int axisID){
         }
     }
 
-    DPRINT("Object technosoftlowdriver with axisID = %d is deinitialized",axisID);
+    //DPRINT("Object technosoftlowdriver with axisID = %d is deinitialized",axisID);
     // Controllo lista vuota. Se e' vuota bisogna chiudere il canale!!!!!
     return 0;
 }
@@ -308,17 +356,17 @@ bool to_bool(const std::string & s) {
 }
 
 int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string valueOfparName){
-
-    //git addaaaaaaaaaaaaaa
-
+    
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){
+    if(i==motors.end()){ 
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-
+    
+    DPRINT("setParameter execution");
+    
     // trim
     trim2(parName);
     trim2(valueOfparName);
@@ -327,28 +375,42 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     std::string strResultparvalue;
     setUpperCase(parName,strResultparName);
     setUpperCase(valueOfparName,strResultparvalue);
-
+    
     double doubleValue;
     int intValue;
     bool boolValue;
-
-    if(strResultparName.compare("SPEED")==0){
+    
+    DPRINT("Stringa elaborata %s",strResultparName.c_str());
+    
+    if(strResultparName.compare("SPEED")==0){ 
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSpeed(doubleValue)<0){
+            DPRINT("setParameter execution error");
             return -2;
+        }
+        
+        return 0;
+    }   
+    else if(strResultparName.compare("MAXSPEED")==0){ 
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxSpeed(doubleValue)<0){
+            DPRINT("setParameter execution error");
+            return -3;
+        }
+        
+        return 0;
+    }  
+    else if(strResultparName.compare("ACCELERATION")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setAcceleration(doubleValue)<0){ 
+            return -4;
         }
         return 0;
     }
-    else if(strResultparName.compare("ACCELERATION")==0){
+    else if(strResultparName.compare("MAXACCELERATION")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setAcceleration(doubleValue)<0){
-            return -3;
-        }
-        return 0;
-    }else if(strResultparName.compare("RATIOFNOISE")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setRatiOfNoise(doubleValue)<0){
-            return -4;
+        if((i->second)->setMaxAcceleration(doubleValue)<0){ 
+            return -5;
         }
         return 0;
     }
@@ -356,112 +418,521 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
         // Conversion from string to bool
         //boolValue = to_bool(valueOfparName);
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setAdditive(intValue)<0){
+        if((i->second)->setAdditive(intValue)<0){ 
             return -5;
         }
         return 0;
     }
     else if(strResultparName.compare("MOVEMENT")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setMovement((short)intValue)<0){
+        if((i->second)->setMovement((short)intValue)<0){ 
             return -6;
         }
         return 0;
     }
     else if(strResultparName.compare("REFERENCEBASE")==0){
         intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setReferenceBase((short)intValue)<0){
+        if((i->second)->setReferenceBase((short)intValue)<0){ 
             return -7;
         }
-        return 0;
+        return 0;   
     }
     else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->sethighSpeedHoming(doubleValue)<0){
+        if((i->second)->sethighSpeedHoming(doubleValue)<0){ 
             return -8;
         }
-        return 0;
+        return 0;       
     }
-
-    else if(strResultparName.compare("LOWSPEEDHOMING")==0){
+    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setlowSpeedHoming(doubleValue)<0){
+        if((i->second)->setMaxhighSpeedHoming(doubleValue)<0){ 
             return -9;
         }
-        return 0;
+        return 0;       
+    }
+    else if(strResultparName.compare("LOWSPEEDHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setlowSpeedHoming(doubleValue)<0){ 
+            return -10;
+        }
+        return 0;   
+    }
+    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxlowSpeedHoming(doubleValue)<0){ 
+            return -11;
+        }
+        return 0;   
     }
     else if(strResultparName.compare("ACCELERATIONHOMING")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setaccelerationHoming(doubleValue)<0){
-            return -10;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
-        // Conversion from string to bool
-        //boolValue = to_bool(valueOfparName);
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setAdditiveHoming(intValue)<0){
-            return -11;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("MOVEMENTHOMING")==0){
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setMovementHoming((short)intValue)<0){
+        if((i->second)->setaccelerationHoming(doubleValue)<0){ 
             return -12;
         }
-        return 0;
+        return 0;   
     }
-    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
-        intValue = atoi(valueOfparName.c_str());
-        if((i->second)->setReferenceBaseHoming((short)intValue)<0){
+    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setMaxAccelerationHoming(doubleValue)<0){ 
             return -13;
         }
-        return 0;
-    }//_________________________________________________________________________
+        return 0;   
+    }
+//    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
+//        // Conversion from string to bool
+//        //boolValue = to_bool(valueOfparName);
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setAdditiveHoming(intValue)<0){ 
+//            return -14;
+//        }
+//        return 0;
+//    }
+//    else if(strResultparName.compare("MOVEMENTHOMING")==0){
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setMovementHoming((short)intValue)<0){ 
+//            return -15;
+//        }
+//        return 0;
+//    }
+//    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
+//        intValue = atoi(valueOfparName.c_str());
+//        if((i->second)->setReferenceBaseHoming((short)intValue)<0){ 
+//            return -16;
+//        }
+//        return 0;   
+//    }//_________________________________________________________________________
     else if(strResultparName.compare("NUMENCODERLINES")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setEncoderLines(doubleValue)<0){
-            return -14;
+        if((i->second)->setEncoderLines(doubleValue)<0){ 
+            return -17;
         }
-        return 0;
+        return 0;   
     }
     else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
         doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setConst_mult_technsoft(doubleValue)<0){
-            return -15;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("STEPSPERROUND")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setSteps_per_rounds(doubleValue)<0){
-            return -16;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setN_rounds(doubleValue)<0){
-            return -17;
-        }
-        return 0;
-    }
-    else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
-        doubleValue = atof(valueOfparName.c_str());
-        if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){
+        if((i->second)->setConst_mult_technsoft(doubleValue)<0){ 
             return -18;
         }
-        return 0;
+        return 0;   
+    } 
+    else if(strResultparName.compare("STEPSPERROUND")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setSteps_per_rounds(doubleValue)<0){ 
+            return -19;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setN_rounds(doubleValue)<0){ 
+            return -20;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setLinear_movement_per_n_rounds(doubleValue)<0){ 
+            return -21;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("VOLTAGE_LNS[V]")==0){ 
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setvoltage_LNS(doubleValue)<0){ 
+            return -22;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("VOLTAGE_LPS[V]")==0){
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setvoltage_LPS(doubleValue)<0){ 
+            return -23;
+        }
+        return 0;   
+    } 
+    else if(strResultparName.compare("RANGE_SLIT[MM]")==0){  //range_slit[mm]
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setRange(doubleValue)<0){ 
+            return -24;
+        }
+        return 0;   
     }
+    else if(strResultparName.compare("FULLSCALEPOT")==0){ //fullscalePot
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setFullscalePot(doubleValue)<0){ 
+            return -25;
+        }
+        return 0;   
+    }
+    else if(strResultparName.compare("GENERATERANDOMALARMS")==0){ //fullscalePot
+        intValue = atoi(valueOfparName.c_str());
+        if((i->second)->setAlarmsGeneration(intValue)<0){ 
+            return -26;
+        }
+        return 0;      
+    }
+    else if(strResultparName.compare("ALARMSINTERVAL")==0){ //fullscalePot
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setAlarmsInterval(doubleValue)<0){ 
+            return -27;
+        }
+        return 0;      
+    }
+    else if(strResultparName.compare("PERCNOISE")==0){ //fullscalePot
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setPercOfNoise(doubleValue)<0){ 
+            return -28;
+        }
+        return 0;      
+    }
+    else if(strResultparName.compare("PROBERROROPERATION")==0){ //fullscalePot
+        doubleValue = atof(valueOfparName.c_str());
+        if((i->second)->setProbError(doubleValue)<0){ 
+            return -29;
+        }
+        return 0;      
+    }        
+    else if(strResultparName.compare("USEIU")==0){ //Use internal units 
+        int intVal= atoi(valueOfparName.c_str());
+        if((i->second)->setMeasureUnit((bool)intVal)<0){ 
+            return -30;
+        }
+        return 0;      
+    }        
     else{
-        return -19;
+        return -31;
     }
 }
 
+int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string& resultString){
+    
+    // ************************** Operazione di selezione axisID ***************************
+    std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
+    // Controlliamo comunque se l'axis id e' stato configurato
+    if(i==motors.end()){ 
+        // In questo caso il motore axisID non e' stato configurato
+        return -1;
+    }
+    
+    DPRINT("getParameter execution");
+    
+    std::stringstream ss;
+    
+    // trim
+    trim2(parName);
+    // To upper case
+    std::string strResultparName;
+    setUpperCase(parName,strResultparName);
+    
+    DPRINT("Stringa elaborata %s",strResultparName.c_str());
+    
+    double doubleValue;
+    int intValue;
+    short shortvalue;
+//    
+    if(strResultparName.compare("SPEED")==0){ 
+        if((i->second)->getSpeed(doubleValue)<0){
+            DPRINT("getParameter execution error");
+            return -2;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita 
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;
+    } 
+    else if(strResultparName.compare("MAXSPEED")==0){ 
+        if((i->second)->getMaxSpeed(doubleValue)<0){
+            DPRINT("getParameter execution error");
+            return -3;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita 
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;
+    }  
+    else if(strResultparName.compare("ACCELERATION")==0){
+        if((i->second)->getAcceleration(doubleValue)<0){ 
+            DPRINT("getParameter execution error");
+            return -4;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;
+    }
+    else if(strResultparName.compare("MAXACCELERATION")==0){
+        if((i->second)->getMaxAcceleration(doubleValue)<0){ 
+            return -6;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;
+    }
+    else if(strResultparName.compare("ISADDITIVE")==0){
+        // Conversion from string to bool
+        //boolValue = to_bool(valueOfparName);
+        if((i->second)->getAdditive(intValue)<0){ 
+            return -5;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<intValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;
+    }
+    else if(strResultparName.compare("MOVEMENT")==0){
+        if((i->second)->getMovement(shortvalue)<0){ 
+            return -6;                                  
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<shortvalue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;
+    }
+    else if(strResultparName.compare("REFERENCEBASE")==0){
+        if((i->second)->getReferenceBase(shortvalue)<0){ 
+            return -7;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<shortvalue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("HIGHSPEEDHOMING")==0){
+        if((i->second)->getHighSpeedHoming(doubleValue)<0){ 
+            return -8;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;       
+    }
+    else if(strResultparName.compare("MAXHIGHSPEEDHOMING")==0){
+        if((i->second)->getMaxhighSpeedHoming(doubleValue)<0){ 
+            return -9;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;       
+    }
+    else if(strResultparName.compare("LOWSPEEDHOMING")==0){
+        if((i->second)->getlowSpeedHoming(doubleValue)<0){ 
+            return -10;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("MAXLOWSPEEDHOMING")==0){
+        if((i->second)->getMaxlowSpeedHoming(doubleValue)<0){ 
+            return -11;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("ACCELERATIONHOMING")==0){
+        if((i->second)->getaccelerationHoming(doubleValue)<0){ 
+            return -12;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;  
+    }
+    else if(strResultparName.compare("MAXACCELERATIONHOMING")==0){
+        if((i->second)->getMaxAccelerationHoming(doubleValue)<0){ 
+            return -13;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("NUMENCODERLINES")==0){
+        if((i->second)->getEncoderLines(doubleValue)<0){ 
+            return -17;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("NUMMICROSTEPSPERSTEP")==0){
+        if((i->second)->getConst_mult_technsoft(doubleValue)<0){ 
+            return -18;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("STEPSPERROUND")==0){
+        if((i->second)->getSteps_per_rounds(doubleValue)<0){ 
+            return -19;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("FIXEDNUMBEROFROUNDS")==0){
+        if((i->second)->getN_rounds(doubleValue)<0){ 
+            return -20;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    } 
+    else if(strResultparName.compare("LINEARDISPLACEMENT[MM]")==0){
+        if((i->second)->getLinear_movement_per_n_rounds(doubleValue)<0){ 
+            return -21;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("VOLTAGE_LNS[V]")==0){ 
+        if((i->second)->getvoltage_LNS(doubleValue)<0){ 
+            return -22;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("VOLTAGE_LPS[V]")==0){
+        if((i->second)->getvoltage_LPS(doubleValue)<0){ 
+            return -23;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("RANGE_SLIT[MM]")==0){  //range_slit[mm]
+        if((i->second)->getRange(doubleValue)<0){ 
+            return -24;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("FULLSCALEPOT")==0){ 
+        if((i->second)->getFullscalePot(doubleValue)<0){ 
+            return -25;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("GENERATERANDOMALARMS")==0){ //fullscalePot
+        if((i->second)->getAlarmsGeneration(intValue)<0){ 
+            return -26;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<intValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("ALARMSINTERVAL")==0){ //fullscalePot
+        if((i->second)->getAlarmsInterval(doubleValue)<0){ 
+            return -27;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("PERCNOISE")==0){ //fullscalePot
+        if((i->second)->getPercOfNoise(doubleValue)<0){ 
+            return -28;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    else if(strResultparName.compare("PROBERROROPERATION")==0){ //fullscalePot
+        if((i->second)->getProbError(doubleValue)<0){ 
+            return -29;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<doubleValue;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;      
+    }   
+    else{
+        resultString.assign("");
+        ss.str(std::string());
+        return -30;
+    }
+    
+    return 0;
+}
+
 int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimeters){
-    DPRINT("moving relative %f mm",deltaMillimeters);
+    //DPRINT("moving relative %f mm",deltaMillimeters);
 
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
@@ -474,7 +945,7 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimete
     // Calcolo argomento funzione moveRelativeSteps
     //double deltaMicroSteps = round((STEPS_PER_ROUNDS_DEFAULT*N_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*deltaMillimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double deltaMicroSteps=(i->second)->getdeltaMicroSteps(deltaMillimeters);
-    DPRINT("deltaMicroSteps = %f mm",deltaMicroSteps);
+    //DPRINT("deltaMicroSteps = %f mm",deltaMicroSteps);
     if(deltaMicroSteps<=LONG_MIN || deltaMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
     }
@@ -504,7 +975,7 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
     // Calcolo argomento funzione moveAbsoluteSteps
     //double nMicroSteps = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*millimeters)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
     double nMicroSteps = (i->second)->getdeltaMicroSteps(millimeters);
-    DPRINT("nMicroSteps=%f\n",nMicroSteps);
+    //DPRINT("ALEDEBUG nMicroSteps=%f\n",nMicroSteps);
 
     if(nMicroSteps<=LONG_MIN || nMicroSteps>=LONG_MAX){ // solo per adesso e necessario questo filtro..
         return -2;
@@ -541,37 +1012,65 @@ int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){
 //}
 
 int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
-    //DPRINT("Position reading, axisID %d",axisID);
-
+    DPRINT("Position reading, axisID %d",axisID);
+    
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
-    if(i==motors.end()){
+    if(i==motors.end()){ 
         // In questo caso il motore axisID non e' stato configurato
         return -1;
     }
-
+   
     if((i->second)->selectAxis()<0){
         return -2;
     }
 
-    if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
-        //long tposition;
-        if((i->second)->getCounter(deltaPosition_mm)<0){
+//    if(mode==READ_COUNTER){ // Lettura posizione per mezzo del counter (TPOS register)
+//        //long tposition;
+//        if((i->second)->getCounter(deltaPosition_mm)<0){
+//            DERR("getting counter");
+//            return -3;
+//        }
+//        //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
+//        //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
+//    }
+//    else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
+//        //long aposition;
+//        if((i->second)->getEncoder(deltaPosition_mm)<0){
+//            return -4;
+//        }
+//        //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
+//        //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
+//    }
+//    else if(mode==READ_POTENTIOMETER){
+//        if((i->second)->getPotentiometer(deltaPosition_mm)<0){
+//            return -5;
+//        }
+//    }
+    switch(mode)
+    {
+    case (READ_COUNTER):
+         if((i->second)->getCounter(deltaPosition_mm)<0){
             DERR("getting counter");
             return -3;
         }
-        //std::cout<< "Il valore del counter e':"<<tposition <<std::endl;
-        //*deltaPosition_mm = (tposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*N_ROUNDS_DEFAULT);
+        break;
+            case (READ_ENCODER):
+            if((i->second)->getEncoder(deltaPosition_mm)<0){
+                return -4;
+            }
+        break;
+            case (READ_POTENTIOMETER):
+            if((i->second)->getPotentiometer(deltaPosition_mm)<0){
+                return -5;
+            }
+            break;
+        default:   
+            break;
     }
-    else if(mode==READ_ENCODER){ // Lettura posizione per mezzo dell'encoder (Apos register)
-        //long aposition;
-        if((i->second)->getEncoder(deltaPosition_mm)<0){
-            return -4;
-        }
-        //std::cout<< "Il valore dell'encoder e':"<<aposition <<std::endl;
-        //*deltaPosition_mm = (aposition*LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT)/(N_ENCODER_LINES_DEFAULT*N_ROUNDS_DEFAULT);
-    }
+ 
+   // DPRINT("ALEDEBUG ActuatorTechnosoftSim, deltaPosition is %f",*deltaPosition_mm);
     return 0;
 }
 
@@ -588,7 +1087,7 @@ int ActuatorTechnoSoft::homing(int axisID,homingType mode){
     if((i->second)->selectAxis()<0){
         return -2;
     }
-    return ((i->second)->homing(mode));
+    return ((i->second)->homing(mode));                          
 }
 
 int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
@@ -596,7 +1095,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     // ******************** NOTA:  le funzioni getState e getAlarms devono essere eseguite in modalita' SEQUENZIALE,
     // e non indipendentemente l'una dall'altra in thread differenti, perche' accedono agli stessi dati *********************
 
-    DPRINT("Getting state of the actuator. ");
+    //DPRINT("Getting state of the actuator. ");
 
     *state  = ACTUATOR_UNKNOWN_STATUS;
     descStr.assign("");
@@ -619,7 +1118,6 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
     }
 
     (i->second)->stateInfoRequest = true; // Comunico al motore che sto richiedendo info riguardanti gli allarmi
-
 
     short indexReg = 4; // see constant REG_SRH in TML_lib.h
     (i->second)->regSRHrequest = true;
@@ -655,6 +1153,7 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_AUTORUN_ENABLED;
         descStr+="Auto run mode. ";
     }
+    
     if(contentRegSRH & ((uint16_t)1<<6)){
         stCode |= ACTUATOR_LSP_EVENT_INTERRUPUT;
         descStr+="Limit switch positive event/interrupt. ";
@@ -664,7 +1163,15 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= ACTUATOR_LSN_EVENT_INTERRUPT;
         descStr+="Limit switch negative event/interrupt. ";
     }
-
+    
+    if(contentRegSRH & ((uint16_t)1<<10)){
+        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
+        descStr+="Motor I2T protection warning. ";
+    }
+    if(contentRegSRH & ((uint16_t)1<<11)){
+        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
+        descStr+="Drive I2T protection warning";
+    }
     if(contentRegSRH & ((uint16_t)1<<12)){
         stCode |= ACTUATOR_IN_GEAR;
         descStr+="Gear ratio in electronic gearing mode. ";
@@ -700,6 +1207,16 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
         stCode |= HOMING_IN_PROGRESS;
         descStr += "Homing in progress.";
     }
+    
+    // STATO LIMIT SWITCHES
+    if((i->second)->LSPactive){
+        stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
+        descStr+="Positive limit switch active. ";
+    }
+    if((i->second)->LSNactive){
+        stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
+        descStr+="Negative limit switch active. ";
+    }
 
     (i->second)->stateInfoRequest = false;
     *state = stCode;
@@ -708,9 +1225,9 @@ int ActuatorTechnoSoft::getState(int axisID,int* state, std::string& descStr){
 
 int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descStr){
 
-    DPRINT("Getting alarms of the actuator");
+    //DPRINT("Getting alarms of the actuator");
 
-    * alrm = ACTUATOR_NO_ALARMS_DETECTED;
+    * alrm = 0;
     descStr.assign("");
 
     // ************************** Operazione di selezione axisID ***************************
@@ -751,6 +1268,14 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
         return -4;
     }
     (i->second)->regSRHrequest = false;
+    
+//    uint8_t emergengyState;
+//    if((i->second)->getEmergency(16,emergengyState,descStr)<0){
+//        DERR("Reading alarms error: %s",descStr.c_str());
+//        stCode|=ACTUATOR_ALARMS_READING_ERROR;
+//        descStr+= "Alarms reading error. ";
+//        return -5;
+//    }
 
     for(uint16_t i=0; i<sizeof(uint16_t)*8; i++){
         if(contentRegMER & ((uint16_t)1<<i)){ // se il bit i-esimo di REG_MER è 1, i=0,1,...,15
@@ -820,31 +1345,18 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t* alrm, std::string& descS
                 stCode|=ACTUATOR_COMMANDERROR;
                 descStr+="Command error. ";
             }
+            else if(i==15){
+                stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
+                descStr+="Emergency. ";
+            }
         }// chiudo if(contentRegMER & ((WORD)(base2^i)))
     } // chiudo for(WORD i=0; i<sizeof(WORD)*8; i++)
 
-
-    // STATO LIMIT SWITCHES
-    if((i->second)->LSPactive){
-        stCode|=ACTUATOR_LSP_LIMIT_ACTIVE;
-        descStr+="Positive limit switch active. ";
-    }
-    if((i->second)->LSNactive){
-        stCode|=ACTUATOR_LSN_LIMIT_ACTIVE;
-        descStr+="Negative limit switch active. ";
-    }
-
     // Analysis of the register content REG_SRH
-    if(contentRegSRH & ((uint16_t)1<<10)){
-        stCode|=ACTUATOR_I2T_WARNING_MOTOR;
-        descStr+="Motor I2T protection warning. ";
-    }
-    if(contentRegSRH & ((uint16_t)1<<11)){
-        stCode|=ACTUATOR_I2T_WARNING_DRIVE;
-        descStr+="Drive I2T protection warning";
-    }
-    
-    // No alarms detected
+//    if(!emergengyState){
+//        stCode|=ACTUATOR_ALARMS_EMERGENCY_ERROR;
+//        descStr+="Emergency error. ";
+//    }
 
     *alrm = stCode;
     (i->second)->alarmsInfoRequest = false; // Comunico al motore che ho terminato di richiedere info riguardanti gli allarmi
@@ -876,6 +1388,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
      // In the fault status the power stage is disabled, the MER register signals
      // the errors occurred and  bit 15 from the SRH is set to high to signal the fault state
      // ************************** Operazione di selezione axisID ***************************
+     //DPRINT("FUNZIONE DI RESET ALARMS ESEGUITA");
      std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
      // Controlliamo comunque se l'axis id e' stato configurato
      if(i==motors.end()){
@@ -885,17 +1398,19 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
 
      int err = 0;
      if((i->second)->selectAxis()<0){
+        //DPRINT("Funzione reset alarms, errore nella selezione dell'axis id %d",err);
         return -2;
      }
-     mode =0;
+     mode = 0;
      switch(mode){
          case 0:
+            //DPRINT("Prima di chiamare resetFault");
             if((i->second)->resetFault()<0){
                 err = -3;
                 // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
                 // errors when the function is executed)
             }
-            DPRINT("FUNZIONE DI RESET ALARMS ESEGUITA");
+            //DPRINT("Dopo aver chiamato resetFault");
             break;
          case 1:
 //            if(driver->resetSetup()<0){
@@ -911,6 +1426,7 @@ int ActuatorTechnoSoft::stopMotion(int axisID){
              err = -5;
              break;
      }
+     //DPRINT("Codice ritornato funzione reset alarms %d",err);
      return err;
  }
 
@@ -981,7 +1497,7 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
      if((i->second)->selectAxis()<0){
         return -2;
      }
-    version=" Technosoft IDM 240 stepper open loop mode";
+    version=" Technosoft IDM 240 stepper open loop mode simulated";
     return 0;
 }
 
@@ -989,23 +1505,36 @@ int ActuatorTechnoSoft::sendDataset(std::string& dataset){
    dataset.clear();
    dataset="{\"attributes\":[";
    dataset+="{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"500.0\",\"default\":\"400.0\"},";
+   dataset+="{\"name\":\"maxspeed\",\"description\":\"Maximum value for max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"1000.0\",\"default\":\"700.0\"},";
    dataset+="{\"name\":\"acceleration\",\"description\":\"Acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"2.0\",\"default\":\"0.6\"},";
+   dataset+="{\"name\":\"maxacceleration\",\"description\":\"Maximum value for acceleration of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"5.0\",\"default\":\"0.9\"},";
    dataset+="{\"name\":\"isadditive\",\"description\":\"Specifies how is computed the position to reach\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
    dataset+="{\"name\":\"movement\",\"description\":\"Defines the moment when the motion is started\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-   dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
+   //dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the motion reference is computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"highspeedhoming\",\"description\":\"Max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"15.0\",\"default\":\"10.0\"},";
-   dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"},";
+   dataset+="{\"name\":\"maxhighspeedhoming\",\"description\":\"Maximum value for max speed of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"100.0\",\"default\":\"14.0\"},";
+   dataset+="{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal profile for homing procedure, for repositioning slit to LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"3.0\",\"default\":\"1.0\"},";
+   dataset+="{\"name\":\"maxlowspeedhoming\",\"description\":\"Max value for speed of trapezoidal profile for homing procedure, for repositioning slit at LSN switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"6.0\",\"default\":\"4.0\"},"; 
    dataset+="{\"name\":\"accelerationhoming\",\"description\":\"Acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"0.6\",\"default\":\"0.3\"},";
-   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
-   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
+   dataset+="{\"name\":\"maxaccelerationhoming\",\"description\":\"Max value for acceleration of trapezoidal profile for homing procedure\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"1.0\",\"default\":\"0.8\"},";
+//   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how is computed the position to reach for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
+//   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the moment when the motion is started for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
+//   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies how the motion reference is computed for homing procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
    dataset+="{\"name\":\"numencoderlines\",\"description\":\"Number of encoder lines\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"800\"},";
    dataset+="{\"name\":\"nummicrostepsperstep\",\"description\":\"Number of micro steps per step\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"256\"},";
    dataset+="{\"name\":\"stepsperround\",\"description\":\"Number of steps to perfor a complete round\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"200\"},";
    dataset+="{\"name\":\"fixednumberofrounds\",\"description\":\"Number of rounds for which the linear displacement is known\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\",\"max\":\"10000000\",\"default\":\"20\"},";
    dataset+="{\"name\":\"lineardisplacement[mm]\",\"description\":\"Linear displacement [mm] performed by slit associated with fixednumberofrounds rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000\",\"default\":\"1.5\"},";
-   dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
-   dataset+="]}";
+   //dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real position rp in millimeter that identifies min and max values of pseudo white noise added to rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
+   dataset+="{\"name\":\"voltage_LNS[V]\",\"description\":\"Voltage associated with LNS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"7.7\"},";
+   dataset+="{\"name\":\"voltage_LPS[V]\",\"description\":\"Voltage associated with LPS [V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"10000000000\",\"default\":\"0.3\"},";
+   dataset+="{\"name\":\"range_slit[mm]\",\"description\":\"Maximum linear displacement of the slit [m]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"10.0\"},";
+   dataset+="{\"name\":\"generateRandomAlarms\",\"description\":\"Decide if alarms are randomly generated. One per minute \",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
+   dataset+="{\"name\":\"alarmsInterval\",\"description\":\"Time interval, in seconds, between two consecutive alarms generated\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"60.0\"},";
+   dataset+="{\"name\":\"percNoise\",\"description\":\"Percent of noise added to measure performed by potentiometer and encoder\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.0\",\"max\":\"1.0\",\"default\":\"0.0\"},";
+   dataset+="{\"name\":\"probErrorOperation\",\"description\":\"Operation error probability\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.0\",\"max\":\"1.0\",\"default\":\"0.0\"},";
+   dataset+="{\"name\":\"fullscalePot\",\"description\":\"Full scale of the potentiometer\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.000000001\",\"max\":\"10000000000\",\"default\":\"20.0\"}";
 
+   dataset+="]}";
    return 0;
 }

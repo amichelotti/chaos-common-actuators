@@ -5,22 +5,6 @@
 
 using namespace common::actuators::models;
 
-//--------------------------------------------
-void ElectricPowerException::badElectricPowerInfo(){
-    
-    std::cerr<< "The electrical power has not been turned off." << std::endl; 
-}
-
-void StopMotionException::badStopMotionInfo(){
-    
-    std::cerr<< "The eventual motion can not be stopped" << std::endl; 
-}
-
-void OpeningChannelException::badOpeningChannelInfo(){
-    
-    std::cerr<< "Channel can not be opened. " << std::endl; 
-}
-
 SerialCommChannelTechnosoft::SerialCommChannelTechnosoft(int hostID, const std::string& pszDevName,BYTE btType,DWORD baudrate){
     init(hostID, pszDevName,btType,baudrate); // La funzione init non ritorna mai un numero negativo per quello che fa, quindi 
                                        // e' inutile mettere il controllo. E poi se ritornasse un numero negativo bisognerebbe lanciare 
@@ -72,66 +56,43 @@ int SerialCommChannelTechnosoft::open(){
 
 //----------------------------------------------
 TechnoSoftLowDriver::TechnoSoftLowDriver(){
-    
-//    // Inizializzazione membri privati
-//    //alreadyopenedChannel = false;
-//    //channelJustOpened = false;
-//    //poweron = false;
-//    //devName = _devName;
-//    
-//    if(my_channel==NULL)
-//        DPRINT("In effetti lo shared pointer solo dichiarato ha valore NULL");
-//    
-//    channel_map_t::iterator i=channels.find(devName); // iteratore alla mappa statica
-//    DPRINT("devName %s", devName.c_str());                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-//    
-//    DPRINT("Dimensione mappa statica all'inizio prima di controllarla: %d",channels.size());
-////    if(channels.size()>0){
-////         DPRINT("Dimensione mappa statica: %d",channels.size());   
-////    }
-//    
-//    if(i!=channels.end()){
-//        my_channel = i->second;
-//        // In questo caso non dovrò più provare ad aprire il canale di comunicazione
-//        // nella sucessiva procedura di inizializzazione  del canale + drive/motor
-//        // Settiamo dunque a true questo stato
-//        DPRINT("Il canale e' gia' stato aperto, con baudrate = %d ", my_channel->getbaudrate());
-//        
-//        //alreadyopenedChannel = true;
-//        // Verrà sfruttato il canale di comunicazione desiderato che è correntemente aperto
-//        DPRINT("Channel %s, with name %s has been already opened", devName.c_str());
-//    } 
-//    else {
-//        my_channel = channel_psh(new SerialCommChannelTechnosoft(hostID, devName, btType, baudrate));//********Altri due parametri OPZIONALI: const BYTE btType,const DWORD baudrate*******
-//        //*****Nota il nuovo canale creato deve essere inserito nella mappa:
-//        //channels.insert( std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI: QUESTA FUNZIONE NON GENERA MAI ECCEZIONE 
-//        if((my_channel->open()<0)){
-//            DERR("error opening channel");
-//            //return -23; // Attenzione: qui dovra' essere generata una eccezione!!!!
-//            throw OpeningChannelException();
-//        }
-//        //channelJustOpened = true;
-//        //if(channelJustOpened){
-//        DPRINT("Inserimento elemento mappa: devName=%s",devName.c_str());
-//        channels.insert(std::pair<std::string,channel_psh>(devName,my_channel)); // IPOTESI TEMPORANEA: QUESTA FUNZIONE NON può GENERAre MAI ECCEZIONE
-//        //alreadyopenedChannel=true;
-//        //}
-//        DPRINT("Dimensione mappa statica alla fine della configurazione: %d",channels.size());
-//        //alreadyopenedChannel=true; // Canale di comunicazione aperto e inizializzazione driver/motor andata a buon fine
-//        DPRINT("channel just opened");
-//        DPRINT("created channel  %s", devName.c_str());
-//    }
-//    readyState = true;
-//    internalHomingStateDefault=0;
-//    internalHomingStateHoming2=0; 
 
 }
 
 TechnoSoftLowDriver::~TechnoSoftLowDriver(){
-    //deinit();
-    //DPRINT("Deallocazione oggetto TechnoSoftLowDriver");
+
 }    
  
+
+double TechnoSoftLowDriver::speedfromMMsToIU(double _speed_mm_s){
+    
+    if (this->useUI)
+        return _speed_mm_s;
+
+    return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_speed_mm_s) / CONVERSION_FACTOR_DEG_UI;
+}
+
+double TechnoSoftLowDriver::speedfromIUTOMMs(double _speed_IU){
+    if (this->useUI)
+        return _speed_IU;
+    
+    return (_speed_IU*CONVERSION_FACTOR_DEG_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
+}
+
+double TechnoSoftLowDriver::accelerationfromMMs2ToIU(double _acceleration_mm_s2){
+   if (this->useUI)
+        return _acceleration_mm_s2;
+    
+    return (N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360*_acceleration_mm_s2) / CONVERSION_FACTOR_DEGs2_UI;
+}
+
+double TechnoSoftLowDriver::accelerationfromIUToMMs2(double _acceleration_IU){
+    if (this->useUI)
+        return _acceleration_IU;
+    
+    return (_acceleration_IU*CONVERSION_FACTOR_DEGs2_UI)/(N_ROUNDS_DEFAULT/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT*360);
+}
+
 int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const int& _axisID,
                         const double _speed_mm_s,
@@ -154,33 +115,38 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _const_mult_technsoft, 
                         const double _steps_per_rounds,    
                         const double _n_rounds,            
-                        const double _linear_movement_per_n_rounds){
+                        const double _linear_movement_per_n_rounds,
+                        const double _voltage_LNS, //[V]
+                        const double _voltage_LPS, //[V]
+                        const double _range,
+                        const double _fullScalePot){
     
     DPRINT("Inizializzazione parametri");
     
+    this->useUI=false;
+    // max speed
     if(_maxSpeed_mm_s<=0){
         return -1;
     }
-    maxSpeed_mm_s=_maxSpeed_mm_s;
-    //DPRINT("maxSpeed_mm_s = %f",maxSpeed_mm_s);
+    maxSpeed_IU=speedfromMMsToIU(_maxSpeed_mm_s);
     
+    // speed
     if(_speed_mm_s<=0 || _speed_mm_s>_maxSpeed_mm_s){
         return -2;
-    }
-    speed_mm_s = _speed_mm_s; 
-    //DPRINT("speed_mm_s = %f",speed_mm_s);
+    }  
+    speed_IU=speedfromMMsToIU(_speed_mm_s);
     
+    // max acceleration
     if(_maxAcceleration_mm_s2<=0){
-        return -3;
-    }
-    maxAcceleration_mm_s2=_maxAcceleration_mm_s2;
-    //DPRINT("maxAcceleration_mm_s2 = %f",maxAcceleration_mm_s2);
-    
-    if(_acceleration_mm_s2<=0 || _acceleration_mm_s2>_maxAcceleration_mm_s2){
         return -4;
     }
-    acceleration_mm_s2=_acceleration_mm_s2;
-    //DPRINT("acceleration_mm_s2 = %f",acceleration_mm_s2);
+    maxAcceleration_IU=accelerationfromMMs2ToIU(_maxAcceleration_mm_s2);
+    
+    // acceleration
+    if(_acceleration_mm_s2<=0 || _acceleration_mm_s2>_maxAcceleration_mm_s2){
+        return -5;
+    }
+    acceleration_IU=accelerationfromMMs2ToIU(_acceleration_mm_s2);
     
     if(_isAdditive!=TRUE && _isAdditive!=FALSE){
         return -5;
@@ -201,38 +167,48 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     //DPRINT("referenceBase = %d",referenceBase);
     
     // ********************* Set homing parameters *********************
+    
+    // max high speed homing
     if(_maxHighSpeedHoming_mm_s<=0){
         return -8;
     }   
-    maxHighSpeedHoming_mm_s = -_maxHighSpeedHoming_mm_s; // N.B. Dalla tastiera verra' inserito un numero positivo, 
+    maxHighSpeedHoming_IU=-speedfromMMsToIU(_maxHighSpeedHoming_mm_s);
+    //maxHighSpeedHoming_mm_s = -_maxHighSpeedHoming_mm_s; // N.B. Dalla tastiera verra' inserito un numero positivo, 
                                                // che poi solo all'interno del drive ne verra' considerato 
                                                // solamente il segno opposto
     
+    //  high speed homing
     if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>_maxHighSpeedHoming_mm_s){
         return -9;
     }
-    highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
+    highSpeedHoming_IU=-speedfromMMsToIU(_highSpeedHoming_mm_s);
     
+    
+    // max low speed homing
     if(_maxLowSpeedHoming_mm_s<=0){
         return -10;
     }   
-    maxLowSpeedHoming_mm_s = _maxLowSpeedHoming_mm_s; // Verra' considerato il solo valore positivo perche' utilizzato
-                                            // nel moveAbsoluteHoming
+    maxLowSpeedHoming_IU = speedfromMMsToIU(_maxLowSpeedHoming_mm_s);
+  
     
+    // low speed homing
     if((_lowSpeedHoming_mm_s<=0) || (_lowSpeedHoming_mm_s>_maxLowSpeedHoming_mm_s)){
         return -11;
     }
-    lowSpeedHoming_mm_s=_lowSpeedHoming_mm_s;
+    lowSpeedHoming_IU=speedfromMMsToIU(_lowSpeedHoming_mm_s);
+    //lowSpeedHoming_mm_s=_lowSpeedHoming_mm_s;
     
+    
+    // ****************** max acceleration homing *********************
     if(_maxAccelerationHoming_mm_s2<=0){
         return -12;
     }
-    maxAccelerationHoming_mm_s2=_maxAccelerationHoming_mm_s2;
+    maxAccelerationHoming_IU=accelerationfromMMs2ToIU(_maxAccelerationHoming_mm_s2);
     
     if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>_maxAccelerationHoming_mm_s2){
         return -13;
     }
-    accelerationHoming_mm_s2 = _accelerationHoming_mm_s2; 
+    accelerationHoming_IU = accelerationfromMMs2ToIU(_accelerationHoming_mm_s2); 
     
     if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
         return -14;
@@ -253,6 +229,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         return -17;
     }
     n_encoder_lines=_n_encoder_lines;
+    DPRINT("VALORE INIZIALE n_encoder_lines: %f", n_encoder_lines);
     
     if(_const_mult_technsoft<=0){
         return -19;
@@ -268,204 +245,435 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
         return -21;
     }
     n_rounds =_n_rounds;
+    DPRINT("VALORE INIZIALE N_ROUNDS: %f", n_rounds);
     
     if(_linear_movement_per_n_rounds<=0){
         return -22;
     }
     linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    DPRINT("VALORE INIZIALE linear_movement_per_n_rounds: %f", linear_movement_per_n_rounds);
     
     axisID = _axisID;
- 
+    
+    if(_voltage_LNS<0){
+        return -23;
+    }
+    voltage_LNS = _voltage_LNS; 
+        
+    if(_voltage_LPS<0){
+        return -24;
+    }
+    voltage_LPS = _voltage_LPS;     
+        
+    if(_range<=0){
+        return -25;
+    }
+    range=_range;  
+    
+    if(_fullScalePot<=0){
+        return -26;
+    }
+    fullScalePot=_fullScalePot;
+    constantPot=_fullScalePot/65535;
+    
     axisRef = TS_LoadSetup(setupFilePath.c_str());
     if(axisRef < 0){
-        DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
-        return -24;
+        DERR("LoadSetup failed \"%s\", %s",setupFilePath.c_str(),TS_GetLastErrorText());
+        return -27;
     }
     
     /*	Setup the axis based on the setup data previously, for axisID*/
     if(!TS_SetupAxis(_axisID, axisRef)){
         DERR("failed to setup axis %d, %s",axisID,TS_GetLastErrorText());
-        return -25;
+        return -28;
     }
    
     if(!TS_SelectAxis(_axisID)){
         DERR("failed to select axis %d, %s",_axisID,TS_GetLastErrorText());
-        return -26;
+        return -29;
     }
     
     /*	Execute the initialization of the drive (ENDINIT) */
     if(!TS_DriveInitialisation()){
         DERR("failed Low driver initialisation");
-        return -27;
+        return -30;
     }
     
      // Settare il registro per la lettura dell'encoder
     if(!TS_Execute("SCR=0x4338")){
         //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
         DERR("Failed TS_Execute command");
-        return -28;
+        return -31;
     }
   
     if(!TS_SetEventOnMotionComplete(0,0)){ 
-	return -30;
+	return -32;
     }
     
     readyState = true;
     internalHomingStateDefault=0;
     internalHomingStateHoming2=0;
     
-    //controlledInitialPositionHoming = false;
-    //epsylon = 0.000000000;
+    cap_position=0;
+    controlLNS=true;
+    
+    // Gestione eventuale sospensione homing
+    minimumIntervalForHoming=2; // s
+    
+    // Inizializzazione ultima volta esecuzione funzione homing
+//    lastTimeTakenForHoming.tv_sec=0;
+//    lastTimeTakenForHoming.tv_usec=0;
+    
+    gettimeofday(&lastTimeTakenForHoming,NULL);
     
     return 0;
 }
 
-//TechnoSoftLowDriver::channel_psh TechnoSoftLowDriver::getMyChannel(){
-//    
-//    return my_channel;
-//}
-
 int TechnoSoftLowDriver::homing(int mode){
     // Attenzione: la variabile mode non viene utilizzata
     
-//    if(!controlledInitialPositionHoming){
-//        // lettura posizione:
-//        double* position;
-//        if(getCounter(position)<0)
-//            return -1;
-//        if(position==0 || ){ // position in millimeters
-//            return 0;
-//        }   
-//    }
+    double time_interval;
+    struct timeval currentTimeTakenForHoming;
+    
+    gettimeofday(&currentTimeTakenForHoming,NULL);
+    time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+    
+    if(time_interval>minimumIntervalForHoming){
+       internalHomingStateDefault=0;
+       internalHomingStateHoming2=0;
+       controlLNS=true;
+       cap_position=0; 
+    }
+    
+    if(controlLNS){
+        std::string descStr="";
+        uint16_t contentRegMER=0;
+        if((getStatusOrErrorReg(5, contentRegMER, descStr))<0){
+            lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+            lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+            internalHomingStateDefault = 0;
+            internalHomingStateHoming2=0;
+            controlLNS=true;
+            cap_position=0;
+            return -1;
+        }
+        if(contentRegMER & ((uint16_t)1<<7)){
+            // Il LNS e' attivo. Non c'e' bisogno di effettuare la procedura di homing.
+            // Reset encoder e counter
+            lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+            lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+            internalHomingStateDefault = 0;
+            internalHomingStateHoming2=0;
+            controlLNS=true;
+            cap_position=0; 
+            
+            if(selectAxis()<0){
+                return -2; 
+            }
+            
+            if(resetEncoder()<0){
+                return -3;
+                   
+            }
+            if(resetCounter()<0){
+                return -4;
+            }
+            return 0;
+        }  
+        controlLNS=false;    
+    }
+    uint16_t contentRegSRL=0;
+    bool motionCompleted=false;
     
     if(mode==0){
-        
+
         int risp;
         int switchTransited=0;
-        int motionCompleted = 0;
+        
         std::string cappos = "CAPPOS";
-        long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
+        //long cap_position = 0; /* the position captures at HIGH-LOW transition of negative limit switch */
+        std::string descStr;
+        //descStr.assign("");
         int absoluteMotionCompleted = 0;
+        
     
         switch (internalHomingStateDefault) {
             case 0:
+//                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+//                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
                 if(selectAxis()<0){
+                    
                     internalHomingStateDefault = 0;
-                    risp = -1;
-                    break;
-                }
-                if(moveVelocityHoming()<0){
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -2;
-                        break;
-                    }
-                    risp = -3;
-                    break;
-                }
-                DPRINT(" STATE 0: move velocity activated ");
-                if(setEventOnLimitSwitch()<0){
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -4;
-                        break;
-                    }
+                    controlLNS=true;
+                    cap_position=0;
                     risp = -5;
                     break;
                 }
+//                if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                } 
+//                usleep(100000);
+                
+                if(moveVelocityHoming()<0){
+                    internalHomingStateDefault = 0;
+                    controlLNS=true;
+                    if(stopMotion()<0){
+                        risp = -6;
+                        break;
+                    }
+                    
+                    risp = -7;
+                    break;
+                }
+                
+                if(setEventOnLimitSwitch()<0){
+                    internalHomingStateDefault = 0;
+                    controlLNS=true;
+                    if(stopMotion()<0){
+                        risp = -8;
+                        break;
+                    }
+                    risp = -9;
+                    break;
+                }
+                
                 DPRINT("STATE 0: event on limit switch activated ");
+                
+                DPRINT(" STATE 0: move velocity activated ");
+                
                 internalHomingStateDefault = 1;
                 risp = 1;
+                //stateHoming0++;
                 break; 
             case 1:
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -6;
+                    controlLNS=true;
+                    risp = -10;
                     break;
                 }
                 if(checkEvent(switchTransited)<0){
                     internalHomingStateDefault = 0;// deve essere riinizializzato per successivi nuovi tentativi di homing 
+                    controlLNS=true; 
                     if(stopMotion()<0){
-                        risp = -7;
+                        risp = -11;
                         break;
-                    }    
-                    risp = -8;
+                    }   
+                    risp = -12;
                     break;
                 } 
                 DPRINT(" STATE 1: possible limit switch transition just checked ");
                 if(switchTransited){
-                    if(setEventOnMotionComplete()<0){ 
-                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
-                        if(stopMotion()<0){
-                            risp= -9;
-                            break;
-                        }
-                        risp =-10;
-                        break;
-                    }  
+//                    if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                    }  
+//                    if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                    } 
+//                    if(getLVariable(cappos, cap_position)<0){ 
+//    //                if(stopMotion()<0){
+//    //                    return -13;
+//    //                }
+//                        internalHomingStateDefault=0;
+//                        risp = -14;
+//                        break;
+//                    }
                     //eventOnMotionCompleteSet = true;
                     internalHomingStateDefault=2;
                     DPRINT(" STATE 1: Negative limit switch transited. Event on motion completed set ");
+//                    double capturePositionHoming;
+//                    capturePositionHoming = (linear_movement_per_n_rounds*cap_position)/(steps_per_rounds*n_rounds*const_mult_technsoft);
+                    //DPRINT("************** switch transitato. cap_position in mm: %f**************",capturePositionHoming);
+                    //cap_position=0; //  ********** lasciamolo cosi************
+                    //usleep(5000);
                 }
                 // **************DA IMPLEMENTARE:*****************
                 // RESET ON Limit Switch Transition Event
                 risp = 1;
+                //stateHoming1++;
                 break; 
             case 2:
+
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -11;
-                    break;
-                }
-                if(checkEvent(motionCompleted)<0){
-                    internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                        risp = -12;
+                    controlLNS=true; 
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -11;
                         break;
                     }
-                    risp= -13;
-                    break;
-                }
-                DPRINT("************** STATE 2: possible event on motion completed checked **************");
-                if(motionCompleted){
-                    DPRINT("************** STATE 2: Motion completed after transition **************");
-                    internalHomingStateDefault = 3;
-                }
-                risp= 1;
-                break;
-            case 3:
-                // The motor is not in motion
-                DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
-                if(selectAxis()<0){
-                    internalHomingStateDefault = 0;
                     risp = -13;
                     break;
                 }
+                
+//                if(getLVariable(cappos, cap_position)<0){ 
+//    //                if(stopMotion()<0){
+//    //                    return -13;
+//    //                }
+//                        internalHomingStateDefault=0;
+//                        risp = -14;
+//                        break;
+//                }
+                
+//                if(checkEvent(motionCompleted)<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                        risp = -12;
+//                        break;
+//                    }
+//                    risp= -13;
+//                    break;
+//                }
+                if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
+                    controlLNS=true; 
+                    internalHomingStateDefault = 0;
+//                    descStr=descStr+"Unknown status. ";
+//                    ERR("Reading state error: %s",descStr.c_str());
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -14;
+                        break;
+                    }
+                    risp= -15;
+                    break;
+                }
+                if((contentRegSRL & ((uint16_t)1<<10))){
+                    motionCompleted=true;
+                }
+                //contentRegSRL=0;
+                DPRINT("************** STATE 2: possible event on motion completed checked **************");
+                if(motionCompleted){
+                    DPRINT("************** STATE 2: Motion completed after transition **************"); 
+                    internalHomingStateDefault = 3;
+//                    double positionHoming;
+//                    getEncoder(&positionHoming);
+                    //DPRINT("************** STATE 2 position in mm after motion is completed: %f **************",positionHoming);
+                    //sleep(60);
+                }
+                if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                    risp = -16;
+                    break;
+                }
+                risp= 1;
+                //stateHoming2++;
+                break;
+            case 3:
+                //usleep(10000000); // Garantisce che il motore sia veramente fermo
+                
+                // The motor is not in motion
+                //DPRINT("************** STATE 3: read the captured position on limit switch transition**************");
+                if(selectAxis()<0){
+                    internalHomingStateDefault = 0;
+                    controlLNS=true; 
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -17;
+                        break;
+                    }
+                    risp = -18;
+                    break;
+                }
+                
                 if(getLVariable(cappos, cap_position)<0){ 
     //                if(stopMotion()<0){
     //                    return -13;
     //                }
                     internalHomingStateDefault=0;
-                    risp = -14;
+                    controlLNS=true; 
+                    risp = -18;
                     break;
                 }
-                DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
-        
+                
+
+//                while (1){
+//                double positionState3;
+//                getEncoder(&positionState3);
+                //DPRINT("************** STATE 3 position in mm prima del recupero: %f **************",positionState3);
+                //usleep(1000000);
+//                }
+                
+//                if(getLVariable(cappos, cap_position)<0){ 
+//    //                if(stopMotion()<0){
+//    //                    return -13;
+//    //                }
+//                    internalHomingStateDefault=0;
+//                    risp = -14;
+//                    break;
+//                }
+                //DPRINT("************** STATE 3: the captured position on limit switch transition is %ld [drive internal position units]**************",cap_position);
+//                if(setEventOnLimitSwitch()<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                        risp = -4;
+//                        break;
+//                    }
+//                    risp = -5;
+//                    break;
+//                }
+//                usleep(5000);
+//                if(setEventOnMotionComplete()<0){ 
+//                        internalHomingStateDefault = 0; // deve essere riinizializzato per successive operazione di homing
+//                        if(stopMotion()<0){
+//                            risp= -9;
+//                            break;
+//                        }
+//                        risp =-10;
+//                        break;
+//                    }  
+//                usleep(10000);
             /*	Command an absolute positioning on the captured position */
+                
+                
                 if(moveAbsoluteStepsHoming(cap_position)<0){  
                     internalHomingStateDefault=0;
-                    risp = -15;
+                    controlLNS=true; 
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -19;
+                        break;
+                    }
+                    risp = -20;
                     break;
                 }
+                
+                if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                    risp = -21;
+                    break;
+                }
+                
+                //sleep(180);//**********************************************DA TOGLIERE*****************
                 DPRINT("************** STATE 3: command of absolute positioning on the captured position sended **************");
                 internalHomingStateDefault = 4;
                 risp= 1;
+                //stateHoming3++;
+                //sleep(20);
                 break;
             case 4:
+//                DPRINT("************** STATE 4: cap_position in mm: %f**************",cap_position);
+//                sleep(30);
                 DPRINT("************** STATE 4: wait for positioning to end **************");
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -16;
+                    controlLNS=true; 
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -22;
+                        break;
+                    }
+                    risp = -23;
                     break;
                 }
 //        if(!eventOnMotionCompleteSet){
@@ -480,58 +688,118 @@ int TechnoSoftLowDriver::homing(int mode){
 //                return -13;
 //            } 
 //        }
-                if(checkEvent(absoluteMotionCompleted)<0){
+//                  
+                
+                if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
+//                    descStr=descStr+"Unknown status. ";
+//                    ERR("Reading state error: %s",descStr.c_str());
+                    controlLNS=true; 
                     internalHomingStateDefault = 0;
-                    if(stopMotion()<0){
-                    //eventOnMotionCompleteSet = false;
-                        risp= -17;
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -25;
                         break;
                     }
-                //eventOnMotionCompleteSet = false;
-                    risp= -18;
+                    risp= -24;
                     break;
                 }
+                if((contentRegSRL & ((uint16_t)1<<10))){
+                    absoluteMotionCompleted=true;
+                }
+                
+//                if(checkEvent(absoluteMotionCompleted)<0){
+//                    internalHomingStateDefault = 0;
+//                    if(stopMotion()<0){
+//                    //eventOnMotionCompleteSet = false;
+//                        risp= -17;
+//                        break;
+//                    }
+//                //eventOnMotionCompleteSet = false;
+//                    risp= -18;
+//                    break;
+//                }
+  
                 if(absoluteMotionCompleted){
                     internalHomingStateDefault = 5;
-                    DPRINT("************** STATE 4: motor positioned to end **************");
+                    
+//                    DPRINT("************** STATE 4: motor positioned to end **************");
+//                    double positionHoming;
+//                    getEncoder(&positionHoming);
+//                    DPRINT("************** STATE 4 current position in mm: %f **************",positionHoming);
                 }
             // **************DA IMPLEMENTARE:*****************
             // RESET ON Event On Motion Complete
+                if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                    risp = -25;
+                    break;
+                }
+                
                 risp= 1;
+                //stateHoming4++;
+                
                 break;
             case 5:
                 // The motor is positioned to end
                 if(selectAxis()<0){
                     internalHomingStateDefault = 0;
-                    risp = -19;
+                    controlLNS=true; 
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -26;
+                        break;
+                    }
+                    risp = -27;
                     break;
                 }
-        
+                
+                cap_position=0;
+                usleep(1000000);
+                
                 if(resetEncoder()<0){
                     internalHomingStateDefault = 0;
+                    controlLNS=true; 
                     //if(stopMotion()<0){
                     //return -23;
                     //}
-                    risp= -20;
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -28;
+                        break;
+                    }
+                    risp= -29;
                     break;
                 }
                 if(resetCounter()<0){
                     internalHomingStateDefault = 0;
+                    controlLNS=true; 
                     //if(stopMotion()<0){
                     //return -25;
                     //}
-                    risp= -21;
+                    if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -30;
+                        break;
+                    }
+                    risp= -31;
                     break;
+                }
+                if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                        risp = -32;
+                        break;
                 }
                 DPRINT("************** STATE 5: encoder e counter e counter are reset **************");
                 internalHomingStateDefault = 0;
                 risp= 0;
+                controlLNS=true;
                 break;
             default:
                 internalHomingStateDefault = 0;
-                risp= -22;
+                controlLNS=true;
+                if(!TS_SetEventOnLimitSwitch(LSW_NEGATIVE, TRANSITION_HIGH_TO_LOW, FALSE, FALSE)){
+                    risp = -33;
+                    break;
+                }
+                risp= -34;
                 break; 
         } 
+        lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+        lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
         return risp;
     }
     else if(mode==1){
@@ -539,12 +807,18 @@ int TechnoSoftLowDriver::homing(int mode){
         uint16_t contentReg;
         std::string descStr = "";
         short homingDone = 0;
+        double time_interval;
+        struct timeval currentTimeTakenForHoming;
+
         switch (internalHomingStateHoming2) {
-            case 0:
+            case 0:       
                 DPRINT("************** Homing procedure Homing2. STATE 0. **************");
+                //gettimeofday(&lastTimeTakenForHoming,NULL);
+                
                 if(moveVelocityHoming()<0){
                     internalHomingStateHoming2=0;
-                    risp= -1;
+                    controlLNS=true;
+                    risp= -35;
                     break;
                 }
                 internalHomingStateHoming2=1;
@@ -552,14 +826,40 @@ int TechnoSoftLowDriver::homing(int mode){
                 break;
             case 1:
                 DPRINT("************** Homing procedure Homing2. STATE 1. **************");
+                
+//                gettimeofday(&currentTimeTakenForHoming,NULL);
+//                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+//                // Aggiornamento lastTimeTakenForHoming
+//                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+//                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+                
+//                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
+//                                                            // Potrebbe essere causata ad esempio da un comando di stop.
+//                    
+//                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+//                    // Le operazioni di questo stato non dovranno essere eseguite! 
+//                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+//                    // Dobbiamo quindi far ripartire la procedura di homing 
+//                    // come se fosse la prima volta che la procedura venisse chiamata,
+//                    // in modo del tutto trasparente alla control unit
+//                    
+//                    internalHomingStateHoming2 = 0;
+//                    controlLNS = true;
+//                    //perche' deve avvenire in modo del tutto trasparente alla control unit:
+//                    risp = 1;
+//                    break;
+//                }
+//                DPRINT("time interval: %f",time_interval);
+
                 if((getStatusOrErrorReg(5, contentReg, descStr))<0){
                     //ERR("Reading state error: %s",descStr.c_str());
                     internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -2;
-                        break;
-                    }
-                    risp= -3;
+                    controlLNS=true;
+//                    if(stopMotion()<0){
+//                        risp= -36;
+//                        break;
+//                    }
+                    risp= -37;
                     break;
                 }
                 // lettura bit di interesse
@@ -570,332 +870,617 @@ int TechnoSoftLowDriver::homing(int mode){
                 risp= 1;
                 break;
             case 2:
+                DPRINT("************** STATE 2: wait for stopping motor after switch transition**************");
+                if(selectAxis()<0){
+                    internalHomingStateHoming2= 0;
+                    controlLNS=true; 
+                    risp = -38;
+                    break;
+                }
+                if((getStatusOrErrorReg(3, contentRegSRL, descStr))<0){
+//                    descStr=descStr+"Unknown status. ";
+//                    ERR("Reading state error: %s",descStr.c_str());
+                    controlLNS=true; 
+                    internalHomingStateHoming2 = 0;
+                    risp= -39;
+                    break;
+                }
+                
+                if((contentRegSRL & ((uint16_t)1<<10))){
+                    motionCompleted=true;
+                }
+  
+                if(motionCompleted){
+                    internalHomingStateHoming2 = 3;
+                    
+//                    DPRINT("************** STATE 4: motor positioned to end **************");
+//                    double positionHoming;
+//                    getEncoder(&positionHoming);
+//                    DPRINT("************** STATE 4 current position in mm: %f **************",positionHoming);
+                }
+                risp= 1;
+                break;
+            case 3:
                 DPRINT("************** Homing procedure Homing2. STATE 2. **************");
                 DPRINT("************** Reset encoder e counter **************");
+                
+//                gettimeofday(&currentTimeTakenForHoming,NULL);
+//                time_interval = ((double)currentTimeTakenForHoming.tv_sec+(double)currentTimeTakenForHoming.tv_usec/1000000.0)-((double)lastTimeTakenForHoming.tv_sec+(double)lastTimeTakenForHoming.tv_usec/1000000.0);
+//                // Aggiornamento lastTimeTakenForHoming
+//                lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+//                lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+
+                // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+                // Le operazioni di questo stato non dovranno essere eseguite! 
+                // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+                // Dobbiamo quindi far ripartire la procedura di homing 
+                // come se fosse la prima volta che la procedura venisse chiamata,
+                // in modo del tutto trasparente alla control unit
+//                if(time_interval>minimumIntervalForHoming){ // In questo caso la procedura di homing sta riprendendo dopo una sospensione.
+//                                                            // Potrebbe essere causata ad esempio da un comando di stop.
+//                    
+//                    // Ma come mi richiami per la prima volta in questo stato, dopo tanto tempo, anziche' nello stato iniziale?
+//                    // Le operazioni di questo stato non dovranno essere eseguite! 
+//                    // Perche' lo stato fisico delle cose potrebbe essere cambiato.
+//                    // Dobbiamo quindi far ripartire la procedura di homing 
+//                    // come se fosse la prima volta che la procedura venisse chiamata,
+//                    // in modo del tutto trasparente alla control unit
+//                    
+//                    internalHomingStateHoming2 = 0;
+//                    controlLNS = true;
+//                    // in modo trasparente alla control unit:
+//                    risp = 1;
+//                    // Aggiornamento lastTimeTakenForHoming
+////                    lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+////                    lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
+//                    break;
+//                }
+                DPRINT("time interval: %f",time_interval);
+                usleep(1000000);
+                
                 if(resetEncoder()<0){
                     internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -4;
-                        break;
-                    }
-                    risp= -5;
+                    controlLNS=true;
+//                    if(stopMotion()<0){
+//                        risp= -38;
+//                        break;
+//                    }
+                    risp= -40;
                     break;
                 }
                 if(resetCounter()<0){
                     internalHomingStateHoming2=0;
-                    if(stopMotion()<0){
-                        risp= -6;
-                        break;
-                    }
-                    risp= -7;
+                    controlLNS=true;
+//                    if(stopMotion()<0){
+//                        risp= -40;
+//                        break;
+//                    }
+                    risp= -41;
                     break;
                 }
+//                lastTimeTakenForHoming.tv_sec=0; // Solo per lasciare pulita la memoria per molto tempo...
+//                lastTimeTakenForHoming.tv_usec=0;     
                 internalHomingStateHoming2=0;
+                controlLNS=true;
                 risp=0;
                 break;
             default:
+//                lastTimeTakenForHoming.tv_sec=0;
+//                lastTimeTakenForHoming.tv_usec=0;
                 internalHomingStateHoming2 = 0;
-                risp=-22;
+                controlLNS=true;
+                risp=-42;
                 break;
         }
+        lastTimeTakenForHoming.tv_sec = currentTimeTakenForHoming.tv_sec;
+        lastTimeTakenForHoming.tv_usec= currentTimeTakenForHoming.tv_usec;
         return risp;
     }
     else{
+        internalHomingStateHoming2=0;               
+        controlLNS=true;
+        lastTimeTakenForHoming.tv_sec=currentTimeTakenForHoming.tv_sec;
+        lastTimeTakenForHoming.tv_usec=currentTimeTakenForHoming.tv_usec;
         return -100;
     }
 }
 
-int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){
+int TechnoSoftLowDriver::moveRelativeSteps(const long& deltaPosition){ // Inteso come comando
     
-    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,speed_mm_s,acceleration_mm_s2,isAdditive,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-    if(!TS_MoveRelative(deltaPosition, speed_mm_s, acceleration_mm_s2, isAdditive, movement, referenceBase)){
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -2;
+//        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
+    }
+    
+    DPRINT("Velocita' movimentazione relativa: %f",speed_IU);
+    DPRINT("Accelerazione movimentazione relativa: %f",acceleration_IU);
+    
+    if(!TS_MoveRelative(deltaPosition, speed_IU, acceleration_IU, isAdditive, movement, referenceBase)){
         DERR("error relative moving");
-        return -2;
+        return -3;
     }
     return 0;
 }
 
 double TechnoSoftLowDriver::getdeltaMicroSteps(const double& deltaMillimeters){
     
+ if (this->useUI)
+    {
+        DPRINT("ALEDEBUG conversion to be checked now %f %f",deltaMillimeters,deltaMillimeters*const_mult_technsoft);
+        //return deltaMillimeters*const_mult_technsoft;
+        return deltaMillimeters;
+    }
+
     return round((steps_per_rounds*n_rounds*const_mult_technsoft*deltaMillimeters)/linear_movement_per_n_rounds);
 }
 
-int TechnoSoftLowDriver::moveRelativeStepsHoming(const long& deltaPosition){
-    DPRINT("Relative Moving axis: %d, deltaMicroSteps %d, speed=%f, acceleration %f, isadditive %d, movement %d, referencebase %d",axisID,deltaPosition,highSpeedHoming_mm_s,accelerationHoming_mm_s2,isAdditiveHoming,movementHoming,referenceBaseHoming);
+int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){ // _speed_mm_s [mm/s] 
     
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-    if(!TS_MoveRelative(deltaPosition, highSpeedHoming_mm_s, accelerationHoming_mm_s2, isAdditiveHoming, movementHoming, referenceBaseHoming)){
-        DERR("error relative moving homing");
+    if(_speed_mm_s<0){
+        DERR("Speed = %f <0 mm/s",_speed_mm_s);
+        return -1;
+    }
+    
+    double _speed_UI = speedfromMMsToIU(_speed_mm_s);
+    
+    if(_speed_UI>maxSpeed_IU){
+        DERR("Speed = %f IU > maxSpeed",_speed_UI);
         return -2;
     }
+    
+    speed_IU = _speed_UI;
+    
+    DPRINT("valore della speed settata: %f", _speed_UI);
     return 0;
 }
 
-// Set trapezoidal parameters
-int TechnoSoftLowDriver::setSpeed(const double& _speed_mm_s){
-    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    DPRINT("Chiamata setspeed");
-    if(_speed_mm_s<=0 || _speed_mm_s>maxSpeed_mm_s){
-        DERR("Speed = %f",_speed_mm_s);
-        return -1;
-    }
-    speed_mm_s = _speed_mm_s;
+int TechnoSoftLowDriver::getSpeed(double& _speed_mms){
+    
+    // Conversione speed_IU in mm/s
+    _speed_mms=speedfromIUTOMMs(speed_IU);
     return 0;
+}
+
+int TechnoSoftLowDriver::setMeasureUnit(const bool& inSteps)
+{
+ this->useUI=inSteps;
+ return 0;
 }
 
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
-    
-    if(_maxspeed_mm_s<=0 || _maxspeed_mm_s<speed_mm_s){
-        DERR("Max speed = %f",_maxspeed_mm_s);
+
+    //DPRINT("setMaxSpeed: _maxspeed_mm_s=%f,speed_mm_s=%f",_maxspeed_mm_s,speed_mm_s);
+    if(_maxspeed_mm_s<=0){
+        DERR("max speed= %f <=0 mm/s",_maxspeed_mm_s);
         return -1;
     }
-    maxSpeed_mm_s = _maxspeed_mm_s;
-    return 0;  
+    double _maxSpeed_IU = speedfromMMsToIU(_maxspeed_mm_s);
+    
+    if(_maxSpeed_IU<speed_IU){
+        DERR("Max speed = %f IU < current speed",_maxSpeed_IU);
+        return -2;
+    }
+    
+    maxSpeed_IU = _maxSpeed_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getMaxSpeed(double& _maxspeed_mms){
+    
+    // Conversione speed_IU in mm/s
+    _maxspeed_mms=speedfromIUTOMMs(maxSpeed_IU);
+    return 0;    
 }
 
 int TechnoSoftLowDriver::setAcceleration(const double& _acceleration_mm_s2){
-    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    DPRINT("Chiamata setAcceleration");
-    if(_acceleration_mm_s2<=0 || _acceleration_mm_s2>maxAcceleration_mm_s2){
-        DERR("Acceleration = %f",_acceleration_mm_s2);
+    
+    if(_acceleration_mm_s2<=0){
+        DERR("(_acceleration_mm_s2 = %f <=0 mm/s^2",_acceleration_mm_s2);
         return -1;
     }
-    acceleration_mm_s2 = _acceleration_mm_s2;
+            
+    double _acceleration_UI = accelerationfromMMs2ToIU(_acceleration_mm_s2);
+    
+    if(_acceleration_UI>maxAcceleration_IU){
+        DERR("Acceleration = %f IU > maxAcceleration",_acceleration_UI);
+        return -2;
+    }
+    
+    acceleration_IU = _acceleration_UI;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getAcceleration(double& _acceleration_mms){
+    
+    _acceleration_mms=accelerationfromIUToMMs2(acceleration_IU);
     return 0;
 }
 
 int TechnoSoftLowDriver::setMaxAcceleration(const double& _maxacceleration_mm_s2){
-    
-    if(_maxacceleration_mm_s2<=0 || _maxacceleration_mm_s2<acceleration_mm_s2){
-        DERR("Max acceleration = %f",_maxacceleration_mm_s2);
+
+    if(_maxacceleration_mm_s2<=0){
+        DERR("_acceleration_mm_s2 = %f <=0 mm/s^2",_maxacceleration_mm_s2);
         return -1;
     }
-    maxAcceleration_mm_s2 = _maxacceleration_mm_s2;
-    return 0;  
+    double _maxAcceleration_UI = accelerationfromMMs2ToIU(_maxacceleration_mm_s2);
+    
+    if(_maxAcceleration_UI<maxAcceleration_IU){
+        DERR("_maxAcceleration_UI<maxAcceleration_IU");
+        return -2;
+    }
+    maxAcceleration_IU= _maxAcceleration_UI;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getMaxAcceleration(double& _maxacceleration_mms){
+    
+    _maxacceleration_mms=accelerationfromIUToMMs2(maxAcceleration_IU);
+    return 0;
 }
 
 int TechnoSoftLowDriver::setAdditive(const BOOL& _isAdditive){
-    DPRINT("Chiamata setAdditive");
+    //DPRINT("Chiamata setAdditive");
     if((_isAdditive!=TRUE) && (_isAdditive!=FALSE)){
         DERR("setAdditive= %d",_isAdditive);
         return -1;
-    }   
+    }
     isAdditive = _isAdditive;
     return 0;
 }
 
+int TechnoSoftLowDriver::getAdditive(BOOL& _isAdditive){
+    //DPRINT("Chiamata setAdditive");
+    
+    _isAdditive=isAdditive;
+    return 0;
+}
+
 int TechnoSoftLowDriver::setMovement(const short& _movement){
-    DPRINT("Chiamata setMovement");
+    //DPRINT("Chiamata setMovement");
     if((_movement!=UPDATE_NONE) && (_movement!=UPDATE_IMMEDIATE) && (_movement!=UPDATE_ON_EVENT)){
         DERR("setMovement = %d",_movement);
         return -1;
     }
-    movement = _movement;   
+    movement = _movement;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getMovement(short& _movement){
+    //DPRINT("Chiamata setAdditive");
+    _movement=movement;
     return 0;
 }
 
 int TechnoSoftLowDriver::setReferenceBase(const short& _referenceBase){
-    DPRINT("Chiamata setReferenceBase");
+    //DPRINT("Chiamata setReferenceBase");
     if((_referenceBase!=FROM_MEASURE) && (_referenceBase!=FROM_REFERENCE)){
         DERR("_referenceBase = %d",_referenceBase);
         return -1;
     }
-    referenceBase=_referenceBase; 
+    referenceBase=_referenceBase;
     return 0;
 }
-  
+
+int TechnoSoftLowDriver::getReferenceBase(short& _referenceBase){
+    //DPRINT("Chiamata setReferenceBase");
+
+    _referenceBase=referenceBase;
+    return 0;
+}
+
 // Set homing parameters
 int TechnoSoftLowDriver::sethighSpeedHoming(const double& _highSpeedHoming_mm_s){
-    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    DPRINT("Chiamata sethighSpeedHoming");
-    if(_highSpeedHoming_mm_s<=0 || _highSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
-        return -1;
-    }
-    highSpeedHoming_mm_s = -_highSpeedHoming_mm_s;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming_mm_s){
     
-     if(_maxhighSpeedHoming_mm_s<=0 || _maxhighSpeedHoming_mm_s<-highSpeedHoming_mm_s || _maxhighSpeedHoming_mm_s<maxLowSpeedHoming_mm_s){
+    if(_highSpeedHoming_mm_s<=0){
         return -1;
     }
-    maxHighSpeedHoming_mm_s = _maxhighSpeedHoming_mm_s;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
-    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
-    DPRINT("Chiamata setlowSpeedHoming");
-    if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
-        return -1;
-    }
-    lowSpeedHoming_mm_s = _lowSpeedHoming_mm_s;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_mm_s){
     
-    if(_maxlowSpeedHoming_mm_s<=0 || _maxlowSpeedHoming_mm_s<lowSpeedHoming_mm_s || _maxlowSpeedHoming_mm_s>maxHighSpeedHoming_mm_s){
-        return -1;
-    }
-    maxLowSpeedHoming_mm_s = _maxlowSpeedHoming_mm_s;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
-    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    DPRINT("Chiamata setaccelerationHoming");
-    if(_accelerationHoming_mm_s2<=0 || _accelerationHoming_mm_s2>maxAccelerationHoming_mm_s2){
-        return -1;
-    }
-    accelerationHoming_mm_s2 = _accelerationHoming_mm_s2;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAccelerationHoming_mm_s2){
-    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
-    if(_maxAccelerationHoming_mm_s2<=0 || _maxAccelerationHoming_mm_s2<accelerationHoming_mm_s2){
-        return -1;
-    }
-    maxAccelerationHoming_mm_s2 = _maxAccelerationHoming_mm_s2;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setAdditiveHoming(const BOOL& _isAdditiveHoming){
-    DPRINT("Chiamata setAdditiveHoming");
-    if(_isAdditiveHoming!=TRUE && _isAdditiveHoming!=FALSE){
-        return -1;
-    }   
-    isAdditiveHoming = _isAdditiveHoming;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setMovementHoming(const short& _movementHoming){
-    DPRINT("Chiamata setMovementHoming");
-    if((_movementHoming!=UPDATE_NONE) && (_movementHoming!=UPDATE_IMMEDIATE) && (_movementHoming!=UPDATE_ON_EVENT)){
-        return -1;
-    }
-    movementHoming = _movementHoming;   
-    return 0;
-}
-
-int TechnoSoftLowDriver::setReferenceBaseHoming(const short& _referenceBaseHoming){
-    DPRINT("Chiamata setReferenceBaseHoming");
-    if((_referenceBaseHoming!=FROM_MEASURE) && (_referenceBaseHoming!=FROM_REFERENCE)){
-        return -1;
-    }
-    referenceBaseHoming=_referenceBaseHoming; 
-    return 0;
-}
-
-// Set encoder lines
-int TechnoSoftLowDriver::setEncoderLines(double& _encoderLines){
-    DPRINT("Chiamata setEncoderLines");
-    if(_encoderLines<=0){
-        return -1;
-    }   
-    n_encoder_lines=_encoderLines;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setConst_mult_technsoft(double& _const_mult_technsoft){
-    DPRINT("Chiamata setConst_mult_technsoft");
-    if(_const_mult_technsoft<=0){
-        return -1;
-    }   
-    const_mult_technsoft=_const_mult_technsoft;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setSteps_per_rounds(double& _steps_per_rounds){
-    DPRINT("Chiamata setSteps_per_rounds");
-    if(_steps_per_rounds<=0){
-        return -1;
-    }   
-    steps_per_rounds=_steps_per_rounds;
-    return 0;
-}
-
-int TechnoSoftLowDriver::setN_rounds(double& _n_rounds){
-    DPRINT("Chiamata setN_rounds");
-    if(_n_rounds<=0){
-        return -1;
-    }   
-    n_rounds=_n_rounds;
-    return 0;
-}
+    double _highSpeedHoming_IU = speedfromMMsToIU(_highSpeedHoming_mm_s);
     
-int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
-    DPRINT("Chiamata setLinear_movement_per_n_rounds");
-    if(_linear_movement_per_n_rounds<=0){
-        return -1;
-    }   
-    linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
-    return 0;
-}  
-
-int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition) const{
-    
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("error selecting axis");
-//        return -1;
-//    }
-    //deltaPosition*=CONST_MULT_TECHNOFT;
-    //printf("%ld",deltaPosition);
-    //DPRINT("moving axis: %d deltapos %d speed=%f acceleration %f isadditive %d movement %d referencebase %d",axisID,deltaPosition,speed,acceleration,isAdditive,movement,referenceBase);
-//    if(speed<0 || speed>MAX_SPEED){
-//        return -1;
-//    }
-//    if(acceleration<0 || acceleration>MAX_ACCELERATION){
-//        return -2;
-//    }
-//    // nota: MAX_SPEED, MAX_ACCELERATION in TechnoSoftLowDriver.h 
-//        
-//    if((movement!=UPDATE_NONE) || (movement!=UPDATE_IMMEDIATE) || (movement!=UPDATE_ON_EVENT)){
-//        return -3;
-//    }
-//    // nota: UPDATE_NONE, UPDATE_IMMEDIATE, UPDATE_ON_EVENT costanti definite in TML_LIB.h 
-//    
-//    if((referenceBase!=FROM_MEASURE) || referenceBase!=FROM_REFERENCE){
-//        return -4;
-//    }
-    DPRINT("moving Absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-    if(!TS_MoveAbsolute(absPosition, speed_mm_s, acceleration_mm_s2, movement, referenceBase)){
-        DERR("error absolute step moving");
+    if(_highSpeedHoming_IU>(-maxHighSpeedHoming_IU)){
         return -2;
     }
+
+    highSpeedHoming_IU = -_highSpeedHoming_IU;
     return 0;
 }
 
 int TechnoSoftLowDriver::getHighSpeedHoming(double& _highSpeedHoming_mm_s){
     
-    DPRINT("Valore letto dell'high speed homing %f:", highSpeedHoming_mm_s);
-    _highSpeedHoming_mm_s = highSpeedHoming_mm_s;
+    // Conversione speed_IU in mm/s
+    _highSpeedHoming_mm_s=std::abs(speedfromIUTOMMs(highSpeedHoming_IU));
+    return 0;
+}
+
+int TechnoSoftLowDriver::setMaxhighSpeedHoming(const double& _maxhighSpeedHoming_mm_s){
+
+    if(_maxhighSpeedHoming_mm_s<=0){
+        return -1;
+    }
+    
+    double _maxHighSpeedHoming_IU = speedfromMMsToIU(_maxhighSpeedHoming_mm_s);
+    
+    if(_maxHighSpeedHoming_IU<-highSpeedHoming_IU || _maxHighSpeedHoming_IU<maxLowSpeedHoming_IU){
+        return -2;
+    }
+
+    maxHighSpeedHoming_IU = _maxHighSpeedHoming_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getMaxhighSpeedHoming(double& _maxhighSpeedHoming_mm_s){
+    
+    // Conversione speed_IU in mm/s
+    _maxhighSpeedHoming_mm_s=std::abs(speedfromIUTOMMs(maxHighSpeedHoming_IU));
+    return 0;
+}
+
+int TechnoSoftLowDriver::setlowSpeedHoming(const double& _lowSpeedHoming_mm_s){
+    //printf("speed = %f, max speed = %f", _speed,maxSpeed);
+    //DPRINT("Chiamata setlowSpeedHoming");
+    
+    if(_lowSpeedHoming_mm_s<=0){
+        return -1;
+    }
+    double _lowSpeedHoming_IU = speedfromMMsToIU(_lowSpeedHoming_mm_s);
+    
+    if(_lowSpeedHoming_IU>maxLowSpeedHoming_IU){
+        return -2;
+    }
+//    if(_lowSpeedHoming_mm_s<=0 || _lowSpeedHoming_mm_s>maxLowSpeedHoming_mm_s){
+//        return -1;
+//    }
+    lowSpeedHoming_IU = _lowSpeedHoming_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getlowSpeedHoming(double& _lowSpeedHoming_mm_s){
+    
+    // Conversione speed_IU in mm/s
+    _lowSpeedHoming_mm_s=speedfromIUTOMMs(lowSpeedHoming_IU);
+    return 0;
+}
+
+int TechnoSoftLowDriver::setMaxlowSpeedHoming(const double& _maxlowSpeedHoming_mm_s){
+
+    if(_maxlowSpeedHoming_mm_s<=0){
+        return -1;
+    }
+    double _maxLowSpeedHoming_IU = speedfromMMsToIU(_maxlowSpeedHoming_mm_s);
+    
+    if(_maxLowSpeedHoming_IU<lowSpeedHoming_IU || _maxLowSpeedHoming_IU>maxHighSpeedHoming_IU){
+        return-2;
+    }
+
+    maxLowSpeedHoming_IU = _maxLowSpeedHoming_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getMaxlowSpeedHoming(double& _maxlowSpeedHoming_mm_s){
+    
+    // Conversione speed_IU in mm/s
+    _maxlowSpeedHoming_mm_s=speedfromIUTOMMs(maxLowSpeedHoming_IU);
+    return 0;
+}
+
+int TechnoSoftLowDriver::setaccelerationHoming(const double&  _accelerationHoming_mm_s2){
+
+    if(_accelerationHoming_mm_s2<=0){
+        return -1;
+    }
+    double _accelerationHoming_IU =  accelerationfromMMs2ToIU(_accelerationHoming_mm_s2);  
+        
+    if(_accelerationHoming_IU>maxAccelerationHoming_IU){
+        return -2;
+    }
+    accelerationHoming_IU = _accelerationHoming_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getaccelerationHoming(double&  _accelerationHoming_mm_s2){
+    
+    _accelerationHoming_mm_s2=accelerationfromIUToMMs2(accelerationHoming_IU);
+    return 0;
+}
+
+int TechnoSoftLowDriver::setMaxAccelerationHoming(const double&  _maxAccelerationHoming_mm_s2){
+    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    
+    if(_maxAccelerationHoming_mm_s2<=0){
+        return -1;
+    }
+    
+    double _maxAccelerationHoming_IU = accelerationfromMMs2ToIU(_maxAccelerationHoming_mm_s2);
+    
+    if(_maxAccelerationHoming_IU <accelerationHoming_IU){
+        return -2;
+    }
+    maxAccelerationHoming_IU = _maxAccelerationHoming_IU;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getMaxAccelerationHoming(double&  _maxAccelerationHoming_mm_s2){
+    //printf("acceleration = %f, max acceleration = %f", _acceleration,maxAcceleration);
+    
+    _maxAccelerationHoming_mm_s2=accelerationfromIUToMMs2(maxAccelerationHoming_IU);
+    return 0;
+}
+
+// Set encoder lines
+int TechnoSoftLowDriver::setEncoderLines(const double& _encoderLines){
+    //DPRINT("Chiamata setEncoderLines");
+    if(_encoderLines<=0){
+        return -1;
+    }
+    n_encoder_lines=_encoderLines;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getEncoderLines(double& _encoderLines){
+    //DPRINT("Chiamata setEncoderLines");
+    _encoderLines=n_encoder_lines;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setConst_mult_technsoft(const double& _const_mult_technsoft){
+    //DPRINT("Chiamata setConst_mult_technsoft");
+    if(_const_mult_technsoft<=0){
+        return -1;
+    }
+    const_mult_technsoft=_const_mult_technsoft;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getConst_mult_technsoft(double& _const_mult_technsoft){
+    //DPRINT("Chiamata setConst_mult_technsoft");
+    
+    _const_mult_technsoft=const_mult_technsoft;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setSteps_per_rounds(const double& _steps_per_rounds){
+    //DPRINT("Chiamata setSteps_per_rounds");
+    if(_steps_per_rounds<=0){
+        return -1;
+    }
+    steps_per_rounds=_steps_per_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getSteps_per_rounds(double& _steps_per_rounds){
+    //DPRINT("Chiamata setSteps_per_rounds");
+    _steps_per_rounds=steps_per_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setN_rounds(const double& _n_rounds){
+    //DPRINT("Chiamata setN_rounds");
+    if(_n_rounds<=0){
+        return -1;
+    }
+    n_rounds=_n_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getN_rounds(double& _n_rounds){
+    //DPRINT("Chiamata setN_rounds");
+    
+    _n_rounds=n_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_linear_movement_per_n_rounds<=0){
+        return -1;
+    }
+    linear_movement_per_n_rounds=_linear_movement_per_n_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+//    if(_linear_movement_per_n_rounds<=0){
+//        return -1;
+//    }
+    _linear_movement_per_n_rounds=linear_movement_per_n_rounds;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setvoltage_LNS(const double& _voltage_LNS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_voltage_LNS<0){
+        return -1;
+    }
+    voltage_LNS=_voltage_LNS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getvoltage_LNS(double& _voltage_LNS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    _voltage_LNS=voltage_LNS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setvoltage_LPS(const double& _voltage_LPS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_voltage_LPS<0){
+        return -1;
+    }
+    voltage_LPS=_voltage_LPS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getvoltage_LPS(double& _voltage_LPS){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    
+    _voltage_LPS=voltage_LPS;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setRange(const double& _range){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_range<0){
+        return -1;
+    }
+    range=_range;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getRange(double& _range){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    _range=range;
+    return 0;
+}
+
+int TechnoSoftLowDriver::setFullscalePot(const double& _fullScale){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    if(_fullScale<0){
+        return -1;
+    }
+    fullScalePot=_fullScale;
+    constantPot=_fullScale/65535;
+    return 0;
+}
+
+int TechnoSoftLowDriver::getFullscalePot(double& _fullScale){
+    //DPRINT("Chiamata setLinear_movement_per_n_rounds");
+    
+//    fullScalePot=_fullScale;
+    _fullScale=fullScalePot;
+    return 0;
+}
+
+
+int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){ // Inteso come comando
+    
+
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -2;
+//        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+    }
+    
+    DPRINT("ALEDEBUG: Move Absolute Steps %d",absPosition);
+    if(!TS_MoveAbsolute(absPosition, speed_IU, acceleration_IU, movement, referenceBase)){
+        DERR("error absolute step moving");
+        return -3;
+    }
     return 0;
 }
 
 int TechnoSoftLowDriver::moveVelocityHoming(){
     
-    //double highSpeedHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*highSpeedHoming_mm_s)/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    //double accelerationHoming_MicroSteps_s = round((N_ROUNDS_DEFAULT*STEPS_PER_ROUNDS_DEFAULT*CONST_MULT_TECHNOFT_DEFAULT*accelerationHoming_mm_s2/LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
-    DPRINT("(homing) moving velocity. Axis : %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,highSpeedHoming_mm_s,accelerationHoming_mm_s2,movementHoming,referenceBaseHoming);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-    if(!TS_MoveVelocity(highSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
+    if(!TS_MoveVelocity(highSpeedHoming_IU, accelerationHoming_IU, movementHoming, referenceBaseHoming)){
         DERR("(homing) Error moving velocity ");
         return -2;
     }
@@ -904,12 +1489,7 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
 
 int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
     
-    DPRINT("(homing) moving absolute steps. Axis: %d, absPosition %d, speed=%f, acceleration %f, movement %d, referencebase %d",axisID,absPosition,speed_mm_s,acceleration_mm_s2,movement,referenceBase);
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-    if(!TS_MoveAbsolute(absPosition, lowSpeedHoming_mm_s, accelerationHoming_mm_s2, movementHoming, referenceBaseHoming)){
+    if(!TS_MoveAbsolute(absPosition, lowSpeedHoming_IU, accelerationHoming_IU, movementHoming, referenceBaseHoming)){
         DERR("(homing) Error absolute steps moving");
         return -2;
     }
@@ -918,21 +1498,23 @@ int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition) const{
 
 int TechnoSoftLowDriver::stopMotion(){
     
-//    if(!TS_SelectAxis(axisID)){
-//        return -1;
-//    }
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
+
     if(!TS_Stop()){
         return -1;
+    }
+    
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
     }
     DPRINT("Motor with axis = %d is stopped, %s",axisID, TS_GetLastErrorText());
     return 0;
 }
 
-int TechnoSoftLowDriver::providePower(){
+int TechnoSoftLowDriver::providePower(){ //******** Inteso come comando *********
     DPRINT("provide power to axis:%d",axisID);
 //      if(!TS_SelectAxis(axisID)){
 //        ERR("ALEDEBUG Error selecting axis");
@@ -942,6 +1524,17 @@ int TechnoSoftLowDriver::providePower(){
 //        DERR("failed to select axis %d",axisID);
 //        return -1;
 //    }
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -1;
+//        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
+    }
+    
     if(!TS_Power(POWER_ON)){
         //ERR("ALEDEBUG Error selecting axis");
         return -2;
@@ -949,30 +1542,42 @@ int TechnoSoftLowDriver::providePower(){
 				
     /*	Wait for power stage to be enabled */
     WORD sAxiOn_flag = 0;
-    while(sAxiOn_flag == 0){
+    int maxCount=20;
+    int count=0;
+    while(sAxiOn_flag == 0 && count<maxCount){
+        //DPRINT("CHECKING POWER ON COMPLETED");
         /* Check the status of the power stage */
         if(!TS_ReadStatus(REG_SRL, sAxiOn_flag)){
 	    
             //ERR("ALEDEBUG Error TS_ReadStatus");
             return -3;
         }
-
         sAxiOn_flag=((sAxiOn_flag & 1<<15) != 0 ? 1 : 0);
+        count++;
+        usleep(5000);
     }
     //DPRINT("ALEDEBUG correctly powered on");
     //poweron=true;
+    
     return 0;
 }
 
-int TechnoSoftLowDriver::stopPower(){
+int TechnoSoftLowDriver::stopPower(){ //******** Inteso come comando *********
     //DPRINT("stopping power to axis:%d",axisID);
-
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
+    
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -1;
+//        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
+    }
+    
     if(!TS_Power(POWER_OFF)){
-        return -1;
+        return -2;
     }
     DPRINT("Motor with axis id = %d is power off",axisID);
     
@@ -985,58 +1590,54 @@ int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPowe
     return 0;
 }
 
-//int TechnoSoftLowDriver::getCounter(long& tposition){
-//    
-//    DPRINT("Reading COUNTER position");
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-//    if(!TS_GetLongVariable("TPOS", tposition)){
-//        return -2;
-//    }
-//    return 0;
-//}
-
 int TechnoSoftLowDriver::getCounter(double* deltaPosition_mm){
     
     DPRINT("Reading COUNTER position");
+ 
     long tposition;
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
+
     if(!TS_GetLongVariable("TPOS", tposition)){
         return -1;
     }
-    *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+    if (this->useUI)
+       *deltaPosition_mm=tposition;
+    else
+       *deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
     return 0;
 }
 
+int TechnoSoftLowDriver::getPotentiometer(double* deltaPosition_mm){
+    
+    DPRINT("Reading potentiometer");
 
-//int TechnoSoftLowDriver::getEncoder(long& aposition){
-//    
-//    DPRINT("Reading ENCODER position");
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -1;
-////    }
-//    if(!TS_GetLongVariable("APOS", aposition)){
-//        return -2;
-//    }
-//    return 0;
-//}
+    short valueAd2;
 
-
+    if(TS_GetIntVariable("CSPD",valueAd2)<0){
+        return -1;
+    }
+    
+    double voltage=(valueAd2*constantPot)-10; //[V]
+    * deltaPosition_mm=(((voltage-voltage_LNS)/(voltage_LPS-voltage_LNS))*range); 
+    
+    //*deltaPosition_mm = (tposition*linear_movement_per_n_rounds)/(steps_per_rounds*const_mult_technsoft*n_rounds);
+    return 0;
+} 
 
 int TechnoSoftLowDriver::getEncoder(double* deltaPosition_mm){
     
     DPRINT("Reading ENCODER position");
+    
     long aposition;
     if(!TS_GetLongVariable("APOS", aposition)){
         return -1;
     }
-    *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
+    //DPRINT("Final APOS for homing %ld",aposition);
+    if (this->useUI)
+    {
+       *deltaPosition_mm=aposition;
+    }
+    else
+       *deltaPosition_mm = (aposition*linear_movement_per_n_rounds)/(n_encoder_lines*n_rounds);
     return 0;
 }
 
@@ -1073,106 +1674,6 @@ int TechnoSoftLowDriver::resetEncoder(){
     return 0;
 }
 
-//int TechnoSoftLowDriver::getPower(BOOL& powered){
-//    
-//    powered = FALSE;
-//    WORD power;
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_ReadStatus(REG_SRL,power)){
-//        return -2;
-//    }
-//    power = ((power & 1<<15)==0 ? 1 : 0); //La forma generale dell'istruzione di SHIFT A SINISTRA e' del tipo:
-//    //variabile_intera << numero_posizioni
-//    if (power==1) {
-//        powered = FALSE;
-//        return -3;
-//    }
-//    else{
-//        powered = TRUE;
-//        return -4;
-//    }
-//}
-
-//int TechnoSoftLowDriver::setFixedVariable(LPCSTR pszName, double value){
-////The function converts the value to type fixed and writes it in the TML data
-////pszName on the active axis
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_SetFixedVariable(pszName, value)){
-//        return -2;
-//    }
-//    return 0;
-//}
-
-//int TechnoSoftLowDriver::abortNativeOperation(){
-//    //The function aborts the execution of a TML function launched with a 
-//    //cancelable call
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_ABORT()){
-//        return -2;
-//    }
-//    return 0;
-//}
-
-
-//int TechnoSoftLowDriver::executeTMLfunction(std::string& pszFunctionName){
-//    // The function commands the active axis to execute the TML function stored
-//    //at pszFunctionName
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_CancelableCALL_Label(pszFunctionName.c_str())){
-//        printf("executeTMLfunction: %s\n",TS_GetLastErrorText());
-//        return -2;
-//    }
-//    return 0;
-//}
-
-//int TechnoSoftLowDriver::setDecelerationParam(double deceleration){
-//    // 
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_QuickStopDecelerationRate(deceleration)){
-//        return -2;
-//    }
-//    return 0;
-//}
-
-//int TechnoSoftLowDriver::setVariable(LPCSTR pszName, long value){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_SetLongVariable(pszName, value)){
-//	return -2;
-//    }
-//    return 0;
-//}
-
-//int TechnoSoftLowDriver::readHomingCallReg(short selIndex, WORD& status){
-//    
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_ReadStatus(selIndex, status))
-//        return FALSE;
-//
-//    status=((status & 1<<8) == 0 ? 1 : 0);
-//    return 0;
-//}
-
 int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
@@ -1206,21 +1707,6 @@ int TechnoSoftLowDriver::checkEvent(BOOL& event){
     return 0;
 }
 
-//int TechnoSoftLowDriver::setPosition(const long& posValue){
-////  if(!TS_SelectAxis(axisID)){
-////        return -1;
-////  }
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-//    if(!TS_SetPosition(posValue)){ 
-//        DPRINT("Error at setting position: %s",TS_GetLastErrorText());
-//        return -1;
-//    }
-//    return 0;
-//}
-
 int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr){
 //    if(!TS_SelectAxis(axisID)){
 //        DERR("failed to select axis %d",axisID);
@@ -1231,25 +1717,85 @@ int TechnoSoftLowDriver::getStatusOrErrorReg(const short& regIndex, WORD& conten
         //DERR("Error at the register reading: %s",TS_GetLastErrorText());
         //descrErr.assign(TS_GetLastErrorText());
         descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
-        return -2;
+        return -1;
     }
     return 0;
 }
 
-int TechnoSoftLowDriver::resetFault(){
+int TechnoSoftLowDriver::getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr){
+    
+    if(!TS_GetInput(nIO, inValue)){
+        descrErr=descrErr+" Error reading status: "+TS_GetLastErrorText();
+        return -1;   
+    }
+    return 0;
+}
+
+int TechnoSoftLowDriver::resetFault(){ // Considerato come COMANDO
+    
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -1;
+//        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
+    }
     
     if(!TS_ResetFault()){
          return -2;
          // Note: the drive-motor will return to FAULT status (SRH.15=1) if there are
          // errors when the function is executed)
     }
+ 
+    return 0;
+}
+
+int TechnoSoftLowDriver::hardreset(bool mode){
+    
+    if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
+//        if(!TS_Stop()){
+//            return -1;
+//        }
+        internalHomingStateHoming2 = 0;
+        internalHomingStateDefault = 0;
+        controlLNS=true;
+//        lastTimeTakenForHoming.tv_sec=0;
+//        lastTimeTakenForHoming.tv_usec=0;
+    }
+    
+    if(mode){
+        if(!TS_Save()){
+            return -2;
+        }
+    }
+    
+    if(!TS_Reset()){
+        return -3;
+    }
+    
+    /*	Execute the initialization of the drive (ENDINIT) */
+    if(!TS_DriveInitialisation()){
+        DERR("failed Low driver initialisation");
+        return -4;
+    }
+    
+     // Settare il registro per la lettura dell'encoder
+    if(!TS_Execute("SCR=0x4338")){
+        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
+        DERR("Failed TS_Execute command");
+        return -5;
+    }
+    
     return 0;
 }
 
 int TechnoSoftLowDriver::selectAxis(){
      
     if(!TS_SelectAxis(axisID)){
-        DERR("failed to select axis %d",axisID);
+        DERR("failed to select axis %d %s",axisID, TS_GetLastErrorText());
         return -1;
     }
     return 0;
@@ -1280,108 +1826,6 @@ int TechnoSoftLowDriver::getinternalHomingStateHoming2(){
 
 int getHoming2Procedure();
 
-//int TechnoSoftLowDriver::resetSetup(){
-//    if(!TS_SelectAxis(axisID)){
-//        DERR("failed to select axis %d",axisID);
-//        return -1;
-//    }
-////    if(!TS_Execute("ENDINIT")){
-////        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
-////        DERR("Failed TS_Execute command");
-////        return -17;
-////    }
-//    
-//    if(!TS_Save()){
-//         DERR("failed Low driver saving current setup: %s",TS_GetLastErrorText());
-//         return -1; 
-//    }
-////    char szDriveVersion[100];
-////    //char* szDriveVersion;
-////    if(!MSK_GetDriveVersion(szDriveVersion))
-////        DERR("Errore lettura versione driver");
-////        
-////    DPRINT("%s",szDriveVersion);
-//    
-//    if(!TS_Reset()){
-//        DERR("failed Low driver reset: %s",TS_GetLastErrorText());
-//        return -1; 
-//    } 
-//    
-//    sleep(10);
-//    
-//    if(!MSK_SetBaudRate(9600)){
-//        DERR("MSK_SetBaudRate 1 %s",TS_GetLastErrorText());
-//        //return -2;
-//        return -2;
-//    }
-//    sleep(3);
-//    
-//    if(!MSK_SetBaudRate(115200)){
-//        DERR("MSK_SetBaudRate 2 %s",TS_GetLastErrorText());
-//        //return -2;
-//        return -2;
-//    }
-//    
-//    sleep(3);
-//
-////    if(!TS_SelectAxis(axisID)){
-////       DERR("failed to select axis %d",axisID);
-////       return -4;
-////    }
-////    
-//    if(!TS_DriveInitialisation()){
-//        DERR("failed Low driver initialisation %s",TS_GetLastErrorText());
-//        return -4;
-//    }
-////    
-//    if(providePower()<0){ // che in teoria non ci andrebbe qui dentro...
-//        DERR("failed power providing %s,", TS_GetLastErrorText());// failed power providing Send message timeout.
-//        return -5;
-//    }
-//    
-////    if((my_channel->open()<0)){
-////         DERR("error opening channel");
-////         return -2;
-////    }
-//     /*	Execute the initialization of the drive (ENDINIT) */
-//    
-////    sleep(2);
-////    
-////    if(!TS_SetupAxis(axisID, axisRef)){
-////        DERR("failed to setup axis %d",axisID);
-////        return -15;
-////    }
-////    
-////    if(!TS_SelectAxis(axisID)){
-////        DERR("failed to select axis %d",axisID);
-////        return -4;
-////    }
-//    
-//    // SET THE SERIAL COMMUNICATION BAUD RATE TO 9600. AFTER RESET THE DRIVE COMMUNICATES USING 9600 BPS
-//    //....................
-//    //....................
-//    //....................
-//    
-//    // RESTORE THE SERIAL COMMUNICATIONE BAUD RATE
-//    //....................
-//    //....................
-//    //....................
-//    
-//    // Settare il registro per la lettura dell'encoder
-////    if(!TS_Execute("SCR=0x4338")){
-////        //descrErr=descrErr+" "+TS_GetLastErrorText()+". ";
-////        DERR("Failed TS_Execute command");
-////        return -17;
-////    }
-////    
-////    if(!TS_DriveInitialisation()){
-////        DERR("failed Low driver initialisation: %s",TS_GetLastErrorText());
-////        return -5;
-////    }
-//    
-//    return -6;
-//}
-
 /*****************************************************************/
 /*****************************************************************/
  void SerialCommChannelTechnosoft::PrintChannel()
@@ -1390,10 +1834,3 @@ int getHoming2Procedure();
 }
 /*****************************************************************/
  int  SerialCommChannelTechnosoft::getFD() {return this->fd;}
- 
- 
-
- 
- 
- 
- 

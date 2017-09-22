@@ -44,24 +44,31 @@
 #define BAUDRATE	115200                              //(da MDS)
 
 // Features of trapezoidal speed profile
-#define SPEED_DEFAULT 400.0 // 30.0  [mm/s] 
-#define ACCELERATION_DEFAULT 0.6 // 0.6 [mm/s^2]     
-#define MAX_SPEED_DEFAULT 500.0    // [mm/s]              (da MDS) 
-#define MAX_ACCELERATION_DEFAULT 2.0   // [mm/s]          (da MDS)
-
+#define SPEED_DEFAULT 0.3      //     [mm/s]     (50.0 [IU]) 
+#define ACCELERATION_DEFAULT 1.373 //    [mm/s2]    ( 0.6  [IU])     
+#define MAX_SPEED_DEFAULT 0.824  //      [mm/s]    (450.0 [IU])             
+#define MAX_ACCELERATION_DEFAULT 4.577 //[mm/s2]     (2.0 [IU])     
 // Features of homing procedure
-#define HIGH_SPEED_HOMING_DEFAULT 10.0 // [mm/s]
-#define MAX_HIGHSPEED_HOMING_DEFAULT 15.0 // [mm/s]       (da MDS)
-#define LOW_SPEED_HOMING_DEFAULT 1.0 // [mm/s]
-#define MAXLOW_SPEED_HOMING_DEFAULT 3.0 // [mm/s]         (da MDS)
-#define ACCELERATION_HOMING_DEFAULT 0.3 //[mm/s^2]
-#define MAX_ACCELERATION_HOMING_DEFAULT 0.6 // [mm/s^2]   (da MDS)
+#define HIGH_SPEED_HOMING_DEFAULT 0.2  // [mm/s]    (10.0 [IU])          
+#define MAX_HIGHSPEED_HOMING_DEFAULT 0.5 // [mm/s]  (15.0 [IU])
+#define LOW_SPEED_HOMING_DEFAULT 0.002   // [mm/s]     (1.0 [IU])
+#define MAXLOW_SPEED_HOMING_DEFAULT 0.006 //[mm/s]     (3.0 [IU])
+#define ACCELERATION_HOMING_DEFAULT 0.687 //[mm/s2]    (0.3 [IU])
+#define MAX_ACCELERATION_HOMING_DEFAULT 1.372 // [mm/s2]    (0.6 [IU])
 
 #define N_ENCODER_LINES_DEFAULT 800.0     // numero linee encoder                                     (da MDS)
 #define CONST_MULT_TECHNOFT_DEFAULT 256.0 // numero micro steps per step                              (da MDS)
 #define STEPS_PER_ROUNDS_DEFAULT 200.0     // numero steps per giro                                   (da MDS)
 #define N_ROUNDS_DEFAULT 20.0              // numero giri per effettuare 1.5 mm (spostamento lineare) (da MDS)
 #define LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT 1.5 //[mm] 
+#define CONVERSION_FACTOR_DEG_UI 8.789 //[mm]
+#define CONVERSION_FACTOR_DEGs2_UI 10986 //[mm]
+//#define REDUCTION_FACTOR 13.3333333333
+#define FULLSCALE_POTENTIOMETER 20.0
+#define V_LNS 7.7 //[V]
+#define V_LSP 0.3 //[V]
+#define RANGE 1 //[m]
+#define HARD_RESET_MODE_DEFAULT false //[m]
 
 #include <map>
 //#include <boost/shared_ptr.hpp>
@@ -71,23 +78,23 @@ namespace common{
     namespace actuators{
        namespace models {
            
-           class ElectricPowerException{
-                public:
-                    ElectricPowerException(){}
-                    void badElectricPowerInfo();
-           };
-           
-           class StopMotionException{
-                public:
-                    StopMotionException(){}
-                    void badStopMotionInfo();
-           };
-           
-           class OpeningChannelException{
-                public:
-                    OpeningChannelException(){}
-                    void badOpeningChannelInfo();
-           };
+//           class ElectricPowerException{
+//                public:
+//                    ElectricPowerException(){}
+//                    void badElectricPowerInfo();
+//           };
+//           
+//           class StopMotionException{
+//                public:
+//                    StopMotionException(){}
+//                    void badStopMotionInfo();
+//           };
+//           
+//           class OpeningChannelException{
+//                public:
+//                    OpeningChannelException(){}
+//                    void badOpeningChannelInfo();
+//           };
            
 	    //Channel class
             class SerialCommChannelTechnosoft{
@@ -122,6 +129,8 @@ namespace common{
                 
                 std::string devName;
                 
+                bool controlLNS;
+                
                 double n_encoder_lines; 
                 double const_mult_technsoft; 
                 double steps_per_rounds;    
@@ -129,27 +138,49 @@ namespace common{
                 double linear_movement_per_n_rounds;
                 
                 // Trapezoidal profile parameters for move relative and move absolute
-                double speed_mm_s;
-                double maxSpeed_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double acceleration_mm_s2;
-                double maxAcceleration_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                //double speed_mm_s;
+                double speed_IU; //    [IU]  
+                double maxSpeed_IU; // [IU] 
+                double acceleration_IU;
+                double maxAcceleration_IU; 
                 BOOL isAdditive;
                 short movement;
                 short referenceBase;
                 
                 // Speed parameters regarding homing procedure
-                double highSpeedHoming_mm_s; // The homing travel speed
-                double lowSpeedHoming_mm_s;
-                double maxHighSpeedHoming_mm_s; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double maxLowSpeedHoming_mm_s;   // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
-                double accelerationHoming_mm_s2;
-                double maxAccelerationHoming_mm_s2; // VALORE CHE UNA VOLA INIZIALIZZATO, NON PUO' ESSERE PIU CAMBIATO
+                double highSpeedHoming_IU; // The homing travel speed
+                double lowSpeedHoming_IU;
+                double maxHighSpeedHoming_IU; 
+                double maxLowSpeedHoming_IU;   
+                double accelerationHoming_IU;
+                double maxAccelerationHoming_IU; 
                 BOOL isAdditiveHoming;
                 short movementHoming;
                 short referenceBaseHoming;
                 
+                double voltage_LNS; //[V]
+                double voltage_LPS; //[V]
+                double range;
+                double fullScalePot;
+                double constantPot;
+                
+                struct timeval lastTimeTakenForHoming;
+                double minimumIntervalForHoming; // in seconds
+                
+                bool hardResetMode;
+		bool useUI;
+                
+                
+                
                 //bool controlledInitialPositionHoming; 
                 //double epsylon;
+//                int stateHoming0;
+//                int stateHoming1;
+//                int stateHoming2;
+//                int stateHoming3;
+//                int stateHoming4;
+//                int stateHoming5;
+                long cap_position;
                 
             public:
                 int internalHomingStateDefault; // N.B. Per ragioni di efficienza questo membro e' utile che rimanga pubblico
@@ -157,36 +188,11 @@ namespace common{
                 
                 bool readyState;
                  
-                // Additional parameters for s-curve profile
-                //long jerkTime;
-                //short decelerationType;
-                
-                //char setupFilePath[200];
-                
-                // ************** cosa rappresentano queste tre variabili? ***************
-                //int absoluteSteps;// contatore software
-                //int status_register;// Reg_MER
-                //int error_register; 
-                
-                //Encoder parameter
-                //int encoderLines; // (passato da MDS)
-//                typedef boost::shared_ptr< SerialCommChannelTechnosoft > channel_psh;
-//                channel_psh my_channel;
-//                typedef std::map<std::string,channel_psh> channel_map_t;
-                
-                //static channel_map_t channels; // gli oggetti TechnoSoftLowDriver condivideranno una struttura dati map,
-                                              // percio e dichiarata di tipo static
-                
-                //bool alreadyopenedChannel;  // Canale di comunicazione aperto
-                //bool poweron; // alimentazione al drive motor erogata
-                //bool channelJustOpened;
-                
                 // Transition parameters
                 
             public:
                 // Costruttore device channel and device name
                 TechnoSoftLowDriver();
-                // *************ATTENZIONE, DICHIARARE IL METODO DISTRUTTORE******************** 
                 ~TechnoSoftLowDriver();
                 // Inizializzazione singolo drive/motor
                 int init(const std::string& setupFilePath,
@@ -211,13 +217,27 @@ namespace common{
                         const double _const_mult_technsoft=CONST_MULT_TECHNOFT_DEFAULT, 
                         const double _steps_per_rounds=STEPS_PER_ROUNDS_DEFAULT,    
                         const double _n_rounds=N_ROUNDS_DEFAULT,            
-                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT);
+                        const double _linear_movement_per_n_rounds=LINEAR_MOVEMENT_PER_N_ROUNDS_DEFAULT,
+                        const double voltage_LNS = V_LNS, //[V]
+                        const double voltage_LPS = V_LSP, //[V]
+                        const double range = RANGE,  //[meter]
+                        const double fullScalePot = FULLSCALE_POTENTIOMETER //[V] 
+                        );
+                double speedfromMMsToIU(double _speed_mm_s);
+                double speedfromIUTOMMs(double _speed_IU);
+                double accelerationfromMMs2ToIU(double _acceleration_mm_s2);
+                double accelerationfromIUToMMs2(double _acceleration_IU);
+ 
+                //double speedfromIUTOMMs(double _speed_IU);
+                //double accelerationfromIUToMMs(double _acceleration_IU);
+                
                 
                 int homing(int mode);
                 
                 int getinternalHomingStateDefault();
                 int getinternalHomingStateHoming2();
                 
+                int getEmergency(BYTE nIO, BYTE& inValue, std::string& descrErr);
 
                 int providePower();
                 int stopPower();
@@ -230,43 +250,81 @@ namespace common{
                 
                 // Set trapezoidal profile parameters
                 int setSpeed(const double& speed);
-                int setMaxSpeed(const double& maxspeed);
-                int setAcceleration(const double& acceleration);
-                int setMaxAcceleration(const double& maxAcceleration);
-                int setAdditive(const BOOL& isAdditive);
-                int setMovement(const short& movement);
-                int setReferenceBase(const short& referenceBase);
-                //Get methods
                 int getSpeed(double& speed);
-                  
-                int getHighSpeedHoming(double& _highSpeedHoming);
+                
+                int setMaxSpeed(const double& maxspeed);
+                int getMaxSpeed(double& maxspeed);
+                
+                int setAcceleration(const double& acceleration);
+                int getAcceleration(double& acceleration);
+                
+                int setMeasureUnit(const bool& inSteps);
+                int setMaxAcceleration(const double& maxAcceleration);
+                int getMaxAcceleration(double& maxAcceleration);
 
+                int setAdditive(const BOOL& isAdditive);
+                int getAdditive(BOOL& isAdditive);
+
+                int setMovement(const short& movement);
+                int getMovement(short& movement);
+                
+                int setReferenceBase(const short& referenceBase);
+                int getReferenceBase(short& referenceBase);
+                
                 //Set homing parameters
                 int sethighSpeedHoming(const double& _highSpeedHoming_mm_s);
-                int setMaxhighSpeedHoming(const double& _speed);
-                int setlowSpeedHoming(const double& _lowSpeedHoming_mm_s);
-                int setMaxlowSpeedHoming(const double& speed);
-                int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
-                int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
-                int setAdditiveHoming(const BOOL& isAdditive);
-                int setMovementHoming(const short& movement);
-                int setReferenceBaseHoming(const short& referenceBase);
+                int getHighSpeedHoming(double& _highSpeedHoming);
                 
-                int setConst_mult_technsoft(double& _const_mult_technsoft);
-                int setSteps_per_rounds(double& _steps_per_rounds);
-                int setN_rounds(double& _n_rounds);
-                int setLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
-                int setEncoderLines(double& _encoderLines);
+                int setMaxhighSpeedHoming(const double& _speed);
+                int getMaxhighSpeedHoming(double& _speed);
+                
+                int setlowSpeedHoming(const double& _lowSpeedHoming_mm_s);
+                int getlowSpeedHoming(double& _lowSpeedHoming_mm_s);
+                
+                int setMaxlowSpeedHoming(const double& speed);
+                int getMaxlowSpeedHoming(double& _lowSpeedHoming_mm_s);
+                
+                int setaccelerationHoming(const double& _accelerationHoming_mm_s2);
+                int getaccelerationHoming(double& _accelerationHoming_mm_s2);
+                
+                int setMaxAccelerationHoming(const double& _maxaccelerationHoming_mm_s2);
+                int getMaxAccelerationHoming(double& _maxaccelerationHoming_mm_s2);
+                           
+                int setConst_mult_technsoft(const double& _const_mult_technsoft);
+                int getConst_mult_technsoft(double& _const_mult_technsoft);
+                
+                int setSteps_per_rounds(const double& _steps_per_rounds);
+                int getSteps_per_rounds(double& _steps_per_rounds);
+                
+                int setN_rounds(const double& _n_rounds);
+                int getN_rounds(double& _n_rounds);
+                
+                int setLinear_movement_per_n_rounds(const double& _linear_movement_per_n_rounds);
+                int getLinear_movement_per_n_rounds(double& _linear_movement_per_n_rounds);
+                
+                int setEncoderLines(const double& _encoderLines);
+                int getEncoderLines(double& _encoderLines);
+                
+                int setFullscalePot(const double& _fullScale);
+                int getFullscalePot(double& _fullScale);
                 
                 //Encoder lines
 
-                int moveAbsoluteSteps(const long& position) const;
+                int moveAbsoluteSteps(const long& position);
                 int moveAbsoluteStepsHoming(const long& position) const;
+                int setvoltage_LNS(const double& _voltage_LNS);
+                int getvoltage_LNS(double& _voltage_LNS);
                 
+                int setvoltage_LPS(const double& _voltage_LPS);
+                int getvoltage_LPS(double& _voltage_LNS);
+                
+                int setRange(const double& _range);
+                int getRange(double& _range);
                 // get methods for variables
                 //channel_psh getMyChannel();
                 int getCounter(double* deltaPosition_mm);
                 int getEncoder(double* deltaPosition_mm);
+                int getPotentiometer(double* voltage);
                 // resetting methos
                 int resetCounter();// reset TPOS_register();
                 int resetEncoder();// reset APOS_register();
@@ -289,6 +347,8 @@ namespace common{
                 int getLVariable(std::string& nameVar, long& var);
                 
                 int checkEvent(BOOL& event);
+                
+                int hardreset(bool mode=HARD_RESET_MODE_DEFAULT);
                 
                 int getStatusOrErrorReg(const short& regIndex, WORD& contentRegister, std::string& descrErr);
 

@@ -40,6 +40,7 @@ namespace common{
                     SerialCommChannelTechnosoft *channel;  
                     
                     static std::map<int,TechnoSoftLowDriver *> motors;
+                    pthread_mutex_t mu;
                 
                 public:
                     
@@ -97,6 +98,10 @@ namespace common{
                     int getState(int axisID,int* state, std::string& desc );                 // *******OK********
                     int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);           // *******OK********
                     uint64_t getFeatures(){return 0;}
+                    
+                    int hardreset(int axisID,bool mode);
+                    
+                    int getParameter(int axisID,std::string parName,std::string& resultString);
      
         /**
         @brief get the actuator position using the readingType mode chosen for reading
