@@ -1789,7 +1789,7 @@ int TechnoSoftLowDriver::moveAbsolutePosition(){
 
     }
     DPRINT("Putting actuatorIDInMotion(%d) to false. stopMotionCommand is %d",actuatorIDInMotion,stopMotionCommand);
-    DPRINT("position is %d, absolute is  %d tolerance %d",position,absolutePosition,tol); 
+    DPRINT("position is %ld, absolute is  %ld tolerance %ld",position,absolutePosition,tol); 
  
     actuatorIDInMotion = false;
     stopMotionCommand = false;
@@ -1825,7 +1825,7 @@ void* TechnoSoftLowDriver::staticMoveAbsolutePositionForThread(void* objPointer)
 
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
 
-    DPRINT("MoveAbsoluteSteps called with %d",absPosition);
+    DPRINT("MoveAbsoluteSteps called with %ld",absPosition);
     if(pthread_mutex_lock(&(mu))!=0){
 
     }
@@ -2635,6 +2635,7 @@ int TechnoSoftLowDriver::faultsGeneration(){
 
         usleep(1000000); 
     }
+    return 0;
 }
 
 void* TechnoSoftLowDriver::staticFaultsGeneration(void* objPointer){
