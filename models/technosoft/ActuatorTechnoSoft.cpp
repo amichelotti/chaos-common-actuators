@@ -19,7 +19,9 @@
 #include <functional> 
 #include <cctype>
 #include <locale>         // std::locale, std::toupper
-#include <json/json.h>
+#ifdef CHAOS
+#include <common/misc/driver/ConfigDriverMacro.h>
+#endif
 
 using namespace boost;
 using namespace ::common::actuators::models;
@@ -65,74 +67,60 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale 
 // apertura del canale
 int ActuatorTechnoSoft::init(void*initialization_string){
-    
-//    if(initChannelAlreadyDone){
-//        DPRINT("This object has already a communication channel correctly initialized");
-//        return 0;
-//    }
-    
-    const std::string& params = (const char*)initialization_string;
-    //const std::string& params = "\"porcoddiomarcio\"";
-    //params.assign((const char*)initialization_string);
-    boost::smatch match;
-    bool jsonInitialization = false; 
-    DPRINT("Init actuatorTechnosoft Initialization string %s", params.c_str());
-
-    Json::Value                                 json_parameter;
-    Json::Reader                                json_reader;
-    //parse json string
-    Json::Value json_HostID ; 
-    Json::Value json_btType; 
-    Json::Value json_baudrate; 
-    Json::Value json_device ; 
-    if(!json_reader.parse(params, json_parameter)) 
+#ifdef CHAOS
+    using namespace std;
+if ((initialization_string == NULL) && (this->jsonConfiguration!= NULL))
+{    
     {
-  	DPRINT ( "ALEDEBUG Bad Json parameter ");
-    }
-    else
-    {
-	if (json_parameter.isObject())
+        GET_PARAMETER_TREE((this->jsonConfiguration),channel)
         {
-  	 DPRINT ( "ALEDEBUG good Json parameter: %s ",json_parameter.asString().c_str());
-         json_HostID = json_parameter["HostID"];
-         json_btType = json_parameter["btType"];
-         json_baudrate =  json_parameter["baudrate"];
-         json_device = json_parameter["device"];
-	 if ((!json_HostID.isNull()) && (!json_btType.isNull()) && (!json_baudrate.isNull()) && (!json_device.isNull())  )
-	 {
-		jsonInitialization=true;
-	 }
-	}
-	else
-	{ DPRINT("ALEDEBUG Json param isn't a Json Object"); }
+            GET_PARAMETER(channel,HostID,int32_t,1);
+            GET_PARAMETER(channel,serdev,string,1);
+            GET_PARAMETER(channel,BtType,int32_t,1);
+            GET_PARAMETER(channel,Baudrate,int32_t,1);
+            this->channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
+            if(this->channel==NULL)
+            {
+                ERR("Cannot  init channel because value of channel is NULL");
+                return -2;
+            }
+            if(this->channel->open()<0)
+            {
+                ERR("Cannot  open channel");
+                return -3;
+            }
+           
+        
+            // Inizializzazione mutex
+            pthread_mutex_init(&(mu),NULL);
+            delectingActuator = false;
 
+            return 0;
+            
+            
+            
+        }
     }
-
+} 
+#endif
+    const std::string& params = (const char*)initialization_string;
     
-    if(jsonInitialization || (regex_match(params, match, driver_match1, boost::match_extra)) )
+    boost::smatch match;
+    DPRINT("Init actuatorTechnosoft Initialization string %s", params.c_str());
+    
+    if (regex_match(params, match, driver_match1, boost::match_extra)) 
     {
 	std::string strHostID,strbtType,strbaudrate;
-	if (jsonInitialization==false)
-	{
-         strHostID = match[1]; 
-         hostID = atoi(strHostID.c_str());
-         strbtType = match[2];
-         btType = atoi(strbtType.c_str());
-         strbaudrate = match[3]; 
-         baudrate = atoi(strbaudrate.c_str());
-         dev_name=match[4]; 
-	}
-	else
-	{
-		strHostID=json_HostID.asString();
-         	hostID = atoi(strHostID.c_str());
-		strbtType=json_btType.asString();
-         	btType = atoi(strbtType.c_str());
-		strbaudrate = json_baudrate.asString();
-         	baudrate = atoi(strbaudrate.c_str());
-		dev_name = json_device.asString(); 
-	}
-        
+	
+        strHostID = match[1]; 
+        hostID = atoi(strHostID.c_str());
+        strbtType = match[2];
+        btType = atoi(strbtType.c_str());
+        strbaudrate = match[3]; 
+        baudrate = atoi(strbaudrate.c_str());
+        dev_name=match[4]; 
+	
+
         DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
         
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
@@ -145,8 +133,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
             ERR("Cannot possible open channel");
             return -3;
         }
-       
-        //initChannelAlreadyDone = true;
+           
         
         // Inizializzazione mutex
         pthread_mutex_init(&(mu),NULL);
@@ -154,7 +141,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         
         return 0;
     }
-    ERR("Cannot possible init channel %s",params.c_str());
+    ERR("Cannot init channel %s",params.c_str());
     return -4;
 }
 
@@ -163,7 +150,33 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 
     params.assign((const char*)initialization_string);
     boost::smatch match;
-
+#ifdef CHAOS
+    using namespace std;
+      if (this->jsonConfiguration != NULL)
+      {
+        
+        try
+        {
+            GET_PARAMETER_TREE((this->jsonConfiguration),driver)
+            {
+                GET_PARAMETER(driver,ConfigAxis,int32_t,1);
+                GET_PARAMETER(driver,ConfigFile,string,1);
+                char Container[512];
+                sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
+                params.assign((const char*)Container);
+                
+                DPRINT("Found configuration on json driver initialization info .Overriding input dataset");
+                
+            }
+        }
+        catch (chaos::CException e)
+        {
+            DPRINT("ALEDEBUG: Some exception occurred. Using Configstring");
+        }
+        
+      }
+      
+#endif
     DPRINT("Configuration string %s", params.c_str());
     
     if(regex_match(params, match, driver_match2, boost::match_extra)){

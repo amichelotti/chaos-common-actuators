@@ -29,6 +29,9 @@
 #include <functional>
 #include <cctype>
 #include <locale>         // std::locale, std::toupper
+#ifdef CHAOS
+#include <common/misc/driver/ConfigDriverMacro.h>
+#endif
 
 using namespace boost;
 using namespace ::common::actuators::models::simul;
@@ -81,12 +84,40 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 
 int ActuatorTechnoSoft::init(void*initialization_string){
 
-//    if(initChannelAlreadyDone){
-//        //DPRINT("This object has already a communication channel correctly initialized");
-//        return 0;
-//    }              
+#ifdef CHAOS
+    using namespace std;
+if ((initialization_string == NULL) && (this->jsonConfiguration!= NULL))
+{    
+    {
+        GET_PARAMETER_TREE((this->jsonConfiguration),channel)
+        {
+            GET_PARAMETER(channel,HostID,int32_t,1);
+            GET_PARAMETER(channel,serdev,string,1);
+            GET_PARAMETER(channel,BtType,int32_t,1);
+            GET_PARAMETER(channel,Baudrate,int32_t,1);
+            this->channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
+            if(this->channel==NULL)
+            {
+                ERR("Cannot  init channel because value of channel is NULL");
+                return -2;
+            }
+            if(this->channel->open()<0)
+            {
+                ERR("Cannot  open channel");
+                return -3;
+            }
+           
+        
+           
 
-    //DPRINT("******** CIAO QUESTA E' LA VERSIONE GIUSTA DI INIT", params.c_str());
+            return 0;
+            
+            
+            
+        }
+    }
+} 
+#endif
     
     
     std::string params;
@@ -128,6 +159,36 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 
     params.assign((const char*)initialization_string);
     boost::smatch match;
+    #ifdef CHAOS
+    using namespace std;
+      if (this->jsonConfiguration != NULL)
+      {
+        
+        try
+        {
+            GET_PARAMETER_TREE((this->jsonConfiguration),driver)
+            {
+                GET_PARAMETER(driver,ConfigAxis,int32_t,1);
+                GET_PARAMETER(driver,ConfigFile,string,1);
+                char Container[512];
+                sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
+                params.assign((const char*)Container);
+                
+                DPRINT("Found configuration on json driver initialization info .Overriding input dataset");
+                
+            }
+        }
+        catch (chaos::CException e)
+        {
+            DPRINT("ALEDEBUG: Some exception occurred. Using Configstring");
+        }
+        
+      }
+      
+#endif
+    
+    
+    
 
     //DPRINT("Configuration string %s", params.c_str());
 
