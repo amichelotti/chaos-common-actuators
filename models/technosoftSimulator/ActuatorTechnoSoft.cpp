@@ -338,7 +338,7 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
-
+    free(this->jsonConfiguration);
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
