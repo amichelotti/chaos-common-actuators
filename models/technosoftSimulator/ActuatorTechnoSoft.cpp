@@ -219,6 +219,40 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             //DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
             //DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            
+            
+            std::string dataset=this->jsonConfiguration->getJSONString().c_str();
+            //DPRINT("ALEDEBUG DATASETVARIABLE getting dataset from driver %s",dataset);
+            Json::Value                                 json_parameter;
+            Json::Reader                                json_reader;
+
+
+            //parse json string
+            if(!json_reader.parse(dataset, json_parameter)) 
+            {
+                DPRINT("Bad Json parameter");
+            }
+            else
+            {
+                DPRINT("Reading json for auxiliary parameters\n");
+                const Json::Value& dataset_description = json_parameter["driver"];
+                for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
+                {
+                    std::string chiave=itr.key().asString();
+                    std::string value=(*itr).asString();
+                   
+                    if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
+                    {
+                        DPRINT("launching set parameter chiave: %s value: %s\n",chiave.c_str(),value.c_str());
+                        val=this->setParameter(axid,chiave,value);
+                        DPRINT("val is %x",val);
+                    
+                    }
+                   
+                }    
+                
+               
+            }
             return 0;
         }
         //DPRINT("Axis id %d è stato già configurato correttamente.", axid
@@ -982,7 +1016,19 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
         resultString.assign(ss.str());
         ss.str(std::string());
         return 0;      
-    }   
+    }
+    else if(strResultparName.compare("USEIU")==0){ 
+        bool iu;
+        if((i->second)->getMeasureUnit(iu)<0){ 
+            return -30;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<iu;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
     else{
         resultString.assign("");
         ss.str(std::string());

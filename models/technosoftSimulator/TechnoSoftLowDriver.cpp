@@ -1494,6 +1494,11 @@ int TechnoSoftLowDriver::setMeasureUnit(const bool& inSteps)
  return 0;
 }
 
+int TechnoSoftLowDriver::getMeasureUnit(bool& inSteps)
+{
+ inSteps=this->useUI;
+ return 0;
+}
 
 int TechnoSoftLowDriver::getN_rounds(double& _n_rounds){
     //DPRINT("Chiamata setN_rounds");
