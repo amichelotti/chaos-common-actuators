@@ -1052,7 +1052,11 @@ int TechnoSoftLowDriver::setMeasureUnit(const bool& inSteps)
  this->useUI=inSteps;
  return 0;
 }
-
+int TechnoSoftLowDriver::getMeasureUnit(bool& inSteps)
+{
+ inSteps=this->useUI;
+ return 0;
+}
 int TechnoSoftLowDriver::setMaxSpeed(const double& _maxspeed_mm_s){
 
     //DPRINT("setMaxSpeed: _maxspeed_mm_s=%f,speed_mm_s=%f",_maxspeed_mm_s,speed_mm_s);

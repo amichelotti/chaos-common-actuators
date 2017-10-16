@@ -259,6 +259,7 @@ namespace common{
                 int getAcceleration(double& acceleration);
                 
                 int setMeasureUnit(const bool& inSteps);
+                int getMeasureUnit(bool& inSteps);
                 int setMaxAcceleration(const double& maxAcceleration);
                 int getMaxAcceleration(double& maxAcceleration);
 
