@@ -43,7 +43,8 @@ namespace common{
                     pthread_mutex_t mu;
                 
                 public:
-                    
+                     
+
                     // costruttore
                     ActuatorTechnoSoft();
                     // Costruttore di copia

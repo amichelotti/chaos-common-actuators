@@ -29,6 +29,9 @@
 #include <functional>
 #include <cctype>
 #include <locale>         // std::locale, std::toupper
+#ifdef CHAOS
+#include <common/misc/driver/ConfigDriverMacro.h>
+#endif
 
 using namespace boost;
 using namespace ::common::actuators::models::simul;
@@ -81,12 +84,40 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 
 int ActuatorTechnoSoft::init(void*initialization_string){
 
-//    if(initChannelAlreadyDone){
-//        //DPRINT("This object has already a communication channel correctly initialized");
-//        return 0;
-//    }              
+#ifdef CHAOS
+    using namespace std;
+if ((initialization_string == NULL) && (this->jsonConfiguration!= NULL))
+{    
+    {
+        GET_PARAMETER_TREE((this->jsonConfiguration),channel)
+        {
+            GET_PARAMETER(channel,HostID,int32_t,1);
+            GET_PARAMETER(channel,serdev,string,1);
+            GET_PARAMETER(channel,BtType,int32_t,1);
+            GET_PARAMETER(channel,Baudrate,int32_t,1);
+            this->channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
+            if(this->channel==NULL)
+            {
+                ERR("Cannot  init channel because value of channel is NULL");
+                return -2;
+            }
+            if(this->channel->open()<0)
+            {
+                ERR("Cannot  open channel");
+                return -3;
+            }
+           
+        
+           
 
-    //DPRINT("******** CIAO QUESTA E' LA VERSIONE GIUSTA DI INIT", params.c_str());
+            return 0;
+            
+            
+            
+        }
+    }
+} 
+#endif
     
     
     std::string params;
@@ -128,6 +159,36 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 
     params.assign((const char*)initialization_string);
     boost::smatch match;
+    #ifdef CHAOS
+    using namespace std;
+      if (this->jsonConfiguration != NULL)
+      {
+        
+        try
+        {
+            GET_PARAMETER_TREE((this->jsonConfiguration),driver)
+            {
+                GET_PARAMETER(driver,ConfigAxis,int32_t,1);
+                GET_PARAMETER(driver,ConfigFile,string,1);
+                char Container[512];
+                sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
+                params.assign((const char*)Container);
+                
+                DPRINT("Found configuration on json driver initialization info .Overriding input dataset");
+                
+            }
+        }
+        catch (chaos::CException e)
+        {
+            DPRINT("ALEDEBUG: Some exception occurred. Using Configstring");
+        }
+        
+      }
+      
+#endif
+    
+    
+    
 
     //DPRINT("Configuration string %s", params.c_str());
 
@@ -158,6 +219,40 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             //DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
             //DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            
+            
+            std::string dataset=this->jsonConfiguration->getJSONString().c_str();
+            //DPRINT("ALEDEBUG DATASETVARIABLE getting dataset from driver %s",dataset);
+            Json::Value                                 json_parameter;
+            Json::Reader                                json_reader;
+
+
+            //parse json string
+            if(!json_reader.parse(dataset, json_parameter)) 
+            {
+                DPRINT("Bad Json parameter");
+            }
+            else
+            {
+                DPRINT("Reading json for auxiliary parameters\n");
+                const Json::Value& dataset_description = json_parameter["driver"];
+                for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
+                {
+                    std::string chiave=itr.key().asString();
+                    std::string value=(*itr).asString();
+                   
+                    if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
+                    {
+                        DPRINT("launching set parameter chiave: %s value: %s\n",chiave.c_str(),value.c_str());
+                        val=this->setParameter(axid,chiave,value);
+                        DPRINT("val is %x",val);
+                    
+                    }
+                   
+                }    
+                
+               
+            }
             return 0;
         }
         //DPRINT("Axis id %d è stato già configurato correttamente.", axid
@@ -277,7 +372,7 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
-
+    free(this->jsonConfiguration);
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
@@ -921,7 +1016,19 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
         resultString.assign(ss.str());
         ss.str(std::string());
         return 0;      
-    }   
+    }
+    else if(strResultparName.compare("USEIU")==0){ 
+        bool iu;
+        if((i->second)->getMeasureUnit(iu)<0){ 
+            return -30;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<iu;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
     else{
         resultString.assign("");
         ss.str(std::string());

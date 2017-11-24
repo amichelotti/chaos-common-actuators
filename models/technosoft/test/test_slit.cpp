@@ -8,7 +8,8 @@
 #include <sstream>
 
 
-#define AXISID_TEST 29
+
+#define AXISID_TEST 14
 
 using namespace common::actuators::models;
 #define USAGE \
@@ -309,12 +310,12 @@ void* function1(void* str){
 
     // INIZIALIZZAZIONE CANALE
     if((ret=OBJ->init((void*)strInit))!=0){
-        DPRINT("*************Cannot init channel. In fact the value returned is %d****************",ret);
+        DPRINT("*************Cannot init channel with (%s) In fact the value returned is %d****************",strInit,ret);
 
     }
     //PROCEDURA DI CONFIGURAZIONE MOTORI, SEMPRE SULLO STESSO OGGETTO !!!
 
-    std::string strConfig = "29,/home/caschera/chaos_bundle/common/actuators/models/technosoft/conf/1setup001.t.zip";
+    std::string strConfig = "14,/home/caschera/chaos_bundle/common/actuators/models/technosoft/conf/1setup001.t.zip";
     if((ret=OBJ->configAxis((void*)strConfig.c_str()))!=0){
         DERR("*************Cannot configure axis. In fact the value returned is %d****************",ret);
         sleep(10);
