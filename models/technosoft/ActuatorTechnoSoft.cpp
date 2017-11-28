@@ -156,14 +156,19 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
       if (this->jsonConfiguration != NULL)
       {
         
+        DPRINT("ALEDEBUG jsonconfiguration not null %s",this->jsonConfiguration->getJSONString().c_str());
         try
         {
             GET_PARAMETER_TREE((this->jsonConfiguration),driver)
             {
+                DPRINT("ALEDEBUG inside getParameterTree");
                 GET_PARAMETER(driver,ConfigAxis,int32_t,1);
+                DPRINT("ALEDEBUG got ConfigAxis");
                 GET_PARAMETER(driver,ConfigFile,string,1);
+                DPRINT("ALEDEBUG got ConfigFile");
                 char Container[512];
                 sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
+                DPRINT("ALEDEBUG After sprintf");
                 params.assign((const char*)Container);
                 
                 DPRINT("Found configuration on json driver initialization info .Overriding input dataset");
@@ -176,6 +181,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         }
         
       }
+	DPRINT("ALEDEBUG jsonconfiguration is null");
       
 #endif
     DPRINT("Configuration string %s", params.c_str());
@@ -352,6 +358,7 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
     free(this->jsonConfiguration);
+    this->jsonConfiguration=NULL;
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
