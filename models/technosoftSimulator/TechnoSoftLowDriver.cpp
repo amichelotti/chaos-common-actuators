@@ -394,13 +394,14 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
-    
     pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
+    DPRINT("ALEDEBUG dopo di pthread create"); 
     
     alarms=(bool)_alarmsPresent;
     durationAlarmsInterval=_alarmsInterval;
     
     controlLNS=true;
+    DPRINT("ALEDEBUG returning OK"); 
     return 0;
 }
 

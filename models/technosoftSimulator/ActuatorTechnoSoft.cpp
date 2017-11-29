@@ -157,15 +157,18 @@ if ((initialization_string == NULL) && (this->jsonConfiguration!= NULL))
 int ActuatorTechnoSoft::configAxis(void*initialization_string){
     std::string params;
 
+    DPRINT("ALEDEBUG: Entered in configAxis simul "); 
     params.assign((const char*)initialization_string);
     boost::smatch match;
     #ifdef CHAOS
     using namespace std;
       if (this->jsonConfiguration != NULL)
       {
-        
+      DPRINT("ALEDEBUG inside jsonConfiguration not null");
+      DPRINT("ALEDEBUG: jsonConfig not null %s",this->jsonConfiguration->getJSONString().c_str() ); 
         try
         {
+       
             GET_PARAMETER_TREE((this->jsonConfiguration),driver)
             {
                 GET_PARAMETER(driver,ConfigAxis,int32_t,1);
@@ -184,13 +187,14 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         }
         
       }
+      else {DPRINT("jsonConfiguration NULL")};
       
 #endif
     
     
     
 
-    //DPRINT("Configuration string %s", params.c_str());
+    DPRINT("Configuration string %s", params.c_str());
 
     if(regex_match(params, match, driver_match2, boost::match_extra)){
 
@@ -209,6 +213,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 return -1;
             }
             int val;
+	    DPRINT("ALEDEBUG before launching init driver");
             if((val=driver->init(conf_path,axid))<0){
                 DPRINT("simulatore: init driver error");
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
@@ -216,44 +221,47 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 driver = NULL;
                 return -2;
             }
-            //DPRINT("Axis id %d configurato correttamente.", axid);
+            DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            //DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
             
-            
-            std::string dataset=this->jsonConfiguration->getJSONString().c_str();
-            //DPRINT("ALEDEBUG DATASETVARIABLE getting dataset from driver %s",dataset);
-            Json::Value                                 json_parameter;
-            Json::Reader                                json_reader;
+            if (this->jsonConfiguration != NULL)
+	    { 
+              std::string dataset=this->jsonConfiguration->getJSONString().c_str();
+              DPRINT("ALEDEBUG DATASETVARIABLE getting dataset from driver %s",dataset.c_str());
+              Json::Value                                 json_parameter;
+              Json::Reader                                json_reader;
 
 
             //parse json string
-            if(!json_reader.parse(dataset, json_parameter)) 
-            {
-                DPRINT("Bad Json parameter");
-            }
-            else
-            {
-                DPRINT("Reading json for auxiliary parameters\n");
-                const Json::Value& dataset_description = json_parameter["driver"];
-                for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
-                {
-                    std::string chiave=itr.key().asString();
-                    std::string value=(*itr).asString();
+              if(!json_reader.parse(dataset, json_parameter)) 
+              {
+                  DPRINT("Bad Json parameter");
+              }
+              else
+              {
+                  DPRINT("Reading json for auxiliary parameters\n");
+                  const Json::Value& dataset_description = json_parameter["driver"];
+                  for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
+                  {
+                      std::string chiave=itr.key().asString();
+                      std::string value=(*itr).asString();
                    
-                    if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
-                    {
-                        DPRINT("launching set parameter chiave: %s value: %s\n",chiave.c_str(),value.c_str());
-                        val=this->setParameter(axid,chiave,value);
-                        DPRINT("val is %x",val);
+                      if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
+                      {
+                          DPRINT("launching set parameter chiave: %s value: %s\n",chiave.c_str(),value.c_str());
+                          val=this->setParameter(axid,chiave,value);
+                          DPRINT("val is %x",val);
                     
-                    }
+                      }
                    
-                }    
+                  }    
                 
-               
-            }
+              return 0; 
+              }
             return 0;
+	  }
+	  return 0;
         }
         //DPRINT("Axis id %d è stato già configurato correttamente.", axid
         DPRINT("simulatore: il motore è già stato configurato");
