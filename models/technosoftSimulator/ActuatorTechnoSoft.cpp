@@ -82,6 +82,17 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale
 // apertura del canale
 
+void trimChar(std::string& str,char rm){
+  std::string::size_type pos = str.find_last_not_of(rm);
+  if(pos != std::string::npos) {
+    str.erase(pos + 1);
+    pos = str.find_first_not_of(rm);
+    if(pos != std::string::npos){
+        str.erase(0, pos);
+        }
+  }
+  else str.erase(str.begin(), str.end());
+}
 int ActuatorTechnoSoft::init(void*initialization_string){
 
 #ifdef CHAOS
@@ -164,7 +175,6 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
     using namespace std;
       if (this->jsonConfiguration != NULL)
       {
-      DPRINT("ALEDEBUG inside jsonConfiguration not null");
       DPRINT("ALEDEBUG: jsonConfig not null %s",this->jsonConfiguration->getJSONString().c_str() ); 
         try
         {
@@ -213,7 +223,6 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 return -1;
             }
             int val;
-	    DPRINT("ALEDEBUG before launching init driver");
             if((val=driver->init(conf_path,axid))<0){
                 DPRINT("simulatore: init driver error");
                 ERR("****************Iipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
@@ -242,10 +251,13 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
               {
                   DPRINT("Reading json for auxiliary parameters\n");
                   const Json::Value& dataset_description = json_parameter["driver"];
+		  int count=0;
                   for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
                   {
                       std::string chiave=itr.key().asString();
-                      std::string value=(*itr).asString();
+                      std::string value=(*itr).toStyledString();
+		      trimChar(value,'"');
+		      //DPRINT("ALEDEBUG value trimmed is  %s",value.c_str()); 
                    
                       if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
                       {
@@ -485,7 +497,7 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     bool boolValue;
     
     DPRINT("Stringa elaborata %s",strResultparName.c_str());
-    
+    DPRINT("Stringa valore %s",strResultparvalue.c_str());
     if(strResultparName.compare("SPEED")==0){ 
         doubleValue = atof(valueOfparName.c_str());
         if((i->second)->setSpeed(doubleValue)<0){
@@ -699,6 +711,8 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     }        
     else if(strResultparName.compare("USEIU")==0){ //Use internal units 
         int intVal= atoi(valueOfparName.c_str());
+	DPRINT("Launching setMeasureUnit with intval %d",intVal);
+
         if((i->second)->setMeasureUnit((bool)intVal)<0){ 
             return -30;
         }

@@ -67,6 +67,18 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
 // quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale 
 // apertura del canale
+void trimChar(std::string& str,char rm){
+  std::string::size_type pos = str.find_last_not_of(rm);
+  if(pos != std::string::npos) {
+    str.erase(pos + 1);
+    pos = str.find_first_not_of(rm);
+    if(pos != std::string::npos){
+        str.erase(0, pos);
+        }
+  }
+  else str.erase(str.begin(), str.end());
+}
+
 int ActuatorTechnoSoft::init(void*initialization_string){
 #ifdef CHAOS
     using namespace std;
@@ -168,7 +180,6 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 DPRINT("ALEDEBUG got ConfigFile");
                 char Container[512];
                 sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
-                DPRINT("ALEDEBUG After sprintf");
                 params.assign((const char*)Container);
                 
                 DPRINT("Found configuration on json driver initialization info .Overriding input dataset");
@@ -223,7 +234,6 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
             DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
             std::string dataset=this->jsonConfiguration->getJSONString().c_str();
-            //DPRINT("ALEDEBUG DATASETVARIABLE getting dataset from driver %s",dataset);
             Json::Value                                 json_parameter;
             Json::Reader                                json_reader;
 
@@ -240,7 +250,10 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
                 for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
                 {
                     std::string chiave=itr.key().asString();
-                    std::string value=(*itr).asString();
+    		    std::string value=(*itr).toStyledString();
+                    trimChar(value,'"');
+                    //DPRINT("ALEDEBUG value trimmed is  %s",value.c_str());
+
                    
                     if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
                     {
