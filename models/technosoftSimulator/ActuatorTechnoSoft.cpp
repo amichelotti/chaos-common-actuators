@@ -29,9 +29,10 @@
 #include <functional>
 #include <cctype>
 #include <locale>         // std::locale, std::toupper
-#ifdef CHAOS
 #include <common/misc/driver/ConfigDriverMacro.h>
-#endif
+#include <chaos/common/data/CDataWrapper.h>
+
+
 
 using namespace boost;
 using namespace ::common::actuators::models::simul;

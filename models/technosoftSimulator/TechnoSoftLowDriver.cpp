@@ -1,6 +1,7 @@
 #include "TechnoSoftLowDriver.h"
 #include <common/debug/core/debug.h>
 #include <iostream>
+#include <sys/time.h>
 
 using namespace common::actuators::models::simul;
 
@@ -282,7 +283,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
 //        DERR("LoadSetup failed \"%s\"",setupFilePath.c_str());
 //        return -24;
 //    }
-    std::srand(std::time(0)); // Inizializza generatore numeri pseudo-casuali
+    std::srand(time(0)); // Inizializza generatore numeri pseudo-casuali
     
     
     if(_probabilityError<0 || _probabilityError>1)
@@ -361,7 +362,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     deltaPosition=0;
     cap_position=0;
 
-    generator.seed(std::time(0)); // seed with the current time
+    generator.seed(time(0)); // seed with the current time
 
     // ********* Info/Alarms request *********
     stateInfoRequest = false;
