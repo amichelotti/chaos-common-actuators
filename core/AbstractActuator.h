@@ -28,14 +28,7 @@
 #ifndef ACTUATORS_DEFAULT_TIMEOUT
 #define ACTUATORS_DEFAULT_TIMEOUT 1000
 #endif
-
-namespace chaos {
-  namespace common{
-    namespace data{
-      class CDataWrapper;
-    }
-  }
-}
+#include <chaos/common/data/CDataWrapper.h>
 
 
 
@@ -107,7 +100,7 @@ typedef enum {
 
         public:
 
-        chaos::common::data::CDataWrapper*  jsonConfiguration=NULL;
+        chaos::common::data::CDataWrapper  jsonConfiguration;
 
         AbstractActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
         virtual ~AbstractActuator() {};

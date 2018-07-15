@@ -98,10 +98,9 @@ int ActuatorTechnoSoft::init(void*initialization_string){
 
 #ifdef CHAOS
     using namespace std;
-if ((initialization_string == NULL) && (this->jsonConfiguration!= NULL))
-{    
+if (initialization_string == NULL) {    
     {
-        GET_PARAMETER_TREE((this->jsonConfiguration),channel)
+        GET_PARAMETER_TREE((&jsonConfiguration),channel)
         {
             GET_PARAMETER(channel,HostID,int32_t,1);
             GET_PARAMETER(channel,serdev,string,1);
@@ -174,13 +173,13 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
     boost::smatch match;
     #ifdef CHAOS
     using namespace std;
-      if (this->jsonConfiguration != NULL)
+      if (1)
       {
-      DPRINT("ALEDEBUG: jsonConfig not null %s",this->jsonConfiguration->getJSONString().c_str() ); 
+      DPRINT("ALEDEBUG: jsonConfig not null %s",jsonConfiguration.getJSONString().c_str() ); 
         try
         {
        
-            GET_PARAMETER_TREE((this->jsonConfiguration),driver)
+            GET_PARAMETER_TREE((&jsonConfiguration),driver)
             {
                 GET_PARAMETER(driver,ConfigAxis,int32_t,1);
                 GET_PARAMETER(driver,ConfigFile,string,1);
@@ -235,9 +234,9 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
             DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
             
-            if (this->jsonConfiguration != NULL)
+            if (1)
 	    { 
-              std::string dataset=this->jsonConfiguration->getJSONString().c_str();
+              std::string dataset=jsonConfiguration.getJSONString().c_str();
               DPRINT("ALEDEBUG DATASETVARIABLE getting dataset from driver %s",dataset.c_str());
               Json::Value                                 json_parameter;
               Json::Reader                                json_reader;
@@ -393,8 +392,6 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
-    free(this->jsonConfiguration);
-    this->jsonConfiguration=NULL;
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
