@@ -232,7 +232,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %Ld",axid,motors.size());
             std::string dataset=jsonConfiguration.getJSONString().c_str();
             Json::Value                                 json_parameter;
             Json::Reader                                json_reader;
