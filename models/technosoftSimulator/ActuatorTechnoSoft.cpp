@@ -1547,8 +1547,7 @@ int ActuatorTechnoSoft::getAlarms(int axisID, uint64_t *alrm, std::string &descS
     uint16_t contentRegMER; // remember typedef uint16_t WORD;
     uint16_t contentRegSRH;
 
-    if ((i->second)->selectAxis() < 0)
-    {
+    if ((i->second == NULL)||((i->second)->selectAxis() < 0)){
         return -2;
     }
 
