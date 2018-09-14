@@ -105,19 +105,21 @@ int ActuatorTechnoSoft::init(void *initialization_string)
     if (initialization_string == NULL)
     {
         {
-            GET_PARAMETER_TREE((&jsonConfiguration), channel)
+            GET_PARAMETER_TREE((&jsonConfiguration), channel_config)
             {
-                GET_PARAMETER(channel, HostID, int32_t, 1);
-                GET_PARAMETER(channel, serdev, string, 1);
-                GET_PARAMETER(channel, BtType, int32_t, 1);
-                GET_PARAMETER(channel, Baudrate, int32_t, 1);
-                this->channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
-                if (this->channel == NULL)
+                GET_PARAMETER(channel_config, HostID, int32_t, 1);
+                GET_PARAMETER(channel_config, serdev, string, 1);
+                GET_PARAMETER(channel_config, BtType, int32_t, 1);
+                GET_PARAMETER(channel_config, Baudrate, int32_t, 1);
+                if(channel==NULL){
+                    channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
+                }
+                if (channel == NULL)
                 {
                     ERR("Cannot  init channel because value of channel is NULL");
                     return -2;
                 }
-                if (this->channel->open() < 0)
+                if (channel->open() < 0)
                 {
                     ERR("Cannot  open channel");
                     return -3;
@@ -149,7 +151,9 @@ int ActuatorTechnoSoft::init(void *initialization_string)
         //DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
 
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
-        channel = new (std::nothrow) SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
+        if(channel==NULL){
+            channel = new (std::nothrow) SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
+        }
         if (channel == NULL)
         {
             return -2;
@@ -236,7 +240,7 @@ int ActuatorTechnoSoft::configAxis(void *initialization_string)
             }
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int, TechnoSoftLowDriver *>(axid, driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d", axid, motors.size());
+            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %lu", axid, motors.size());
 
             if (1)
             {
