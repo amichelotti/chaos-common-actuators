@@ -43,7 +43,7 @@ static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 static const boost::regex driver_match2("(\\d+),(.+)");
 //(([1-9][0-9]*\\.?[0-9]*)|(\\.[0-9]+))([Ee][+-]?[0-9]+)?
 
-std::map<int, TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
+//std::map<int, TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
 ActuatorTechnoSoft::ActuatorTechnoSoft()
 {
