@@ -26,15 +26,15 @@
 
 using namespace boost;
 using namespace ::common::actuators::models;
-        
+
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
-      
+
 
 static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
 static const boost::regex driver_match2("(\\d+),(.+)");
 
-std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
+//std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     //driver=NULL;
@@ -44,7 +44,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    // show content:                       
+    // show content:           
     DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
