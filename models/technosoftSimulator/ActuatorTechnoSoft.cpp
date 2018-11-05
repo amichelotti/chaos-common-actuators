@@ -261,12 +261,28 @@ int ActuatorTechnoSoft::configAxis(void *initialization_string)
                     int count = 0;
                     for (Json::ValueIterator itr = dataset_description.begin(); itr != dataset_description.end(); itr++)
                     {
+                         std::string chiave = itr.key().asString();
+                        std::string value = (*itr).toStyledString();
+                        trimChar(value, '"');
+                        if (chiave == "useIU") 
+                        {
+                            DPRINT("launching set parameter on USEIU at start. Value: %s\n", chiave.c_str(), value.c_str());
+                            val = this->setParameter(axid, chiave, value);
+                            DPRINT("val is %x", val);
+                        }
+                    }
+
+
+
+
+                    for (Json::ValueIterator itr = dataset_description.begin(); itr != dataset_description.end(); itr++)
+                    {
                         std::string chiave = itr.key().asString();
                         std::string value = (*itr).toStyledString();
                         trimChar(value, '"');
                         //DPRINT("ALEDEBUG value trimmed is  %s",value.c_str());
 
-                        if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
+                        if ((chiave != "ConfigAxis") && (chiave != "ConfigFile") && (chiave != "useIU"))
                         {
                             DPRINT("launching set parameter chiave: %s value: %s\n", chiave.c_str(), value.c_str());
                             val = this->setParameter(axid, chiave, value);
@@ -524,8 +540,13 @@ int ActuatorTechnoSoft::setParameter(int axisID, std::string parName, std::strin
 
     DPRINT("Stringa elaborata %s", strResultparName.c_str());
     DPRINT("Stringa valore %s", strResultparvalue.c_str());
+
+
     if (strResultparName.compare("SPEED") == 0)
     {
+        bool gg;
+        (i->second)->getMeasureUnit(gg);
+        DPRINT("ALEDEBUGGGGONE use steps %d",gg);
         doubleValue = atof(valueOfparName.c_str());
         if ((i->second)->setSpeed(doubleValue) < 0)
         {
@@ -647,29 +668,7 @@ int ActuatorTechnoSoft::setParameter(int axisID, std::string parName, std::strin
         }
         return 0;
     }
-    //    else if(strResultparName.compare("ISADDITIVEHOMING")==0){
-    //        // Conversion from string to bool
-    //        //boolValue = to_bool(valueOfparName);
-    //        intValue = atoi(valueOfparName.c_str());
-    //        if((i->second)->setAdditiveHoming(intValue)<0){
-    //            return -14;
-    //        }
-    //        return 0;
-    //    }
-    //    else if(strResultparName.compare("MOVEMENTHOMING")==0){
-    //        intValue = atoi(valueOfparName.c_str());
-    //        if((i->second)->setMovementHoming((short)intValue)<0){
-    //            return -15;
-    //        }
-    //        return 0;
-    //    }
-    //    else if(strResultparName.compare("REFERENCEBASEHOMING")==0){
-    //        intValue = atoi(valueOfparName.c_str());
-    //        if((i->second)->setReferenceBaseHoming((short)intValue)<0){
-    //            return -16;
-    //        }
-    //        return 0;
-    //    }//_________________________________________________________________________
+    
     else if (strResultparName.compare("NUMENCODERLINES") == 0)
     {
         doubleValue = atof(valueOfparName.c_str());
@@ -1184,6 +1183,7 @@ int ActuatorTechnoSoft::getParameter(int axisID, std::string parName, std::strin
         }
         // 1. Conversione valore numerico ---> Stringa
         ss << iu;
+        
         // 2. resultString =  nuova_stringa_convertita
         resultString.assign(ss.str());
         ss.str(std::string());
