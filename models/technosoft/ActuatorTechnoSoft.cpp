@@ -85,12 +85,12 @@ int ActuatorTechnoSoft::init(void*initialization_string){
     if ((initialization_string == NULL) )
 {    
     {
-        GET_PARAMETER_TREE((&jsonConfiguration),channel)
+        GET_PARAMETER_TREE((&jsonConfiguration),driver_config)
         {
-            GET_PARAMETER(channel,HostID,int32_t,1);
-            GET_PARAMETER(channel,serdev,string,1);
-            GET_PARAMETER(channel,BtType,int32_t,1);
-            GET_PARAMETER(channel,Baudrate,int32_t,1);
+            GET_PARAMETER(driver_config,HostID,int32_t,1);
+            GET_PARAMETER(driver_config,serdev,string,1);
+            GET_PARAMETER(driver_config,BtType,int32_t,1);
+            GET_PARAMETER(driver_config,Baudrate,int32_t,1);
             this->channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
             if(this->channel==NULL)
             {
@@ -171,12 +171,12 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         DPRINT("ALEDEBUG jsonconfiguration not null %s",jsonConfiguration.getJSONString().c_str());
         try
         {
-            GET_PARAMETER_TREE((&jsonConfiguration),driver)
+            GET_PARAMETER_TREE((&jsonConfiguration),device_config)
             {
                 DPRINT("ALEDEBUG inside getParameterTree");
-                GET_PARAMETER(driver,ConfigAxis,int32_t,1);
+                GET_PARAMETER(device_config,ConfigAxis,int32_t,1);
                 DPRINT("ALEDEBUG got ConfigAxis");
-                GET_PARAMETER(driver,ConfigFile,string,1);
+                GET_PARAMETER(device_config,ConfigFile,string,1);
                 DPRINT("ALEDEBUG got ConfigFile");
                 char Container[512];
                 sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
@@ -246,7 +246,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             else
             {
                 DPRINT("Reading json for auxiliary parameters\n");
-                const Json::Value& dataset_description = json_parameter["driver"];
+                const Json::Value& dataset_description = json_parameter["device_config"];
                 for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
                 {
                     std::string chiave=itr.key().asString();
