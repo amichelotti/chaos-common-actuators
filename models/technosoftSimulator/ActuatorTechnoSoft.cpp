@@ -105,12 +105,12 @@ int ActuatorTechnoSoft::init(void *initialization_string)
     if (initialization_string == NULL)
     {
         {
-            GET_PARAMETER_TREE((&jsonConfiguration), driver_config)
+            GET_PARAMETER_TREE((&jsonConfiguration), driver_param)
             {
-                GET_PARAMETER(driver_config, HostID, int32_t, 1);
-                GET_PARAMETER(driver_config, serdev, string, 1);
-                GET_PARAMETER(driver_config, BtType, int32_t, 1);
-                GET_PARAMETER(driver_config, Baudrate, int32_t, 1);
+                GET_PARAMETER(driver_param, HostID, int32_t, 1);
+                GET_PARAMETER(driver_param, serdev, string, 1);
+                GET_PARAMETER(driver_param, BtType, int32_t, 1);
+                GET_PARAMETER(driver_param, Baudrate, int32_t, 1);
                 if(channel==NULL){
                     channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
                 }
@@ -185,10 +185,10 @@ int ActuatorTechnoSoft::configAxis(void *initialization_string)
         try
         {
 
-            GET_PARAMETER_TREE((&jsonConfiguration), device_config)
+            GET_PARAMETER_TREE((&jsonConfiguration), device_param)
             {
-                GET_PARAMETER(device_config, ConfigAxis, int32_t, 1);
-                GET_PARAMETER(device_config, ConfigFile, string, 1);
+                GET_PARAMETER(device_param, ConfigAxis, int32_t, 1);
+                GET_PARAMETER(device_param, ConfigFile, string, 1);
                 char Container[512];
                 sprintf(Container, "%d,%s", ConfigAxis, ConfigFile.c_str());
                 params.assign((const char *)Container);
@@ -257,7 +257,7 @@ int ActuatorTechnoSoft::configAxis(void *initialization_string)
                 else
                 {
                     DPRINT("Reading json for auxiliary parameters\n");
-                    const Json::Value &dataset_description = json_parameter["device_config"];
+                    const Json::Value &dataset_description = json_parameter["device_param"];
                     int count = 0;
                     for (Json::ValueIterator itr = dataset_description.begin(); itr != dataset_description.end(); itr++)
                     {
