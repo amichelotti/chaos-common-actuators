@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(common_actuators)
+find_package(Boost MODULE REQUIRED REQUIRED COMPONENTS program_options system)
 FILE(GLOB core_src core/*.cpp)    
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${core_src})
+include_directories(../.. ${Boost_INCLUDE_DIRS})
+link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 INSTALL_TARGETS(/lib ${PROJECT_NAME})
 

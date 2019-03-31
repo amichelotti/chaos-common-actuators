@@ -20,18 +20,21 @@
 #include <cctype>
 #include <locale>         // std::locale, std::toupper
 #include <json/json.h>
+#ifdef CHAOS
+#include <common/misc/driver/ConfigDriverMacro.h>
+#endif
 
 using namespace boost;
 using namespace ::common::actuators::models;
-        
+
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
-      
+
 
 static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
 static const boost::regex driver_match2("(\\d+),(.+)");
 
-std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
+//std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     //driver=NULL;
@@ -41,7 +44,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    // show content:                       
+    // show content:           
     DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
@@ -64,75 +67,73 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
 // quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale 
 // apertura del canale
+void trimChar(std::string& str,char rm){
+  std::string::size_type pos = str.find_last_not_of(rm);
+  if(pos != std::string::npos) {
+    str.erase(pos + 1);
+    pos = str.find_first_not_of(rm);
+    if(pos != std::string::npos){
+        str.erase(0, pos);
+        }
+  }
+  else str.erase(str.begin(), str.end());
+}
+
 int ActuatorTechnoSoft::init(void*initialization_string){
-    
-//    if(initChannelAlreadyDone){
-//        DPRINT("This object has already a communication channel correctly initialized");
-//        return 0;
-//    }
-    
-    const std::string& params = (const char*)initialization_string;
-    //const std::string& params = "\"porcoddiomarcio\"";
-    //params.assign((const char*)initialization_string);
-    boost::smatch match;
-    bool jsonInitialization = false; 
-    DPRINT("Init actuatorTechnosoft Initialization string %s", params.c_str());
-
-    Json::Value                                 json_parameter;
-    Json::Reader                                json_reader;
-    //parse json string
-    Json::Value json_HostID ; 
-    Json::Value json_btType; 
-    Json::Value json_baudrate; 
-    Json::Value json_device ; 
-    if(!json_reader.parse(params, json_parameter)) 
+#ifdef CHAOS
+    using namespace std;
+    if ((initialization_string == NULL) )
+{    
     {
-  	DPRINT ( "ALEDEBUG Bad Json parameter ");
-    }
-    else
-    {
-	if (json_parameter.isObject())
+        GET_PARAMETER_TREE((&jsonConfiguration),driver_param)
         {
-  	 DPRINT ( "ALEDEBUG good Json parameter: %s ",json_parameter.asString().c_str());
-         json_HostID = json_parameter["HostID"];
-         json_btType = json_parameter["btType"];
-         json_baudrate =  json_parameter["baudrate"];
-         json_device = json_parameter["device"];
-	 if ((!json_HostID.isNull()) && (!json_btType.isNull()) && (!json_baudrate.isNull()) && (!json_device.isNull())  )
-	 {
-		jsonInitialization=true;
-	 }
-	}
-	else
-	{ DPRINT("ALEDEBUG Json param isn't a Json Object"); }
+            GET_PARAMETER(driver_param,HostID,int32_t,1);
+            GET_PARAMETER(driver_param,serdev,string,1);
+            GET_PARAMETER(driver_param,BtType,int32_t,1);
+            GET_PARAMETER(driver_param,Baudrate,int32_t,1);
+            this->channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
+            if(this->channel==NULL)
+            {
+                ERR("Cannot  init channel because value of channel is NULL");
+                return -2;
+            }
+            if(this->channel->open()<0)
+            {
+                ERR("Cannot  open channel");
+                return -3;
+            }
+           
+        
+            // Inizializzazione mutex
+            pthread_mutex_init(&(mu),NULL);
+            delectingActuator = false;
 
+            return 0;
+            
+            
+            
+        }
     }
-
+} 
+#endif
+    const std::string& params = (const char*)initialization_string;
     
-    if(jsonInitialization || (regex_match(params, match, driver_match1, boost::match_extra)) )
+    boost::smatch match;
+    DPRINT("Init actuatorTechnosoft Initialization string %s", params.c_str());
+    
+    if (regex_match(params, match, driver_match1, boost::match_extra)) 
     {
 	std::string strHostID,strbtType,strbaudrate;
-	if (jsonInitialization==false)
-	{
-         strHostID = match[1]; 
-         hostID = atoi(strHostID.c_str());
-         strbtType = match[2];
-         btType = atoi(strbtType.c_str());
-         strbaudrate = match[3]; 
-         baudrate = atoi(strbaudrate.c_str());
-         dev_name=match[4]; 
-	}
-	else
-	{
-		strHostID=json_HostID.asString();
-         	hostID = atoi(strHostID.c_str());
-		strbtType=json_btType.asString();
-         	btType = atoi(strbtType.c_str());
-		strbaudrate = json_baudrate.asString();
-         	baudrate = atoi(strbaudrate.c_str());
-		dev_name = json_device.asString(); 
-	}
-        
+	
+        strHostID = match[1]; 
+        hostID = atoi(strHostID.c_str());
+        strbtType = match[2];
+        btType = atoi(strbtType.c_str());
+        strbaudrate = match[3]; 
+        baudrate = atoi(strbaudrate.c_str());
+        dev_name=match[4]; 
+	
+
         DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial channel %s",hostID ,btType ,baudrate,dev_name.c_str());
         
         //SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType, baudrate);
@@ -145,8 +146,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
             ERR("Cannot possible open channel");
             return -3;
         }
-       
-        //initChannelAlreadyDone = true;
+           
         
         // Inizializzazione mutex
         pthread_mutex_init(&(mu),NULL);
@@ -154,7 +154,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
         
         return 0;
     }
-    ERR("Cannot possible init channel %s",params.c_str());
+    ERR("Cannot init channel %s",params.c_str());
     return -4;
 }
 
@@ -163,7 +163,38 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
 
     params.assign((const char*)initialization_string);
     boost::smatch match;
-
+#ifdef CHAOS
+    using namespace std;
+    if (1)
+      {
+        
+        DPRINT("ALEDEBUG jsonconfiguration not null %s",jsonConfiguration.getJSONString().c_str());
+        try
+        {
+            GET_PARAMETER_TREE((&jsonConfiguration),device_param)
+            {
+                DPRINT("ALEDEBUG inside getParameterTree");
+                GET_PARAMETER(device_param,ConfigAxis,int32_t,1);
+                DPRINT("ALEDEBUG got ConfigAxis");
+                GET_PARAMETER(device_param,ConfigFile,string,1);
+                DPRINT("ALEDEBUG got ConfigFile");
+                char Container[512];
+                sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
+                params.assign((const char*)Container);
+                
+                DPRINT("Found configuration on json driver initialization info .Overriding input dataset");
+                
+            }
+        }
+        catch (chaos::CException e)
+        {
+            DPRINT("ALEDEBUG: Some exception occurred. Using Configstring");
+        }
+        
+      }
+	DPRINT("ALEDEBUG jsonconfiguration is null");
+      
+#endif
     DPRINT("Configuration string %s", params.c_str());
     
     if(regex_match(params, match, driver_match2, boost::match_extra)){
@@ -201,7 +232,45 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
+            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %Ld",axid,motors.size());
+            std::string dataset=jsonConfiguration.getJSONString().c_str();
+            Json::Value                                 json_parameter;
+            Json::Reader                                json_reader;
+
+
+            //parse json string
+            if(!json_reader.parse(dataset, json_parameter)) 
+            {
+                DPRINT("Bad Json parameter");
+            }
+            else
+            {
+                DPRINT("Reading json for auxiliary parameters\n");
+                const Json::Value& dataset_description = json_parameter["device_param"];
+                for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
+                {
+                    std::string chiave=itr.key().asString();
+    		    std::string value=(*itr).toStyledString();
+                    trimChar(value,'"');
+                    //DPRINT("ALEDEBUG value trimmed is  %s",value.c_str());
+
+                   
+                    if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
+                    {
+                        DPRINT("launching set parameter chiave: %s value: %s\n",chiave.c_str(),value.c_str());
+                        val=this->setParameter(axid,chiave,value);
+                        DPRINT("val is %x",val);
+                    
+                    }
+                   
+                }    
+                
+               
+            }
+            
+            
+            
+            
             
             return 0;     
         } 
@@ -301,7 +370,6 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
-    
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
@@ -638,6 +706,21 @@ int ActuatorTechnoSoft::getParameter(int axisID,std::string parName,std::string&
         ss.str(std::string());
         return 0;   
     }
+    else if(strResultparName.compare("USEIU")==0){ 
+        bool iu;
+        if((i->second)->getMeasureUnit(iu)<0){ 
+            return -25;
+        }
+        // 1. Conversione valore numerico ---> Stringa
+        ss<<iu;
+        // 2. resultString =  nuova_stringa_convertita
+        resultString.assign(ss.str());
+        ss.str(std::string());
+        return 0;   
+    }
+    
+    
+    
     else{
         resultString.assign("");
         ss.str(std::string());

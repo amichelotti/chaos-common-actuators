@@ -39,11 +39,12 @@ namespace common{
                     int hostID;
                     SerialCommChannelTechnosoft *channel;  
                     
-                    static std::map<int,TechnoSoftLowDriver *> motors;
+                    std::map<int,TechnoSoftLowDriver *> motors;
                     pthread_mutex_t mu;
                 
                 public:
-                    
+                     
+
                     // costruttore
                     ActuatorTechnoSoft();
                     // Costruttore di copia
