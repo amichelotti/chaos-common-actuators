@@ -11,8 +11,8 @@
 #include "TechnoSoftLowDriver.h"
 #include <sys/time.h>
 
-#ifndef ActuatorTechnoSoft_h
-#define ActuatorTechnoSoft_h
+#ifndef ActuatorTechnoSoftSimul_h
+#define ActuatorTechnoSoftSimul_h
 
 namespace common{
     namespace actuators{
@@ -38,7 +38,7 @@ namespace common{
                     int hostID;
                     SerialCommChannelTechnosoft *channel;
 
-                    static std::map<int,TechnoSoftLowDriver *> motors;
+                    std::map<int,TechnoSoftLowDriver *> motors;
                     
                     pthread_mutex_t mu;
 

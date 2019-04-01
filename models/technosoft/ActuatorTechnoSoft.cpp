@@ -26,15 +26,15 @@
 
 using namespace boost;
 using namespace ::common::actuators::models;
-        
+
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
-      
+
 
 static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
 static const boost::regex driver_match2("(\\d+),(.+)");
 
-std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
+//std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
 ActuatorTechnoSoft::ActuatorTechnoSoft(){
     //driver=NULL;
@@ -44,7 +44,7 @@ ActuatorTechnoSoft::ActuatorTechnoSoft(){
 }
 
 ActuatorTechnoSoft::~ActuatorTechnoSoft(){
-    // show content:                       
+    // show content:           
     DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
@@ -67,18 +67,30 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
 // La nuova funzione init si dovra' occupare della sola inizializzazione del canale
 // quindi la stringa dovra' contenere informazioni necessarie per la sola eventuale 
 // apertura del canale
+void trimChar(std::string& str,char rm){
+  std::string::size_type pos = str.find_last_not_of(rm);
+  if(pos != std::string::npos) {
+    str.erase(pos + 1);
+    pos = str.find_first_not_of(rm);
+    if(pos != std::string::npos){
+        str.erase(0, pos);
+        }
+  }
+  else str.erase(str.begin(), str.end());
+}
+
 int ActuatorTechnoSoft::init(void*initialization_string){
 #ifdef CHAOS
     using namespace std;
-if ((initialization_string == NULL) && (this->jsonConfiguration!= NULL))
+    if ((initialization_string == NULL) )
 {    
     {
-        GET_PARAMETER_TREE((this->jsonConfiguration),channel)
+        GET_PARAMETER_TREE((&jsonConfiguration),driver_param)
         {
-            GET_PARAMETER(channel,HostID,int32_t,1);
-            GET_PARAMETER(channel,serdev,string,1);
-            GET_PARAMETER(channel,BtType,int32_t,1);
-            GET_PARAMETER(channel,Baudrate,int32_t,1);
+            GET_PARAMETER(driver_param,HostID,int32_t,1);
+            GET_PARAMETER(driver_param,serdev,string,1);
+            GET_PARAMETER(driver_param,BtType,int32_t,1);
+            GET_PARAMETER(driver_param,Baudrate,int32_t,1);
             this->channel = new (std::nothrow) SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
             if(this->channel==NULL)
             {
@@ -153,15 +165,19 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
     boost::smatch match;
 #ifdef CHAOS
     using namespace std;
-      if (this->jsonConfiguration != NULL)
+    if (1)
       {
         
+        DPRINT("ALEDEBUG jsonconfiguration not null %s",jsonConfiguration.getJSONString().c_str());
         try
         {
-            GET_PARAMETER_TREE((this->jsonConfiguration),driver)
+            GET_PARAMETER_TREE((&jsonConfiguration),device_param)
             {
-                GET_PARAMETER(driver,ConfigAxis,int32_t,1);
-                GET_PARAMETER(driver,ConfigFile,string,1);
+                DPRINT("ALEDEBUG inside getParameterTree");
+                GET_PARAMETER(device_param,ConfigAxis,int32_t,1);
+                DPRINT("ALEDEBUG got ConfigAxis");
+                GET_PARAMETER(device_param,ConfigFile,string,1);
+                DPRINT("ALEDEBUG got ConfigFile");
                 char Container[512];
                 sprintf(Container,"%d,%s",ConfigAxis,ConfigFile.c_str());
                 params.assign((const char*)Container);
@@ -176,6 +192,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
         }
         
       }
+	DPRINT("ALEDEBUG jsonconfiguration is null");
       
 #endif
     DPRINT("Configuration string %s", params.c_str());
@@ -215,9 +232,8 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             
             DPRINT("Axis id %d configurato correttamente.", axid);
             motors.insert(std::pair<int,TechnoSoftLowDriver*>(axid,driver));
-            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %d",axid,motors.size());
-            std::string dataset=this->jsonConfiguration->getJSONString().c_str();
-            //DPRINT("ALEDEBUG DATASETVARIABLE getting dataset from driver %s",dataset);
+            DPRINT("Dimensione mappa statica alla fine della configurazione dell'axisID %d avvenuta correttamente: %Ld",axid,motors.size());
+            std::string dataset=jsonConfiguration.getJSONString().c_str();
             Json::Value                                 json_parameter;
             Json::Reader                                json_reader;
 
@@ -230,11 +246,14 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             else
             {
                 DPRINT("Reading json for auxiliary parameters\n");
-                const Json::Value& dataset_description = json_parameter["driver"];
+                const Json::Value& dataset_description = json_parameter["device_param"];
                 for( Json::ValueIterator itr = dataset_description.begin() ; itr != dataset_description.end() ; itr++ )
                 {
                     std::string chiave=itr.key().asString();
-                    std::string value=(*itr).asString();
+    		    std::string value=(*itr).toStyledString();
+                    trimChar(value,'"');
+                    //DPRINT("ALEDEBUG value trimmed is  %s",value.c_str());
+
                    
                     if ((chiave != "ConfigAxis") && (chiave != "ConfigFile"))
                     {
@@ -351,7 +370,6 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
 
 int ActuatorTechnoSoft::deinit(int axisID){
     //readyState=false;
-    free(this->jsonConfiguration);
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
     // Controlliamo comunque se l'axis id e' stato configurato
