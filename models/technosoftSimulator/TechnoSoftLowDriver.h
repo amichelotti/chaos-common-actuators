@@ -24,6 +24,9 @@
 #include <cmath>
 #include <limits.h>
 #include <string.h>
+#ifdef _WIN32
+#define HAVE_STRUCT_TIMESPEC
+#endif
 #include <pthread.h>
 #include <math.h>       /* fabs */
 #include <boost/random.hpp>
