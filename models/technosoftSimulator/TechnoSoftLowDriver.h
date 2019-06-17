@@ -35,9 +35,9 @@
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
-#	include "../../../include/TML_lib.h"
+#	include "TML_lib.h"
 #	include <windows.h>
-#	include "../../../include/tmlcomm.h"
+#	include "tmlcomm.h"
 
 #	if defined(__BORLANDC__)
 #		pragma comment(lib, "../../../lib/TML_lib-borlandc.lib")
