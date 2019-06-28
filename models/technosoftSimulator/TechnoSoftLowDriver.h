@@ -24,6 +24,9 @@
 #include <cmath>
 #include <limits.h>
 #include <string.h>
+#ifdef _WIN32
+#define HAVE_STRUCT_TIMESPEC
+#endif
 #include <pthread.h>
 #include <math.h>       /* fabs */
 #include <boost/random.hpp>
@@ -35,9 +38,9 @@
 
 #if defined(WINDOWS) || defined(WIN32)
 #	include <conio.h>
-#	include "../../../include/TML_lib.h"
+#	include "TML_lib.h"
 #	include <windows.h>
-#	include "../../../include/tmlcomm.h"
+//#	include "tmlcomm.h"
 
 #	if defined(__BORLANDC__)
 #		pragma comment(lib, "../../../lib/TML_lib-borlandc.lib")

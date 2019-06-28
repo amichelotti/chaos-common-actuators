@@ -8,8 +8,9 @@
 
 #ifndef _TMLCOMM_H
 #define _TMLCOMM_H
-
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 
