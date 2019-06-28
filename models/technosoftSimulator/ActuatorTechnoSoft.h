@@ -9,8 +9,9 @@
 
 #include <common/actuators/core/AbstractActuator.h>
 #include "TechnoSoftLowDriver.h"
+#ifndef _WIN32
 #include <sys/time.h>
-
+#endif
 #ifndef ActuatorTechnoSoftSimul_h
 #define ActuatorTechnoSoftSimul_h
 
