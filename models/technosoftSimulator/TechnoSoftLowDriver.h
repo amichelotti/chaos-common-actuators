@@ -124,7 +124,7 @@ namespace common{
            struct containerIncrementPosition{
                long deltaPosition;
                //long absolutePosition;
-               pthread_mutex_t mu;
+           //    pthread_mutex_t mu;
            };
 
             //Channel class
@@ -234,7 +234,7 @@ namespace common{
                 //containerIncrementPosition cIP;
                 long absolutePosition;
                 long deltaPosition;
-                pthread_mutex_t mu;
+             //   pthread_mutex_t mu;
                 
                 pthread_t thstaticFaultsGeneration;
 
