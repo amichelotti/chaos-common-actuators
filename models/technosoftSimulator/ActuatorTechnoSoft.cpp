@@ -102,8 +102,11 @@ int ActuatorTechnoSoft::init(void *initialization_string) {
 #ifdef CHAOS
   using namespace std;
   if (initialization_string != NULL) {
+        jsonConfiguration.setSerializedJsonData((const char*)initialization_string);
+
+  }
+  
     {
-      jsonConfiguration.setSerializedJsonData((const char*)initialization_string);
       GET_PARAMETER_TREE((&jsonConfiguration), driver_config) {
         GET_PARAMETER(driver_config, HostID, int32_t, 1);
         GET_PARAMETER(driver_config, serdev, string, 1);
@@ -125,7 +128,7 @@ int ActuatorTechnoSoft::init(void *initialization_string) {
         return 0;
       }
     }
-  }
+  
 #endif
 
  /* std::string params;
