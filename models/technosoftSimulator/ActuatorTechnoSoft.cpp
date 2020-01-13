@@ -101,7 +101,11 @@ int ActuatorTechnoSoft::init(void *initialization_string) {
 
 #ifdef CHAOS
   using namespace std;
-  if (initialization_string == NULL) {
+  if (initialization_string != NULL) {
+        jsonConfiguration.setSerializedJsonData((const char*)initialization_string);
+
+  }
+  
     {
       GET_PARAMETER_TREE((&jsonConfiguration), driver_config) {
         GET_PARAMETER(driver_config, HostID, int32_t, 1);
@@ -124,10 +128,10 @@ int ActuatorTechnoSoft::init(void *initialization_string) {
         return 0;
       }
     }
-  }
+  
 #endif
 
-  std::string params;
+ /* std::string params;
   params.assign((const char *)initialization_string);
   boost::smatch match;
 
@@ -161,9 +165,12 @@ int ActuatorTechnoSoft::init(void *initialization_string) {
     }
     // initChannelAlreadyDone = true;
     return 0;
+  }*/
+  if(channel==NULL){
+    ERR("Cannot initialize with params %s", initialization_string?(const char*)initialization_string:"''");
+    return -4;
   }
-  ERR("Cannot possible init channel %s", params.c_str());
-  return -4;
+  return 0;
 }
 
 int ActuatorTechnoSoft::configAxis(void *initialization_string) {
