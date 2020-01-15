@@ -108,10 +108,10 @@ int ActuatorTechnoSoft::init(void *initialization_string) {
   
     {
       GET_PARAMETER_TREE((&jsonConfiguration), driver_param) {
-        GET_PARAMETER(driver_config, HostID, int32_t, 1);
-        GET_PARAMETER(driver_config, serdev, string, 1);
-        GET_PARAMETER(driver_config, BtType, int32_t, 1);
-        GET_PARAMETER(driver_config, Baudrate, int32_t, 1);
+        GET_PARAMETER(driver_param, HostID, int32_t, 1);
+        GET_PARAMETER(driver_param, serdev, string, 1);
+        GET_PARAMETER(driver_param, BtType, int32_t, 1);
+        GET_PARAMETER(driver_param, Baudrate, int32_t, 1);
         if (channel == NULL) {
           channel = new (std::nothrow)
               SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
