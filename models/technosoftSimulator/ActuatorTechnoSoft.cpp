@@ -1629,11 +1629,15 @@ int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
       "maxacceleration", "Acceleration of trapezoidal profile",
       chaos::DataType::DataType::TYPE_DOUBLE, chaos::DataType::Input, "0.001",
       "2.0", "0.6", "0.1", "mm/s2");
+  DatasetAttribute useIU(
+	  "useIU", "use Internal Units.",
+	  chaos::DataType::DataType::TYPE_INT32, chaos::DataType::Input, "0",
+	  "1", "0", "1", "strict");
 
-  ds << speed << maxspeed;
+  ds << speed << maxspeed << useIU;
   dataset = ds.getJSONString();
 #else
-
+	
   dataset.clear();
   dataset = "{\"attributes\":[";
   dataset += "{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal "
