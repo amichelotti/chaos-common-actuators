@@ -988,7 +988,7 @@ int ActuatorTechnoSoft::getParameter(int axisID, std::string parName,
 
 int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,
                                                 double deltaMillimeters) {
-  // DPRINT("moving relative %f mm",deltaMillimeters);
+   DPRINT("moving relative %f mm",deltaMillimeters);
 
   // ************************** Operazione di selezione axisID
   // ***************************

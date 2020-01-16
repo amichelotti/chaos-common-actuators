@@ -858,7 +858,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 
     //threadMoveRelativeOn=false; // Spegnamo il thread correntemente in esecuzione
     stopMotionCommand=false; 
-   
+    DPRINT("ALEDEBUG moving to %ld ",_deltaPosition)
     if(internalHomingStateHoming2 != 0 || internalHomingStateDefault !=0){
 
         
