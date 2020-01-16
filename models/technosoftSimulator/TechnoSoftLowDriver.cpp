@@ -739,7 +739,7 @@ int TechnoSoftLowDriver::homing(int mode){
 int TechnoSoftLowDriver::incrDecrPosition(){
 
     bool goahead=false; // Per default vai indietro
-	DPRINT("ALEDEBUG Finalmente facciamo qualcosa");
+	
 
     if(deltaPosition==0){
       
@@ -755,9 +755,14 @@ int TechnoSoftLowDriver::incrDecrPosition(){
 
     long initPosition = position;
     bool resetLimitSwicth=true;
-
-    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<abs(deltaPosition) && !stopMotionCommand){
-
+	DPRINT("ALEDEBUG :ENTRIAMO NEL WHILE?");
+	DPRINT("position %ld >= %d", position,(-10*SPEED_DEFAULT));
+	DPRINT("position %ld <= %d + %d", position,positiveLimitPosition,(10*SPEED_DEFAULT));
+	DPRINT("abs(position-initPosition) &ld < abs(deltaPosition) %ld", abs(position - initPosition), abs(deltaPosition));
+	DPRINT("stopMotionCommand %d", stopMotionCommand);
+    while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<abs(deltaPosition) && !stopMotionCommand)
+	{
+		
         if(!powerOffCommand){
             
 
