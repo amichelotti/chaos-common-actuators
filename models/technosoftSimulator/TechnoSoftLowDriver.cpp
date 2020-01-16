@@ -749,7 +749,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     if(deltaPosition>=0){
         goahead=true;
     }
-
+	DPRINT("Setting state to motion incrDecr position of %ld",deltaPosition);
     actuatorIDInMotion = true;
    
 
@@ -815,7 +815,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
       
         }
 
-        //DPRINT("Posizione incrementata!!!!!");
+        DPRINT("Posizione incrementata!!!!!");
 	if (!this->useUI)
         	usleep(1000); // Sleep for 1 milli second
 	else
