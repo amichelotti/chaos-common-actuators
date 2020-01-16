@@ -739,7 +739,7 @@ int TechnoSoftLowDriver::homing(int mode){
 int TechnoSoftLowDriver::incrDecrPosition(){
 
     bool goahead=false; // Per default vai indietro
-
+	DPRINT("ALEDEBUG Finalmente facciamo qualcosa");
 
     if(deltaPosition==0){
       
@@ -871,7 +871,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 
     if(motionscalled>1){
         if(stopMotion()<0){
-          
+			DPRINT("ALEDEBUG exiting for stopMotion internal");
             return -2;
         }
         usleep(100000); // Attendi che la corrente movimentazione si fermi
@@ -879,7 +879,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
 
     int random_variable = std::rand();
     if(random_variable<p*(RAND_MAX)){
-       
+		DPRINT("ALEDEBUG exiting for fake Caschera Error");
         return -3;
     }
 
@@ -887,7 +887,7 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
     deltaPosition = _deltaPosition;
     //cIP.ptr = this;
     
-   
+	DPRINT("ALEDEBUG Launching staticIncrementDecrementPositionFunctionForThread");
     pthread_create(&th, NULL,TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread,this);
 
     return 0;
