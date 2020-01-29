@@ -107,11 +107,11 @@ int ActuatorTechnoSoft::init(void *initialization_string) {
   }
   
     {
-      GET_PARAMETER_TREE((&jsonConfiguration), driver_config) {
-        GET_PARAMETER(driver_config, HostID, int32_t, 1);
-        GET_PARAMETER(driver_config, serdev, string, 1);
-        GET_PARAMETER(driver_config, BtType, int32_t, 1);
-        GET_PARAMETER(driver_config, Baudrate, int32_t, 1);
+      GET_PARAMETER_TREE((&jsonConfiguration), driver_param) {
+        GET_PARAMETER(driver_param, HostID, int32_t, 1);
+        GET_PARAMETER(driver_param, serdev, string, 1);
+        GET_PARAMETER(driver_param, BtType, int32_t, 1);
+        GET_PARAMETER(driver_param, Baudrate, int32_t, 1);
         if (channel == NULL) {
           channel = new (std::nothrow)
               SerialCommChannelTechnosoft(HostID, serdev, BtType, Baudrate);
@@ -988,7 +988,7 @@ int ActuatorTechnoSoft::getParameter(int axisID, std::string parName,
 
 int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,
                                                 double deltaMillimeters) {
-  // DPRINT("moving relative %f mm",deltaMillimeters);
+   DPRINT("moving relative %f mm",deltaMillimeters);
 
   // ************************** Operazione di selezione axisID
   // ***************************
@@ -1629,11 +1629,15 @@ int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
       "maxacceleration", "Acceleration of trapezoidal profile",
       chaos::DataType::DataType::TYPE_DOUBLE, chaos::DataType::Input, "0.001",
       "2.0", "0.6", "0.1", "mm/s2");
+  DatasetAttribute useIU(
+	  "useIU", "use Internal Units.",
+	  chaos::DataType::DataType::TYPE_INT32, chaos::DataType::Input, "0",
+	  "1", "0", "1", "strict");
 
-  ds << speed << maxspeed;
+  ds << speed << maxspeed << useIU;
   dataset = ds.getJSONString();
 #else
-
+	
   dataset.clear();
   dataset = "{\"attributes\":[";
   dataset += "{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal "
