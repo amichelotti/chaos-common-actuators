@@ -1611,61 +1611,15 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string &version) {
 }
 using namespace chaos::common::data::structured;
 int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
-#ifdef CHAOS
-  chaos::common::data::CDataWrapper ds;
-  DatasetAttribute speed("speed", "Max speed of trapezoidal profile",
-                         chaos::DataType::DataType::TYPE_DOUBLE,
-                         chaos::DataType::Input, "0.001", "500.0", "400.0",
-                         "0.1", "mm/s");
-  DatasetAttribute maxspeed("maxspeed", "Max speed of trapezoidal profile",
-                            chaos::DataType::DataType::TYPE_DOUBLE,
-                            chaos::DataType::Input, "0.001", "1000.0", "700.0",
-                            "0.1", "mm/s");
-  DatasetAttribute acceleration(
-      "acceleration", "Acceleration of trapezoidal profile",
-      chaos::DataType::DataType::TYPE_DOUBLE, chaos::DataType::Input, "0.001",
-      "2.0", "0.6", "0.1", "mm/s2");
-  DatasetAttribute maxacceleration(
-      "maxacceleration", "Acceleration of trapezoidal profile",
-      chaos::DataType::DataType::TYPE_DOUBLE, chaos::DataType::Input, "0.001",
-      "2.0", "0.6", "0.1", "mm/s2");
-  DatasetAttribute useIU(
-	  "useIU", "use Internal Units.",
-	  chaos::DataType::DataType::TYPE_INT32, chaos::DataType::Input, "0",
-	  "1", "0", "1", "strict");
-
-  ds << speed << maxspeed << useIU;
-  dataset = ds.getJSONString();
-#else
-	
   dataset.clear();
   dataset = "{\"attributes\":[";
   dataset += "{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal "
              "profile\",\"datatype\":\"double\",\"direction\":\"Input\","
              "\"min\":\"0.001\",\"max\":\"500.0\",\"default\":\"400.0\"},";
-  dataset += "{\"name\":\"maxspeed\",\"description\":\"Maximum value for max "
-             "speed of trapezoidal "
-             "profile\",\"datatype\":\"double\",\"direction\":\"Input\","
-             "\"min\":\"0.001\",\"max\":\"1000.0\",\"default\":\"700.0\"},";
   dataset += "{\"name\":\"acceleration\",\"description\":\"Acceleration of "
              "trapezoidal "
              "profile\",\"datatype\":\"double\",\"direction\":\"Input\","
              "\"min\":\"0.001\",\"max\":\"2.0\",\"default\":\"0.6\"},";
-  dataset += "{\"name\":\"maxacceleration\",\"description\":\"Maximum value "
-             "for acceleration of trapezoidal "
-             "profile\",\"datatype\":\"double\",\"direction\":\"Input\","
-             "\"min\":\"0.001\",\"max\":\"5.0\",\"default\":\"0.9\"},";
-  dataset += "{\"name\":\"isadditive\",\"description\":\"Specifies how is "
-             "computed the position to "
-             "reach\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":"
-             "\"0\",\"max\":\"1\",\"default\":\"0\"},";
-  dataset += "{\"name\":\"movement\",\"description\":\"Defines the moment when "
-             "the motion is "
-             "started\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":"
-             "\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-  // dataset+="{\"name\":\"referenceBase\",\"description\":\"Specifies how the
-  // motion reference is
-  // computed\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
   dataset += "{\"name\":\"highspeedhoming\",\"description\":\"Max speed of "
              "trapezoidal profile for homing "
              "procedure\",\"datatype\":\"double\",\"direction\":\"Input\","
@@ -1674,33 +1628,6 @@ int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
              "for max speed of trapezoidal profile for homing "
              "procedure\",\"datatype\":\"double\",\"direction\":\"Input\","
              "\"min\":\"0.001\",\"max\":\"100.0\",\"default\":\"14.0\"},";
-  dataset +=
-      "{\"name\":\"lowspeedhoming\",\"description\":\"Speed of trapezoidal "
-      "profile for homing procedure, for repositioning slit to LSN "
-      "switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0."
-      "001\",\"max\":\"3.0\",\"default\":\"1.0\"},";
-  dataset += "{\"name\":\"maxlowspeedhoming\",\"description\":\"Max value for "
-             "speed of trapezoidal profile for homing procedure, for "
-             "repositioning slit at LSN "
-             "switch\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":"
-             "\"0.001\",\"max\":\"6.0\",\"default\":\"4.0\"},";
-  dataset += "{\"name\":\"accelerationhoming\",\"description\":\"Acceleration "
-             "of trapezoidal profile for homing "
-             "procedure\",\"datatype\":\"double\",\"direction\":\"Input\","
-             "\"min\":\"0.001\",\"max\":\"0.6\",\"default\":\"0.3\"},";
-  dataset += "{\"name\":\"maxaccelerationhoming\",\"description\":\"Max value "
-             "for acceleration of trapezoidal profile for homing "
-             "procedure\",\"datatype\":\"double\",\"direction\":\"Input\","
-             "\"min\":\"0.001\",\"max\":\"1.0\",\"default\":\"0.8\"},";
-  //   dataset+="{\"name\":\"isadditivehoming\",\"description\":\"Specifies how
-  //   is computed the position to reach for homing
-  //   procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0\"},";
-  //   dataset+="{\"name\":\"movementhoming\",\"description\":\"Defines the
-  //   moment when the motion is started for homing
-  //   procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"-1\",\"max\":\"1\",\"default\":\"1\"},";
-  //   dataset+="{\"name\":\"referenceBaseHoming\",\"description\":\"Specifies
-  //   how the motion reference is computed for homing
-  //   procedure\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"1\"},";
   dataset +=
       "{\"name\":\"numencoderlines\",\"description\":\"Number of encoder "
       "lines\",\"datatype\":\"int32\",\"direction\":\"Input\",\"min\":\"1\","
@@ -1722,18 +1649,6 @@ int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
       "displacement [mm] performed by slit associated with fixednumberofrounds "
       "rounds\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0."
       "000000001\",\"max\":\"10000000\",\"default\":\"1.5\"},";
-  // dataset+="{\"name\":\"ratiOfNoise\",\"description\":\"Ratio of the real
-  // position rp in millimeter that identifies min and max values of pseudo white
-  // noise added to
-  // rp\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0\",\"max\":\"1\",\"default\":\"0.0\"}";
-  dataset += "{\"name\":\"voltage_LNS[V]\",\"description\":\"Voltage "
-             "associated with LNS "
-             "[V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":"
-             "\"0\",\"max\":\"10000000000\",\"default\":\"7.7\"},";
-  dataset += "{\"name\":\"voltage_LPS[V]\",\"description\":\"Voltage "
-             "associated with LPS "
-             "[V]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":"
-             "\"0\",\"max\":\"10000000000\",\"default\":\"0.3\"},";
   dataset += "{\"name\":\"range_slit[mm]\",\"description\":\"Maximum linear "
              "displacement of the slit "
              "[m]\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":"
@@ -1761,6 +1676,5 @@ int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
       "\"0.000000001\",\"max\":\"10000000000\",\"default\":\"20.0\"}";
 
   dataset += "]}";
-#endif
   return 0;
 }
