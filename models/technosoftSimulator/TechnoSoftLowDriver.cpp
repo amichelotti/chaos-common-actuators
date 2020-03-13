@@ -757,7 +757,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     bool resetLimitSwicth=true;
 	DPRINT("ALEDEBUG :ENTRIAMO NEL WHILE?");
 	DPRINT("position %ld >= %d", position,(-10*SPEED_DEFAULT));
-	DPRINT("position %ld <= %d + %d", position,positiveLimitPosition,(10*SPEED_DEFAULT));
+	DPRINT("position %ld <= %ld + %d", position,positiveLimitPosition,(10*SPEED_DEFAULT));
 	DPRINT("abs(position-initPosition) %ld < abs(deltaPosition) %ld", abs(position - initPosition), abs(deltaPosition));
 	DPRINT("stopMotionCommand %d", stopMotionCommand);
     while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<abs(deltaPosition) && !stopMotionCommand)
