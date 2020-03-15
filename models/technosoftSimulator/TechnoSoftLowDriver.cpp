@@ -46,6 +46,7 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 
     deallocateTimerAlarms = true;
     usleep(1500000);
+    deinit();
 }
 
 double TechnoSoftLowDriver::speedfromMMsToIU(double _speed_mm_s){
@@ -855,7 +856,7 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
     ((TechnoSoftLowDriver*)objPointer)->incrDecrPosition();
 
     //DPRINT("Uscita dal thread di movimentazione");
-    pthread_exit(NULL);
+   // pthread_exit(NULL);
 }
 
 
@@ -1956,6 +1957,8 @@ int TechnoSoftLowDriver::stopPower(){
 }
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
+    pthread_join(thstaticFaultsGeneration);
+    pthread_join(th);
 
     //DPRINT("TechnoSoftLowDriver %d object is deallocated",axisID);
     return 0;
