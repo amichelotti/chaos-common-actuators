@@ -364,7 +364,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
    // pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
-    staticFaultsGeneration((void*)this);
+   // staticFaultsGeneration((void*)this);
     alarms=(bool)_alarmsPresent;
     durationAlarmsInterval=_alarmsInterval;
     
