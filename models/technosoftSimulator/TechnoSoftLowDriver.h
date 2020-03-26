@@ -236,7 +236,7 @@ namespace common{
                 long deltaPosition;
              //   pthread_mutex_t mu;
                 
-                pthread_t thstaticFaultsGeneration;
+                pthread_t thstaticFaultsGeneration,th;
 
                 int moveAbsolutePosition();
                 int incrDecrPosition();
