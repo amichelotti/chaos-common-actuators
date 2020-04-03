@@ -46,6 +46,7 @@ TechnoSoftLowDriver::~TechnoSoftLowDriver(){
 
     deallocateTimerAlarms = true;
     usleep(1500000);
+    deinit();
 }
 
 double TechnoSoftLowDriver::speedfromMMsToIU(double _speed_mm_s){
@@ -107,7 +108,7 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
                         const double _probabilityError
                         ){
 
-    DPRINT("Inizializzazione parametri");
+   // DPRINT("Inizializzazione parametri");
     this->useUI=false;
     // max speed
     if(_maxSpeed_mm_s<=0){
@@ -362,14 +363,12 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     
     deallocateTimerAlarms = false;
     deallocateTimerStates = false;
-    pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
-    DPRINT("ALEDEBUG dopo di pthread create"); 
-    
+   // pthread_create(&thstaticFaultsGeneration, NULL,staticFaultsGeneration,this);
+   // staticFaultsGeneration((void*)this);
     alarms=(bool)_alarmsPresent;
     durationAlarmsInterval=_alarmsInterval;
     
     controlLNS=true;
-    DPRINT("ALEDEBUG returning OK"); 
     return 0;
 }
 
@@ -757,7 +756,7 @@ int TechnoSoftLowDriver::incrDecrPosition(){
     bool resetLimitSwicth=true;
 	DPRINT("ALEDEBUG :ENTRIAMO NEL WHILE?");
 	DPRINT("position %ld >= %d", position,(-10*SPEED_DEFAULT));
-	DPRINT("position %ld <= %d + %d", position,positiveLimitPosition,(10*SPEED_DEFAULT));
+	DPRINT("position %ld <= %ld + %d", position,positiveLimitPosition,(10*SPEED_DEFAULT));
 	DPRINT("abs(position-initPosition) %ld < abs(deltaPosition) %ld", abs(position - initPosition), abs(deltaPosition));
 	DPRINT("stopMotionCommand %d", stopMotionCommand);
     while(position>=(-10*SPEED_DEFAULT) && (position<=positiveLimitPosition+10*SPEED_DEFAULT)  && abs(position-initPosition)<abs(deltaPosition) && !stopMotionCommand)
@@ -855,7 +854,8 @@ void* TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(void* objPoin
     ((TechnoSoftLowDriver*)objPointer)->incrDecrPosition();
 
     //DPRINT("Uscita dal thread di movimentazione");
-    pthread_exit(NULL);
+   // pthread_exit(NULL);
+   return NULL;
 }
 
 
@@ -888,13 +888,12 @@ int TechnoSoftLowDriver::moveRelativeSteps(const long& _deltaPosition){
         return -3;
     }
 
-    pthread_t th;
     deltaPosition = _deltaPosition;
     //cIP.ptr = this;
     
-	DPRINT("ALEDEBUG Launching staticIncrementDecrementPositionFunctionForThread");
-    pthread_create(&th, NULL,TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread,this);
-
+	//DPRINT("ALEDEBUG Launching staticIncrementDecrementPositionFunctionForThread");
+  //  pthread_create(&th, NULL,TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread,this);
+    TechnoSoftLowDriver::staticIncrDecrPositionFunctionForThread(this);
     return 0;
 }
 
@@ -1585,7 +1584,7 @@ void* TechnoSoftLowDriver::staticMoveAbsolutePositionForThread(void* objPointer)
 
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePosition();
-    pthread_exit(NULL); // Perche' e' la funzione chiamata direttamente dal thread
+    return NULL;
 }
 
 int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
@@ -1617,12 +1616,11 @@ int TechnoSoftLowDriver::moveAbsoluteSteps(const long& absPosition){
         return -1;
     }
 
-    pthread_t th;
     absolutePosition=absPosition;
 
    
-    pthread_create(&th, NULL,staticMoveAbsolutePositionForThread,(void*)this);
-
+    //pthread_create(&th, NULL,staticMoveAbsolutePositionForThread,(void*)this);
+    staticMoveAbsolutePositionForThread((void*)this);
     return 0;
 }
 
@@ -1686,8 +1684,7 @@ void* TechnoSoftLowDriver::staticMoveConstantVelocityHomingFunctionForThread(voi
 
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->moveConstantVelocityHoming();
-
-    pthread_exit(NULL);
+    return NULL;
 }
 
 int TechnoSoftLowDriver::moveVelocityHoming(){
@@ -1698,9 +1695,8 @@ int TechnoSoftLowDriver::moveVelocityHoming(){
         return -1;
     }
     
-    pthread_t th;
-    pthread_create(&th, NULL,staticMoveConstantVelocityHomingFunctionForThread,this);
-
+    //pthread_create(&th, NULL,staticMoveConstantVelocityHomingFunctionForThread,this);
+staticMoveConstantVelocityHomingFunctionForThread((void*)this);
     return 0;
 }
 
@@ -1784,7 +1780,7 @@ void* TechnoSoftLowDriver::staticMoveAbsolutePositionHomingFunctionForThread(voi
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->moveAbsolutePositionHoming();
 
-    pthread_exit(NULL);
+    return NULL;
 }
 
 int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition){
@@ -1807,12 +1803,11 @@ int TechnoSoftLowDriver::moveAbsoluteStepsHoming(const long& absPosition){
         return -1;
     }
 
-    pthread_t th;
     absolutePosition=absPosition;
     
 
-    pthread_create(&th, NULL,staticMoveAbsolutePositionHomingFunctionForThread,this);
-
+   // pthread_create(&th, NULL,staticMoveAbsolutePositionHomingFunctionForThread,this);
+staticMoveAbsolutePositionHomingFunctionForThread((void*)this);
     return 0;
 }
 
@@ -1849,7 +1844,7 @@ void* TechnoSoftLowDriver::staticStopMotionForThread(void* objPointer){ // Metod
     //objPointer permettera' al thread di eseguire le funzione membro della classe TechnoSoftLowDriver
     ((TechnoSoftLowDriver*)objPointer)->stopMotion();
 
-    pthread_exit(NULL);
+return NULL;
 }
 
 int TechnoSoftLowDriver::hardreset(bool mode){
@@ -1956,6 +1951,8 @@ int TechnoSoftLowDriver::stopPower(){
 }
 
 int TechnoSoftLowDriver::deinit(){ // Identical to TechnoSoftLowDriver::stopPower()
+  //  pthread_join(thstaticFaultsGeneration,NULL);
+   // pthread_join(th,NULL);
 
     //DPRINT("TechnoSoftLowDriver %d object is deallocated",axisID);
     return 0;
@@ -2117,7 +2114,7 @@ int TechnoSoftLowDriver::resetEncoderHoming(){
 //    
 //    pthread_t th;
 //    pthread_create(&th, NULL,staticResetEncoderForThread,this);
-   
+   staticResetEncoderForThread((void*)this);
     positionEncoder = 0;
     //position = 0;
    
@@ -2127,7 +2124,7 @@ int TechnoSoftLowDriver::resetEncoderHoming(){
 void* TechnoSoftLowDriver::staticResetEncoderForThread(void* objPointer){
 
     ((TechnoSoftLowDriver*)objPointer)->resetEncoderHoming();
-    pthread_exit(NULL);
+    return NULL;
 }
 
 int TechnoSoftLowDriver::setEventOnLimitSwitch(short lswType, short transitionType, BOOL waitEvent, BOOL enableStop){
@@ -2283,7 +2280,7 @@ void* TechnoSoftLowDriver::staticFaultsGeneration(void* objPointer){
     ((TechnoSoftLowDriver*)objPointer)->faultsGeneration();
 
     //DPRINT("Uscita dal thread faultsGeneration");
-    pthread_exit(NULL); 
+    return NULL;
 }
 
 int TechnoSoftLowDriver::resetFault(){
