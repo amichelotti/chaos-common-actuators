@@ -107,7 +107,7 @@ typedef enum {
         
         virtual int setParameter(int axisID, std::string parName,std::string value)=0; // (2)
         
-        virtual int moveRelativeMillimeters(int axisID,double mm)=0;  // (2)
+        virtual int moveRelative(int axisID,double mm)=0;  // (2)
 
 virtual int getParameter(int axisID,std::string parName,std::string& resultString)=0;
 
@@ -177,7 +177,7 @@ virtual int getParameter(int axisID,std::string parName,std::string& resultStrin
         virtual int resetAlarms(int axisID,uint64_t alrm)=0;                     // (2)
         virtual int poweron(int axisID,int on)=0;
         virtual uint64_t getFeatures()=0;
-        virtual int moveAbsoluteMillimeters(int axisID,double mm)=0;
+        virtual int moveAbsolute(int axisID,double mm)=0;
     };
 }
 }

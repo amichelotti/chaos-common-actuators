@@ -56,13 +56,13 @@ namespace common{
                     int configAxis(void*initialization_string);
 
                     int deinit(int axisID); // Rimane da gestire la fase di deinit
-                    int moveRelativeMillimeters(int axisID,double deltaMillimeters); // Non e' relativa a ciascun axis ID
+                    int moveRelative(int axisID,double deltaMillimeters); // Non e' relativa a ciascun axis ID
 
                     int setParameter(int axisID,std::string parName,std::string value); // Non e' relativa a ciascun axis ID
                     
                     int getParameter(int axisID,std::string parName,std::string& resultString);
   
-                    int moveAbsoluteMillimeters(int axisID,double mm);                       // *******OK********
+                    int moveAbsolute(int axisID,double mm);                       // *******OK********
 
                     int poweron(int axisID,int on);                                          // *******OK********
                     //int selectAxis(); // Non e' relativa a ciascun axis ID
