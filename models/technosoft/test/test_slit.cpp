@@ -256,7 +256,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
     DPRINT("************** Prima movimentazione relativa in AVANTI **************");
     sleep(5);
     int resp;
-    if((resp=OBJ->moveRelativeMillimeters(axisID,50))<0){
+    if((resp=OBJ->moveRelative(axisID,50))<0){
         DPRINT("************** Error returned by movement operation, code error %d **************",resp);
     }
 //    sleep(120);

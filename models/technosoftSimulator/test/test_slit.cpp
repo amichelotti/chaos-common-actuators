@@ -253,7 +253,7 @@ int procedura(common::actuators::AbstractActuator *OBJ,int numSeq){
     checkProcedures((void*)&hd2);
     
     int resp;
-    if((resp=OBJ->moveRelativeMillimeters(axisID,5))<0){
+    if((resp=OBJ->moveRelative(axisID,5))<0){
         DPRINT("************** Error returned by movement operation, code error %d **************",resp);
     }
     
