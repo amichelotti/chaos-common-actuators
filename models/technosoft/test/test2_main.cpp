@@ -76,7 +76,7 @@ int main(int argc,const char* argv[]){
 	double relPosition;
 	std::cout<<"Enter number of millimeters for motion: " << std::endl;
 	std::cin>>relPosition;
-	if(ActuatorTechSoft.moveRelativeMillimeters(relPosition)!=0){
+	if(ActuatorTechSoft.moveRelative(relPosition)!=0){
 		std::cout<<"Errore movimentazione relativa in millimetri: " << std::endl;
 		return -6;
 	}

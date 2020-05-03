@@ -986,7 +986,7 @@ int ActuatorTechnoSoft::getParameter(int axisID, std::string parName,
   return 0;
 }
 
-int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,
+int ActuatorTechnoSoft::moveRelative(int axisID,
                                                 double deltaMillimeters) {
    DPRINT("moving relative %f mm",deltaMillimeters);
 
@@ -1024,7 +1024,7 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,
 }
 
 // Move absolute homing
-int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,
+int ActuatorTechnoSoft::moveAbsolute(int axisID,
                                                 double millimeters) {
 
   // ************************** Operazione di selezione axisID

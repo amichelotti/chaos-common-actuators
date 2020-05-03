@@ -953,7 +953,7 @@ int ActuatorTechnoSoft::setParameter(int axisID,std::string parName,std::string 
     }
 }
 
-int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimeters){
+int ActuatorTechnoSoft::moveRelative(int axisID,double deltaMillimeters){
     DPRINT("moving relative %f mm",deltaMillimeters);
     
     // ************************** Operazione di selezione axisID ***************************
@@ -985,7 +985,7 @@ int ActuatorTechnoSoft::moveRelativeMillimeters(int axisID,double deltaMillimete
 
 
 // Move absolute homing
-int ActuatorTechnoSoft::moveAbsoluteMillimeters(int axisID,double millimeters){ 
+int ActuatorTechnoSoft::moveAbsolute(int axisID,double millimeters){ 
     
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
