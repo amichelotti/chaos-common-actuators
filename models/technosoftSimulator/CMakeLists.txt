@@ -11,7 +11,10 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug boost_regex boost_log boost_s
 if(COMMON_TEST)
 ADD_EXECUTABLE(test_technosoftSim_slit test/test_slit.cpp)
 TARGET_LINK_LIBRARIES(test_technosoftSim_slit ${PROJECT_NAME} chaos_common common_actuators common_debug ${chaoslib} ${FrameworkLib} )
-INSTALL_TARGETS(/bin test_technosoftSim_slit)
+
+INSTALL(TARGETS test_technosoftSim_slit
+        DESTINATION "bin"
+        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 ENDIF()
 
 FILE(GLOB model_src *.h)    
