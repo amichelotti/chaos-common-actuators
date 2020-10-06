@@ -10,9 +10,12 @@ FILE(GLOB src *.cpp)
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${src} )
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} common_debug TML_lib tmlcomm)
-ADD_EXECUTABLE(test_technosoft_slit test/test_slit.cpp)
-TARGET_LINK_LIBRARIES(test_technosoft_slit ${PROJECT_NAME} chaos_common common_actuators common_debug ${chaoslib} tmlcomm ${FrameworkLib})
 
+#ADD_EXECUTABLE(test_technosoft_slit test/test_slit.cpp)
+IF(KAFKA_ASIO_ENABLE)
+
+# TARGET_LINK_LIBRARIES(test_technosoft_slit ${PROJECT_NAME} common_actuators common_debug ${chaoslib} tmlcomm chaos_common ${FrameworkLib} z)
+ENDIF()
 
 FILE(GLOB model_src *.h)    
  
@@ -24,6 +27,6 @@ INSTALL(TARGETS ${PROJECT_NAME}
         DESTINATION "lib"
         PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
-INSTALL(TARGETS test_technosoft_slit
-        DESTINATION "bin"
-        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+#INSTALL(TARGETS test_technosoft_slit
+#        DESTINATION "bin"
+#        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
