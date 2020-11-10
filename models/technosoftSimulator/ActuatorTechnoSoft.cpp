@@ -1613,9 +1613,10 @@ using namespace chaos::common::data::structured;
 int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
   dataset.clear();
   dataset = "{\"attributes\":[";
-  dataset += "{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal "
+ /* dataset += "{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal "
              "profile\",\"datatype\":\"double\",\"direction\":\"Input\","
              "\"min\":\"0.001\",\"max\":\"500.0\",\"default\":\"400.0\"},";
+  */
   dataset += "{\"name\":\"acceleration\",\"description\":\"Acceleration of "
              "trapezoidal "
              "profile\",\"datatype\":\"double\",\"direction\":\"Input\","
