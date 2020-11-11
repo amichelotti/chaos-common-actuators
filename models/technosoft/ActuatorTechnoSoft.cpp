@@ -1037,7 +1037,7 @@ int ActuatorTechnoSoft::moveAbsolute(int axisID,double millimeters){
 //}
 
 int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
-    DPRINT("Position reading, axisID %d",axisID);
+  //  DPRINT("Position reading, axisID %d",axisID);
     
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
