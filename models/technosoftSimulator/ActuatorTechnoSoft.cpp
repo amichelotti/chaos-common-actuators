@@ -1083,7 +1083,7 @@ int ActuatorTechnoSoft::moveAbsolute(int axisID,
 
 int ActuatorTechnoSoft::getPosition(int axisID, readingTypes mode,
                                     double *deltaPosition_mm) {
-  DPRINT("Position reading, axisID %d", axisID);
+  //DPRINT("Position reading, axisID %d", axisID);
 
   // ************************** Operazione di selezione axisID
   // ***************************
