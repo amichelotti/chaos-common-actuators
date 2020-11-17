@@ -104,7 +104,7 @@ int getSWVersion(int axisID, std::string& version);
         @return 0 if success or an error code
         */
 
-int sendDataset(std::string& dataset);
+int listParameters(std::string& dataset);
         };
 
         }

@@ -130,7 +130,7 @@ namespace common{
         @return 0 if success or an error code
         */
 	
-	int sendDataset(std::string& dataset);
+	int listParameters(std::string& dataset);
         };
 	}
     }

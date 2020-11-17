@@ -1610,7 +1610,7 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string &version) {
   return 0;
 }
 using namespace chaos::common::data::structured;
-int ActuatorTechnoSoft::sendDataset(std::string &dataset) {
+int ActuatorTechnoSoft::listParameters(std::string &dataset) {
   dataset.clear();
   dataset = "{\"attributes\":[";
  /* dataset += "{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal "

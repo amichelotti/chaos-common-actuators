@@ -156,7 +156,7 @@ virtual int getParameter(int axisID,std::string parName,std::string& resultStrin
 @brief returns a string containing the dataset attributes from driver which responds to SetParameter method
 
 */
-        virtual int sendDataset(std::string& dataset)=0; // ****Da implementare***  (2)
+        virtual int listParameters(std::string& dataset)=0; // ****Da implementare***  (2)
          /**
 
         @brief stop the motion of the actuator 

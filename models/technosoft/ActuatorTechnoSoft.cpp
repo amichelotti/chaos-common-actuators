@@ -1505,7 +1505,7 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
     return 0; 
 }
 
-int ActuatorTechnoSoft::sendDataset(std::string& dataset){
+int ActuatorTechnoSoft::listParameters(std::string& dataset){
    dataset.clear();
    dataset="{\"attributes\":[";
    dataset+="{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"500.0\",\"default\":\"400.0\"},";
