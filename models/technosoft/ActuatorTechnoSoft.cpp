@@ -48,7 +48,7 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        deinit(it->first); 
+        deinitACT(it->first); 
         //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
     } 
     // Remove all the element from the map container
@@ -79,7 +79,7 @@ void trimChar(std::string& str,char rm){
   else str.erase(str.begin(), str.end());
 }
 
-int ActuatorTechnoSoft::init(void*initialization_string){
+int ActuatorTechnoSoft::initACT(void*initialization_string){
 #ifdef CHAOS
     using namespace std;
     if ((initialization_string == NULL) )
@@ -217,7 +217,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             }  
             int val;
             
-            if((val=driver->init(conf_path,axid))<0){
+            if((val=driver->initACT(conf_path,axid))<0){
                 ERR("****************Tipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
@@ -368,7 +368,7 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
     return 0;
 }
 
-int ActuatorTechnoSoft::deinit(int axisID){
+int ActuatorTechnoSoft::deinitACT(int axisID){
     //readyState=false;
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);

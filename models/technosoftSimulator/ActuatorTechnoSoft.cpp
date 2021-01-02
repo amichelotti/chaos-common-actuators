@@ -64,7 +64,7 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft() {
   delectingActuator = true;
   for (std::map<int, TechnoSoftLowDriver *>::iterator it = motors.begin();
        it != motors.end(); ++it) {
-    deinit(it->first);
+    deinitACT(it->first);
     // DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID
     // %d",it->first);
   }
@@ -97,7 +97,7 @@ void trimChar(std::string &str, char rm) {
   } else
     str.erase(str.begin(), str.end());
 }
-int ActuatorTechnoSoft::init(void *initialization_string) {
+int ActuatorTechnoSoft::initACT(void *initialization_string) {
 
 #ifdef CHAOS
   using namespace std;
@@ -372,7 +372,7 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode) {
   return 0;
 }
 
-int ActuatorTechnoSoft::deinit(int axisID) {
+int ActuatorTechnoSoft::deinitACT(int axisID) {
   // readyState=false;
   // Controllo costruzione oggetto axisID
   std::map<int, TechnoSoftLowDriver *>::iterator i = motors.find(axisID);
