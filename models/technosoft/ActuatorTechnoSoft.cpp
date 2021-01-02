@@ -217,7 +217,7 @@ int ActuatorTechnoSoft::configAxis(void*initialization_string){
             }  
             int val;
             
-            if((val=driver->initACT(conf_path,axid))<0){
+            if((val=driver->init(conf_path,axid))<0){
                 ERR("****************Tipologia di errore in fase di inizializzazione dell'oggetto technosoft low driver %d",val);
                 delete driver;
                 driver = NULL;
