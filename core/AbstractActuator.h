@@ -127,13 +127,13 @@ virtual int getParameter(int axisID,std::string parName,std::string& resultStrin
         @brief initialize and poweron the motor
         @return 0 if success
         */
-        virtual int initACT(void*)=0;
+        virtual int initACT(int axisID,void*)=0;
          /**
            @brief de-initialize the actuator and close the communication
            @return 0 if success
           */
             
-        virtual int configAxis(void*initialization_string)=0;
+        virtual int configAxis(int axisID,void*initialization_string)=0;
 
         virtual int deinitACT(int axisID)=0; // (2)      
         virtual int hardreset(int axisID, bool mode)=0;

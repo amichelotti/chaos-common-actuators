@@ -52,8 +52,8 @@ namespace common{
                     ActuatorTechnoSoft& operator=(const ActuatorTechnoSoft& objActuator); // Overloading operatore assegnamento
                     ~ActuatorTechnoSoft();
 
-                    int initACT(void*initialization_string);
-                    int configAxis(void*initialization_string);
+                    int initACT(int axis,void*initialization_string);
+                    int configAxis(int axis,void*initialization_string);
 
                     int deinitACT(int axisID); // Rimane da gestire la fase di deinit
                     int moveRelative(int axisID,double deltaMillimeters); // Non e' relativa a ciascun axis ID

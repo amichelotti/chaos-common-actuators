@@ -97,7 +97,7 @@ void trimChar(std::string &str, char rm) {
   } else
     str.erase(str.begin(), str.end());
 }
-int ActuatorTechnoSoft::initACT(void *initialization_string) {
+int ActuatorTechnoSoft::initACT(int axis,void *initialization_string) {
 
 #ifdef CHAOS
   using namespace std;
@@ -173,7 +173,7 @@ int ActuatorTechnoSoft::initACT(void *initialization_string) {
   return 0;
 }
 
-int ActuatorTechnoSoft::configAxis(void *initialization_string) {
+int ActuatorTechnoSoft::configAxis(int axis,void *initialization_string) {
 
   DPRINT("ALEDEBUG: Entered in configAxis simul ");
   if (initialization_string != NULL) {
