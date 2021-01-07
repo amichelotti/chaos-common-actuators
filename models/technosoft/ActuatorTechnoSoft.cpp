@@ -79,7 +79,7 @@ void trimChar(std::string& str,char rm){
   else str.erase(str.begin(), str.end());
 }
 
-int ActuatorTechnoSoft::initACT(void*initialization_string){
+int ActuatorTechnoSoft::initACT(int axisID,void*initialization_string){
 #ifdef CHAOS
     using namespace std;
     if ((initialization_string == NULL) )
@@ -158,7 +158,7 @@ int ActuatorTechnoSoft::initACT(void*initialization_string){
     return -4;
 }
 
-int ActuatorTechnoSoft::configAxis(void*initialization_string){
+int ActuatorTechnoSoft::configAxis(int axisID,void*initialization_string){
     std::string params;
 
     params.assign((const char*)initialization_string);
