@@ -52,10 +52,10 @@ namespace common{
                     ActuatorTechnoSoft& operator=(const ActuatorTechnoSoft& objActuator); // Overloading operatore assegnamento 
                     ~ActuatorTechnoSoft();
                     
-                    int init(void*initialization_string);
-                    int configAxis(void*initialization_string);     
+                    int initACT(int axisID,void*initialization_string);
+                    int configAxis(int axisID,void*initialization_string);     
                     
-                    int deinit(int axisID); // Rimane da gestire la fase di deinit
+                    int deinitACT(int axisID); // Rimane da gestire la fase di deinit
                     int moveRelative(int axisID,double deltaMillimeters); // Non e' relativa a ciascun axis ID
                     
                     int setParameter(int axisID,std::string parName,std::string value); // Non e' relativa a ciascun axis ID
@@ -130,7 +130,7 @@ namespace common{
         @return 0 if success or an error code
         */
 	
-	int sendDataset(std::string& dataset);
+	int listParameters(std::string& dataset);
         };
 	}
     }

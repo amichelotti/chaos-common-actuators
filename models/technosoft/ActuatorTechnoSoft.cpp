@@ -48,7 +48,7 @@ ActuatorTechnoSoft::~ActuatorTechnoSoft(){
     DPRINT("Deleting Actuator Technosoft");
     delectingActuator = true;
     for (std::map<int,TechnoSoftLowDriver *> ::iterator it=motors.begin(); it!=motors.end(); ++it){
-        deinit(it->first); 
+        deinitACT(it->first); 
         //DPRINT("Deallocazione oggetto actuatorTechnSoft con axis ID %d",it->first);
     } 
     // Remove all the element from the map container
@@ -79,7 +79,7 @@ void trimChar(std::string& str,char rm){
   else str.erase(str.begin(), str.end());
 }
 
-int ActuatorTechnoSoft::init(void*initialization_string){
+int ActuatorTechnoSoft::initACT(int axisID,void*initialization_string){
 #ifdef CHAOS
     using namespace std;
     if ((initialization_string == NULL) )
@@ -158,7 +158,7 @@ int ActuatorTechnoSoft::init(void*initialization_string){
     return -4;
 }
 
-int ActuatorTechnoSoft::configAxis(void*initialization_string){
+int ActuatorTechnoSoft::configAxis(int axisID,void*initialization_string){
     std::string params;
 
     params.assign((const char*)initialization_string);
@@ -368,7 +368,7 @@ int ActuatorTechnoSoft::hardreset(int axisID, bool mode){
     return 0;
 }
 
-int ActuatorTechnoSoft::deinit(int axisID){
+int ActuatorTechnoSoft::deinitACT(int axisID){
     //readyState=false;
     // Controllo costruzione oggetto axisID
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
@@ -1037,7 +1037,7 @@ int ActuatorTechnoSoft::moveAbsolute(int axisID,double millimeters){
 //}
 
 int ActuatorTechnoSoft::getPosition(int axisID,readingTypes mode, double* deltaPosition_mm){
-    DPRINT("Position reading, axisID %d",axisID);
+  //  DPRINT("Position reading, axisID %d",axisID);
     
     // ************************** Operazione di selezione axisID ***************************
     std::map<int,TechnoSoftLowDriver* >::iterator i = motors.find(axisID);
@@ -1505,7 +1505,7 @@ int ActuatorTechnoSoft::getHWVersion(int axisID, std::string& version){
     return 0; 
 }
 
-int ActuatorTechnoSoft::sendDataset(std::string& dataset){
+int ActuatorTechnoSoft::listParameters(std::string& dataset){
    dataset.clear();
    dataset="{\"attributes\":[";
    dataset+="{\"name\":\"speed\",\"description\":\"Max speed of trapezoidal profile\",\"datatype\":\"double\",\"direction\":\"Input\",\"min\":\"0.001\",\"max\":\"500.0\",\"default\":\"400.0\"},";
