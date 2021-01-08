@@ -127,15 +127,15 @@ virtual int getParameter(int axisID,std::string parName,std::string& resultStrin
         @brief initialize and poweron the motor
         @return 0 if success
         */
-        virtual int init(void*)=0;
+        virtual int initACT(int axisID,void*)=0;
          /**
            @brief de-initialize the actuator and close the communication
            @return 0 if success
           */
             
-        virtual int configAxis(void*initialization_string)=0;
+        virtual int configAxis(int axisID,void*initialization_string)=0;
 
-        virtual int deinit(int axisID)=0; // (2)      
+        virtual int deinitACT(int axisID)=0; // (2)      
         virtual int hardreset(int axisID, bool mode)=0;
             
         /**
@@ -156,7 +156,7 @@ virtual int getParameter(int axisID,std::string parName,std::string& resultStrin
 @brief returns a string containing the dataset attributes from driver which responds to SetParameter method
 
 */
-        virtual int sendDataset(std::string& dataset)=0; // ****Da implementare***  (2)
+        virtual int listParameters(std::string& dataset)=0; // ****Da implementare***  (2)
          /**
 
         @brief stop the motion of the actuator 
