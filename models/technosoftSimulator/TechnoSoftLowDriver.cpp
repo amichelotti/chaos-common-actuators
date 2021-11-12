@@ -2107,14 +2107,11 @@ int TechnoSoftLowDriver::resetCounterHoming(){
 int TechnoSoftLowDriver::resetEncoderHoming(){
     
     // Simulazione dialogo con il drive/motor
-    int random_variable = std::rand();
-    if(random_variable<p*(RAND_MAX)){
-        return -1;
-    }
+  
 //    
 //    pthread_t th;
 //    pthread_create(&th, NULL,staticResetEncoderForThread,this);
-   staticResetEncoderForThread((void*)this);
+    sleep(3); // wait 3 seconds in order to simulate a movement
     positionEncoder = 0;
     //position = 0;
    
