@@ -231,7 +231,7 @@ namespace common{
                 //double speedfromIUTOMMs(double _speed_IU);
                 //double accelerationfromIUToMMs(double _acceleration_IU);
                 
-                
+                int soft_homing(double positionToSet);
                 int homing(int mode);
                 
                 int getinternalHomingStateDefault();

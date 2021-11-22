@@ -366,7 +366,7 @@ namespace common{
 
 
                 int homing(int mode);
-
+                int soft_homing(double positionToSet);
                 int getinternalHomingStateDefault();
                 int getinternalHomingStateHoming2();
 		double speedfromMMsToIU(double _speed_mm_s);
