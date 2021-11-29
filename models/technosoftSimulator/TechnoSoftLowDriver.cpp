@@ -372,6 +372,12 @@ int TechnoSoftLowDriver::init(const std::string& setupFilePath,
     return 0;
 }
 
+int TechnoSoftLowDriver::soft_homing(double positionToSet)
+{
+    return -1;
+}
+
+
 int TechnoSoftLowDriver::homing(int mode){
     // Attenzione: la variabile mode non viene utilizzata
     if(controlLNS){

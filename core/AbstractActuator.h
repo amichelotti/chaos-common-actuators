@@ -172,6 +172,7 @@ virtual int getParameter(int axisID,std::string parName,std::string& resultStrin
         } homingType;
 
         virtual int homing(int axisID,homingType mode)=0;                        // (2) 
+        virtual int soft_homing(int axisID,double positionToSet)=0;
         virtual int getState(int axisID,int* state, std::string& desc)=0;        // (2) 
         virtual int getAlarms(int axisID,uint64_t*alrm,std::string& desc)=0;     // (2) 
         virtual int resetAlarms(int axisID,uint64_t alrm)=0;                     // (2)

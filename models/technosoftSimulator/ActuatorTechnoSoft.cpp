@@ -1152,6 +1152,24 @@ int ActuatorTechnoSoft::getPosition(int axisID, readingTypes mode,
   return 0;
 }
 
+
+int ActuatorTechnoSoft::soft_homing(int axisID,double positionToSet)
+{
+  std::map<int, TechnoSoftLowDriver *>::iterator i = motors.find(axisID);
+  // Controlliamo comunque se l'axis id e' stato configurato
+  if (i == motors.end()) {
+    // In questo caso il motore axisID non e' stato configurato
+    ERR("Motor not configured axis:%d", axisID);
+
+    return -1;
+  }
+
+  if ((i->second)->selectAxis() < 0) {
+    return -2;
+  }
+  return ((i->second)->soft_homing(positionToSet));
+}
+
 int ActuatorTechnoSoft::homing(int axisID, homingType mode) {
 
   // ************************** Operazione di selezione axisID

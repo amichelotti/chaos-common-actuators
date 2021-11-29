@@ -73,7 +73,8 @@ namespace common{
 
                     int stopMotion(int axisID);                                              // *******OK********
                     int getPosition(int axisID,readingTypes mode, double* deltaPosition_mm); // *******OK********
-                    int homing(int axisID,homingType mode);                                  // ************* GESTIONE HOMING **************
+                    int homing(int axisID,homingType mode);                                    // ************* GESTIONE HOMING **************
+                    int soft_homing(int axisID,double positionToSet);
                     int getState(int axisID,int* state, std::string& desc );                 // *******OK********
                     int getAlarms(int axisID,uint64_t*alrm, std::string& descStr);           // *******OK********
                     uint64_t getFeatures(){return 0;}
