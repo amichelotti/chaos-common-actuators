@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 project(actuators_models)
   add_subdirectory(technosoftSimulator)
 IF("${CMAKE_C_COMPILER}" MATCHES "i686-nptl-linux-gnu-gcc") 
