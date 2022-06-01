@@ -382,22 +382,8 @@ int ActuatorTechnoSoft::deinitACT(int axisID) {
 
     // In questo caso il motore axisID non e' stato configurato, non c'e' quindi
     // alcun motore da inizializzare
-    return -1;
   }
-  // Invio comando stop di movimentazione al motore
-  //    if((i->second)->selectAxis()<0)
-  //        return -2;
-  // ************* Simula INVIO comando selectAxis ****************
-  int random_variable = std::rand();
-  if (random_variable < (RAND_MAX / 40))
-    return -2;
-  // ************* Simula INVIO comando stopMotion() ****************
-  //    if((i->second)->stopMotion()<0)
-  //        return -3;
-  random_variable = std::rand();
-  if (random_variable < (RAND_MAX / 40))
-    return -3;
-
+ 
   if (((i->second)->actuatorIDInMotion) == true)
     // ............... GESTIRE LO STOP VIRTUALE DEL MOTORE ATTRAVERSO IL LOCK
     // ...............
@@ -406,10 +392,7 @@ int ActuatorTechnoSoft::deinitACT(int axisID) {
 
     //    if((i->second)->stopPower()<0)
     //        return -4;
-    random_variable = std::rand();
-  if (random_variable < (RAND_MAX / 40))
-    return -4;
-
+  
   // Invio comando apertura circuito alimentazione motore
   if (i->second != NULL) {
     delete (i->second);
