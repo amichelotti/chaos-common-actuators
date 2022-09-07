@@ -23,6 +23,60 @@
 
 using namespace common::actuators;
 
+ std::string AbstractActuator::StatusDecoding(uint64_t status)
+ {
+	 std::string desc = "";
+	 for (int i = 0; i < 64; i++)
+	 {
+
+		 bool check = ((((int64_t) 1) << i) & status) != 0;
+
+		 {
+			 switch (i)
+			 {
+			 case 0: if (check)
+				 desc += "I2T Motor Warning "; break;
+			 case 1: if (check)
+				 desc += "I2T Drive Warning "; break;
+			 case 8: if (check)
+				 desc += "Actuator Ready "; break;
+			 case 9: if (check)
+				 desc += "Over Position Trigger "; break;
+			 case 10: if (check)
+				 desc += "Autorun Enabled "; break;
+			 case 11: if (check)
+				 desc += "Positive Limit Switch Event Occurred "; break;
+			 case 12: if (check)
+				 desc += "Negative Limit Switch Event Occurred "; break;
+			 case 13: if (check)
+				 desc += "Gearing Mode "; break;
+			 case 14: if (check)
+				 desc += "Camming Mode "; break;
+			 case 15: if (check)
+				 desc += "Actuator in Fault "; break;
+			 case 16: if (check)
+				 desc += "Actuator in Motion "; break;
+			 case 17: if (check)
+				 desc += "Actuator Power ON ";
+					else
+				 desc += "Actuator Power OFF ";
+				 break;
+			 case 18: if (check)
+				 desc += "Homing in Progress "; break;
+			 case 19: if (check)
+				 desc += "Positive Limit Switch Active "; break;
+			 case 20: if (check)
+				 desc += "Negative Limit Switch Active "; break;
+			 case 21: if (check)
+				 desc += "Actuator Status Unknown "; break;
+			 default: break;
+
+			 }
+		 }
+	 }
+	 return desc;
+ }
+
 //int AbstractActuator::setTimeout(uint64_t _timeo_ms){ // ******* DA ELIMINARE *******
 //    timeo_ms=_timeo_ms;
 //    return 0;

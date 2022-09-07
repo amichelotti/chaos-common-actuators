@@ -99,7 +99,7 @@ typedef enum {
             uint64_t timeo_homing_ms; // ***** DA ELIMINARE *****            
 
         public:
-
+            static std::string StatusDecoding(uint64_t status);
         chaos::common::data::CDataWrapper  jsonConfiguration;
 
         AbstractActuator() {timeo_ms=0;}; // ***** DA ELIMINARE il corpo *****
