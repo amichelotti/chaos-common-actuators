@@ -22,58 +22,37 @@
 #include "AbstractActuator.h"
 
 using namespace common::actuators;
+#define TEST_STATUS(x,str) if(status&x){desc+=str;}
 
  std::string AbstractActuator::StatusDecoding(uint64_t status)
  {
 	 std::string desc = "";
-	 for (int i = 0; i < 64; i++)
-	 {
+	 TEST_STATUS(ACTUATOR_I2T_WARNING_MOTOR,"I2T Motor Warning|");
+	 TEST_STATUS(ACTUATOR_I2T_WARNING_DRIVE,"I2T Drive Warning|");
+	 TEST_STATUS(ACTUATOR_READY,"Actuator Ready|");
+	 TEST_STATUS(ACTUATOR_OVER_POSITION_TRIGGER,"Over Position Trigger|");
+	 TEST_STATUS(ACTUATOR_AUTORUN_ENABLED,"Autorun Enabled|");
+	 TEST_STATUS(ACTUATOR_LSP_EVENT_INTERRUPUT,"Positive Limit Switch Event Occurred|");
+	 TEST_STATUS(ACTUATOR_LSN_EVENT_INTERRUPT,"Negative Limit Switch Event Occurred|");
+	 TEST_STATUS(ACTUATOR_IN_GEAR,"Gearing Mode|");
+	 TEST_STATUS(ACTUATOR_IN_CAM,"Camming Mode|");
+	 TEST_STATUS(ACTUATOR_FAULT,"Actuator in Fault|");
+	 TEST_STATUS(ACTUATOR_INMOTION,"Actuator in Motion|");
+	 TEST_STATUS(ACTUATOR_POWER_SUPPLIED,"Actuator Power ON|");
+	 TEST_STATUS(HOMING_IN_PROGRESS,"Homing in Progress|");
+	 TEST_STATUS(ACTUATOR_LSP_LIMIT_ACTIVE,"Positive Limit Switch Active|");
+	 TEST_STATUS(ACTUATOR_LSN_LIMIT_ACTIVE,"Negative Limit Switch Active|");
+	 TEST_STATUS(ACTUATOR_AT_HOME,"At Home|");
+	 TEST_STATUS(ACTUATOR_HOMED,"Home Done|");
+	 TEST_STATUS(ACTUATOR_ENCODER,"Actuator has encoder|");
+	 TEST_STATUS(ACTUATOR_MOTION_COMPLETE,"Motion Done|");
+	 TEST_STATUS(ACTUATOR_COMM_ERROR,"Communication Error|");
+	 TEST_STATUS(ACTUATOR_STALL_ERROR,"Stall Error|");
+	 TEST_STATUS(ACTUATOR_HOME_LIMIT,"Home Limit|");
+	 TEST_STATUS(ACTUATOR_GAIN_CTRL,"Actuator has position ctrl|");
+	 TEST_STATUS(ACTUATOR_POSITION_CTRL,"Actuator has close loop ctrl");
 
-		 bool check = ((((int64_t) 1) << i) & status) != 0;
 
-		 {
-			 switch (i)
-			 {
-			 case 0: if (check)
-				 desc += "I2T Motor Warning "; break;
-			 case 1: if (check)
-				 desc += "I2T Drive Warning "; break;
-			 case 8: if (check)
-				 desc += "Actuator Ready "; break;
-			 case 9: if (check)
-				 desc += "Over Position Trigger "; break;
-			 case 10: if (check)
-				 desc += "Autorun Enabled "; break;
-			 case 11: if (check)
-				 desc += "Positive Limit Switch Event Occurred "; break;
-			 case 12: if (check)
-				 desc += "Negative Limit Switch Event Occurred "; break;
-			 case 13: if (check)
-				 desc += "Gearing Mode "; break;
-			 case 14: if (check)
-				 desc += "Camming Mode "; break;
-			 case 15: if (check)
-				 desc += "Actuator in Fault "; break;
-			 case 16: if (check)
-				 desc += "Actuator in Motion "; break;
-			 case 17: if (check)
-				 desc += "Actuator Power ON ";
-					else
-				 desc += "Actuator Power OFF ";
-				 break;
-			 case 18: if (check)
-				 desc += "Homing in Progress "; break;
-			 case 19: if (check)
-				 desc += "Positive Limit Switch Active "; break;
-			 case 20: if (check)
-				 desc += "Negative Limit Switch Active "; break;
-			 case 21: if (check)
-				 desc += "Actuator Status Unknown "; break;
-			 default: break;
-
-			 }
-		 }
-	 }
 	 return desc;
  }
 

@@ -45,26 +45,34 @@ typedef enum {
             ACTUATOR_I2T_WARNING_DRIVE = 0x2,
     
             // ******** dal nono bit in poi ci sono gli stati *******
-            ACTUATOR_READY = 0x100, 
+            ACTUATOR_READY = 0x10, 
 
-            ACTUATOR_OVER_POSITION_TRIGGER = 0x200, // Position trigger
-            ACTUATOR_AUTORUN_ENABLED = 0x400, // Auto run mode status
-            ACTUATOR_LSP_EVENT_INTERRUPUT = 0x800, // Limit switch positive event/interrupt
-            ACTUATOR_LSN_EVENT_INTERRUPT = 0x1000, // Limit switch negative event/interrupt
+            ACTUATOR_OVER_POSITION_TRIGGER = 0x20, // Position trigger
+            ACTUATOR_AUTORUN_ENABLED = 0x40, // Auto run mode status
+            ACTUATOR_LSP_EVENT_INTERRUPUT = 0x80, // Limit switch positive event/interrupt
+            ACTUATOR_LSN_EVENT_INTERRUPT = 0x100, // Limit switch negative event/interrupt
            
-            ACTUATOR_IN_GEAR = 0x2000, // Gear ratio in electronic gearing mode
-            ACTUATOR_IN_CAM = 0x4000, // Reference position in absolute electronic camming mode
-            ACTUATOR_FAULT=0x8000, // Fault status
+            ACTUATOR_IN_GEAR = 0x200, // Gear ratio in electronic gearing mode
+            ACTUATOR_IN_CAM = 0x400, // Reference position in absolute electronic camming mode
+            ACTUATOR_FAULT=0x800, // Fault status
 
             // Low part of the status
-            ACTUATOR_INMOTION = 0x10000, 
-            ACTUATOR_POWER_SUPPLIED = 0x20000,  // cambiare nome
-            HOMING_IN_PROGRESS = 0x40000,
-            ACTUATOR_LSP_LIMIT_ACTIVE=0x80000,        
-            ACTUATOR_LSN_LIMIT_ACTIVE=0x100000,
-                    
+            ACTUATOR_INMOTION        = 0x1000, 
+            ACTUATOR_POWER_SUPPLIED  = 0x2000,  // cambiare nome
+            HOMING_IN_PROGRESS       = 0x4000,
+            ACTUATOR_LSP_LIMIT_ACTIVE= 0x8000,        
+            ACTUATOR_LSN_LIMIT_ACTIVE= 0x10000,
+            ACTUATOR_AT_HOME         = 0x20000, // at home
+            ACTUATOR_HOMED           = 0x40000, // home done
+            ACTUATOR_ENCODER         = 0x80000, // has encoder
+            ACTUATOR_MOTION_COMPLETE = 0x100000, // motion complete
+            ACTUATOR_COMM_ERROR      = 0x200000, // comunication error
+            ACTUATOR_STALL_ERROR     = 0x400000, // stall or other error
+            ACTUATOR_HOME_LIMIT      = 0x800000, // home limit switch hit
+            ACTUATOR_GAIN_CTRL       = 0x1000000, //  motor supports closed-loop position control.
+            ACTUATOR_POSITION_CTRL   = 0x2000000, //  position control enabled
             // Unknown status
-            ACTUATOR_UNKNOWN_STATUS = 0x200000  // Unknown state of the actuator
+            ACTUATOR_UNKNOWN_STATUS  = 0x80000000  // Unknown state of the actuator
         } actuatorStatus;
 
         typedef enum {
