@@ -7,7 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <sstream>
-#include <boost/regex.hpp>
+#include <regex>
 
 using namespace common::actuators::models;
 #define USAGE \
@@ -329,16 +329,16 @@ void* function1(void* str){
 
 
 bool validate_card_format(const std::string& s){
-    static const boost::regex e("(\\d{4}[-]){3}\\d{4}"); // Formato che la stringa in input deve rispettare: 1234-5678-0321-8756
+    static const std::regex e("(\\d{4}[-]){3}\\d{4}"); // Formato che la stringa in input deve rispettare: 1234-5678-0321-8756
     return regex_match(s, e);
 }
 
 // match any format with the regular expression:
-const boost::regex e("\\A(\\d{3,4})[- ]?(\\d{4})[- ]?(\\d{4})[- ]?(\\d{4})\\z");
-const boost::regex str("(\\w+)\\W+(\\w+)");
+const std::regex e("\\A(\\d{3,4})[- ]?(\\d{4})[- ]?(\\d{4})[- ]?(\\d{4})\\z");
+const std::regex str("(\\w+)\\W+(\\w+)");
 
-static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(\\d),(\\d+),\\d*.\\d*,(.+)");
-static const boost::regex driver_match2("(\\d+),(.+)");
+static const std::regex driver_match1("(\\d+),(\\d+),(\\d+),(\\d),(\\d+),\\d*.\\d*,(.+)");
+static const std::regex driver_match2("(\\d+),(.+)");
 
 //"14,/home/caschera/chaos_bundle/common/actuators/models/technosoft/conf/1setup001.t.zip"
 
@@ -351,10 +351,10 @@ const std::string machine_format("\\1\\2\\3\\4");
 const std::string human_format("\\1-\\2-\\3-\\4");
 
 std::string machine_readable_card_number(const std::string s){
-    return regex_replace(s, e, machine_format, boost::match_default | boost::format_sed);
+    return regex_replace(s, e, machine_format, std::regex::constants::match_default | std::regex::constants::format_sed);
 }
 std::string human_readable_card_number(const std::string s){
-    return regex_replace(s, e, human_format, boost::match_default | boost::format_sed);
+    return regex_replace(s, e, human_format, std::regex::constants::match_default | std::regex::constants::format_sed);
 }
 
 int main(int argc,const char* argv[]){
