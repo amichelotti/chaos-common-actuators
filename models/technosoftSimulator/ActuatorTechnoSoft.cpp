@@ -16,7 +16,7 @@
 #include "ActuatorTechnoSoft.h"
 #include <stdio.h>
 
-#include <boost/regex.hpp>
+#include <regex>
 #include <common/debug/core/debug.h>
 //#include <cstdlib.h>
 
@@ -29,6 +29,7 @@
 #include <cctype>
 #include <common/misc/driver/ConfigDriverMacro.h>
 #include <functional>
+#include <regex>
 #include <locale> // std::locale, std::toupper
 #ifdef CHAOS
 #include <chaos/common/data/CDataWrapper.h>
@@ -42,10 +43,10 @@ using namespace ::common::actuators;
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su
 //modulo Technosoft
 
-static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
+static const std::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration
 // path>,<axisid>,<hostid> (\\w+)
-static const boost::regex driver_match2("(\\d+),(.+)");
+static const std::regex driver_match2("(\\d+),(.+)");
 //(([1-9][0-9]*\\.?[0-9]*)|(\\.[0-9]+))([Ee][+-]?[0-9]+)?
 
 // std::map<int, TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
@@ -131,41 +132,6 @@ int ActuatorTechnoSoft::initACT(int axis,void *initialization_string) {
   
 #endif
 
- /* std::string params;
-  params.assign((const char *)initialization_string);
-  boost::smatch match;
-
-  DPRINT("Initialization string %s", params.c_str());
-
-  if (regex_match(params, match, driver_match1, boost::match_extra)) {
-
-    std::string strHostID = match[1];
-    hostID = atoi(strHostID.c_str());
-    std::string strbtType = match[2];
-    btType = atoi(strbtType.c_str());
-    std::string strbaudrate = match[3];
-    baudrate = atoi(strbaudrate.c_str());
-    dev_name = match[4];
-
-    // DPRINT("String is matched: hostID: %d, btType: %d, baudrate: %d,serial
-    // channel %s",hostID ,btType ,baudrate,dev_name.c_str());
-
-    // SerialCommChannelTechnosoft objChannel(hostID, dev_name, btType,
-    // baudrate);
-    if (channel == NULL) {
-      channel = new (std::nothrow)
-          SerialCommChannelTechnosoft(hostID, dev_name, btType, baudrate);
-    }
-    if (channel == NULL) {
-      return -2;
-    }
-    // Tentativo apertura canale di comunicazione, simulato
-    if (channel->open() < 0) {
-      return -3;
-    }
-    // initChannelAlreadyDone = true;
-    return 0;
-  }*/
   if(channel==NULL){
     ERR("Cannot initialize with params %s", initialization_string?(const char*)initialization_string:"''");
     return -4;

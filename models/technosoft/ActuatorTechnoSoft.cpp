@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include "ActuatorTechnoSoft.h"
-#include <boost/regex.hpp>
+#include <regex>
 #include <common/debug/core/debug.h>
 //#include <boost/algorithm/string/trim.hpp>
 //#include <boost/algorithm/string/case_conv.hpp>
@@ -30,9 +30,9 @@ using namespace ::common::actuators::models;
 //([\\w\\/]+)int axisID;// numero dell’asse (selezionabile da dip switch su modulo Technosoft
 
 
-static const boost::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
+static const std::regex driver_match1("(\\d+),(\\d+),(\\d+),(.+)");
 // initialisation format <device>,<device name>,<configuration path>,<axisid>,<hostid> (\\w+)
-static const boost::regex driver_match2("(\\d+),(.+)");
+static const std::regex driver_match2("(\\d+),(.+)");
 
 //std::map<int,TechnoSoftLowDriver *> ActuatorTechnoSoft::motors;
 
@@ -118,10 +118,10 @@ int ActuatorTechnoSoft::initACT(int axisID,void*initialization_string){
 #endif
     const std::string& params = (const char*)initialization_string;
     
-    boost::smatch match;
+    std::smatch match;
     DPRINT("Init actuatorTechnosoft Initialization string %s", params.c_str());
     
-    if (regex_match(params, match, driver_match1, boost::match_extra)) 
+    if (regex_match(params, match, driver_match1, std::regex::constants::match_extra)) 
     {
 	std::string strHostID,strbtType,strbaudrate;
 	
@@ -162,7 +162,7 @@ int ActuatorTechnoSoft::configAxis(int axisID,void*initialization_string){
     std::string params;
 
     params.assign((const char*)initialization_string);
-    boost::smatch match;
+    std::smatch match;
 #ifdef CHAOS
     using namespace std;
     if (1)
@@ -197,7 +197,7 @@ int ActuatorTechnoSoft::configAxis(int axisID,void*initialization_string){
 #endif
     DPRINT("Configuration string %s", params.c_str());
     
-    if(regex_match(params, match, driver_match2, boost::match_extra)){
+    if(regex_match(params, match, driver_match2, std::regex::constants::match_extra)){
 
         std::string conf_path=match[2];
         std::string straxid=match[1];

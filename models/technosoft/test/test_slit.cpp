@@ -366,8 +366,8 @@ int main(int argc,const char* argv[]){
     sprintf(sinit1,"%d,%d,%d,%s",hostID,btType,baudrate,dev1);
     
 //    std::string s = "Boost Libraries";
-//    boost::regex expr("\\w+\\s\\w+");
-//    std::cout << std::boolalpha << boost::regex_match(s, expr) << '\n';
+//    std::regex expr("\\w+\\s\\w+");
+//    std::cout << std::boolalpha << std::regex_match(s, expr) << '\n';
 //    
     
     //common::actuators::AbstractActuator*mySlit1 = NULL;
